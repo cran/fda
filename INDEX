@@ -1,0 +1,78 @@
+
+bsplineS                B-spline Basis Function Values
+bsplinepen              B-Spline Penalty Matrix
+cca.2fun.fd             Canonical Correlation for Two Functional Data
+                        Objects
+cca.fd                  Canonical correlation analysis 
+center.fd               Center Functional Data
+create.basis            Create a Basis Object 
+create.bifd             Create a Two-Argument Functional Data Object
+create.bspline.basis    Create a set of B-spline basis functions for
+                        constructing a functional data object. 
+create.constant.basis   Create a Constant Basis
+create.exponential.basis
+                        Create an Exponential Basis
+create.fd               Create a Functional Data Object 
+create.fourier.basis    Create a set of Fourier basis functions for
+                        constructing a functional data object. 
+create.polygonal.basis
+                        Create a Polygonal Basis 
+create.power.basis      Create a Power Basis Object 
+data2fd                 Convert Discrete Data to Functional Data 
+densityfd               Compute a Probability Density Function 
+deriv.fd                Compute a Derivative Functional Data Object 
+df2lambda               Convert Degrees of Freedom to Smoothing
+                        Parameter 
+eval.bifd               Evaluate a Two-argument Functional Data Object 
+eval.fd                 Evaluate a Functional Data Object
+eval.monfd              Evaluate a Monotone Functional Data Object 
+expon                   Exponential Basis Function Values 
+exponpen                Exponential Penalty Matrix 
+fourier                 Fourier Basis Function Values 
+fourierpen              Fourier Penalty Matrix 
+getbasis                Get the Basis Object from a Functional Data
+                        Object 
+getbasismatrix          Get Values of Basis Functions 
+getbasispenalty         Evaluate a Roughness Penalty Matrix 
+getbasistype            Get the Basis Type from a Basis Object 
+getcoef                 Get the Coefficient Array from a Functional
+                        Data Object 
+inprod                  Inner product of two functional data objects or
+                        two basis objects
+lambda2df               Convert Smoothing Parameter to Degrees of
+                        Freedom 
+landmarkreg             Registration of Functional Observations Using
+                        Landmarks 
+lines.fd                Add Lines from Functional Data to a Plot 
+linmod.fd               Fit One of Three Types of Functional Linear
+                        Model. 
+mean.fd                 Mean of Functional Data 
+pca.fd                  Functional Principal Components Analysis 
+plot.cca.fd             Plot Output from Canonical Correlation Function
+                        CCA.FD 
+plot.fd                 Plot a Functional Data Object 
+plot.pca.fd             Plot Output from Principal Components Analysis
+                        Function PCA.FD 
+plotfit.fd              Plot a Functional Data Object Along with Data 
+polyg                   Polygonal Basis Function Values 
+polygpen                Polygonal Penalty Matrix 
+posfd                   Smooth Data with a Positive Function using a
+                        Roughness Penalty 
+powerbasis              Power Basis Function Values 
+powerpen                Power Penalty Matrix 
+print.fd                Print a Functional Data Object 
+project.basis           Approximate Functional Data Using a Basis 
+registerfd              Register Functional Data Objects 
+smooth.Pspline          Smooth Data with Using mth Derivative Penalty 
+smooth.basis            Smooth Data using a Roughness Penalty 
+smooth.fd               Smooth a Functional Data Object Using a
+                        Roughness Penalty 
+smooth.monotone         Monotone Smoothing of Data 
+std.fd                  Standard Deviation of Functional Data 
+sum.fd                  Sum of Functional Data 
+summary.fd              Summarize a Functional Data Object 
+var.fd                  Variance and Covariance Surfaces for a
+                        Functional Data Object 
+varmx.pca.fd            Rotation of Functional Principal Components
+                        with VARIMAX Criterion 
+warpsmth                A Smooth Monotone Warping Function 

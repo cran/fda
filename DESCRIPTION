@@ -1,0 +1,9 @@
+Package: fda
+Version: 1.0
+Date: 2003-12-14
+Title: Functional Data Analysis
+Author: Jim Ramsay <ramsay@psych.mcgill.ca>
+Maintainer: Jim Ramsay <ramsay@psych.mcgill.ca>
+Description: Analysis of fucntional data, that is data where the basic observation is a function of some sort--an area involving the generalization of the techniques of multivariate data analysis to functional data
+License: GPL Version 2 or newer.
+URL: http://www.psych.mcgill.ca/faculty/ramsay/ramsay.html
