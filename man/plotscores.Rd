@@ -45,7 +45,7 @@ additional plotting arguments used in function \code{plot}.
 a plot of scores
 }
 \seealso{
-pca.fd
+\code{\link{pca.fd}}
 }
 % docclass is function
 \keyword{smooth}

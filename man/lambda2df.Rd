@@ -39,7 +39,7 @@ the smoothing parameter to be converted.
 the equivalent degrees of freedom value.
 }
 \seealso{
-df2lambda
+\code{\link{df2lambda}}
 }
 % docclass is function
 \keyword{smooth}

@@ -80,7 +80,9 @@ history.
 }
 }
 \seealso{
-smooth.monotone, landmarkreg, register.fd
+\code{\link{smooth.monotone}}, 
+\code{\link{landmarkreg}}, 
+\code{\link{register.fd}}
 }
 % docclass is function
 \keyword{smooth}

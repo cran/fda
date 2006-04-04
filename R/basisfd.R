@@ -105,7 +105,6 @@ if (type=="unknown"){
 }
 
 #  check if QUADVALS is present, and set to default if not
-
 if (missing(quadvals)) quadvals <- NULL
 else if(!is.null(quadvals)){
      nquad <- dim(quadvals)[1]
@@ -120,7 +119,7 @@ else if(!is.null(quadvals)){
 }
 
 #  check VALUES if present, and set to a single empty cell if not.
-if(!missing(values) && !is.null(values)) {
+if(!missing(values) && !is.null(values) && !is.null(quadvals)) {
  	 n <- dim(values)[1]
 	 k <- dim(values)[2]
     if (n != nquad)   

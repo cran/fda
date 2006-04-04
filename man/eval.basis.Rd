@@ -37,7 +37,9 @@ must be one larger than the highest order of derivative
 required.
 }
 \seealso{
-getbasismatrix, eval.fd, plot.basis
+\code{\link{getbasismatrix}}, 
+\code{\link{eval.fd}}, 
+\code{\link{plot.basisfd}}
 }
 % docclass is function
 \keyword{smooth}

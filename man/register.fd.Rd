@@ -78,7 +78,8 @@ smoothing function in for function \code{smooth.monotone.}  See the
 help file for that function for further details.
 }
 \seealso{
-registerC.fd, smooth.monotone, smooth.morph
+\code{\link{smooth.monotone}}, 
+\code{\link{smooth.morph}}
 }
 \examples{
 #See the analyses of the growth data for examples.

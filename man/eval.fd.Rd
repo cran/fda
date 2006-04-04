@@ -32,7 +32,11 @@ values.  The first dimension corresponds to the argument values in
 the second to replications, and the third if present to functions.
 }
 \seealso{
-getbasismatrix, eval.bifd, eval.penalty, eval.monfd, eval.posfd
+\code{\link{getbasismatrix}}, 
+\code{\link{eval.bifd}}, 
+\code{\link{eval.penalty}}, 
+\code{\link{eval.monfd}}, 
+\code{\link{eval.posfd}}
 }
 \examples{
 

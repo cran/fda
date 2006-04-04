@@ -27,7 +27,12 @@ a matrix of values of basis functions.  Rows correspond to
 argument values and columns to basis functions.
 }
 \seealso{
-polynom, power, expon, fourier, polyg, bsplineS
+\code{\link{polynom}}, 
+\code{\link{power}}, 
+\code{\link{expon}}, 
+\code{\link{fourier}}, 
+\code{\link{polyg}}, 
+\code{\link{bsplineS}}
 }
 \examples{
 

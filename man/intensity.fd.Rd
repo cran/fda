@@ -85,7 +85,7 @@ To plot the intensity function or to evaluate it,
 evaluate \code{Wfdobj}, exponentiate the resulting vector.
 }
 \seealso{
-density.fd
+\code{\link{density.fd}}
 }
 \examples{
 

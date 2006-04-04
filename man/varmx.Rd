@@ -33,7 +33,8 @@ tend more and more to be either near 0 or near 1, and this tends to
 help with the process of labelling or interpreting the rotated matrix.
 }
 \seealso{
-varmx.pca, varmx.cca
+\code{\link{varmx.pca.fd}}, 
+\code{\link{varmx.cca.fd}}
 }
 % docclass is function
 \keyword{smooth}

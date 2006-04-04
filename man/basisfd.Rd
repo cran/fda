@@ -102,10 +102,20 @@ to use this function, so no examples are provided.
 }
 \keyword{smooth}
 \seealso{
-is.basis, is.eqbasis, plot.basis, getbasismatrix, getbasispenalty,
-create.bspline.basis, create.constant.basis, create.exponential.basis,
-create.fourier.basis, create.monomial.basis, create.polygonal.basis,
-create.polynomial.basis, create.power.basis
+\code{\link{is.basis}}, 
+\code{\link{is.eqbasis}}, 
+\code{\link{plot.basisfd}}, 
+\code{\link{getbasismatrix}}, 
+\code{\link{getbasispenalty}}, 
+\code{\link{create.bspline.basis}}, 
+\code{\link{create.constant.basis}}, 
+\code{\link{create.exponential.basis}}, 
+\code{\link{create.fourier.basis}}, 
+\code{\link{create.monomial.basis}}, 
+\code{\link{create.polygonal.basis}}, 
+\code{\link{create.polynomial.basis}}, 
+\code{\link{create.power.basis}}
 }
 % docclass is function
 \keyword{smooth}
+\keyword{internal}

@@ -29,7 +29,8 @@ information is used to further smooth argument \code{fdobj}.
 a functional data object.
 }
 \seealso{
-smooth.basis, data2fd
+\code{\link{smooth.basis}}, 
+\code{\link{data2fd}}
 }
 \examples{
 

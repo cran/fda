@@ -94,7 +94,7 @@ it calls is important.
 Press, et, al, $Numerical Recipes$.
 }
 \seealso{
-eval.penalty, getpenaltymatrix
+\code{\link{eval.penalty}}, 
 }
 % docclass is function
 \keyword{smooth}

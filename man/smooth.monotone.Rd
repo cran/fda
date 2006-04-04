@@ -112,7 +112,9 @@ in vector $c$ multipying the design matrix.
 
 }
 \seealso{
-smooth.basis, smooth.pos, smooth.morph
+\code{\link{smooth.basis}}, 
+\code{\link{smooth.pos}}, 
+\code{\link{smooth.morph}}
 }
 \examples{
 

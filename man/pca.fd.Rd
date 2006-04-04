@@ -17,7 +17,7 @@ variation among the several functions that make up a multivariate
 functional observation.
 }
 \usage{
-pca.fd(fdobj, nharm = 2, harmfdPar=fdPar(),
+pca.fd(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
        centerfns = TRUE)
 }
 \arguments{
@@ -58,7 +58,8 @@ a functional data object giving the mean function
 }
 }
 \seealso{
-cca.fd, pda.fd
+\code{\link{cca.fd}}, 
+\code{\link{pda.fd}}
 }
 \examples{
 

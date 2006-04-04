@@ -25,7 +25,7 @@ none
 a plot of the basis functions
 }
 \seealso{
-plot.fd
+\code{\link{plot.fd}}
 }
 \examples{
 

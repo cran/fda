@@ -24,7 +24,8 @@ operator is defined
 a linear differential operator object
 }
 \seealso{
-int2Lfd, Lfd
+\code{\link{int2Lfd}}, 
+\code{\link{Lfd}}
 }
 \examples{
 #  define the harmonic acceleration operator used in the

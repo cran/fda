@@ -90,12 +90,12 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), WfdParobj, zmat=matrix(1,nobs,
 
 #  initialize matrix Kmat defining penalty term
 
-  if (lambda > 0) Kmat <- lambda*getbasispenalty(basisobj, Lfdobj)
+  if (WfdParobj$lambda > 0) Kmat <- WfdParobj$lambda*getbasispenalty(basisobj, Lfdobj)
   else            Kmat <- NULL
 
 #  Compute initial function and gradient values
 
-  result <- fngrad.smooth.monotone(y, x, zmat, wt, Wfdobj, lambda,
+  result <- fngrad.smooth.monotone(y, x, zmat, wt, Wfdobj, WfdParobj$lambda,
                                    Kmat, inact, basislist)
   Flist  <- result[[1]]
   beta   <- result[[2]]
@@ -103,7 +103,7 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), WfdParobj, zmat=matrix(1,nobs,
 
 #  compute the initial expected Hessian
 
-  hessmat <- hesscal.smooth.monotone(beta, Dyhat, wtroot, lambda, Kmat, inact)
+  hessmat <- hesscal.smooth.monotone(beta, Dyhat, wtroot, WfdParobj$lambda, Kmat, inact)
 
 #  evaluate the initial update vector for correcting the initial cvec
 
@@ -212,7 +212,7 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), WfdParobj, zmat=matrix(1,nobs,
         #  compute new function value and gradient
         cvecnew <- cvec + linemat[1,5]*deltac
         Wfdnew$coefs <- as.matrix(cvecnew)
-        result  <- fngrad.smooth.monotone(y, x, zmat, wt, Wfdnew, lambda,
+        result  <- fngrad.smooth.monotone(y, x, zmat, wt, Wfdnew, WfdParobj$lambda,
                                           Kmat, inact, basislist)
         Flist   <- result[[1]]
         beta    <- result[[2]]
@@ -269,7 +269,7 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), WfdParobj, zmat=matrix(1,nobs,
        cvecold  <- cvec
        betaold  <- beta
        Foldlist <- Flist
-       hessmat  <- hesscal.smooth.monotone(beta, Dyhat, wtroot, lambda, Kmat, inact)
+       hessmat  <- hesscal.smooth.monotone(beta, Dyhat, wtroot, WfdParobj$lambda, Kmat, inact)
        #  udate the line search direction
        result   <- linesearch.smooth.monotone(Flist, hessmat, dbglev)
        deltac   <- result[[1]]

@@ -41,7 +41,7 @@ necessary. This function just calls the roughness penalty evaluation
 function specific to the basis involved.
 }
 \seealso{
-eval.penalty
+\code{\link{eval.penalty}}
 }
 \examples{
 

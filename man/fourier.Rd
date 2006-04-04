@@ -37,7 +37,7 @@ a matrix of function values.  The number of rows equals the number of
 arguments, and the number of columns equals the number of basis functions.
 }
 \seealso{
-fourierpen
+\code{\link{fourierpen}}
 }
 \examples{
 

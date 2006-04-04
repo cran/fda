@@ -31,7 +31,11 @@ a symmetric matrix of order equal to the number of
 monomial basis functions.
 }
 \seealso{
-polynompen, exponpen, fourierpen, bsplinepen, polygpen
+\code{\link{polynompen}}, 
+\code{\link{exponpen}}, 
+\code{\link{fourierpen}}, 
+\code{\link{bsplinepen}}, 
+\code{\link{polygpen}}
 }
 \examples{
 

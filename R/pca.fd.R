@@ -1,4 +1,4 @@
-pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(), centerfns = TRUE)
+pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj), centerfns = TRUE)
 {
 #  Carry out a functional PCA with regularization
 #  Arguments:

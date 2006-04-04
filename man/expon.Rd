@@ -34,7 +34,7 @@ to argument values and columns to basis functions.
 There are no restrictions on the rate constants.
 }
 \seealso{
-exponpen
+\code{\link{exponpen}}
 }
 % docclass is function
 \keyword{smooth}

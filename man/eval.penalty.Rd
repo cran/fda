@@ -51,22 +51,14 @@ inner products are computed by an iterative numerical
 integration method called Richard extrapolation using the
 trapezoidal rule.
 
- The computation of the penalty matrix is a relatively
-lengthy operation, and particular in S-PLUS code, so that
-the calculations are made with a C++ function.  The function
-\code{getbasispenaltyC} calls this function, but can
-only do so for integer-valued linear differential operators.
-
  If the penalty matrix must be evaluated repeatedly,
 computation can be greatly speeded up by avoiding the use
 of this function, and instead using quadrature points and
-weights defined by Simpson's rule.  These may be conveniently
-computed using function \code{quadset}, and stored along
-with the associated basis function/derivative values as a
-part of the basis object.
+weights defined by Simpson's rule.  
 }
 \seealso{
-getbasispenalty, eval.basis, quadset, getbasispenaltyC
+\code{\link{getbasispenalty}}, 
+\code{\link{eval.basis}}, 
 }
 % docclass is function
 \keyword{smooth}

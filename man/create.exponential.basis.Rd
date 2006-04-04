@@ -58,9 +58,14 @@ is the rate constant.  If $b = 0$, the constant function is
 defined.
 }
 \seealso{
-basisfd, create.bspline.basis, create.constant.basis, create.fourier.basis,
-create.monomial.basis, create.polygonal.basis, create.polynomial.basis,
-create.power.basis
+\code{\link{basisfd}}, 
+\code{\link{create.bspline.basis}}, 
+\code{\link{create.constant.basis}}, 
+\code{\link{create.fourier.basis}}, 
+\code{\link{create.monomial.basis}}, 
+\code{\link{create.polygonal.basis}}, 
+\code{\link{create.polynomial.basis}}, 
+\code{\link{create.power.basis}}
 }
 \examples{
 

@@ -27,7 +27,8 @@ data objects.
 a rotated version of argument \code{cca.fd}.
 }
 \seealso{
-varmx, varmx.pca.fd
+\code{\link{varmx}}, 
+\code{\link{varmx.pca.fd}}
 }
 % docclass is function
 \keyword{smooth}

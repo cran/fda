@@ -45,7 +45,8 @@ usually estimated by monotone smoothing function
 \code{smooth.monotone.}
 }
 \seealso{
-eval.fd, eval.posfd
+\code{\link{eval.fd}}, 
+\code{\link{eval.posfd}}
 }
 \examples{
 

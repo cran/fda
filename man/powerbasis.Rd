@@ -34,7 +34,8 @@ arguments, and the number of columns equals the number of basis
 functions.
 }
 \seealso{
-create.power.basis, powerpen
+\code{\link{create.power.basis}}, 
+\code{\link{powerpen}}
 }
 \examples{
 

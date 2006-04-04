@@ -89,7 +89,11 @@ by how many basis functions are used.  In more sophisticated
 applications, it would be better to use the function \code{\link{smooth.basis}}
 }
 \seealso{
-smooth.basis, project.basis, smooth.fd, smooth.monotone, smooth.pos
+\code{\link{smooth.basis}}, 
+\code{\link{project.basis}}, 
+\code{\link{smooth.fd}}, 
+\code{\link{smooth.monotone}}, 
+\code{\link{smooth.pos}}
 }
 \examples{
 

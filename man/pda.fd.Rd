@@ -128,7 +128,8 @@ a forcing function.
 }
 }
 \seealso{
-pca.fd, cca.fd
+\code{\link{pca.fd}}, 
+\code{\link{cca.fd}}
 }
 \examples{
 #See analyses of daily weather data for examples.

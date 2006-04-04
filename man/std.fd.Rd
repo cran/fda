@@ -21,7 +21,10 @@ that contains the standard deviation of the one or several functions in
 the object \code{fdobj}.
 }
 \seealso{
-stddev.fd, mean.fd, sum.fd, center.fd
+\code{\link{stddev.fd}}, 
+\code{\link{mean.fd}}, 
+\code{\link{sum.fd}}, 
+\code{\link{center.fd}}
 }
 \examples{
 liptime  <- seq(0,1,.02)

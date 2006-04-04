@@ -96,7 +96,9 @@ with coefficients equal to the elements of the vector.
 use this function, but rather either \code{ls} or \code{lsfit}.
 }
 \seealso{
-fRegress.stderr, fRegress.CV, linmod
+\code{\link{fRegress.stderr}}, 
+\code{\link{fRegress.CV}}, 
+\code{\link{linmod}}
 }
 \examples{
 #See the weather data analyses in the file \code{daily.ssc} for

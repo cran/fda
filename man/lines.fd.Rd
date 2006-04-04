@@ -27,7 +27,8 @@ in all plotting programs.
 Lines added to an existing plot.
 }
 \seealso{
-plot.fd, plotfit.fd
+\code{\link{plot.fd}}, 
+\code{\link{plotfit.fd}}
 }
 % docclass is function
 \keyword{smooth}

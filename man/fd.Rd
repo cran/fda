@@ -46,20 +46,14 @@ functions, and is given the default name "values".
 a functional data object
 }
 \details{
-
-
- To check that an object is of this class, use function
+To check that an object is of this class, use function
 \code{is.fd}.
 
- Normally only developers of new functional data analysis
+Normally only developers of new functional data analysis
 functions will actually need
 to use this function, so no examples are provided.
-}
-\seealso{
-Most of the functional data analysis functions either have
-functional data objects as arguments, or generate functional data
-objects, or both.
 }
 
 % docclass is function
 \keyword{smooth}
+\keyword{internal}

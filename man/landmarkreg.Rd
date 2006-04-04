@@ -79,7 +79,8 @@ preliminary to using the more sophisticated but more lengthy process in
 \code{register.fd.}
 }
 \seealso{
-register.fd, smooth.morph
+\code{\link{register.fd}}, 
+\code{\link{smooth.morph}}
 }
 \examples{
 #See the analysis for the lip data in the examples.

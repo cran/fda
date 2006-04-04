@@ -19,7 +19,10 @@ a functional data object to be centered.
 a functional data object whose mean is zero.
 }
 \seealso{
-mean.fd, sum.fd, stddev.fd, std.fd
+\code{\link{mean.fd}}, 
+\code{\link{sum.fd}}, 
+\code{\link{stddev.fd}}, 
+\code{\link{std.fd}}
 }
 \examples{
 daytime    <- (1:365)-0.5

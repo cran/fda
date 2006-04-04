@@ -57,7 +57,7 @@ to the data that solves the equation.  Such a fit will be a
 linear combinations of m independent solutions.
 }
 \seealso{
-pda.fd, ivp.ab
+\code{\link{pda.fd}}, 
 }
 \examples{
 #See the analyses of the lip data.

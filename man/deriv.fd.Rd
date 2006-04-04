@@ -36,7 +36,8 @@ and therefore this must have enough basis functions to represent
 the variation in the derivative satisfactorily.
 }
 \seealso{
-getbasismatrix, eval.basis
+\code{\link{getbasismatrix}}, 
+\code{\link{eval.basis}}
 }
 \examples{
 

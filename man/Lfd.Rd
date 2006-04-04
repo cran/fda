@@ -60,7 +60,10 @@ $Lx(t) = b_0(t) x(t) + b_1(t)Dx(t) + ... + b_\{m-1\}(t) D^\{m-1\} x(t)
 + D^mx(t)$
 }
 \seealso{
-int2Lfd, vec2Lfd, fdPar, pda.fd
+\code{\link{int2Lfd}}, 
+\code{\link{vec2Lfd}}, 
+\code{\link{fdPar}}, 
+\code{\link{pda.fd}}
 }
 \examples{
 #  Set up the harmonic acceleration operator

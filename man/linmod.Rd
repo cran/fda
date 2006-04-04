@@ -59,7 +59,7 @@ Otherwise the matrix of approximate values.
 }
 }
 \seealso{
-fRegress
+\code{\link{fRegress}}
 }
 \examples{
 #See the prediction of precipitation using temperature as

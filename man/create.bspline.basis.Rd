@@ -124,9 +124,14 @@ abrupt change of level, but only a few knots are required where the
 curve is changing very slowly.
 }
 \seealso{
-basisfd, create.constant.basis, create.exponential.basis, create.fourier.basis,
-create.monomial.basis, create.polygonal.basis, create.polynomial.basis,
-create.power.basis
+\code{\link{basisfd}}, 
+\code{\link{create.constant.basis}}, 
+\code{\link{create.exponential.basis}}, 
+\code{\link{create.fourier.basis}}, 
+\code{\link{create.monomial.basis}}, 
+\code{\link{create.polygonal.basis}}, 
+\code{\link{create.polynomial.basis}}, 
+\code{\link{create.power.basis}}
 }
 \examples{
 

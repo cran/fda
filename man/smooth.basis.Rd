@@ -127,8 +127,15 @@ the data in a basis system with reasonably high resolution using
 using function \code{smooth.fd}.
 }
 \seealso{
-data2fd, df2lambda, lambda2df, lambda2gcv, plot.fd, project.basis, smooth.fd,
-smooth.monotone, smooth.pos
+\code{\link{data2fd}}, 
+\code{\link{df2lambda}}, 
+\code{\link{lambda2df}}, 
+\code{\link{lambda2gcv}}, 
+\code{\link{plot.fd}}, 
+\code{\link{project.basis}}, 
+\code{\link{smooth.fd}}, 
+\code{\link{smooth.monotone}}, 
+\code{\link{smooth.pos}}
 }
 \examples{
 

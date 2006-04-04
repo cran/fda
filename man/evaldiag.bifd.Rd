@@ -37,7 +37,8 @@ object.
 a vector or matrix of diagonal function values.
 }
 \seealso{
-var.fd, eval.bifd
+\code{\link{var.fd}}, 
+\code{\link{eval.bifd}}
 }
 % docclass is function
 \keyword{smooth}

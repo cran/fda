@@ -20,7 +20,10 @@ a functional data object with a single replication
 that contains the sum of the functions in the object \code{fd}.
 }
 \seealso{
-mean.fd, std.fd, stddev.fd, center.fd
+\code{\link{mean.fd}}, 
+\code{\link{std.fd}}, 
+\code{\link{stddev.fd}}, 
+\code{\link{center.fd}}
 }
 % docclass is function
 \keyword{smooth}

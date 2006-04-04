@@ -72,7 +72,8 @@ history.
 }
 }
 \seealso{
-smooth.monotone, smooth.morph
+\code{\link{smooth.monotone}}, 
+\code{\link{smooth.morph}}
 }
 \examples{
 #See the analyses of the daily weather data for examples.

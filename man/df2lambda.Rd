@@ -42,7 +42,8 @@ The conversion requires a one-dimensional optimization and may be
 therefore computationally intensive.
 }
 \seealso{
-lambda2df, lambda2gcv
+\code{\link{lambda2df}}, 
+\code{\link{lambda2gcv}}
 }
 \examples{
 

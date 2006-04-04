@@ -101,7 +101,7 @@ exponentiate the resulting vector, and then divide by the normalizing
 constant \code{C}.
 }
 \seealso{
-intensity.fd
+\code{\link{intensity.fd}}
 }
 \examples{
 

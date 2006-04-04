@@ -65,7 +65,9 @@ a matrix of scores on the second canonical variable.
 }
 }
 \seealso{
-plot.cca.fd, varmx.cca.fd, pca.fd
+\code{\link{plot.cca.fd}}, 
+\code{\link{varmx.cca.fd}}, 
+\code{\link{pca.fd}}
 }
 \examples{
 #  Canonical correlation analysis of knee-hip curves

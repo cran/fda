@@ -30,7 +30,8 @@ a matrix of function values.  The number of rows equals the number of
 arguments, and the number of columns equals the number of basis
 }
 \seealso{
-create.polygonal.basis, polygpen
+\code{\link{create.polygonal.basis}}, 
+\code{\link{polygpen}}
 }
 \examples{
 

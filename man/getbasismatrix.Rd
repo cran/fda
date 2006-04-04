@@ -26,7 +26,7 @@ a matrix of basis function or derivative values.  Rows correspond
 to argument values and columns to basis functions.
 }
 \seealso{
-eval.fd
+\code{\link{eval.fd}}
 }
 % docclass is function
 \keyword{smooth}

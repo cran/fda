@@ -56,9 +56,14 @@ is the use of a shift value.  This helps to avoid rounding error
 when the argument values are a long way from zero.
 }
 \seealso{
-basisfd, create.bspline.basis, create.constant.basis, create.fourier.basis,
-create.exponential.basis, create.monomial.basis, create.polygonal.basis,
-create.power.basis
+\code{\link{basisfd}}, 
+\code{\link{create.bspline.basis}}, 
+\code{\link{create.constant.basis}}, 
+\code{\link{create.fourier.basis}}, 
+\code{\link{create.exponential.basis}}, 
+\code{\link{create.monomial.basis}}, 
+\code{\link{create.polygonal.basis}}, 
+\code{\link{create.power.basis}}
 }
 \examples{
 #  Create a polynomial basis over the years in the 20th century

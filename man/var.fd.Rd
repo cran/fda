@@ -27,7 +27,9 @@ surface for a single functional data object or the covariance
 between two functional data objects.
 }
 \seealso{
-mean.fd, std.fd, stddev.fd
+\code{\link{mean.fd}}, 
+\code{\link{std.fd}}, 
+\code{\link{stddev.fd}}
 }
 % docclass is function
 \keyword{smooth}

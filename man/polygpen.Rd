@@ -36,7 +36,8 @@ this is the default. To apply this roughness penalty, the matrix of
 inner products produced by this function is necessary.
 }
 \seealso{
-create.polygonal.basis, polyg
+\code{\link{create.polygonal.basis}}, 
+\code{\link{polyg}}
 }
 \examples{
 

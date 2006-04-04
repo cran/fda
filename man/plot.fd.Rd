@@ -72,7 +72,8 @@ Note that for multivariate data, a
 suitable array must first be defined using the \code{par} function.
 }
 \seealso{
-lines.fd, plotfit.fd
+\code{\link{lines.fd}}, 
+\code{\link{plotfit.fd}}
 }
 \examples{
 daytime   <- (1:365)-0.5

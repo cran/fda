@@ -20,7 +20,10 @@ a functional data object with a single replication
 that contains the mean of the functions in the object \code{fd}.
 }
 \seealso{
-stddev, var, sum.fd, center.fd
+\code{\link{stddev.fd}}, 
+\code{\link{var.fd}}, 
+\code{\link{sum.fd}}, 
+\code{\link{center.fd}}
 }
 \examples{
 liptime  <- seq(0,1,.02)

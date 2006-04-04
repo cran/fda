@@ -33,7 +33,8 @@ a rotated principal components analysis object of class
 \code{pca.fd}.
 }
 \seealso{
-varmx, varmx.cca
+\code{\link{varmx}}, 
+\code{\link{varmx.cca.fd}}
 }
 % docclass is function
 \keyword{smooth}

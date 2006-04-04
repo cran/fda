@@ -37,7 +37,9 @@ is necessary. This function just calls the roughness penalty evaluation
 function specific to the basis involved.
 }
 \seealso{
-fourier, eval.penalty, getbasispenalty
+\code{\link{fourier}}, 
+\code{\link{eval.penalty}}, 
+\code{\link{getbasispenalty}}
 }
 \examples{
 

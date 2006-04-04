@@ -36,7 +36,9 @@ None
 A plot of the cycles
 }
 \seealso{
-plot.fd, plotfit.fd, demo(gait)
+\code{\link{plot.fd}}, 
+\code{\link{plotfit.fd}}, 
+demo(gait)
 }
 % docclass is function
 \keyword{smooth}

@@ -56,8 +56,12 @@ is the case for functions \code{fRegress} and  \code{pda.fd},
 for example.
 }
 \seealso{
-cca.fd, density.fd, fRegress, intensity.fd, pca.fd, pda.fd
-smooth.basis, smooth.monotone, smooth.ps
+\code{\link{cca.fd}}, 
+\code{\link{density.fd}}, 
+\code{\link{fRegress}}, 
+\code{\link{intensity.fd}}, 
+\code{\link{pca.fd}}, 
+\code{\link{smooth.monotone}}, 
 }
 \examples{
 

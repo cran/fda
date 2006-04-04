@@ -1,8 +1,8 @@
 Package: fda
-Version: 1.1.2
+Version: 1.1.4
 Date: 2006-04-04
 Title: Functional Data Analysis
-Author: J. O. Ramsay <ramsay@psych.mcgill.ca>.
+Author: J. O. Ramsay <ramsay@psych.mcgill.ca>, Hadley Wickham <h.wickham@gmail.com>
 Maintainer: J. O. Ramsay <ramsay@psych.mcgill.ca>
 Depends: R (>= 2.1.0), splines
 Suggests: graphics
@@ -18,4 +18,4 @@ Description: These functions were developed to support
 License: GPL version 2 or later
 URL: http://www.functionaldata.org
 LazyData: true
-Packaged: Sun Apr  9 22:10:39 2006; hornik
+Packaged: Wed May 24 10:53:55 2006; hadley

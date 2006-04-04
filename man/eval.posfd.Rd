@@ -38,7 +38,8 @@ usually estimated by positive smoothing function
 \code{smooth.positive}
 }
 \seealso{
-eval.fd, eval.monfd
+\code{\link{eval.fd}}, 
+\code{\link{eval.monfd}}
 }
 % docclass is function
 \keyword{smooth}

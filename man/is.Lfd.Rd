@@ -19,7 +19,9 @@ a logical value:
 \code{TRUE} if the class is correct, \code{FALSE} otherwise.
 }
 \seealso{
-is.basis, is.fd, is.fdPar
+\code{\link{is.basis}}, 
+\code{\link{is.fd}}, 
+\code{\link{is.fdPar}}
 }
 % docclass is function
 \keyword{smooth}

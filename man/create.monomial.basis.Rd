@@ -53,9 +53,14 @@ column of \code{ quadvals }.
 a basis object with the type \code{monom}.
 }
 \seealso{
-basisfd, create.bspline.basis, create.constant.basis, create.fourier.basis,
-create.exponential.basis, create.polygonal.basis, create.polynomial.basis,
-create.power.basis
+\code{\link{basisfd}}, 
+\code{\link{create.bspline.basis}}, 
+\code{\link{create.constant.basis}}, 
+\code{\link{create.fourier.basis}}, 
+\code{\link{create.exponential.basis}}, 
+\code{\link{create.polygonal.basis}}, 
+\code{\link{create.polynomial.basis}}, 
+\code{\link{create.power.basis}}
 }
 \examples{
 #  Create a monomial basis over the interval [-1,1]

@@ -61,7 +61,8 @@ coefficients to coefficients for regression coefficients.
 }
 }
 \seealso{
-fRegress, fRegress.CV
+\code{\link{fRegress}}, 
+\code{\link{fRegress.CV}}
 }
 \examples{
 #See the weather data analyses in the file \code{daily.ssc} for

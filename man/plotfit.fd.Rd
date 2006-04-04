@@ -60,7 +60,8 @@ with other \code{plot} functions.
 }
 }
 \seealso{
-plot.fd, lines.fd
+\code{\link{plot.fd}}, 
+\code{\link{lines.fd}}
 }
 % docclass is function
 \keyword{smooth}

@@ -32,7 +32,8 @@ regression functions and their level of smoothing.
 the sum of squared errors in predicting \code{yvec}.
 }
 \seealso{
-fRegress, fRegress.stderr
+\code{\link{fRegress}}, 
+\code{\link{fRegress.stderr}}
 }
 \examples{
 #See the analyses of the daily weather data.

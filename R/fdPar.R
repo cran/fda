@@ -9,7 +9,6 @@
 #  Generator function of class fdPar
 
 fdPar <- function(fdobj=fd(), Lfdobj=int2Lfd(0), lambda=0, estimate=TRUE, penmat=NULL){
-		
 # Sets up a functional parameter object
 #  Arguments:
 #  FDOBJ    ... A functional data object.
