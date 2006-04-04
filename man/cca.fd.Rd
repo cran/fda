@@ -1,31 +1,93 @@
 \name{cca.fd}
 \alias{cca.fd}
-\title{Canonical correlation analysis }
+\title{
+  Functional Canonical Correlation Analysis
+}
 \description{
-Carry out a functional canonical correlation analysis with regularization or roughness penalties on the estimated canonical variables. 
+Carry out a functional canonical correlation analysis with
+regularization or roughness penalties on the estimated
+canonical variables.
 }
 \usage{
-cca.fd(fd, ncan=2, lambda=0.00025, Lfd=2)
+cca.fd(fdobj1, fdobj2=fdobj1, ncan = 2,
+       ccafdParobj1=fdPar(basisobj1, 2, 1e-10),
+       ccafdParobj2=ccafdParobj1, centerfns=TRUE)
 }
 \arguments{
-  \item{fd}{A bivariate functional data object. That is, it is assumed that there are two functions for each replication. The coefficient matrix for this object will be three-dimensional, with the final dimension being of length 2. }
-  \item{ncan}{Number of pairs of canonical variates to be found.}
-  \item{lambda}{Smoothing or regularization parameter. If lambda is a 2-vector then the first component will be applied to the "x" and the second to the "y" functions. }
-  \item{Lfd}{The order of derivative to be penalized if it is a scalar, or the linear differential operator whose value is to be penalized if it is a functional data object. }
+\item{fdobj1}{
+a functional data object.
 }
-\details{
+\item{fdobj2}{
+a functional data object.  By default this is \code{ fdobj1 }, in
+which case the first argument must be a bivariate funnctional data
+object.
+}
+\item{ncan}{
+the number of canonical variables and weight functions to be
+computed.  The default is 2.
+}
+\item{ccafdParobj1}{
+a functional parameter object defining the first set of canonical
+weight functions.  The object may contain specifications for a
+roughness penalty. The default is defined using the same basis
+as that used for \code{ fdobj1 } with a slight penalty on its
+second derivative.
+}
+\item{ccafdParobj2}{
+a functional parameter object defining the second set of canonical
+weight functions.  The object may contain specifications for a
+roughness penalty. The default is \code{ ccafdParobj1 }.
+}
+\item{centerfns}{
+if TRUE, the functions are centered prior to analysis. This is the
+default.
+}
 }
 \value{
-An object of class cca.fd with these entries is returned. 
-"weight functions" A functional data object for the "ncan" pairs of canonical variate weight functions. Each replicate corresponds to a pair of weight functions. 
-"correlations" The complete set of canonical correlations. The number is equal to the number of basis functions. 
-"variates" An array of the values taken by the canonical variates, that is, the scores on the variates. This is a 3-way array with first dimension corresponding to replicates, second to the different variates (dimension NCAN) and third (dimension 2) to the "x" and "y" scores. 
+an object of class \code{cca.fd} with the 5 slots:
+
+\item{ccwtfd1}{
+a functional data object for the first
+canonical variate weight function
 }
-\references{
-Ramsay, J. O. and Silverman, B. W. (1997) Functional Data Analysis. New York: Springer. Canonical correlation analysis is described in Chapter 12. 
+\item{ccwtfd2}{
+a functional data object for the second
+canonical variate weight function
 }
-\note{}
-\author{}
-\seealso{plot.cca.fd, cca.2fun.fd}
-\examples{}
-\keyword{}
+\item{cancorr}{
+a vector of canonical correlations
+}
+\item{ccavar1}{
+a matrix of scores on the first canonical variable.
+}
+\item{ccavar2}{
+a matrix of scores on the second canonical variable.
+}
+}
+\seealso{
+plot.cca.fd, varmx.cca.fd, pca.fd
+}
+\examples{
+#  Canonical correlation analysis of knee-hip curves
+
+gaittime  <- (1:20)/21
+gaitrange <- c(0,1)
+gaitbasis <- create.fourier.basis(gaitrange,21)
+lambda    <- 10^(-11.5)
+harmaccelLfd <- vec2Lfd(c(0, 0, (2*pi)^2, 0))
+
+gaitfdPar <- fdPar(gaitbasis, harmaccelLfd, lambda)
+gaitfd <- smooth.basis(gaittime, gait, gaitfdPar)$fd
+
+#ccafdPar <- fdPar(gaitfd, harmaccelLfd, 1e-8)
+#ccafd    <- cca.fd(gaitfd[,1], gaitfd[,2], ncan=3, ccafdPar, ccafdPar)
+#  compute a VARIMAX rotation of the canonical variables
+#ccafd <- varmx.cca.fd(ccafd)
+#  plot the canonical weight functions
+#par(mfrow=c(2,1))
+#plot.cca.fd(ccafd, cex=1.2, ask=TRUE)
+#  display the canonical correlations
+#round(ccafd$ccacorr[1:6],3)
+}
+% docclass is function
+\keyword{smooth}

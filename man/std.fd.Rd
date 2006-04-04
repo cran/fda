@@ -1,26 +1,51 @@
 \name{std.fd}
 \alias{std.fd}
-\title{Standard Deviation of Functional Data }
+\title{
+  Standard Deviation of Functional Data
+}
 \description{
-Evaluate the standard deviation of a set of functions in a functional data object. 
+Evaluate the standard deviation of a set of functions in a functional
+data object.
 }
 \usage{
-std.fd(fd)
+std.fd(fdobj)
 }
 \arguments{
-  \item{fd }{A functional data object. }
+\item{fdobj}{
+a functional data object.
 }
-\details{
 }
 \value{
-Returns a functional data object with a single replication that contains the standard deviation of the one or several functions in the object fd. 
+a functional data object with a single replication
+that contains the standard deviation of the one or several functions in
+the object \code{fdobj}.
+}
+\seealso{
+stddev.fd, mean.fd, sum.fd, center.fd
+}
+\examples{
+liptime  <- seq(0,1,.02)
+liprange <- c(0,1)
+
+#  -------------  create the fd object -----------------
+#       use 31 order 6 splines so we can look at acceleration
+
+nbasis <- 51
+norder <- 6
+lipbasis <- create.bspline.basis(liprange, nbasis, norder)
+
+#  ------------  apply some light smoothing to this object  -------
+
+Lfdobj   <- int2Lfd(4)
+lambda   <- 1e-12
+lipfdPar <- fdPar(lipbasis, Lfdobj, lambda)
+
+lipfd <- smooth.basis(liptime, lip, lipfdPar)$fd
+names(lipfd$fdnames) = c("Normalized time", "Replications", "mm")
+
+lipstdfd <- std.fd(lipfd)
+plot(lipstdfd)
 
 }
-\references{}
-\note{}
-\author{}
-\seealso{
-meanFd, sumFd, center.fd 
-}
-\examples{}
-\keyword{}
+% docclass is function
+\keyword{smooth}

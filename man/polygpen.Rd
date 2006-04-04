@@ -1,25 +1,52 @@
 \name{polygpen}
 \alias{polygpen}
-\title{Polygonal Penalty Matrix }
+\title{
+  Polygonal Penalty Matrix
+}
 \description{
-Computes the matrix defining the roughness penalty for functions expressed in terms of a polygonal basis. 
+Computes the matrix defining the roughness penalty for functions
+expressed in terms of a polygonal basis.
 }
 \usage{
-polygpen(basisfd, Lfd=1)
+polygpen(basisobj, Lfdobj=int2Lfd(1))
 }
 \arguments{
-  \item{basisfd }{A polygonal basis object. }
-  \item{Lfd }{Either a nonnegative integer or a linear differential operator object. }
+\item{basisobj}{
+a polygonal functional basis object.
 }
-\details{
-A roughness penalty for a function x(t) is defined by integrating the square of either the derivative of x(t) or, more generally, the result of applying a linear differential operator L to it. The only roughness penalty possible aside from penalizing the size of the function itself is the integral of the square of the first derivative D1x(t), and this is the default. To apply this roughness penalty, the matrix of inner products produced by this function is necessary. 
+\item{Lfdobj}{
+either an integer that is either 0 or 1, or a
+linear differential operator object of degree 0 or 1.
+}
 }
 \value{
-A symmetric matrix of order equal to the number of basis functions defined by the polygonal basis object. Each element is the inner product of two polygonal basis functions after applying the derivative or linear differential operator defined by Lfdobj. 
+a symmetric matrix of order equal to the number of basis functions
+defined by the polygonal basis object.  Each element is the inner product
+of two polygonal basis functions after applying the derivative or linear
+differential operator defined by Lfdobj.
 }
-\references{}
-\note{}
-\author{}
-\seealso{}
-\examples{}
-\keyword{}
+\details{
+a roughness penalty for a function $ x(t) $ is defined by
+integrating the square of either the derivative of  $ x(t) $ or,
+more generally, the result of applying a linear differential operator
+$ L $ to it.  The only roughness penalty possible aside from
+penalizing the size of the function itself is the integral
+of the square of the first derivative, and
+this is the default. To apply this roughness penalty, the matrix of
+inner products produced by this function is necessary.
+}
+\seealso{
+create.polygonal.basis, polyg
+}
+\examples{
+
+#  set up a sequence of 11 argument values
+argvals <- seq(0,1,0.1)
+#  set up the polygonal basis
+basisobj <- create.polygonal.basis(argvals)
+#  compute the 11 by 11 penalty matrix
+penmat <- polygpen(basisobj)
+
+}
+% docclass is function
+\keyword{smooth}

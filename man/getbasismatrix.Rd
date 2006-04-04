@@ -1,26 +1,32 @@
 \name{getbasismatrix}
 \alias{getbasismatrix}
-\title{Get Values of Basis Functions }
+\title{
+  Values of Basis Functions or their Derivatives
+}
 \description{
-Evaluates a set of basis functions for a vector of argument values. 
+Evaluate a set of basis functions or their derivatives at
+a set of argument values.
 }
 \usage{
-getbasismatrix(evalarg, basisfd, Lfd=0)
+getbasismatrix(evalarg, basisobj, nderiv=0)
 }
 \arguments{
-  \item{evalarg }{A vector of argument values at which the basis object is to be evaluated. }
-  \item{basisfd }{A basis object. }
-  \item{Lfd }{Either a nonnegative integer or a linear differential operator object. If present, the derivative or the value of applying the operator is evaluated rather than the basis functions themselves. }
+\item{evalarg}{
+a vector of arguments values.
 }
-\details{
+\item{basisobj}{
+a basis object.
+}
+\item{nderiv}{
+a nonnegative integer specifying the derivative to be evaluated.
+}
 }
 \value{
-A matrix with number of rows equal to the length of evalarg and number of columns equal to the number of basis functions. The matrix contains values of each basis function at each argument value. 
+a matrix of basis function or derivative values.  Rows correspond
+to argument values and columns to basis functions.
 }
-\references{}
-\note{}
-\author{}
-\seealso{}
-\examples{
+\seealso{
+eval.fd
 }
-\keyword{}
+% docclass is function
+\keyword{smooth}

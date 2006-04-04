@@ -1,7 +1,10 @@
-df2lambda <- function(argvals, basisobj, wtvec=rep(1,n), Lfd=0, df=nbasis)
+df2lambda <- function(argvals, basisobj, wtvec=rep(1,n), Lfdobj=0, df=nbasis)
+{
 #  Convert a degree of freedom DF for a smooth to the equivalent value
 #    of the smoothing parameter lambda.
-{
+
+#  Last modified 26 October 2005
+
 n <- length(argvals)
 nbasis <- basisobj$nbasis
 if (df >= nbasis) {
@@ -29,7 +32,7 @@ eps <- sqrt(eps)
 bx <- -4.0
 #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 lambda <- 10^(bx)
-fb <- (lambda2df(argvals, basisobj, wtvec, Lfd, lambda) - df)^2
+fb <- (lambda2df(argvals, basisobj, wtvec, Lfdobj, lambda) - df)^2
 #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  now try bracketing the minimum by using a large value and a small
 #  value.  If (this doesn't work, revert to the iterative method
@@ -39,12 +42,12 @@ if (bx >= -10 &&  bx <= 5) {
    cx <- 5  #  the upper limit
 #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
    lambda <- 10^(cx)
-   fc <- (lambda2df(argvals, basisobj, wtvec, Lfd, lambda) - df)^2
+   fc <- (lambda2df(argvals, basisobj, wtvec, Lfdobj, lambda) - df)^2
 #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
    ax <- -8  #  the lower limit
 #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
    lambda <- 10^(ax)
-   fa <- (lambda2df(argvals, basisobj, wtvec, Lfd, lambda) - df)^2
+   fa <- (lambda2df(argvals, basisobj, wtvec, Lfdobj, lambda) - df)^2
 }
 #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  check to see if minimum bracketed
@@ -56,7 +59,7 @@ if (fb >= fa || fb >= fc) {
   ax <- bx + 1
   #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   lambda <- 10^(ax)
-  fa <- (lambda2df(argvals, basisobj, wtvec, Lfd, lambda) - df)^2
+  fa <- (lambda2df(argvals, basisobj, wtvec, Lfdobj, lambda) - df)^2
   #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   #  now the bracketing process begins
   if (fb > fa) {
@@ -72,7 +75,7 @@ if (fb >= fa || fb >= fc) {
   cx <- bx + GOLD*(bx - ax)
   #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   lambda <- 10^(cx)
-  fc <- (lambda2df(argvals, basisobj, wtvec, Lfd, lambda) - df)^2
+  fc <- (lambda2df(argvals, basisobj, wtvec, Lfdobj, lambda) - df)^2
   #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   #  check if (three values bracket minimum
   #print(c(ax,bx,cx,fa,fb,fc, lambda))
@@ -85,7 +88,7 @@ if (fb >= fa || fb >= fc) {
      if ((bx-u)*(u-cx) > 0.0) {
         #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         lambda <- 10^(u)
-        fu <- (lambda2df(argvals, basisobj, wtvec, Lfd, lambda) - df)^2
+        fu <- (lambda2df(argvals, basisobj, wtvec, Lfdobj, lambda) - df)^2
         #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         if (fu < fc) {
            #  success
@@ -105,13 +108,13 @@ if (fb >= fa || fb >= fc) {
         u <- cx + GOLD*(cx - bx)
         #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         lambda <- 10^(u)
-        fu <- (lambda2df(argvals, basisobj, wtvec, Lfd, lambda) - df)^2
+        fu <- (lambda2df(argvals, basisobj, wtvec, Lfdobj, lambda) - df)^2
         #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
      }
      if ((cx - u)*(u - ulim) > 0.0) {
         #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         lambda <- 10^(u)
-        fu <- (lambda2df(argvals, basisobj, wtvec, Lfd, lambda) - df)^2
+        fu <- (lambda2df(argvals, basisobj, wtvec, Lfdobj, lambda) - df)^2
         #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         if (fu < fc) {
            bx <- cx
@@ -121,7 +124,7 @@ if (fb >= fa || fb >= fc) {
            fc <- fu
            #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
            lambda <- 10^(u)
-           fu <- (lambda2df(argvals, basisobj, wtvec, Lfd, lambda) - df)^2
+           fu <- (lambda2df(argvals, basisobj, wtvec, Lfdobj, lambda) - df)^2
            #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         }
      }
@@ -129,13 +132,13 @@ if (fb >= fa || fb >= fc) {
         u <- ulim
         #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         lambda <- 10^(u)
-        fu <- (lambda2df(argvals, basisobj, wtvec, Lfd, lambda) - df)^2
+        fu <- (lambda2df(argvals, basisobj, wtvec, Lfdobj, lambda) - df)^2
         #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
      } else {
         u <- cx + GOLD*(cx - bx)
         #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         lambda <- 10^(u)
-        fu <- (lambda2df(argvals, basisobj, wtvec, Lfd, lambda) - df)^2
+        fu <- (lambda2df(argvals, basisobj, wtvec, Lfdobj, lambda) - df)^2
         #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
      }
      ax <- bx
@@ -206,7 +209,7 @@ while (crit > 0) {
   }
   #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   lambda <- 10^u
-  fu <- (lambda2df(argvals, basisobj, wtvec, Lfd, lambda) - df)^2
+  fu <- (lambda2df(argvals, basisobj, wtvec, Lfdobj, lambda) - df)^2
   #  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   #  update  a, b, v, w, and x
   if (fu <= fx) {

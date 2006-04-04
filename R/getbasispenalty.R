@@ -1,46 +1,48 @@
-getbasispenalty <- function(basisfd, Lfd=NULL)
+getbasispenalty <- function(basisobj, Lfdobj=NULL)
 {
-#  Computes the penalty matrix  associated with basis.fd object BASISFD.
-#    This is defined in terms of a linear differential operator Lfd
-#    The default for Lfd depends on the nature of the basis.
+#  Computes the penaltymat matrix  associated with basis object basisobj.
+#    This is defined in terms of a linear differential operator LFDOBJ.
+#    The default for LFDOBJ depends on the nature of the basis.
 
-#  Last modified 13 December 2002
+#  Last modified 26 October 2005
 
-if (!(inherits(basisfd, "basis.fd"))) stop(
+#  check BASISOBJ
+
+if (!(inherits(basisobj, "basisfd"))) stop(
     "First argument is not a basis object.")
 
-type   <- getbasistype(basisfd)
-nbasis <- basisfd$nbasis
+type   <- basisobj$type
+nbasis <- basisobj$nbasis
 
 if        (type == "fourier") {
-    if (is.null(Lfd)) Lfd <- 2
-    penalty <- fourierpen(basisfd, Lfd)
+    if (is.null(Lfdobj)) Lfdobj <- 2
+    penaltymat <- fourierpen(basisobj, Lfdobj)
 } else if (type == "bspline") {
-    norder <- basisfd$nbasis - length( basisfd$params )
-    if (is.null(Lfd)) Lfd <- as.integer(norder/2)
-    penalty <- bsplinepen(basisfd, Lfd)
-} else if (type == "poly")    {
-    if (is.null(Lfd)) Lfd <- 2
-    penalty <- polynompen(basisfd, Lfd)
+    norder <- basisobj$nbasis - length( basisobj$params )
+    if (is.null(Lfdobj)) Lfdobj <- 2
+    penaltymat <- bsplinepen(basisobj, Lfdobj)
 } else if (type == "expon")   {
-    if (is.null(Lfd)) Lfd <- 2
-    penalty <- exponpen(basisfd, Lfd)
-} else if (type == "polyg")   {
-    if (is.null(Lfd)) Lfd <- 1
-    penalty <- polygpen(basisfd, Lfd)
+    if (is.null(Lfdobj)) Lfdobj <- 2
+    penaltymat <- exponpen(basisobj, Lfdobj)
+} else if (type == "polyg" | type == "polygonal")   {
+    if (is.null(Lfdobj)) Lfdobj <- 1
+    penaltymat <- polygpen(basisobj, Lfdobj)
+} else if (type == "polynom" & type == "polynomial")    {
+    if (is.null(Lfdobj)) Lfdobj <- 2
+    penaltymat <- polynompen(basisobj, Lfdobj)
 } else if (type == "power")   {
-    if (is.null(Lfd)) Lfd <- 2
-    penalty <- powerpen(basisfd, Lfd)
+    if (is.null(Lfdobj)) Lfdobj <- 2
+    penaltymat <- powerpen(basisobj, Lfdobj)
 } else if (type == "const")   {
-    if (is.null(Lfd)) Lfd <- 0
-    if (Lfd == 0) {
-      penalty <- basisfd$rangeval[2] - basisfd$rangeval[1]
+    if (is.null(Lfdobj)) Lfdobj <- 0
+    if (Lfdobj == 0) {
+      penaltymat <- basisobj$rangeval[2] - basisobj$rangeval[1]
     } else {
-      penalty <- 0
+      penaltymat <- 0
     }
 } else {
     stop("Basis type not recognizable")
 }
 
-return(penalty)
+return(penaltymat)
 }

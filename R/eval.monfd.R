@@ -1,4 +1,4 @@
-eval.monfd <- function(evalarg, Wfd, Lfd=0) {
+eval.monfd <- function(evalarg, Wfd, Lfdobj=int2Lfd(0)) {
   #  Evaluates a monotone functional data observation, or the value of a linear
   #  differential operator LFD applied to the object,
   #  at argument values in an array EVALARGS.
@@ -16,64 +16,59 @@ eval.monfd <- function(evalarg, Wfd, Lfd=0) {
   #  The interval over which the integration takes places is defined in
   #  the basisfd object in WFD.
 
-  coef  <- getcoef(Wfd)
+  #  Last modified 26 October 2005
+
+  coef  <- Wfd$coefs
   coefd <- dim(coef)
   ndim  <- length(coefd)
   if (ndim > 2) stop("WFD is not a univariate function")
   if (ndim == 2) ncurve <- coefd[2] else ncurve <- 1
 
-  if (is.numeric(Lfd)) {
-    if (length(Lfd) == 1) {
-      nderiv <- Lfd
-      if (nderiv != as.integer(nderiv)) {
-        stop("Order of derivative must be an integer")
-      }
-      if (nderiv < 0) {
-        stop("Order of derivative must be 0 or positive")
-      }
-    } else {
-      stop("Order of derivative must be a single number")
-    }
-  } else {
-    stop("General linear differential operators not implemented yet.")
-  }
+  #  determine if LFDOBJ is an integer
 
-  n       <- length(evalarg)
+  Lfdobj <- int2Lfd(Lfdobj)
+
+  if (!is.integer(Lfdobj)) stop(
+		"LFDOBJ is not an integer operator.")
+
+  nderiv <- Lfdobj$nderiv
+
+  n  <- length(evalarg)
 
   hmat <- matrix(0, n, ncurve)
 
   for (icurve in 1:ncurve) {
 	
-  if (nderiv == 0) {
-    hval <- monfn(evalarg, Wfd[icurve])
-    hmat[,icurve] <- hval
-  }
+  	if (nderiv == 0) {
+    	hval <- monfn(evalarg, Wfd[icurve])
+    	hmat[,icurve] <- hval
+  	}
 
-  if (nderiv == 1) {
-    Dhval <- exp(eval.fd(evalarg, Wfd[icurve]))
-    hmat[,icurve] <- Dhval
-  }
+  	if (nderiv == 1) {
+    	Dhval <- exp(eval.fd(evalarg, Wfd[icurve]))
+    	hmat[,icurve] <- Dhval
+  	}
 
-  if (nderiv == 2) {
-    basisfd <- getbasis(Wfd)
-    Dwmat   <- getbasismatrix(evalarg, basisfd, 1)
-    D2hval  <- (Dwmat %*% coef) * exp(eval.fd(evalarg, Wfd[icurve]))
-    hmat[,icurve] <- D2hval
-  }
+  	if (nderiv == 2) {
+    	basisfd <- Wfd$basis
+    	Dwmat   <- getbasismatrix(evalarg, basisfd, 1)
+    	D2hval  <- (Dwmat %*% coef) * exp(eval.fd(evalarg, Wfd[icurve]))
+    	hmat[,icurve] <- D2hval
+  	}
 
-  if (nderiv == 3) {
-    basisfd <- getbasis(Wfd)
-    Dwmat   <- eval.fd(evalarg, basisfd, 1)
-    D2wmat  <- eval.fd(evalarg, basisfd, 2)
-    D3hval  <- ((D2wmat %*% coef) + (Dwmat %*% coef)^2) *
+  	if (nderiv == 3) {
+    	basisfd <- Wfd$basis
+    	Dwmat   <- eval.fd(evalarg, basisfd, 1)
+    	D2wmat  <- eval.fd(evalarg, basisfd, 2)
+    	D3hval  <- ((D2wmat %*% coef) + (Dwmat %*% coef)^2) *
                  exp(eval.fd(evalarg, Wfd[icurve]))
-    hmat[,icurve] <- D3hval
+    	hmat[,icurve] <- D3hval
+  	}
+
+  	if (nderiv > 3) stop ("Derivatives higher than 3 not implemented.")
+
   }
 
-  if (nderiv > 3) stop ("Derivatives higher than 3 not implemented.")
-
-  }
-  
   return(hmat)
 
 }

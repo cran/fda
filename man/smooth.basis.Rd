@@ -1,51 +1,166 @@
 \name{smooth.basis}
 \alias{smooth.basis}
-\title{Smooth Data using a Roughness Penalty }
+\title{
+  Smooth Data with a Roughness Penalty
+}
 \description{
-This is the main function for smoothing data using a roughness penalty. Unlike function data2fd, which does not employ a rougness penalty, this function controls the nature and degree of smoothing by penalyzing a measure of rougness. Roughness is definable in a wide variety of ways using either derivatives or a linear differential operator. 
+This is the main function for smoothing data using a roughness penalty.
+Unlike function \code{data2fd}, which does not employ a rougness
+penalty, this function controls the nature and degree of smoothing by
+penalyzing a measure of rougness.  Roughness is definable in a wide
+variety of ways using either derivatives or a linear differential
+operator.
 }
 \usage{
-smooth.basis(y, argvals, basisfd, wtvec=rep(1, n), Lfd=NULL, lambda=0,
+smooth.basis(argvals, y, fdParobj, wtvec=rep(1,n),
+             dffactor=1,
              fdnames=list(NULL, dimnames(y)[2], NULL))
 }
 \arguments{
-  \item{y }{An array containing values of curves at discrete sampling points or argument values. If the array is a matrix, the rows must correspond to argumentvalues and columns to replications, and it will be assumed that there is only one variable per observation. If Y is a three-dimensional array, the first dimension corresponds to argument values, the second to replications, and the third to variables within replications. If Y is a vector, only one replicate and variable are assumed. }
-  \item{argvals }{A vector of argument values correspond to the observations in array y. }
-  \item{basisfd }{A basis object. Each curve is represented by a linear combination of the basis functions defined in this object. }
-  \item{wtvec }{A vector the same length as argvals containing nonnegative weight to be applied to the observations. By default these are one's. }
-  \item{Lfd }{Either a nonnegative integer or a linear differential operator object. If present, the derivative or the value of applying the operator is evaluated rather than the functions themselves. }
-  \item{lambda }{A nonnegative value controlling the amount of roughness in the data. }
-  \item{fdnames}{ A list of length 3 with members containing 
-    a single name for the argument domain, such as 'Time' 
-    a vector of names for the replications or cases 
-    a name for the function, or a vector of names if there are multiple functions. 
-   }
+\item{argvals}{
+a vector of argument values correspond to the observations in array
+\code{y}.
 }
-\details{
-If lambda is zero, there is no penalty on roughness. As lambda increases, usually in logarithmic terms, the penalty on roughness increases and the fitted curves become more and more smooth. Ultimately, the curves are forced to have zero roughness in the sense of being in the null space of the differential operator Lfd. For example, a common choice of roughness penalty is the integrated square of the second derivative. This penalizes curvature. Since the second derivative of a straight line is zero, very large values of lambda will force the fit to become linear. 
-
-It is also possible to control the amount of roughness by using a degrees of freedom measure. The value equivalent to lambda is found in the list returned by the function. On the other hand, it is possible to specify a degrees of freedom value, and then use function df2lambda to determine the equivalent value of lambda. 
-
-One should not put complete faith in any automatic method for selecting lambda, including the GCV method. There are many reasons for this. For example, if derivatives are required, then the smoothing level that is automatically selected may give unacceptably rough derivatives. These methods are also highly sensitive to the assumption of independent errors, which is usually dubious with functional data. The best advice is to start with the value minimizing the gcv measure, and then explore lambda values a few log units up and down from this value to see what the smoothing function and its derivatives look like. The function plotfit.fd was designed for this purpose. 
-
-An alternative to using smooth.basis is to first represent the data in a basis system with reasonably high resolution using data2fd, and then smooth the resulting functional data object using function smooth.fd. 
+\item{y}{
+an array containing values of curves at discrete sampling points or
+argument values. If the array is a matrix, the rows must correspond to
+argumentvalues and columns to replications, and it will be assumed
+that there is only one variable per observation.
+If \code{y} is a three-dimensional array, the first dimension
+corresponds to argument values, the second to replications,
+and the third to variables within replications.
+If \code{y} is a vector, only one replicate and variable are assumed.
+}
+\item{fdParobj}{
+a functional parameter object, a functional data object or a
+functional basis object.  If the object is a functional
+parameter object, then the linear differential operator object
+and the smoothing parameter in this object define the roughness
+penalty.  If the object is a functional data object, the
+basis within this object is used without a roughness penalty,
+and this is also the case if the object is a functional basis
+object.  In these latter two cases, \code{smooth.basis}
+is essentially the same as \code{data2fd}.
+}
+\item{wtvec}{
+a vector of the same length as \code{argvals} containing
+weights for the values to be smoothed.
+}
+\item{dffactor}{
+Chong Gu in his book \emph{Smoothing Spline ANOVA Models} suggests
+a modification of the GCV criterion using a factor modifying
+the effective degrees of freedom of the smooth.  He suggests
+that values like 1.2 are effective at avoiding undersmoothing
+of the data.  The default value of 1 is the classic definition.
+}
+\item{fdnames}{
+a list of length 3 with members containing
+\itemize{
+	\item a single name for the argument domain, such as 'Time'
+	\item a vector of names for the replications or cases
+	\item a name for the function, or a vector of names if there are multiple functions.
+}
+}
 }
 \value{
-A list containing: 
-fd
-An object of class fd containing coefficients 
-df
-A degrees of freedom measure 
-gcv
-A measure of lack of fit discounted for df. One method for choosing the smoothing parameter lambda, called the GCV method, is to find the value which minimizes this measure. 
+a named list of length 7 containing:
+
+\item{fdobj}{
+a functional data object that smooths the data.
 }
-\references{
-A discussion of roughness penalties can be found in Chapter 4 of Ramsay, J. O. and Silverman, B.W. (1997) Functional Data Analysis. More information can be found in recent texts on nonparametric regression. A good discussion of degrees of freedom measure can be found in Hastie, T. and Tibshirani, R. (1990) Generalized Additive Models. 
+\item{df}{
+a degrees of freedom measure of the smooth
 }
-\note{}
-\author{}
+\item{gcv}{
+the value of the generalized cross-validation or GCV criterion.
+If there are multiple curves, this is a vector of values, one per
+curve.  If the smooth is multivariate, the result is a matrix of
+gcv values, with columns corresponding to variables.
+}
+\item{coef}{
+the coefficient matrix or array for the basis function
+expansion of the smoothing function
+}
+\item{SSE}{
+the error sums of squares.
+SSE is a vector or a matrix of the same size as GCV.
+}
+\item{penmat}{
+the penalty matrix.
+}
+\item{y2cMap}{
+the matrix mapping the data to the coefficients.
+}
+}
+\details{
+If the smoothing parameter \code{lambda} is zero,
+there is no penalty on roughness.  As
+lambda increases, usually in logarithmic terms, the penalty on roughness
+increases and the fitted curves become more and more smooth.
+Ultimately, the curves are forced to have zero roughness in the sense of
+being in the null space of the linear differential operator
+object \code{Lfdobj}that is a member of the \code{fdParobj}.
+
+For example, a common choice of roughness penalty is the integrated square
+of the second derivative.  This penalizes curvature.  Since the second
+derivative of a straight line is zero, very large values of
+\code{lambda} will force the fit to become linear.
+It is also possible to control the amount of roughness by using a
+degrees of freedom measure.  The value equivalent to \code{lambda} is
+found in the list returned by the function.  On the other hand, it is
+possible to specify a degrees of freedom value, and then use function
+\code{df2lambda} to determine the equivalent value of \code{lambda}.
+One should not put complete faith in any automatic method for
+selecting \code{lambda}, including the GCV method. There are many
+reasons for this.  For example, if derivatives are required, then the
+smoothing level that is automatically selected may give unacceptably
+rough derivatives.  These methods are also highly sensitive to the
+assumption of independent errors, which is usually dubious with
+functional data.  The best advice is to start with the value minimizing
+the \code{gcv} measure, and then explore \code{lambda} values a few
+log units up and down from this value to see what the smoothing function
+and its derivatives look like.  The function \code{plotfit.fd} was
+designed for this purpose.
+An alternative to using \code{smooth.basis} is to first represent
+the data in a basis system with reasonably high resolution using
+\code{data2fd}, and then smooth the resulting functional data object
+using function \code{smooth.fd}.
+}
 \seealso{
-data2fd, plotfit.fd, smooth.fd, project.basis 
+data2fd, df2lambda, lambda2df, lambda2gcv, plot.fd, project.basis, smooth.fd,
+smooth.monotone, smooth.pos
 }
-\examples{}
-\keyword{}
+\examples{
+
+#  Shows the effects of three levels of smoothing
+#  where the size of the third derivative is penalized.
+#  The null space contains quadratic functions.
+x <- seq(-1,1,0.02)
+y <- x + 3*exp(-6*x^2) + rnorm(rep(1,101))*0.2
+#  set up a saturated B-spline basis
+basisobj <- create.bspline.basis(c(-1,1),101)
+lambda   <- 1
+fdParobj <- fdPar(basisobj, 2, lambda)
+result1  <- smooth.basis(x, y, fdParobj)
+yfd1     <- result1$fd
+c(result1$df,result1$gcv) #  display df and gcv measures
+lambda   <- 1e-4
+fdParobj <- fdPar(basisobj, 2, lambda)
+result2  <- smooth.basis(x, y, fdParobj)
+yfd2     <- result2$fd
+c(result2$df,result2$gcv)
+lambda   <- 0
+fdParobj <- fdPar(basisobj, 2, lambda)
+result3  <- smooth.basis(x, y, fdParobj)
+yfd3     <- result3$fd
+c(result3$df,result3$gcv)
+plot(x,y)           # plot the data
+lines(yfd1, lty=2)  #  add heavily penalized smooth
+lines(yfd2, lty=1)  #  add reasonably penalized smooth
+lines(yfd3, lty=3)  #  add smooth without any penalty
+legend(-1,3,c("1","0.0001","0"),lty=c(2,1,3))
+plotfit.fd(y, x, yfd2)  # plot data and smooth
+
+}
+% docclass is function
+\keyword{smooth}

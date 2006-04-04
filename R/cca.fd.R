@@ -1,96 +1,149 @@
-cca.fd <- function(fd, ncan = 2, lambda = 0.00025, Lfd = 2)
+cca.fd <- function(fdobj1, fdobj2=fdobj1, ncan = 2,
+                   ccafdParobj1=fdPar(basisobj1, 2, 1e-10),
+                   ccafdParobj2=ccafdParobj1,
+                   centerfns=TRUE)
 {
-#  carry out a functional CCA with regularization.
+#  Carry out a functional CCA with regularization using two different
+#    functional data samples.  These may have different bases, and
+#    different penalty functionals.  It is assumed that both are
+#    univariate.
 #  Arguments:
-#  FD        ... Functional data object.  It is assumed that there are
-#                  two functions for each replication.
-#  NCAN     ...  Number of pairs of canonical variates to be found
-#  LAMBDA    ... Smoothing or regularization parameter.  The value 1 is
-#                  arbitrary.  If lambda is a 2-vector then the first
-#                  component will be applied to the "x" and the second to
-#                  the "y" functions.
-#  LFD  ... The order derivative to be penalized if an integer, or
-#           a linear differential operator if a functional data object.
+#  FDOBJ1        ... Functional data object.
+#  FDOBJ2        ... Functional data object.
+#  NCAN          ... Number of pairs of canonical variates to be found
+#  CCAFDPAROBJ1  ... A functional parameter object for the first set of
+#                    canonical variables.
+#  CCAFDPAROBJ2  ... A functional parameter object for the second set of
+#                    canonical variables.
+#  CENTERFNS     ... A logical variable indicating whether or not to
+#                    center the functions before analysis.  Default is T.
 #
-#  Returns:  A list with the entries
-#  weight functions  ... A functional data object for the canonical
-#                  variate weight functions
-#  correlations    ... The corresponding set of canonical correlations
-#  variates        ... An array of the values taken by the canonical variates
-#                  (ie the scores on the variates.)  This is a 3-way array
-#                       with first dimension corresponding to replicates,
-#                       second to the different variates (dimension NCAN)
-#                       and third (dimension 2) to the "x" and "y" scores.
+#  Returns:  An object of the CCA.FD class containing:
+#  CCWTFD1       ... A functional data object for the first set of
+#                    canonical variables
+#  CCWTFD2       ... A functional data object for the second set of
+#                    canonical variables
+#  CANCORR       ... A vector of canonical correlations
+#  CCAVAR1       ... A matrix of scores on the first canonical variable.
+#  CCAVAR2       ... A matrix of scores on the second canonical variable.
 #
 
-  #  last modified 15 November 2001
+#  Last modified 27 March 2006
 
-  #  Check arguments
+  if (!(inherits(fdobj1, "fd"))) stop(
+		"Argument FDOBJ1 not a functional data object.")
+  if (!(inherits(fdobj2, "fd"))) stop(
+		"Argument FDOBJ2 not a functional data object.")
+		
+  if (centerfns) {
+      fdobj1 <- center.fd(fdobj1)
+      fdobj2 <- center.fd(fdobj2)
+  }
+  coef1  <- fdobj1$coefs
+  coefd1 <- dim(coef1)
+  ndim1  <- length(coefd1)
+  nrep1  <- coefd1[2]
 
-  if (!(inherits(fd, "fd"))) stop("Argument FD not a functional data object.")
+  coef2  <- fdobj2$coefs
+  coefd2 <- dim(coef2)
+  ndim2  <- length(coefd2)
+  nrep2  <- coefd2[2]
 
-  #  compute mean function and center if required
+  if (nrep1 != nrep2) stop("Numbers of replications are not equal.")
+  if (nrep1 < 2) stop("CCA not possible without replications.")
 
-  ctrfd <- center.fd(fd)
-  coef  <- getcoef(ctrfd)
-  coefd <- dim(coef)
-  ndim  <- length(coefd)
+  nrep <- nrep1
 
-  if (ndim < 3 || coefd[3] == 1) stop(
-     "CCA only possible with bivariate functions")
-  if (coefd[3] > 2) warning("Only first two of multiple functions used")
-  lambda <- c(lambda, lambda)
-  if (lambda[1] <= 0 || lambda[2] <= 0) stop(
-     "Smoothing parameters must be strictly positive")
-  basisfd   <- getbasis(ctrfd)
+  if (ndim1 > 2 || ndim2 > 2) stop(
+		"One or both functions are not univariate.")
 
-  nbasis    <- basisfd$nbasis
-  type      <- getbasistype(basisfd)
-  nrep      <- coefd[2]
-  if (nrep < 2) stop("CCA not possible without replications.")
-#
-#   Set up cross product matrices
-#
-  Jmat  <- getbasispenalty(basisfd, 0)
-  Jx    <- t(Jmat %*% coef[,  , 1])
-  Jy    <- t(Jmat %*% coef[,  , 2])
+  basisobj1  <- fdobj1$basis
+  nbasis1    <- basisobj1$nbasis
+  type1      <- basisobj1$type
+
+  basisobj2  <- fdobj2$basis
+  nbasis2    <- basisobj2$nbasis
+  type2      <- basisobj2$type
+
+  #   Set up cross product matrices
+
+  Jmat1 <- eval.penalty(basisobj1, 0)
+  Jmat2 <- eval.penalty(basisobj2, 0)
+  Jx    <- t(Jmat1 %*% coef1)
+  Jy    <- t(Jmat2 %*% coef2)
   PVxx  <- crossprod(Jx)/nrep
   PVyy  <- crossprod(Jy)/nrep
-  if (inherits(Lfd, "fd") || (is.numeric(Lfd) && Lfd >= 0)) {
-    Kmat  <- getbasispenalty(basisfd, Lfd)
-    if (lambda[1] > 0) PVxx  <- PVxx + lambda[1] * Kmat
-    if (lambda[2] > 0) PVyy  <- PVyy + lambda[2] * Kmat
-  }
   Vxy   <- crossprod(Jx,Jy)/nrep
-  #  do eigenanalysis
-  result <- geigen(Vxy, PVxx, PVyy)
-  #  set up canonical correlations and coefficients for weight functions
-  canwtcoef      <- array(0,c(nbasis,ncan,2))
-  canwtcoef[,,1] <- result$Lmat[,1:ncan]
-  canwtcoef[,,2] <- result$Mmat[,1:ncan]
-  corrs          <- result$values
-  #   Normalize the coefficients for weight functions
-  for (j in 1:ncan) for(k in 1:2) {
-      temp <- canwtcoef[,j,k]
-      temp <- temp/sqrt(sum(temp^2))
-      canwtcoef[,j,k] <- temp
-  }
-  #  set up the canonical weight functions
-  canwtfdnames      <- getnames(fd)
-  canwtfdnames[[2]] <- paste('Can. Fn.',as.character(1:ncan))
-  names(canwtfdnames)[2] <- 'Canonical functions'
-  names(canwtfdnames)[3] <-
-            paste('CCA wt. fns. for',names(canwtfdnames)[3])
-  canwtfd           <- create.fd(canwtcoef, basisfd, canwtfdnames)
-  #  set up canonical variable values
-  canvarvalues      <- array(0, c(nrep, ncan, 2))
-  canvarvalues[,,1] <- Jx %*% canwtcoef[,,1]
-  canvarvalues[,,2] <- Jy %*% canwtcoef[,,2]
-  #  set up return list
-  cancorlist        <- list(canwtfd, corrs, canvarvalues)
-  setOldClass("cca.fd")  
-  oldClass(cancorlist) <- "cca.fd"
-  names(cancorlist) <- c("weight functions", "correlations", "variates")
 
-  return(cancorlist)
+  #  add roughness penalty
+
+  if (!inherits(ccafdParobj1, "fdPar")) stop(
+		"CCAFDPAROBJ1 is not a FDPAR object.")
+  if (!inherits(ccafdParobj2, "fdPar")) stop(
+		"CCAFDPAROBJ2 is not a FDPAR object.")
+		
+  Lfdobj1 <- ccafdParobj1$Lfd
+  Lfdobj2 <- ccafdParobj2$Lfd
+  lambda1 <- ccafdParobj1$lambda
+  lambda2 <- ccafdParobj2$lambda
+
+  if (lambda1 > 0) {
+    Kmat1 <- eval.penalty(basisobj1, Lfdobj1)
+    PVxx  <- PVxx + lambda1 * Kmat1
+  }
+  if (lambda2 > 0) {
+    Kmat2 <- eval.penalty(basisobj2, Lfdobj2)
+    PVyy  <- PVyy + lambda2 * Kmat2
+  }
+
+  #  do eigenanalysis
+
+  result <- geigen(Vxy, PVxx, PVyy)
+
+  #  set up canonical correlations and coefficients for weight functions
+
+  canwtcoef1 <- result$Lmat[,1:ncan]
+  canwtcoef2 <- result$Mmat[,1:ncan]
+  corrs      <- result$values
+
+  #   Normalize the coefficients for weight functions
+
+  for (j in 1:ncan) {
+      temp <- canwtcoef1[,j]
+      temp <- temp/sqrt(sum(temp^2))
+      canwtcoef1[,j] <- temp
+      temp <- canwtcoef2[,j]
+      temp <- temp/sqrt(sum(temp^2))
+      canwtcoef2[,j] <- temp
+  }
+
+  #  set up the canonical weight functions
+
+  canwtfdnames      <- fdobj1$fdnames
+  canwtfdnames[[2]] <- "Canonical Variable"
+  names(canwtfdnames)[2] <- "Canonical functions"
+  names(canwtfdnames)[3] <-
+            paste("CCA wt. fns. for",names(canwtfdnames)[3])
+  canwtfd1 <- fd(canwtcoef1, basisobj1, canwtfdnames)
+  canwtfd2 <- fd(canwtcoef2, basisobj2, canwtfdnames)
+  canwtfd1$fdnames <- fdobj1$fdnames
+  canwtfd2$fdnames <- fdobj2$fdnames
+
+  #  set up canonical variable values
+
+  canvarvalues1 <- Jx %*% canwtcoef1
+  canvarvalues2 <- Jy %*% canwtcoef2
+
+  #  set up return list
+
+  ccafd        <- list(canwtfd1, canwtfd2, corrs,
+                       canvarvalues1, canvarvalues2)
+  names(ccafd) <- c("ccwtfd1", "ccwtfd2", "ccacorr",
+                    "ccavar1", "ccavar2")
+
+  setOldClass("cca.fd")
+  oldClass(ccafd) <- "cca.fd"
+
+  return(ccafd)
 }
+

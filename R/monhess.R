@@ -15,23 +15,24 @@ monhess <- function(x, Wfd, basislist)
 #  D2H   values of D2 h wrt c
 #  TVAL  Arguments used for trapezoidal approximation to integral
 
+#  Last modified 15 December 2005
+
 #  set some constants
 
-	#cat("\nD2cmonfn")
 EPS    <- 1e-5
 JMIN   <- 11
 JMAX   <- 15
 
 #  get coefficient matrix and check it
 
-coef  <- getcoef(Wfd)
+coef  <- Wfd$coefs
 coefd <- dim(coef)
 ndim  <- length(coefd)
 if (ndim > 1 & coefd[2] != 1) stop("WFD is not a single function")
 
 #  get the basis
 
-basis    <- getbasis(Wfd)
+basis    <- Wfd$basis
 rangeval <- basis$rangeval
 nbasis   <- basis$nbasis
 nbaspr   <- nbasis*(nbasis+1)/2

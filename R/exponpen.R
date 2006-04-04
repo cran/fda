@@ -1,56 +1,36 @@
-exponpen <- function(basisfd, Lfd=2)
+exponpen <- function(basisobj, Lfdobj=int2Lfd(2))
 {
 
 #  Computes the Exponential penalty matrix.
 #  Argument:
-#  BASISFD ... a basis.fd object of type "expon"
-#  LFD     ... either the order of derivative or a
+#  BASISOBJ ... a basis.fd object of type "expon"
+#  LFDOBJ   ... either the order of derivative or a
 #                linear differential operator to be penalized.
 #  Returns the penalty matrix.
 
-#  Last modified 5 December 2001
+#  Last modified 26 October 2005
 
-if (!(inherits(basisfd, "basis.fd"))) stop(
-    "First argument is not a basis.fd object.")
+#  Check BASISOBJ
 
-type <- getbasistype(basisfd)
+if (!(inherits(basisobj, "basisfd"))) stop(
+    "First argument is not a basis object.")
+
+type <- basisobj$type
 if (type != "expon") stop ("Wrong basis type")
 
-#  Find the highest order derivative in LFD
+#  Check LFDOBJ
 
-if (is.numeric(Lfd)) {
-    if (length(Lfd) == 1) {
-      	nderiv <- Lfd
-      	if (nderiv != as.integer(nderiv)) {
-        	stop("Order of derivative must be an integer")
-      	}
-      	if (nderiv < 0) {
-        	stop("Order of derivative must be 0 or positive")
-      	}
-    } else {
-      	stop("Order of derivative must be a single number")
-    }
-    if (nderiv < 0) stop ("Order of derivative cannot be negative")
-} else if (inherits(Lfd, "fd")) {
-   	derivcoef <- getcoef(Lfd)
-   	if (length(dim(derivcoef))==3) derivcoef <- derivcoef[,,1]
-   	nderiv <- dim(derivcoef)[2] - 1
-   	if (nderiv < 0) {
-   		stop("Order of derivative must be 0 or positive")
-   	}
-    nderiv <- ncol(derivcoef)
-} else {
-    stop("Second argument must be an integer or a functional data object")
-}
+Lfdobj <- int2Lfd(Lfdobj)
 
 #  Compute penalty matrix
 
-if (is.numeric(Lfd)) {
-    ratevec <- basisfd$params
+if (is.integer(Lfdobj)) {
+    nderiv  <- Lfdobj$nderiv
+    ratevec <- basisobj$params
     nrate   <- length(ratevec)
     penaltymatrix <- matrix(0,nrate,nrate)
-    tl <- basisfd$rangeval[1]
-    tu <- basisfd$rangeval[2]
+    tl <- basisobj$rangeval[1]
+    tu <- basisobj$rangeval[2]
     for (irate in 1:nrate) {
       	ratei <- ratevec[irate]
       	for (jrate in 1:irate) {
@@ -66,8 +46,8 @@ if (is.numeric(Lfd)) {
       	}
 	}
 } else {
-    penaltymatrix <- inprod(basisfd, basisfd, Lfd, Lfd)
+    penaltymatrix <- inprod(basisobj, basisobj, Lfdobj, Lfdobj)
 }
 
-return( penaltymatrix )
+penaltymatrix
 }

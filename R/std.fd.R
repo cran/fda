@@ -1,26 +1,27 @@
-std.fd <- function(fd)
+std.fd <- function(fdobj)
 {
   #  Compute the standard deviation functions for functional observations
   #  Argument:
-  #  FD    ... a functional data object
+  #  fdobj    ... a functional data object
   #  Return:
   #  STDFD ... a functional data for the standard deviation functions
 
-  #  Last modified 6 Feb 2001
+  #  Last modified 26 October 2005
 
-  if (!(inherits(fd, "fd"))) stop("Argument  FD not a functional data object.")
+  if (!(inherits(fdobj, "fd"))) stop(
+		"Argument  fdobj not a functional data object.")
 
-  coef     <- getcoef(fd)
+  coef     <- fdobj$coefs
   coefd    <- dim(coef)
   ndim     <- length(coefd)
   if (coefd[1] == 1) stop("Only one replication found.")
 
-  basisfd  <- getbasis(fd)
-  nbasis   <- basisfd$nbasis
-  rangeval <- basisfd$rangeval
-  fdnames  <- getnames(fd)
+  basisobj <- fdobj$basis
+  fdnames  <- fdobj$fdnames
+  nbasis   <- basisobj$nbasis
+  rangeval <- basisobj$rangeval
 
-  varbifd  <- var.fd(fd)
+  varbifd  <- var.fd(fdobj)
 
   neval    <- 10*nbasis + 1
   evalarg  <- seq(rangeval[1], rangeval[2], length=neval)
@@ -42,9 +43,9 @@ std.fd <- function(fd)
       }
     }
   }
-  stdcoef <- project.basis(stdmat, evalarg, basisfd)
+  stdcoef <- project.basis(stdmat, evalarg, basisobj)
   names(fdnames)[2] <- "Std. Dev."
   names(fdnames)[3] <- paste("Std. Dev.",names(fdnames)[3])
-  stdfd <- create.fd(stdcoef, basisfd, fdnames)
+  stdfd <- fd(stdcoef, basisobj, fdnames)
   return(stdfd)
 }

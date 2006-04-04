@@ -6,12 +6,12 @@ stepit <- function(linemat, ips, ind, dblwrd, MAXSTEP, dbgwrd) {
 #            Row 3 contains function values
 #  IPS:      If 1, previous slope was positive
 #  IND:      Termination status
-#  DBLWRD:   Vector of length 2:  dblwrd[1] T means step halved
-#                                 dblwrd[2] T means step doubled
+#  DBLWRD:   Vector of length 2:  dblwrd[1] TRUE means step halved
+#                                 dblwrd[2] TRUE means step doubled
 #  DBGWRD:   Print out details of step
 #  MAXSTEP:  maximum size of step
 
-#  Last modified 11 January 2001
+#  Last modified 19 September 2005
 
 test1 <- abs(linemat[2,5]) < abs(linemat[2,1])/10
 test2 <- linemat[3,5] > linemat[3,1]
@@ -21,7 +21,7 @@ if ((test1 || !test3) && test2) {
    #  function is worse and either slope is satisfory or negative
    ips <- 0        #  step is halved
    if (dblwrd[2]) {
-      ind < -5
+      ind = -5
       return(list(linemat, ips, ind, dblwrd))
    }
    linemat[1,5] <- min(c(linemat[1,5]/2, MAXSTEP))

@@ -1,28 +1,31 @@
 create.constant.basis <- function(rangeval = c(0,1))
 {
-  #  This function creates a constant basis
-  #  Argument:
-  #  RANGEVAL ... an array of length 2 containing the lower and upper
-  #  Return:
-  #  BASISFD  ... a functional data basis object of type "constant"
-  #
+#  This function creates a constant basis
+#  Argument:
+#  RANGEVAL ... an array of length 2 containing the lower and upper
+#  Return:
+#  BASISOBJ  ... a functional data basis object of type "constant"
+#
 
-  #  Last modified 25 March 2003
+#  Last modified 8 December 2005
 
-  type <- "constant"
+type     <- "const"
+nbasis   <- 1
+params   <- NULL
+dropind  <- NULL
+quadvals <- NULL
+values   <- NULL
 
-  if (!rangechk(rangeval)) stop('Argument RANGEVAL is not correct.')
+if (length(rangeval) == 1){
+    if (rangeval <= 0) stop("RANGEVAL a single value that is not postive.")
+    rangeval = c(0,rangeval)
+}
 
-  params  <- 0
+if (!rangechk(rangeval)) stop("Argument RANGEVAL is not correct.")
 
-  nbasis  <- 1
+basisobj <- basisfd(type=type, rangeval=rangeval, nbasis=nbasis, params=params,
+                    dropind=dropind, quadvals=quadvals, values=values)
 
-  #  set up basis object
+basisobj
 
-  basisfd <- list(type, rangeval, nbasis, params)
-  names(basisfd) <- c("type", "rangeval", "nbasis", "params")
-
-  class(basisfd) <- "basis.fd"
-
-  return(basisfd)
 }

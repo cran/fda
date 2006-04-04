@@ -1,0 +1,39 @@
+\name{varmx}
+\alias{varmx}
+\title{
+  Rotate a Matrix of Component Loadings using the VARIMAX Criterion
+}
+\description{
+The matrix being rotated contains the values of the component
+functional data objects computed in either a principal
+components analysis or a canonical correlation analysis.
+The values are computed over a fine mesh of argument values.
+}
+\usage{
+varmx(amat)
+}
+\arguments{
+\item{amat}{
+the matrix to be rotated.  The number of rows is
+equal to the number of argument values \code{nx} used
+in a fine mesh.  The number of columns is the number of
+components to be rotated.
+}
+}
+\value{
+a square rotation matrix of order equal to the number
+of components that are rotated.  A rotation matrix
+$T$ has that property that $T'T = TT' = I$.
+}
+\details{
+The VARIMAX criterion is the variance of the squared component values.
+As this criterion is maximized with respect to a rotation of the
+space spanned by the columns of the matrix, the squared loadings
+tend more and more to be either near 0 or near 1, and this tends to
+help with the process of labelling or interpreting the rotated matrix.
+}
+\seealso{
+varmx.pca, varmx.cca
+}
+% docclass is function
+\keyword{smooth}

@@ -1,25 +1,53 @@
 \name{exponpen}
 \alias{exponpen}
-\title{Exponential Penalty Matrix }
+\title{
+  Exponential Penalty Matrix
+}
 \description{
-Computes the matrix defining the roughness penalty for functions expressed in terms of a exponential basis. 
+Computes the matrix defining the roughness penalty for functions
+expressed in terms of an exponential basis.
 }
 \usage{
-exponpen(basisfd, Lfd=2)
+exponpen(basisobj, Lfdobj=int2Lfd(2))
 }
 \arguments{
-  \item{basisfd}{An exponential basis object. }
-  \item{Lfd}{Either a nonnegative integer or a linear differential operator object. }
+\item{basisobj}{
+an exponential basis object.
 }
-\details{
-A roughness penalty for a function x(t) is defined by integrating the square of either the derivative of x(t) or, more generally, the result of applying a linear differential operator L to it. The most common roughness penalty is the integral of the square of the second derivative D2x(t), and this is the default. To apply this roughness penalty, the matrix of inner products produced by this function is necessary. 
+\item{Lfdobj}{
+either a nonnegative integer or a linear differential operator object.
+}
 }
 \value{
-A symmetric matrix of order equal to the number of basis functions defined by the exponential basis object. Each element is the inner product of two exponential basis functions after applying the derivative or linear differential operator defined by Lfdobj. 
+a symmetric matrix of order equal to the number of basis functions
+defined by the exponential basis object.  Each element is the inner product
+of two exponential basis functions after applying the derivative or linear
+differential operator defined by Lfdobj.
 }
-\references{}
-\note{}
-\author{}
-\seealso{}
-\examples{}
-\keyword{}
+\details{
+A roughness penalty for a function $x(t)$ is defined by
+integrating the square of either the derivative of  $ x(t) $ or,
+more generally, the result of applying a linear differential operator
+$L$ to it.  The most common roughness penalty is the integral of
+the square of the second derivative, and
+this is the default. To apply this roughness penalty, the matrix of
+inner products of the basis functions (possibly after applying the
+linear differential operator to them) defining this function
+is necessary. This function just calls the roughness penalty evaluation
+function specific to the basis involved.
+}
+\seealso{
+expon, eval.penalty, getbasispenalty
+}
+\examples{
+
+#  set up an exponential basis with 3 basis functions
+ratevec  <- c(0, -1, -5)
+basisobj <- create.exponential.basis(c(0,1),3,ratevec)
+#  compute the 3 by 3 matrix of inner products of
+#  second derivatives
+penmat <- exponpen(basisobj)
+
+}
+% docclass is function
+\keyword{smooth}

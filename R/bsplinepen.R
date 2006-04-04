@@ -1,49 +1,62 @@
-bsplinepen <- function(basisfd, Lfd=2)
+bsplinepen <- function(basisobj, Lfdobj=2, rng=basisobj$rangeval)
 {
 
 #  Computes the Bspline penalty matrix.
 #  Arguments:
-#  BASISFD   ... a basis.fd object of type "bspline"
-#  LFD ... either the order of derivative or a
-#          nonhomogeneous linear differential operator to be penalized.
+#  BASISOBJ    a basis.fd object of type "bspline"
+#  LFDOBJ      A linear differential operator object.
+#  RNG         A range over which the product is evaluate
 #  Returns the penalty matrix.
 
-#  Last modified 5 December 2001
+#  Last modified 26 October 2005
 
-if (!(inherits(basisfd, "basis.fd"))) stop(
+#  check BASISOBJ
+
+if (!(inherits(basisobj, "basisfd"))) stop(
     "First argument is not a basis.fd object.")
 
-type <- getbasistype(basisfd)
-if (type != "bspline") stop("BASISFD not of type bspline")
+#  check basis type
 
-norder <- basisfd$nbasis - length(basisfd$params)
+type <- basisobj$type
+if (type != "bspline") stop("basisobj not of type bspline")
+
+#  check LFDOBJ
+
+Lfdobj <- int2Lfd(Lfdobj)
+
+#  get basis information
+
+nbasis <- basisobj$nbasis
+params <- basisobj$params
+
+#  if there are no internal knots, use the monomial penalty
+
+if (length(params) == 0) {
+    basisobj      <- create.monomial.basis(range, nbasis, 0:(nbasis-1))
+    penaltymatrix <- monompen(basisobj, Lfdobj, rng)
+    return(penaltymatrix)
+}
+
+#  normal case:  PARAMS is not empty
+
+rangeval  <- basisobj$rangeval
+breaks    <- c(rangeval[1],params,rangeval[2])  #  break points
+nbreaks   <- length(breaks)
+ninterval <- nbreaks - 1    #  number of intervals defined by breaks
+
+#  check break values
+
+if (length(breaks) < 2)
+    stop("The length of argument breaks is less than 2.")
 
 #  Find the highest order derivative in LFD
 
-if (is.numeric(Lfd)) {
-    if (length(Lfd) == 1) {
-      	nderiv <- Lfd
-      	if (nderiv != as.integer(nderiv)) {
-        	stop("Order of derivative must be an integer")
-      	}
-      	if (nderiv < 0) {
-        	stop("Order of derivative must be 0 or positive")
-      	}
-    } else {
-      	stop("Order of derivative must be a single number")
-    }
-    if (nderiv < 0) stop ("Order of derivative cannot be negative")
-} else if (inherits(Lfd, "fd")) {
-   	derivcoef <- getcoef(Lfd)
-   	if (length(dim(derivcoef))==3) derivcoef <- derivcoef[,,1]
-   	nderiv <- dim(derivcoef)[2] - 1
-   	if (nderiv < 0) {
-   		stop("Order of derivative must be 0 or positive")
-   	}
-    nderiv <- ncol(derivcoef)
-} else {
-    stop("Second argument must be an integer or a functional data object")
-}
+nderiv <- Lfdobj$nderiv
+
+norder <- nbasis - length(params)
+
+#  check for order of derivative being equal or greater than
+#  order of spline
 
 if (nderiv >= norder) {
 	cat(paste("Derivative of order", nderiv,
@@ -53,21 +66,163 @@ if (nderiv >= norder) {
    	stop()
 }
 
-if (nderiv == norder - 1 && is.numeric(Lfd)) {
-    breakvals  <- c(basisfd$rangeval[1], basisfd$params,
-                    basisfd$rangeval[2])
-    nbreakvals <- length(breakvals)
-    norder     <- basisfd$nbasis - nbreakvals + 2
-    if (nderiv >= norder) stop (
-         "NDERIV cannot be as large as order of B-spline.")
-    halfseq    <- (breakvals[2:nbreakvals] +
-                   breakvals[1:(nbreakvals-1)])/2
-    halfmat    <- bsplineS(halfseq, breakvals, norder, nderiv)
-    brwidth    <- diff(breakvals)
-    penaltymatrix <- t(halfmat) %*% diag(brwidth) %*% halfmat
-} else {
-    penaltymatrix <- inprod(basisfd, basisfd, Lfd, Lfd)
+#  check for order of derivative being equal to order of spline
+#  minus one, in which case following code won't work.
+
+if (nderiv > 0 && nderiv == norder - 1)
+    stop(paste("Penalty matrix cannot be evaluated for derivative of order ",
+               nderiv, " for B-splines of order ", norder, sep=""))
+
+#  special case where LFD is D^NDERIV and NDERIV = NORDER - 1
+
+bwtlist <- Lfdobj$bwtlist
+isintLfd <- TRUE
+if (nderiv > 0) {
+	for (ideriv in 1:nderiv) {
+		fdj <- bwtlist[[ideriv]]
+		if (!is.null(fdj)) {
+			if (any(fdj$coefs != 0)) {
+				isintLfd <- FALSE
+				break
+			}
+		}
+	}
 }
 
-return( penaltymatrix )
+if (isintLfd && nderiv == norder - 1) {
+    #  special case of nderiv = norder - 1
+    halfseq    <- (breaks[2:nbreaks] + breaks[1:(nbreaks-1)])/2
+    halfmat    <- bsplineM(halfseq, breaks, norder, nderiv)
+    brwidth    <- diff(breaks)
+    penaltymat <- sparse(t(halfmat) %*% diag(brwidth) %*% halfmat)
+    return(penaltymat)
+}
+
+#  look for knot multiplicities within the range
+
+intbreaks    <- c(rng[1], params, rng[2])
+index        <- intbreaks >= rng[1] & intbreaks <= rng[2]
+intbreaks    <- intbreaks[index]
+nintbreaks   <- length(intbreaks)
+uniquebreaks <- min(diff(intbreaks)) > 0
+
+#  if LFD is D^NDERIV, and there are no break multiplicities,
+#  use exact computation
+
+if (isintLfd && rng[1] == rangeval[1] &&
+    uniquebreaks      && rng[2] == rangeval[2]) {
+
+    #  Set up the knot sequence
+
+    onesv <- matrix(1,1,norder)
+    knots <- c(rangeval[1]*onesv, breaks[2:(nbreaks-1)], rangeval[2]*onesv)
+
+    # Construct  the piecewise polynomial representation
+
+    polyorder <- norder - nderiv
+    ndegree   <- polyorder - 1
+    prodorder <- 2*ndegree + 1   # order of product
+    polycoef  <- array(0, c(ninterval, polyorder, norder))
+    indxdown  <- seq(norder, (nderiv+1), -1)
+    for (i in 1:nbasis) {
+        #  compute polynomial representation of B(i,norder,t)(x)
+        t       <- knots[i:(i+norder)]
+        ppBlist <- ppBspline(t)
+        Coeff   <- ppBlist[[1]]
+        index   <- ppBlist[[2]]
+        nrowcoef <- dim(Coeff)[1]
+        # convert the index of the breaks in t to the index in the
+        # variable "breaks"
+        index <- index + i - norder
+        CoeffD <- matrix(Coeff[,1:polyorder],nrowcoef,polyorder)
+        if (nderiv > 0) {
+            for (ideriv in 1:nderiv) {
+                fac    <- indxdown - ideriv
+                CoeffD <- outer(rep(1,nrowcoef),fac) * CoeffD
+            }
+        }
+        # add the polynomial representation of B(i,norder,t)(x) to f
+        if (i >= norder) k <- norder else k <- i
+        if (i <= norder) m <- i      else m <- norder
+        for (j in 1:nrowcoef) polycoef[i-k+j,,m-j+1] <- CoeffD[j,]
+    }
+
+    # Compute the scalar products
+
+    prodmat <- matrix(0, nbasis, nbasis)
+    convmat <- array(0,c(norder, norder, prodorder))
+    for (k in 1:ninterval) {
+        #  get the coefficients for the polynomials for this interval
+        Coeff <- polycoef[k,,]
+        #  compute the coefficients for the products
+        for (i in 0:(ndegree-1)) {
+            ind <- (0:i) + 1
+            if (length(ind) == 1) {
+                convmat[,,i+1        ] <-
+                    outer(Coeff[ind,          ], Coeff[i-ind+2,      ])
+                convmat[,,prodorder-i] <-
+                    outer(Coeff[ndegree-ind+2,], Coeff[ndegree-i+ind,])	
+            } else {
+                convmat[,,i+1        ] <-
+                    crossprod(Coeff[ind,          ], Coeff[i-ind+2,      ])
+                convmat[,,prodorder-i] <-
+                    crossprod(Coeff[ndegree-ind+2,], Coeff[ndegree-i+ind,])
+            }
+        }
+        ind <- (0:ndegree)+1
+        convmat[,,ndegree+1] <-
+                crossprod(Coeff[ind,          ], Coeff[ndegree-ind+2,])
+        #  compute the coefficients of the integral
+        delta    <- breaks[k+1] - breaks[k]
+        power    <- delta
+        prodmati <- matrix(0, norder, norder)
+        for (i in 1:prodorder) {
+            prodmati <- prodmati +
+                power*convmat[,,prodorder-i+1]/i
+            power <- power*delta
+        }
+        # add the integral to s
+        index <- k:(k+norder-1)
+        prodmat[index,index] <- prodmat[index,index] + prodmati
+    }
+
+     penaltymat <- prodmat
+
+} else {
+
+    #  set iter
+
+    iter <- 0
+
+    #  LFDOBJ is not D^NDERIV, use approximate integration by calling
+    #  function INPROD().
+
+    if (uniquebreaks) {
+        #  no knot multiplicities
+        prodmat <- inprod(basisobj, basisobj, Lfdobj, Lfdobj, rng)
+    } else {
+        #  knot multiplicities  find their locations
+        rngvec <- rng[1]
+        for (i in 2:nbreaks) {
+            if (breaks[i] == breaks[i-1]) rngvec <- c(rngvec, breaks[i])
+        }
+        rngvec <- unique(rngvec)
+        nrng   <- length(rngvec)
+        if (rngvec[nrng] < rng[2]) {
+            rngvec <- c(rngvec,rng[2])
+            nrng   <- nrng + 1
+        }
+        #  sum prodmat over intervals between knot multiplicities
+        prodmat <- matrix(0,nbasis,nbasis)
+        for (i in 2:nrng) {
+            rngi <- c(rngvec[i-1] + 1e-10, rngvec[i] - 1e-10)
+            prodmati <- inprod(basisobj, basisobj, Lfdobj, Lfdobj, rngi)
+            prodmat <- prodmat + prodmati
+        }
+    }
+
+    penaltymat <- prodmat
+}
+
+    return( penaltymat )
 }

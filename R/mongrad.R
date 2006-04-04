@@ -14,18 +14,18 @@ mongrad <- function(x, Wfd, basislist=vector("list",JMAX)) {
 #  Returns:
 #  GVAL   ... value of gradient at input values in X.
 
-#  Last modified 1 January 2001
+#  Last modified 15 December 2005
 
   JMAX <- 15
   JMIN <- 11
   EPS  <- 1E-5
 
-  coef  <- getcoef(Wfd)
+  coef  <- Wfd$coefs
   coefd <- dim(coef)
   ndim  <- length(coefd)
   if (ndim > 1 && coefd[2] != 1) stop("Wfd is not a single function")
 
-  basisfd  <- getbasis(Wfd)
+  basisfd  <- Wfd$basis
   rangeval <- basisfd$rangeval
   nbasis   <- basisfd$nbasis
   onebas   <- rep(1,nbasis)

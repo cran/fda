@@ -23,14 +23,14 @@ plotscores <- function(pcafd, scores = c(1, 2), xlab = NULL, ylab = NULL,
 #               if 0 or NULL nothing is plotted beyond the scatterplot.
 #
 #    matplt2    the matplt value for the plot of the sample functions;
-#               if matplt=T, the curves are plotted on the same plot;
-#               if matplt=F, they are plotted separately.
+#               if matplt=TRUE, the curves are plotted on the same plot;
+#               if matplt=FALSE, they are plotted separately.
 #
 #   ...         arguments to be passed to the pc scores scatterplot
 #
 #  RETURNS:   a list containing the PC scores of the plotted functions
 
-#  Last modified 4 July 2001
+#  Last modified 26 October 2005
 
    if (!(inherits(pcafd, "pca.fd"))) stop('Argument PCAFD is not a pca.fd object.')
 
@@ -61,7 +61,7 @@ plotscores <- function(pcafd, scores = c(1, 2), xlab = NULL, ylab = NULL,
       "; Score", scores[2], "=", signif(zz$y, 2))
    names(fdnames)[2] <- "Sample function"
    names(fdnames)[3] <- "Function value"
-   fd <- create.fd(coefs, pcafd$meanfd$basis, fdnames)
+   fd <- fd(coefs, pcafd$meanfd$basis, fdnames)
    plot(fd, matplt = matplt2)
    return(zz)
 }

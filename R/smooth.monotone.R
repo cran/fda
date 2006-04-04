@@ -1,6 +1,6 @@
-smooth.monotone <- function(x, y, wt=rep(1,nobs), Wfdobj, zmat=matrix(1,nobs,1),
-                            Lfdobj=1, lambda=0, conv=.0001, iterlim=20,
-                            active=c(FALSE,rep(TRUE,ncvec-1)), dbglev=1) {
+smooth.monotone <- function(x, y, wt=rep(1,nobs), WfdParobj, zmat=matrix(1,nobs,1),
+                            conv=.0001, iterlim=20, active=c(FALSE,rep(TRUE,ncvec-1)),
+                            dbglev=1) {
 #  Smooths the relationship of Y to X using weights in WT by fitting a
 #     monotone function of the form
 #                   f(x) = b_0 + b_1 D^{-1} exp W(x)
@@ -21,19 +21,11 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), Wfdobj, zmat=matrix(1,nobs,1),
 #  X       ...  vector of argument values
 #  Y       ...  vector of function values to be fit
 #  WT      ...  a vector of weights
-#  WFDOBJ  ...  functional data object for W(x).  It's coefficient array
-#               has a single column, and these are the starting values
-#               for the iterative minimization of mean squared error.
+#  WFDPAROBJ  ...  functional parameter object for W(x).  The coefficient array
+#               for WFDPAROBJ$FD has a single column, and these are the
+#               starting values for the iterative minimization of mean squared error.
 #  ZMAT    ...  a matrix of covariate values for the constant term.
 #               It defaults to a column of one's
-#  LFDOBJ  ...  linear differential opr defining roughness penalty to
-#               be applied to WFDOBJ.  This may be either a functional data
-#               object defining a linear differential operator, or a
-#               nonnegative integer.  If the latter, it specifies the
-#               order of derivative to be penalized.
-#               LFDOBJ = 1 by default, corresponding to L = D.
-#  LAMBDA  ...  smoothing parameter determining the amount of penalty,
-#               0 by default.
 #  CONV    ...  convergence criterion, 0.0001 by default
 #  ITERLIM ...  maximum number of iterations, 20 by default
 #  ACTIVE  ...  vector of 1's and 0's indicating which coefficients
@@ -48,26 +40,30 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), Wfdobj, zmat=matrix(1,nobs,1),
 #  WFDOBJ    ...  functional data object for W(x).  Its coefficients are
 #                   those that optimize fit.
 #  BETA      ...  final regression coefficient values
-#  FNEW      ...  final function value
-#  MSG       ...  final gradient norm
+#  FLIST     ...  A list containing the final function value, gradient and
+#                 gradient norm.
 #  ITERNUM   ...  number of iterations
 #  ITERHIST  ...  ITERNUM+1 by 5 array containing iteration history
 
-#  Last modified 28 January 2003
-
-  if (!(inherits(Wfdobj, "fd"))) stop('Argument WFDOBJ is not a functional data object.')
+#  Last modified 26 October 2005
 
 #  initialize some arrays
 
-  nobs   <- length(x)      #  number of observations
-  basis  <- getbasis(Wfdobj)  #  basis for W(x)
-  nbasis <- basis$nbasis   #  number of basis functions
-  type   <- basis$type
+  x      <- as.vector(x)
+  nobs   <- length(x)         #  number of observations
 
 #  the starting values for the coefficients are in FD object WFDOBJ
 
-  cvec   <- getcoef(Wfdobj)
-  ncvec  <- length(cvec)
+  if (!(inherits(WfdParobj, "fdPar"))) stop(
+		"Argument WFDPAROBJ is not a functional data object.")
+
+  Wfdobj   <- WfdParobj$fd
+  Lfdobj   <- WfdParobj$Lfd
+  basisobj <- Wfdobj$basis     #  basis for W(x)
+  nbasis   <- basisobj$nbasis  #  number of basis functions
+  type     <- basisobj$type
+  cvec     <- Wfdobj$coefs
+  ncvec    <- length(cvec)
 
 #  check some arguments
 
@@ -94,11 +90,8 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), Wfdobj, zmat=matrix(1,nobs,1),
 
 #  initialize matrix Kmat defining penalty term
 
-  if (lambda > 0) {
-    Kmat <- lambda*getbasispenalty(basis, Lfdobj)
-  } else {
-    Kmat <- NULL
-  }
+  if (lambda > 0) Kmat <- lambda*getbasispenalty(basisobj, Lfdobj)
+  else            Kmat <- NULL
 
 #  Compute initial function and gradient values
 
@@ -124,7 +117,7 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), Wfdobj, zmat=matrix(1,nobs,1),
   status  <- c(iternum, Flist$f, Flist$norm, beta)
   if (dbglev >= 1) {
     cat("\nIter.   PENSSE   Grad Length Intercept   Slope")
-    cat('\n')
+    cat("\n")
     cat(iternum)
     cat("        ")
     cat(round(status[2],4))
@@ -135,33 +128,32 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), Wfdobj, zmat=matrix(1,nobs,1),
     cat("      ")
     cat(round(beta[ncovp1],4))
   }
-  if (dbglev == 0 && iterlim > 1) cat("Progress:  Each dot is an iteration\n")
 
   iterhist <- matrix(0,iterlim+1,length(status))
   iterhist[1,]  <- status
   if (iterlim == 0)
-    return ( list( "Wfdobj" = Wfdobj, "beta" = beta, "Flist" = Flist, 
+    return ( list( "Wfdobj" = Wfdobj, "beta" = beta, "Flist" = Flist,
                  "iternum" = iternum, "iterhist" = iterhist ) )
 
 #  -------  Begin iterations  -----------
 
   MAXSTEPITER <- 10
-  MAXSTEP <- 100
-  trial   <- 1
-  reset   <- FALSE
-  linemat <- matrix(0,3,5)
-  betaold <- beta
-  cvecold <- cvec
-  Foldlist <- Flist
-  dbgwrd  <- dbglev >= 2
+  MAXSTEP     <- 100
+  trial       <- 1
+  reset       <- FALSE
+  linemat     <- matrix(0,3,5)
+  betaold     <- beta
+  cvecold     <- cvec
+  Foldlist    <- Flist
+  dbgwrd      <- dbglev >= 2
+
   for (iter in 1:iterlim)
   {
-     if (dbglev == 0 && iterlim > 1) cat('.')
      iternum <- iternum + 1
      #  initialize logical variables controlling line search
-     dblwrd <- c(0,0)
-     limwrd <- c(0,0)
-     stpwrd <- 0
+     dblwrd <- c(FALSE,FALSE)
+     limwrd <- FALSE
+     stpwrd <- FALSE
      ind    <- 0
      ips    <- 0
      #  compute slope at 0 for line search
@@ -175,7 +167,7 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), Wfdobj, zmat=matrix(1,nobs,1),
       linemat[,1:4] <- outer(c(0, linemat[2,1], Flist$f),rep(1,4))
       stepiter <- 0
       if (dbglev >= 2) {
-          cat('\n')
+          cat("\n")
           cat(paste("                 ", stepiter, "  "))
           cat(format(round(t(linemat[,1]),6)))
       }
@@ -219,7 +211,7 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), Wfdobj, zmat=matrix(1,nobs,1),
         }
         #  compute new function value and gradient
         cvecnew <- cvec + linemat[1,5]*deltac
-        Wfdnew[[1]] <- as.matrix(cvecnew)
+        Wfdnew$coefs <- as.matrix(cvecnew)
         result  <- fngrad.smooth.monotone(y, x, zmat, wt, Wfdnew, lambda,
                                           Kmat, inact, basislist)
         Flist   <- result[[1]]
@@ -229,7 +221,7 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), Wfdobj, zmat=matrix(1,nobs,1),
         #  compute new directional derivative
         linemat[2,5] <- sum(deltac*Flist$grad)
         if (dbglev >= 2) {
-          cat('\n')
+          cat("\n")
           cat(paste("                 ", stepiter, "  "))
           cat(format(round(t(linemat[,5]),6)))
         }
@@ -244,7 +236,7 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), Wfdobj, zmat=matrix(1,nobs,1),
         if (ind == 0 | ind == 5) break
      }
      #  end iteration loop
-     cvec <- cvecnew
+     cvec    <- cvecnew
      Wfdobj  <- Wfdnew
      #  check that function value has not increased
      if (Flist$f > Foldlist$f) {
@@ -255,25 +247,25 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), Wfdobj, zmat=matrix(1,nobs,1),
           cat("\n")
         }
         #  reset parameters and fit
-        beta     <- betaold
-        cvec     <- cvecold
-        Wfdobj[[1]] <- cvec
-        Flist    <- Foldlist
-        deltac   <- -Flist$grad
+        beta         <- betaold
+        cvec         <- cvecold
+        Wfdobj$coefs <- cvec
+        Flist        <- Foldlist
+        deltac       <- -Flist$grad
         if (reset) {
           # This is the second time in a row that
           #  this has happened ... quit
           if (dbglev >= 2) cat("Reset twice, terminating.\n")
-          return ( list( "Wfdobj" = Wfdobj, "beta" = beta, "Flist" = Flist, 
-                 "iternum" = iternum, "iterhist" = iterhist ) )
+          return ( list( "Wfdobj" = Wfdobj, "beta" = beta, "Flist" = Flist,
+                         "iternum" = iternum, "iterhist" = iterhist ) )
         } else {
           reset <- TRUE
         }
      } else {
        if (abs(Foldlist$f - Flist$f) < conv) {
-	       cat('\n')
+	       cat("\n")
 	       break
-       }        
+       }
        cvecold  <- cvec
        betaold  <- beta
        Foldlist <- Flist
@@ -288,7 +280,7 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), Wfdobj, zmat=matrix(1,nobs,1),
      status <- c(iternum, Flist$f, Flist$norm, beta)
      iterhist[iter+1,] <- status
      if (dbglev >= 1) {
-        cat('\n')
+        cat("\n")
         cat(iternum)
         cat("        ")
         cat(round(status[2],4))
@@ -300,7 +292,7 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), Wfdobj, zmat=matrix(1,nobs,1),
         cat(round(beta[ncovp1],4))
      }
   }
-  return ( list( "Wfdobj" = Wfdobj, "beta" = beta, "Flist" = Flist, 
+  return ( list( "Wfdobj" = Wfdobj, "beta" = beta, "Flist" = Flist,
                  "iternum" = iternum, "iterhist" = iterhist ) )
 }
 
@@ -328,7 +320,7 @@ fngrad.smooth.monotone <- function(y, x, zmat, wt, Wfdobj, lambda,
   ncov   <- ncol(zmat)
   ncovp1 <- ncov + 1
   nobs   <- length(x)
-  cvec   <- getcoef(Wfdobj)
+  cvec   <- Wfdobj$coefs
   nbasis <- length(cvec)
   h      <- monfn(x, Wfdobj, basislist)
   Dyhat  <- mongrad(x, Wfdobj, basislist)

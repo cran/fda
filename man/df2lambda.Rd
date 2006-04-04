@@ -1,28 +1,76 @@
 \name{df2lambda}
 \alias{df2lambda}
-\title{Convert Degrees of Freedom to Smoothing Parameter }
+\title{
+  Convert Degrees of Freedom to a Smoothing Parameter Value
+}
 \description{
-The degree of roughness of an estimated function is controlled by a smoothing parameter lambda that directly multiplies the penalty. However, it can be difficult to interpret or choose this value, and it is often easier to determine the roughness by choosing a value that is equivalent of the degrees of freedom used by the smoothing procedure. This function converts a degrees of freedom value into a multipler lambda. 
+The degree of roughness of an estimated function is controlled by a
+smoothing parameter $lambda$ that directly multiplies the penalty.
+However, it can be difficult to interpret or choose this value, and it
+is often easier to determine the roughness by choosing a value that is
+equivalent of the degrees of freedom used by the smoothing procedure.
+This function converts a degrees of freedom value into a multipler
+$lambda$.
 }
 \usage{
-df2lambda(argvals, basisobj, wtvec=rep(1, n), Lfd=0, df=nbasis)
+df2lambda(argvals, basisobj, wtvec=rep(1, n), Lfdobj=0,
+          df=nbasis)
 }
 \arguments{
-  \item{argvals }{Argument values associated with the values to be smoothed. }
-  \item{basisobj}{A basis object.}
-  \item{wtvec}{A vector of weights for the data to be smoothed. }
-  \item{Lfd}{Either a nonnegative integer or a linear differential operator object. }
-  \item{df}{The degrees of freedom to be converted. }
+\item{argvals}{
+a vector containing rgument values associated with the values to
+be smoothed.
 }
-\details{
-The conversion requires a one-dimensional optimization and may be therefore computationally intensive. 
+\item{basisobj}{
+a basis function object.
+}
+\item{wtvec}{
+a vector of weights for the data to be smoothed.
+}
+\item{Lfdobj}{
+either a nonnegative integer or a linear differential operator object.
+}
+\item{df}{
+the degrees of freedom to be converted.
+}
 }
 \value{
-The equivalent smoothing parameter value. 
+a positive smoothing parameter value $lambda$
 }
-\references{}
-\note{}
-\author{}
-\seealso{}
-\examples{}
-\keyword{}
+\details{
+The conversion requires a one-dimensional optimization and may be
+therefore computationally intensive.
+}
+\seealso{
+lambda2df, lambda2gcv
+}
+\examples{
+
+#  Smooth growth curves using a specified value of
+#  degrees of freedom.
+#  Set up the ages of height measurements for Berkeley data
+age <- c( seq(1, 2, 0.25), seq(3, 8, 1), seq(8.5, 18, 0.5))
+#  Range of observations
+rng <- c(1,18)
+#  Set up a B-spline basis of order 6 with knots at ages
+knots  <- age
+norder <- 6
+nbasis <- length(knots) + norder - 2
+hgtbasis <- create.bspline.basis(rng, nbasis, norder, knots)
+#  Find the smoothing parameter equivalent to 12
+#  degrees of freedom
+lambda <- df2lambda(age, hgtbasis, df=12)
+#  Set up a functional parameter object for estimating
+#  growth curves.  The 4th derivative is penalyzed to
+#  ensure a smooth 2nd derivative or acceleration.
+Lfdobj <- 4
+growfdPar <- fdPar(hgtbasis, Lfdobj, lambda)
+#  Smooth the data.  The data for the girls are in matrix
+#  hgtf.
+hgtffd <- smooth.basis(age, growth$hgtf, growfdPar)$fd
+#  Plot the curves
+plot(hgtffd)
+
+}
+% docclass is function
+\keyword{smooth}

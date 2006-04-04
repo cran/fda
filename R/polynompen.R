@@ -1,56 +1,53 @@
-polynompen <- function(basisfd, Lfd=2)
+polynompen <- function(basisobj, Lfdobj=2)
 {
 
 #  Computes the polynomial penalty matrix for polynomials of the form
 #      (x-ctr)^l
 #  Arguments:
-#  BASISFD   ... a basis.fd object of type "poly"
-#  LFD ... either the order of derivative or a
-#           nonhomogeneous linear differential operator to be penalized.
+#  BASISOBJ ... a basis object of type "polynom"
+#  LFDOBJ   ... either the order of derivative or a  nonhomogeneous 
+#               linear differential operator to be penalized.
 #  Returns the penalty matrix.
 
-#  Last modified 5 December 2001
+#  Last modified 17 January 2006
 
-if (!(inherits(basisfd, "basis.fd"))) stop(
+if (!(inherits(basisobj, "basis"))) stop(
     "First argument is not a basis.fd object.")
 
-type <- getbasistype(basisfd)
-  if (type != "poly") stop("BASISFD not of type poly")
+Lfdobj <- int2Lfd(Lfdobj)
+
+type <- basisobj$type
+  if (type != "polynom") stop("BASISOBJ not of type polynom")
 
 #  Find the highest order derivative in LFD
 
-if (is.numeric(Lfd)) {
-    if (length(Lfd) == 1) {
-      	nderiv <- Lfd
-      	if (nderiv != as.integer(nderiv)) {
-        	stop("Order of derivative must be an integer")
-      	}
-      	if (nderiv < 0) {
-        	stop("Order of derivative must be 0 or positive")
-      	}
-    } else {
-      	stop("Order of derivative must be a single number")
-    }
-    if (nderiv < 0) stop ("Order of derivative cannot be negative")
-} else if (inherits(Lfd, "fd")) {
-   	derivcoef <- getcoef(Lfd)
-   	if (length(dim(derivcoef))==3) derivcoef <- derivcoef[,,1]
-   	nderiv <- dim(derivcoef)[2] - 1
-   	if (nderiv < 0) {
-   		stop("Order of derivative must be 0 or positive")
-   	}
-    nderiv <- ncol(derivcoef)
+if (inherits(Lfdobj, "Lfd")) {
+    nderiv <- Lfdobj$nderiv
 } else {
     stop("Second argument must be an integer or a functional data object")
 }
 
 #  Compute penalty matrix
 
-if (is.numeric(Lfd)) {
-    nbasis   <- basisfd$nbasis
-    rangex   <- basisfd$rangeval
-    ctr      <- basisfd$params[1]
-    basismat <- getbasismatrix(rangex, basisfd, nderiv)
+bwtlist <- Lfdobj$bwtlist
+isintLfd <- TRUE
+if (nderiv > 0) {
+	for (ideriv in 1:nderiv) {
+		fdj <- bwtlist[[ideriv]]
+		if (!is.null(fdj)) {
+			if (any(fdj$coefs != 0)) {
+				isintLfd <- FALSE
+				break
+			}
+		}
+	}
+}
+
+if (isintLfd) {
+    nbasis   <- basisobj$nbasis
+    rangex   <- basisobj$rangeval
+    ctr      <- basisobj$params[1]
+    basismat <- getbasismatrix(rangex, basisobj, nderiv)
     penmatl  <- outer(basismat[1,],basismat[1,])*(rangex[1] - ctr)
     penmatu  <- outer(basismat[2,],basismat[2,])*(rangex[2] - ctr)
     penaltymatrix <- matrix(0,nbasis,nbasis)
@@ -59,7 +56,7 @@ if (is.numeric(Lfd)) {
       	penaltymatrix[j,i] <- penaltymatrix[i,j]
     }
 } else {
-    penaltymatrix <- inprod(basisfd, basisfd, Lfd, Lfd)
+    penaltymatrix <- inprod(basisobj, basisobj, Lfdobj, Lfdobj)
 }
 
   return( penaltymatrix )

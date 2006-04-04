@@ -1,26 +1,30 @@
-plotfit.fd <- function(y, argvals, fd, rng = rangeval, index = 1:nrep, nfine = 101, residual = FALSE, sortwrd = FALSE) 
+plotfit.fd <- function(x, argvals, fdobj, rng = rangeval, index = 1:nrep, nfine = 101,
+                       residual = FALSE, sortwrd = FALSE, titles=NULL, ...)
 {
+  y <- x
 	#PLOTFIT plots discrete data along with a functional data object for fitting the
 	#  data.  It is designed to be used after DATA2FD, SMOOTH.FD or SMOOTH.BASIS to
 	#  check the fit of the data offered by the FD object.
 	#  Arguments:
 	#  Y        ... the data used to generate the fit
 	#  ARGVALS  ... discrete argument values associated with data
-	#  FD       ... a functional data object for fitting the data
+	#  fdobj       ... a functional data object for fitting the data
 	#  RNG      ... a range of argument values to be plotted
 	#  INDEX    ... an index for plotting subsets of the curves (either sorted or not)
 	#  NFINE    ... number of points to use for plotting curves
-	#  RESIDUAL ... if T, the residuals are plotted instead of the data plus curve
+	#  RESIDUAL ... if TRUE, the residuals are plotted instead of the data plus curve
 	#  SORTWRD  ... sort plots by mean square error
+	#  TITLES   ... vector of title strings for curves
 	
-	#  Last modified 4 July 2001
+	#  Last modified 20 March 2006
 	
-   if (!(inherits(fd, "fd"))) stop('Third argument is not a functional data object.')
+   if (!(inherits(fdobj, "fd"))) stop(
+		"Third argument is not a functional data object.")
 
-	basis    <- getbasis(fd)
-	rangeval <- basis$rangeval
+	basisobj <- fdobj$basis
+	rangeval <- basisobj$rangeval
 	
-	coef  <- getcoef(fd)
+	coef  <- fdobj$coefs
 	coefd <- dim(coef)
 	ndim  <- length(coefd)
 	
@@ -34,17 +38,19 @@ plotfit.fd <- function(y, argvals, fd, rng = rangeval, index = 1:nrep, nfine = 1
 	
 	curveno <- 1:nrep
 	
-	fdnames <- fd$fdnames
-	argname <- names(fdnames)[1]
-	if (nrep == 1) casenames <- names(fdnames)[2] else casenames <- fdnames[[2]]
-	if (nvar == 1) varnames  <- names(fdnames)[3] else varnames  <- fdnames[[3]]
+	fdnames <- fdobj$fdnames
+	argname <- names(fdnames)[[1]]
+	if (nrep == 1) casenames <- names(fdnames)[[2]] else casenames <- fdnames[[2]]
+	if (nvar == 1) varnames  <- names(fdnames)[[3]] else varnames  <- fdnames[[3]]
 	if (is.null(argname)) argname <- "Argument Value"
-	if (is.null(casenames) || length(casenames) != nrep) casenames <- as.character(1:nrep)
-	if (is.null( varnames) || length( varnames) != nvar) varnames  <- as.character(1:nvar)
+	if (is.null(casenames) || length(casenames) != nrep)
+		casenames <- as.character(1:nrep)
+	if (is.null( varnames) || length( varnames) != nvar)
+		varnames  <- as.character(1:nvar)
 
 	#  compute fitted values for evalargs and fine mesh of values
 	
-	yhat   <- array(eval.fd(argvals, fd),c(n,nrep,nvar))
+	yhat   <- array(eval.fd(argvals, fdobj),c(n,nrep,nvar))
 	res    <- y - yhat
 	MSE    <- apply(res^2,c(2,3),mean)
 	MSEsum <- apply(MSE,1,sum)
@@ -52,7 +58,7 @@ plotfit.fd <- function(y, argvals, fd, rng = rangeval, index = 1:nrep, nfine = 1
 	#  compute fitted values for fine mesh of values
 	
 	xfine <- seq(rng[1], rng[2], len=nfine)
-	yfine <- array(eval.fd(xfine, fd),c(nfine,nrep,nvar))
+	yfine <- array(eval.fd(xfine, fdobj),c(nfine,nrep,nvar))
 	
 	#  sort cases by MSE if desired
 	
@@ -107,31 +113,40 @@ plotfit.fd <- function(y, argvals, fd, rng = rangeval, index = 1:nrep, nfine = 1
 		
 	#  plot the results
 	
+	ndigit = abs(floor(log10(min(c(MSE)))) - 1)
 	if (residual) {
-		#  plot the residuals
-		ylimit <- range(res)
-	    for (i in 1:nrep) for (j in 1:nvar) {
-		    plot(argvals, res[,i,j], xlim=rng, ylim=ylimit,
-		          xlab=argname, ylab=paste("Residual for",varnames[j]),
-		          main=paste("Case",casenames[i],
-		                     "  RMS residual =",round(sqrt(MSE[i,j]),3)))
-		    abline(h=0, lty=2)
-           mtext("Click to advance to next plot",
-                    side = 3, line = -3, outer = TRUE)
-		    text(locator(1),"")
+	    #  plot the residuals
+	    ylimit <- range(res)
+	    for (i in 1:nrep) {
+              for (j in 1:nvar) {
+                #if (j==1) par(ask = TRUE) else par(ask = FALSE)
+		    plot(argvals, res[,i,j], xlim=rng, ylim=ylimit, 
+		          xlab=argname, ylab=paste("Residual for",varnames[j]))
+		    abline(h=0, lty=4, lwd=2)
+		    if (is.null(titles))
+		    	  title(main=paste("Case",casenames[i]),
+		              sub =paste("  RMS residual =",round(sqrt(MSE[i,j]),ndigit)))
+		    else title(main=paste(titles[i]),
+		               sub =paste("  RMS residual =",round(sqrt(MSE[i,j]),ndigit)))
+              }
 	    }			
 	} else {
-		#  plot the data and fit
-		ylimit <- range(c(c(y),c(yfine)))
-	    for (i in 1:nrep) for (j in 1:nvar) {
+	    #  plot the data and fit
+	    ylimit <- range(c(c(y),c(yfine)))
+	    for (i in 1:nrep) { 
+              for (j in 1:nvar) {
+                #if (j==1) par(ask = TRUE) else par(ask = FALSE)
 		    plot(argvals, y[,i,j], type="p", xlim=rng, ylim=ylimit, col=1,
-		          xlab=argname, ylab=varnames[j],
-		          main=paste("Case",casenames[i],
-		                     "  RMS residual =",round(sqrt(MSE[i,j]),3)))
-		    lines(xfine, yfine[,i,j], col=1)
-           mtext("Click to advance to next plot",
-                    side = 3, line = -3, outer = TRUE)
-		    text(locator(1),"")
+		          xlab=argname, ylab=varnames[j])
+		    lines(xfine, yfine[,i,j], col=1, lwd=2)
+		    if (is.null(titles))
+		    	title(main=paste("Case",casenames[i]),
+		            sub =paste("  RMS residual =",round(sqrt(MSE[i,j]),ndigit)))
+		    else 
+                  title(main=paste(titles[i]),
+		            sub =paste("  RMS residual =",round(sqrt(MSE[i,j]),ndigit)))
+              }
 	    }			
 	}
+	invisible(NULL)
 }

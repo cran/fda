@@ -1,26 +1,39 @@
 \name{varmx.pca.fd}
 \alias{varmx.pca.fd}
-\title{Rotation of Functional Principal Components with VARIMAX Criterion }
+\title{
+  Rotation of Functional Principal Components with VARIMAX
+Criterion
+}
 \description{
-Principal components are often easier to interpret if they are rotated. Among the many possible ways in which this rotation can be defined, the VARIMAX criterion seems to give satisfactory results most of the time. 
+Principal components are often easier to interpret if they are
+rotated.  Among the many possible ways in which this rotation can be
+defined, the VARIMAX criterion seems to give satisfactory results most
+of the time.
 }
 \usage{
-varmx.pca.fd(pcafd, nharm=scoresd[2], nx=101)
+varmx.pca.fd(pcafd, nharm=scoresd[2], nx=501)
 }
 \arguments{
-  \item{pcafd }{A principal components analysis object of class pca.fd. }
-  \item{nharm }{The number of principal components or harmonics to be rotated. }
-  \item{nx }{The number of argument values used to define the harmonics to be rotated. }
+\item{pcafd}{
+an object of class \code{pca.fd} that is produced by function
+\code{pca.fd}.
 }
-\details{
+\item{nharm}{
+the number of harmonics or principal components to be
+rotated.
+}
+\item{nx}{
+the number of argument values in a fine mesh
+used to define the harmonics to be
+rotated.
+}
 }
 \value{
-A princpal components analysis object of class pca.fd. 
+a rotated principal components analysis object of class
+\code{pca.fd}.
 }
-\references{}
-\note{}
-\author{}
-\seealso{}
-\examples{
+\seealso{
+varmx, varmx.cca
 }
-\keyword{}
+% docclass is function
+\keyword{smooth}

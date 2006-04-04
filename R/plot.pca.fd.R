@@ -1,0 +1,120 @@
+plot.pca.fd <- function(x, nx = 128, pointplot = TRUE, harm = 0,
+                        expand = 0, cycle = FALSE, ...)
+{
+  pcafd <- x
+#
+#  Plots the harmonics produced by PCA.FD.
+#
+#   If pointplot=TRUE, then the harmonics are plotted as + and -
+#    otherwise lines are used.  Another thing that needs doing is an
+#     arrowplot option.
+#
+# If harm = 0 (the default) then all the computed harmonics are plotted.
+#   Otherwise those in jharm are plotted.
+# If expand =0 then effect of +/- 2 standard deviations of each pc are given
+#   otherwise the factor expand is used.
+# If cycle=TRUE and there are 2 variables then a cycle plot will be drawn
+#  If the number of variables is anything else, cycle will be ignored.
+#
+
+#  Note that PCAFD is an oldClass type object
+
+#  Last modified 20 March 2006
+
+  if (!(inherits(pcafd, "pca.fd"))) stop(
+		"Argument PCAFD is not a pca.fd object.")
+
+  harmfd  <- pcafd[[1]]
+  basisfd <- harmfd$basis
+  rangex  <- basisfd$rangeval
+  x       <- seq(rangex[1], rangex[2], length = nx)
+  fdmat   <- eval.fd(x, harmfd)
+  meanmat <- eval.fd(x, pcafd$meanfd)
+  dimfd   <- dim(fdmat)
+  nharm   <- dimfd[2]
+  #if (nharm > 1) par(ask = TRUE) else par(ask = FALSE)
+  harm    <- as.vector(harm)
+  if(harm[1] == 0) harm <- (1:nharm)
+  if(length(dimfd) == 2) {
+    	for(iharm in harm) {
+          if(expand == 0) fac <- sqrt(pcafd$values[iharm])
+	    else            fac <- expand
+          vecharm <- fdmat[, iharm]
+          pcmat <- cbind(meanmat + fac * vecharm, meanmat - fac * vecharm)
+          if (pointplot) plottype <- "p" else plottype <- "l"
+          percentvar <- round(100 * pcafd$varprop[iharm], 1)
+          plot(x, meanmat, type = "l",
+	         ylim=c(min(pcmat),max(pcmat)),
+               ylab=paste("Harmonic", iharm),
+               main=paste("PCA function", iharm,
+                          "(Percentage of variability", percentvar, ")"),
+               ...)				
+	    if (pointplot) {
+		  points(x, pcmat[,1], pch="+")
+		  points(x, pcmat[,2], pch="-")
+	    }
+	    else {
+		  lines (x, pcmat[,1], lty=2)
+		  lines (x, pcmat[,2], lty=3)
+	    }
+   	}
+  }
+  else {
+    	if(cycle && dimfd[3] == 2) {
+          meanmat <- drop(meanmat)
+          for(iharm in harm) {
+              if(expand == 0) fac <- 2 * sqrt(pcafd$values[iharm])
+              else            fac <- expand
+              matharm <- fdmat[, iharm,  ]
+              mat1 <- meanmat + fac * matharm
+              mat2 <- meanmat - fac * matharm
+              if (pointplot) plottype <- "p" else plottype <- "l"
+              percentvar <- round(100 * pcafd$varprop[iharm],1)
+              plot(meanmat[,1], meanmat[,2], type=plottype,
+                   xlim=c(min(c(mat1[,1],mat2[,1])),max(c(mat1[,1],mat2[,1]))),
+                   ylim=c(min(c(mat1[,2],mat2[,2])),max(c(mat1[,2],mat2[,2]))),
+                   main=paste("PCA function", iharm,
+                              "(Percentage of variability", percentvar, ")"),
+                   ...)
+              if (pointplot) {
+		      points(mat1[, 1], mat1[, 2], pch="+")
+	            points(mat2[, 1], mat2[, 2], pch="-")
+              }
+              else {
+                  lines (mat1[, 1], mat1[, 2], lty=2)
+                  lines (mat2[, 1], mat2[, 2], lty=3)
+              }
+         }
+      } else {
+          for (iharm in harm) {
+              if (expand == 0) fac <- sqrt(pcafd$values[iharm]) 
+              else             fac <- expand
+        	  meanmat <- drop(meanmat)
+        	  matharm <- fdmat[, iharm,  ]
+        	  nvar    <- dim(matharm)[2]
+        	  for (jvar in 1:nvar) {
+          	      pcmat <- cbind(meanmat[, jvar] + fac * matharm[, jvar],
+                     		   meanmat[, jvar] - fac * matharm[, jvar])
+          		if (pointplot) plottype <- "p" else plottype <- "l"
+          		percentvar <- round(100 * pcafd$varprop[iharm], 1)
+          		plot(x, meanmat[,jvar], type=plottype,
+              	     ylab=paste("Harmonic", iharm),
+                       sub = paste("PCA function", iharm,
+                             	     "(Percentage of variability", 
+                                   percentvar,")"),
+                       main = dimnames(fdmat)[[3]][jvar],
+                       ...)
+			if (pointplot) {
+			    points(x, pcmat[,1], pch="+")
+			    points(x, pcmat[,2], pch="-")
+			}
+			else {
+			    lines (x, pcmat[,1], lty=2)
+			    lines (x, pcmat[,2], lty=3)
+			}
+        	  }
+          }
+    	}
+  }
+  invisible(NULL)
+}

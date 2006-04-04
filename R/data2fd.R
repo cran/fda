@@ -1,4 +1,4 @@
-data2fd <- function(y, argvals = seq(0, 1, len = n), basisfd,
+data2fd <- function(y, argvals = seq(0, 1, len = n), basisobj,
                     fdnames = defaultnames, argnames = c("time", "reps", "values") )
 {
 #  DATA2FD Converts an array Y of function values plus an array
@@ -116,21 +116,21 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisfd,
 #
 #  DATA2FD Returns the object FDOBJ of functional data class containing
 #    coefficients for the expansion and the functional data basis object
-#    basisfd.
+#    basisobj.
 #
 #  DATA2FD is intended for more casual use not requiring a great deal of
 #    control over the smoothness of the functional data object.  It uses
 #    function PROJECT.BASIS to compute the functional data object. Indeed,
 #    in the simplest and most common situation, DATA2FD consists of
-#             coef  = project.basis(y, argvals, basisfd)
-#             fdobj = fd(coef,basisfd,fdnames)
+#             coef  = project.basis(y, argvals, basisobj)
+#             fdobj = fd(coef,basisobj,fdnames)
 #    However, for more advanced applications requiring more smoothing
 #    control than is possible by setting the number of basis functions in
-#    basisfd, function SMOOTH.BASIS should be used.  Or, alternatively,
+#    basisobj, function SMOOTH.BASIS should be used.  Or, alternatively,
 #    DATA2FD may first be used with a generous number of basis functions,
 #    followed by smoothing using function SMOOTH.
 
-#  Last modified:  15 May 2001
+#  Last modified:  26 October 2005
 
 #
 #  set up default fdnames, using dimnames of Y if there are any.
@@ -141,11 +141,11 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisfd,
 # defaultnames[[3]] <- dimnames(y)[[3]]
 
 #
-#  check basisfd argument.
+#  check basisobj argument.
 #
-  if(!(inherits(basisfd, "basis.fd"))) stop(
-      "BASISFD is not a functional data basis.")
-  nbasis <- basisfd$nbasis
+  if(!(inherits(basisobj, "basisfd"))) stop(
+      "BASISOBJ is not a functional data basis.")
+  nbasis <- basisobj$nbasis
 
 #
 #  Make Y an array, and determine its dimensions
@@ -183,12 +183,12 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisfd,
   if (nargd==2 && argd[2] != nrep) stop(
     paste("Matrix argvals must have same number of columns\n",
           "as the number of replicates."))
-#  Issue a warning of arguments are outside of the in the basisfd.
-  rangeval <- basisfd$rangeval
+#  Issue a warning of arguments are outside of the in the basisobj.
+  rangeval <- basisobj$rangeval
   temp <- c(argvals)
   temp <- temp[!is.na(temp)]
   if (min(temp) < rangeval[1] | max(temp) > rangeval[2]) {
-    warning(c("Some arguments values are outside of the range in basisfd,\n",
+    warning(c("Some arguments values are outside of the range in basisobj,\n",
           " and some data values will not be used."))
     if (nargd == 1) {
        index <- argvals < rangeval[1] | argvals > rangeval[2]
@@ -214,9 +214,9 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisfd,
 #  First case:  no missing values, ARGVALS a vector
 #    In this case all of the work is done by function PROJECT.BASIS
       if (nbasis <= n) {
-        coef <- project.basis(y, argvals, basisfd)
+        coef <- project.basis(y, argvals, basisobj)
       } else {
-        coef <- project.basis(y, argvals, basisfd, TRUE)
+        coef <- project.basis(y, argvals, basisobj, TRUE)
       }
     } else {
 #  Second case: ARGVALS a vector, but missing data present
@@ -227,8 +227,8 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisfd,
 # set up penalty and basis matrices
 #
       index    <- !is.na(argvals)
-      basismat <- getbasismatrix(argvals, basisfd)
-      penmat   <- getbasispenalty(basisfd)
+      basismat <- eval.basis(argvals, basisobj)
+      penmat   <- getbasispenalty(basisobj)
       # add a small amount to diagonal of penalty to ensure conditioning
       penmat   <- penmat + 1e-10 * max(penmat) * diag(dim(penmat)[1])
       # add a small penalty to deal with underdetermination by data
@@ -270,8 +270,8 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisfd,
     argv     <- c(argvals)
     index    <- !is.na(argv)
     argv     <- unique(argv[index])
-    basismat <- getbasismatrix(argv, basisfd)
-    penmat   <- getbasispenalty(basisfd)
+    basismat <- eval.basis(argv, basisobj)
+    penmat   <- getbasispenalty(basisobj)
     penmat   <- penmat + 1e-10 * max(penmat) * diag(dim(penmat)[1])
     # add a small penalty to deal with underdetermination by data
     lambda1  <- 0.0001 * sum(basismat^2)/sum(diag(penmat))
@@ -287,7 +287,7 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisfd,
               paste("Less than 2 data values available for curve",
                     j,"."))
         coef[, j] <-
-            project.basis(yy[index], argv[index], basisfd, TRUE)
+            project.basis(yy[index], argv[index], basisobj, TRUE)
       }
     } else {
       #  Multivariate functions
@@ -299,15 +299,15 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisfd,
               paste("Less than 2 data values available for curve",
                     j," and variable",k,"."))
         coef[, j, k] <-
-            project.basis(yy[index], argv[index], basisfd, TRUE)
+            project.basis(yy[index], argv[index], basisobj, TRUE)
       }
     }
   }
   #
   #  Now that coefficient array has been computed, create functional data object
   #
-  fd <- create.fd(coef, basisfd, fdnames = fdnames)
+  fd <- fd(coef, basisobj, fdnames = fdnames)
 
-  return(fd)
+  fd
 }
 

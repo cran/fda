@@ -1,34 +1,66 @@
 \name{plotfit.fd}
 \alias{plotfit.fd}
-\title{Plot a Functional Data Object Along with Data }
+\title{
+  Plot a Functional Data Object With Data
+}
 \description{
-Functional observations are plotted one by one along with the data used to estimate them. 
+Functional observations are plotted one by one along with the data
+used to estimate them, or residuals can be plotted.  This function
+is useful for assessing how well a functional data object fits
+the actual discrete data.
 }
 \usage{
-plotfit.fd(y, argvals, fd, rng=rangeval, index=1:nrep,
-           nfine=101, residual=FALSE, sortwrd=FALSE)
+plotfit.fd(x, argvals, fdobj, rng = rangeval,
+           index = 1:nrep, nfine = 101, residual = FALSE,
+           sortwrd = FALSE, titles=NULL, ...)
 }
 \arguments{
-  \item{y }{The discrete observations used to estimate the functional data object. }
-  \item{argvals }{The argument values corresponding to y. }
-  \item{fd }{The functional data object to be plotted. }
-  \item{rng}{A vector of two strictly increasing values specifying a range over which the plots are to be shown. This range must be contained within the range used to define the functional data object. }
-  \item{index }{A set of indices of functions if only a subset of the observations are to be plotted. }
-  \item{nfine }{The number of argument values used to define the plot of the functional data object. }
-  \item{residual }{A logical variable. If TRUE, the residuals are plotted rather than the data and functional data object. }
-  \item{sortwrd }{A logical variable. If TRUE, the observations are sorted for plotting by the size of the sum of squared residuals. }
+\item{x}{
+a vector, matrix or array containing the discrete observations used to
+estimate the functional data object.
 }
-\details{
+\item{argvals}{
+a vector containing the argument values corresponding to the
+first dimension of \code{y}.
 }
-\value{
-A set of plots, where a mouse click advances from one plot to the next. 
+\item{fdobj}{
+a functional data object estimated from the data.
 }
-\references{}
-\note{}
-\author{}
+\item{rng}{
+a vector of length 2 specifying a reduced range contained within
+the range defined by the functional data object or the arguments.
+This is used to examine the fit over a limited segment of the
+whole range of it.
+}
+\item{index}{
+a set of indices of functions if only a subset of the
+observations are to be plotted.
+}
+\item{nfine}{
+the number of argument values used to define the plot of the
+functional data object.  This may need to be increased if
+the functions have a great deal of fine detail.
+}
+\item{residual}{
+a logical variable:
+if \code{TRUE}, the residuals are plotted rather than the
+data and functional data object.
+}
+\item{sortwrd}{
+a logical variable:
+if \code{TRUE}, the observations are sorted for
+plotting by the size of the sum of squared residuals.
+}
+\item{titles}{
+a vector containing strings that are titles for each observation.
+}
+\item{\dots }{
+additional arguments such as axis labels that may be used
+with other \code{plot} functions.
+}
+}
 \seealso{
-plotFd, linesFd 
+plot.fd, lines.fd
 }
-\examples{
-}
-\keyword{}
+% docclass is function
+\keyword{smooth}

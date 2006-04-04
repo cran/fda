@@ -1,72 +1,75 @@
-smooth.fd <- function(fd, lambda = 0, Lfd = NULL, rebase = TRUE)
-{
-#  Smooths a functional data object.
+smooth.fd <- function(fdobj, fdParobj){
+#SMOOTH_FD smooths a functional data object.
+#
 #  Arguments for this function:
 #
-#  FD      ... A functional data object.
-#
-#  LAMBDA  ... The smoothing parameter determining the weight to be
-#              placed on the size of the derivative in smoothing.  This
-#              is 0 by default, but this will produce a warning
-#              message that no smoothing has been carried out.
-#
-#  LFD     ... The order of derivative or a linear differential
-#              operator to be penalized in the smoothing phase.
-#              By default Lfd is set in function GETBASISPENALTY
-#
-#  If rebase=TRUE and the basis type is "polyg" then the basis
-#    is changed to a cubic bspline  basis and before smoothing
+#  FDOBJ    ... A functional data object.
+#  FDPAROBJ ... A functional parameter object.
 #
 #  Returns a functional data object containing a smoothed version
 #    of the input functional data object
 #
-
-#  Last modified 6 Feb 2001
- 
-#
-# Rebase to default B spline basis if rebase is T and basistype is
-#    polygonal.  Then test to see if any smoothing is actually required.
+#  Last modified:  26 October 2005
 #
 
-  if (!(inherits(fd, "fd"))) stop("Argument FD not a functional data object.")
+#  check fdParobj
 
-  basisfd <- getbasis(fd)
-  if(rebase == TRUE && basisfd$type == "polyg") {
-    fd <- data2fd(getcoef(fd), basisfd$params, fdnames = fd$fdnames)
-    basisfd <- getbasis(fd)
-  }
-  if(lambda <= 0) {
-    warning("LAMBDA was not positive. No smoothing carried out.")
-    return(fd)
-  }
+if (!inherits(fdParobj,"fdPar")) stop(
+		"FDPAROBJ is not a functional parameter object.")
+
+#  check LFD
+
+Lfdobj <- fdParobj$Lfd
+Lfdobj <- int2Lfd(Lfdobj)
+nderiv <- Lfdobj$nderiv
+
+#  set up FDOBJ
+
+newfdobj <- fdParobj$fd
+
+#  set up basis
+
+basisobj <- newfdobj$basis
+
 #
 #  Main smoothing step
 #
-  coef  <- NA * getcoef(fd)
-  coefd <- dim(coef)
-  ndim  <- length(coefd)
-  Bmat  <- inprod(basisfd, basisfd)
+
+coef  <- fdobj$coefs
+coefd <- dim(coef)
+ndim  <- length(coefd)
+if (ndim == 3)  nvar <- coefd[3] else nvar <- 1
+
+Bmat  <- inprod(basisobj, basisobj)
+
 #
 #  set up coefficient matrix for normal equations
 #
-  penmat <- getbasispenalty(basisfd, Lfd)
-  Cmat   <- Bmat + lambda * penmat
+
+lambda <- fdParobj$lambda
+penmat <- eval.penalty(basisobj, Lfdobj)
+
+penmat <- eval.penalty(basisobj, Lfdobj)
+Cmat   <- Bmat + lambda * penmat
+
 #
 #  solve normal equations for each observation
 #
-  if(ndim < 3) {
-    Dmat <- inprod(basisfd, fd)
-    coef <- symsolve(Cmat, Dmat)
-  }
-  else {
-    for(ivar in (1:coefd[3])) {
-      Dmat <- inprod(basisfd, fd[,ivar])
-      coef[,,ivar] <- symsolve(Cmat, Dmat)
+if (ndim < 3){
+     Dmat <- inprod(basisobj, fdobj)
+     coef <- solve(Cmat, Dmat)
+} else {
+	coef <- array(0,coefd)
+    for(ivar in 1:nvar){
+        Dmat <- inprod(basis, fdobj[,ivar])
+        coef[,,ivar] <- solve(Cmat, Dmat)
     }
-  }
-#
-#  replace coefficient matrix in fd, leaving other properties alone
-#
-  fd[[1]] <- coef
-  return(fd)
+}
+
+#  set up the smoothed functional data object
+
+fdnames <- fdobj$fdnames
+smthfd  <- fd(coef, basisobj, fdnames)
+
+return(smthfd)
 }

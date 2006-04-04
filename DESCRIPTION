@@ -1,9 +1,21 @@
 Package: fda
-Version: 1.0
-Date: 2003-12-14
+Version: 1.1.1
+Date: 2006-04-04
 Title: Functional Data Analysis
-Author: Jim Ramsay <ramsay@psych.mcgill.ca>
-Maintainer: Jim Ramsay <ramsay@psych.mcgill.ca>
-Description: Analysis of fucntional data, that is data where the basic observation is a function of some sort--an area involving the generalization of the techniques of multivariate data analysis to functional data
-License: GPL Version 2 or newer.
-URL: http://www.psych.mcgill.ca/faculty/ramsay/ramsay.html
+Author: J. O. Ramsay <ramsay@psych.mcgill.ca>.
+Maintainer: J. O. Ramsay <ramsay@psych.mcgill.ca>
+Depends: R (>= 2.1.0), splines
+Suggests: graphics
+Description: These functions were developed to support 
+   functional data analysis as described in Ramsay, J. O.
+   and Silverman, B. W. (2005) Functional Data Analysis.
+   New York: Springer.  They were ported from earlier
+   versions in Matlab and S-PLUS.  A manual that describes
+   the use of these functions is available in this
+   library. The library also contains a number of the
+   data sets used in the book along with R code for the
+   analyses that produced many of the figures in the book.
+License: GPL version 2 or later
+URL: http://www.functionaldata.org
+LazyData: true
+Packaged: Thu Apr  6 13:58:36 2006; hornik

@@ -1,28 +1,26 @@
-center.fd <- function(fd)
+center.fd <- function(fdobj)
 {
-  #  remove mean function for functional observations
+  	#  remove mean function for functional observations
 
-  #  Last modified 6 Feb 2001
+  	#  Last modified 26 October 2005
 
-  if (!(inherits(fd, "fd"))) stop('Argument  FD not a functional data object.')
-
-  coef   <- as.array(fd[[1]])
-  coefd  <- dim(coef)
-  ndim   <- length(coefd)
-  basis  <- fd[[2]]
-  nbasis <- basis$nbasis
-  if (ndim == 2) {
-    coefmean <- apply(coef,1,mean)
-    coef     <- sweep(coef,1,coefmean)
-  } else {
-    nvar <- coefd[3]
-    for (j in 1:nvar) {
-      coefmean <- apply(coef[,,j],1,mean)
-      coef[,,j] <- sweep(coef[,,j],1,coefmean)
-    }
-  }
-  fdnames <- fd$fdnames
-  names(fdnames)[3] <- paste('Centered',names(fdnames)[3])
-  centerfd <- create.fd(coef, basis, fdnames)
-  return(centerfd)
+  	coef     <- as.array(fdobj$coefs)
+  	coefd    <- dim(coef)
+  	ndim     <- length(coefd)
+  	basisobj <- fdobj$basis
+  	nbasis   <- basisobj$nbasis
+  	if (ndim == 2) {
+    	coefmean <- apply(coef,1,mean)
+    	coef     <- sweep(coef,1,coefmean)
+  	} else {
+    	nvar <- coefd[3]
+    	for (j in 1:nvar) {
+      		coefmean  <- apply(coef[,,j],1,mean)
+      		coef[,,j] <- sweep(coef[,,j],1,coefmean)
+    	}
+  	}
+  	fdnames      <- fdobj$fdnames
+  	fdnames[[3]] <- paste("Centered",fdnames[[3]])
+  	centerfdobj  <- fd(coef, basisobj, fdnames)
+  	return(centerfdobj)	
 }

@@ -1,4 +1,4 @@
-project.basis <- function(y, argvals, basisfd, penalize=FALSE)
+project.basis <- function(y, argvals, basisobj, penalize=FALSE)
 {
 #  Arguments for this function:
 #
@@ -12,8 +12,8 @@ project.basis <- function(y, argvals, basisfd, penalize=FALSE)
 #               If Y is a vector, only one replicate and variable are assumed.
 #  ARGVALS  ... A vector of argument values.  This must be of length
 #    length(Y) if Y is a vector or dim(Y)[1] otherwise.
-#  BASISFD  ... A basis.fd object
-#  PENALIZE ... If T, a penalty term is used to deal with a singular
+#  BASISOBJ ... A basis.fd object
+#  PENALIZE ... If TRUE, a penalty term is used to deal with a singular
 #               basis matrix.  But this is not normally needed.
 #
 #  Returns a coefficient vector or array. The first dimension is the number
@@ -21,16 +21,21 @@ project.basis <- function(y, argvals, basisfd, penalize=FALSE)
 #  the other dimensions of Y.
 #
 
-#  Last modified:  23 May 1998
+#  Last modified:  29 October 2005
+
+#  Check BASISOBJ
+
+  if (!inherits(basisobj, "basisfd")) stop(
+    "BASISOBJ is not a basis object.")
 
 #
 #  Calculate the basis and penalty matrices, using the default
 #   for the number of derivatives in the penalty.
 #
-  basismat <- getbasismatrix(argvals, basisfd)
+  basismat <- getbasismatrix(argvals, basisobj)
   Bmat     <- crossprod(basismat)
   if (penalize) {
-    penmat <- getbasispenalty(basisfd)
+    penmat <- eval.penalty(basisobj)
 #
 #  Add a very small multiple of the identity to penmat
 #   and find a regularization parameter
@@ -51,11 +56,11 @@ project.basis <- function(y, argvals, basisfd, penalize=FALSE)
     coef <- symsolve(Cmat, Dmat)
   } else {
     nvar <- dim(y)[3]
-    coef <- array(0, c(basisfd$nbasis, dim(y)[2], nvar))
+    coef <- array(0, c(basisobj$nbasis, dim(y)[2], nvar))
     for(ivar in 1:nvar) {
       Dmat <- crossprod(basismat, y[,  , ivar])
       coef[,  , ivar] <- symsolve(Cmat, Dmat)
     }
   }
-  return(coef)
+  coef
 }

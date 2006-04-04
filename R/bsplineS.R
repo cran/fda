@@ -25,7 +25,7 @@ bsplineS <- function (x, breaks, norder=4, nderiv=0)
   tol <- 1e-14
   nbreaks <- length(breaks)
   if (nbreaks < 2) stop('Number of knots less than 2.')
-  if (min(diff(breaks)) <= 0 ) stop('Knots are not strictly increasing')
+  if (min(diff(breaks)) < 0 ) stop('Knots are not increasing')
 
   if ( max(x) > max(breaks) + tol ||
        min(x) < min(breaks) - tol )

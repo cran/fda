@@ -1,0 +1,86 @@
+eval.posfd <- function(evalarg, Wfdobj, Lfdobj=int2Lfd(0))
+{
+#  Evaluates a value or a derivative of a positive functional
+#  data object.
+#  A positive functional data object h  is = the form
+#           h(x) = (exp Wfdobj)(x)
+#  Note that the linear differential operator object LFDOBJ
+#  MUST be an integer in the range 0 to 1.
+#  Note that the first two arguments may be interchanged.
+#
+#  Arguments:
+#  EVALARG ... A vector of values at which all functions are to
+#              evaluated.
+#  WFDOBJ  ... Functional data object.  It must define a single
+#              functional data observation.
+#  LFDOBJ  ... A linear differential operator object
+#              applied to the functions that are evaluated.
+#              Default is INT2LFD(0).
+#
+#  Returns:  An array of function values corresponding to the
+#              argument values in EVALARG
+
+#  Last modified 21 March 2006
+
+#  Exchange the first two arguments if the first is an FD object
+#    and the second numeric
+
+if (is.numeric(Wfdobj) & inherits(class(evalarg), "fd")) {
+    temp    <- Wfdobj
+    Wfdobj  <- evalarg
+    evalarg <- temp
+}
+
+#  Check the arguments
+
+if (!is.numeric(evalarg)) stop(
+	"Argument EVALARG is not numeric.")
+
+evalarg <- as.vector(evalarg)
+
+#  check WFDOBJ
+
+if (!inherits(Wfdobj, "fd")) stop(
+    "Argument WFDOBJ is not a functional data object.")
+
+#  check LFDOBJ
+
+Lfdobj = int2Lfd(Lfdobj)
+if (!inherits(Lfdobj, "Lfd")) stop(
+    "LFDOBJ is not linear differential operator object.")
+
+nderiv = Lfdobj$nderiv
+
+#  Extract information about the basis
+
+basisobj <- Wfdobj$basis
+nbasis   <- basisobj$nbasis
+rangeval <- basisobj$rangeval
+onerow   <- rep(1,nbasis)
+
+#  Set up coefficient array for FD
+
+coef  <- Wfdobj$coefs
+
+#  Evaluate function values
+
+index <- evalarg < rangeval[1]-1e-10
+if (length(evalarg[index]) > 0) evalarg <- evalarg[!index]
+index <- evalarg > rangeval[2]+1e-10
+if (length(evalarg[index]) > 0) evalarg <- evalarg[!index]
+
+basismat <- getbasismatrix(evalarg, basisobj)
+fdvec    <- exp(basismat %*% coef)
+
+#  If a differential operator has been defined in LFDOBJ, compute
+#  the derivative values
+
+if (nderiv > 0) {
+     Lbasismat <- eval.basis(evalarg, basisobj, Lfdobj)
+     evalarray <- fdvec*(Lbasismat %*% coef)
+} else evalarray <- fdvec
+
+return(evalarray)
+
+}
+

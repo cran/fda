@@ -1,13 +1,11 @@
-pca.fd <- function(fd, nharm = 2, lambda = 0, Lfd = 2, centerfns = TRUE)
+pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(), centerfns = TRUE)
 {
 #  Carry out a functional PCA with regularization
 #  Arguments:
-#  FD        ... Functional data object
+#  FDOBJ	    ... Functional data object
 #  NHARM     ... Number of principal components or harmonics to be kept
-#  LAMBDA    ... Smoothing or regularization parameter
-#  LFD       ... Either the order derivative or a linear differential operator
-#                to be penalized
-#  CENTERFNS ... If T, the mean function is first subtracted from each function
+#  HARMFDPAR ... Functional parameter object for the harmonics
+#  CENTERFNS ... If TRUE, the mean function is first subtracted from each function
 #
 #  Returns:  An object PCAFD of class "pca.fd" with these named entries:
 #  harmonics  ... A functional data object for the harmonics or eigenfunctions
@@ -18,25 +16,26 @@ pca.fd <- function(fd, nharm = 2, lambda = 0, Lfd = 2, centerfns = TRUE)
 #  meanfd     ... A functional data object giving the mean function
 #
 
-  #  Last modified:  15 November 2001
+  #  Last modified:  26 October 2005
 
   #  Check arguments
 
-  if (!(inherits(fd, "fd")))    stop("Argument FD  not a functional data object.")
+  if (!(inherits(fdobj, "fd"))) stop(
+		"Argument FD  not a functional data object.")
 
   #  compute mean function and center if required
 
-  meanfd <- meanFd(fd)
-  if (centerfns) fd <- center.fd(fd)
+  meanfd <- mean.fd(fdobj)
+  if (centerfns) fdobj <- center.fd(fdobj)
 
-  coef  <- getcoef(fd)
+  coef  <- fdobj$coefs
   coefd <- dim(coef)
   ndim  <- length(coefd)
   coefnames <- dimnames(coef)
 
-  fdbasis <- getbasis(fd)
-  nbasis  <- fdbasis$nbasis
-  type    <- getbasistype(fdbasis)
+  basisobj <- fdobj$basis
+  nbasis   <- basisobj$nbasis
+  type     <- basisobj$type
 
   nrep <- coefd[2]
   if (nrep < 2) stop("PCA not possible without replications.")
@@ -55,10 +54,12 @@ pca.fd <- function(fd, nharm = 2, lambda = 0, Lfd = 2, centerfns = TRUE)
 
   #  set up cross product and penalty matrices
 
+  Lfdobj <- harmfdPar$Lfd
+  lambda <- harmfdPar$lambda
   Cmat <- crossprod(t(ctemp))/nrep
-  Jmat <- getbasispenalty(fdbasis, 0)
+  Jmat <- eval.penalty(basisobj, 0)
   if(lambda > 0) {
-    Kmat <- getbasispenalty(fdbasis, Lfd)
+    Kmat <- eval.penalty(basisobj, Lfdobj)
     Wmat <- Jmat + lambda * Kmat
   } else {
     Wmat <- Jmat
@@ -124,12 +125,11 @@ pca.fd <- function(fd, nharm = 2, lambda = 0, Lfd = 2, centerfns = TRUE)
     harmnames <- list(coefnames[[1]], harmnames)
   if(length(coefd) == 3)
     harmnames <- list(coefnames[[1]], harmnames, coefnames[[3]])
-  harmfd   <- create.fd(harmcoef, fdbasis, harmnames)
+  harmfd   <- fd(harmcoef, basisobj, harmnames)
 
   pcafd        <- list(harmfd, eigvalc, harmscr, varprop, meanfd)
-  setOldClass("pca.fd")  
-  oldClass(pcafd) <- "pca.fd"
   names(pcafd) <- c("harmonics", "values", "scores", "varprop", "meanfd")
+  class(pcafd) <- c("pca.fd", class(pcafd))
 
   return(pcafd)
 }

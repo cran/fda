@@ -1,8 +1,4 @@
-is.Lfd <- function(Lfd) {
-#  check whether LFD is a linear differential operator
-  if (inherits(Lfd, 'fd') || (is.numeric(Lfd) && Lfd >= 0))  {
-    return(TRUE)
-  } else {
-    return(FALSE)
-  }
+is.Lfd <- function(Lfdobj) {
+#  check whether LFDOBJ is a linear differential operator
+  if (inherits(Lfdobj, "Lfd")) return(TRUE) else return(FALSE)
 }

@@ -39,10 +39,7 @@ stepchk <- function(oldstep, cvec, deltac, limwrd, ind,
         }
 #  check whether lower limit has been reached twice in a row
         if (limflg) {
-          if (limwrd) {
-            ind <- 1
-            break
-          } else limwrd <- TRUE
+          if (limwrd) ind <- 1 else limwrd <- TRUE
         } else limwrd <- FALSE
   return(list(newstep, ind, limwrd))
 }

@@ -1,27 +1,61 @@
 \name{getbasispenalty}
 \alias{getbasispenalty}
-\title{Evaluate a Roughness Penalty Matrix }
+\title{
+  Evaluate a Roughness Penalty Matrix
+}
 \description{
-Computes the matrix defining the roughness penalty for functions expressed in terms of a basis. 
+A basis roughness penalty matrix is the matrix containing
+the possible inner products of pairs of basis functions.
+These inner products are typically defined in terms of
+the value of a derivative or of a linear differential
+operator applied to the basis function.  The basis penalty
+matrix plays an important role in the computation of
+functions whose roughness is controlled by a roughness
+penalty.
 }
 \usage{
-getbasispenalty(basisfd, Lfd=NULL)
+getbasispenalty(basisobj, Lfdobj=NULL)
 }
 \arguments{
-  \item{basisfd }{A basis object. }
-  \item{Lfd }{Either a nonnegative integer or a linear differential operator object. }
+\item{basisobj}{
+a basis object.
 }
-\details{
-A roughness penalty for a function x(t) is defined by integrating the square of either the derivative of x(t) or, more generally, the result of applying a linear differential operator L to it. The most common roughness penalty is the integral of the square of the second derivative D2x(t), and this is the default. To apply this roughness penalty, the matrix of inner products of the basis functions defining this function is necessary. This function just calls the roughness penalty evaluation function specific to the basis involved. 
+\item{Lfdobj}{
+
+}
 }
 \value{
-A symmetric matrix of order equal to the number of basis functions defined by the B-spline basis object. Each element is the inner product of two B-spline basis functions after applying the derivative or linear differential operator defined by Lfd. 
+a symmetric matrix of order equal to the number of basis functions
+defined by the B-spline basis object.  Each element is the inner product
+of two B-spline basis functions after taking the derivative.
 }
-\references{}
-\note{}
-\author{}
+\details{
+A roughness penalty for a function $x(t)$ is defined by
+integrating the square of either the derivative of  $ x(t) $ or,
+more generally, the result of applying a linear differential operator
+$L$ to it.  The most common roughness penalty is the integral of
+the square of the second derivative, and
+this is the default. To apply this roughness penalty, the matrix of
+inner products of the basis functions defining this function is
+necessary. This function just calls the roughness penalty evaluation
+function specific to the basis involved.
+}
 \seealso{
-bsplinepen, exponpen, fourierpen, polygpen, powerpen 
+eval.penalty
 }
-\examples{}
-\keyword{}
+\examples{
+
+#  set up a B-spline basis of order 4 with 13 basis functions
+#  and knots at 0.0, 0.1,..., 0.9, 1.0.
+basisobj <- create.bspline.basis(c(0,1),13)
+#  compute the 13 by 13 matrix of inner products of second derivatives
+penmat <- getbasispenalty(basisobj)
+#  set up a Fourier basis with 13 basis functions
+#  and and period 1.0.
+basisobj <- create.fourier.basis(c(0,1),13)
+#  compute the 13 by 13 matrix of inner products of second derivatives
+penmat <- getbasispenalty(basisobj)
+
+}
+% docclass is function
+\keyword{smooth}

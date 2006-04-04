@@ -1,57 +1,53 @@
-smooth.pos <- function(x, y, wt=rep(1,nobs), Wfdobj, Lfdobj=2, lambda=0, 
-                       conv=1e-4, iterlim=20, dbglev=1) {
-# SMOOTH.POS estimates a positive function fitting a sample of scalar observations.
+smooth.pos <- function(argvals, y, WfdParobj, wt=rep(1,nobs), conv=1e-4,
+                       iterlim=20, dbglev=1) {
+# POSFD estimates a positive function fitting a sample of scalar observations.
 
 #  Arguments are:
-#  X  array of function values
-#  Y        array of argument values
-#  WT      ...  a vector of weights
-#  WFDOBJ   functional data basis object defining initial density
-#  LFDOBJ   linear differential operator defining roughness penalty
-#  LAMBDA   smoothing parameter
-#  CONV     convergence criterion
-#  ITERLIM  iteration limit for scoring iterations
-#  DBGLEV   level of output of computation history
+#  ARGVALS   ... array of function values
+#  Y         ... array of argument values
+#  WFDPARobj ... functional parameter object defining initial log smooth
+#  WT        ... a vector of weights
+#  CONV      ... Foldlistergence test value
+#  ITERLIM   ... iteration limit for scoring iterations
+#  DBGLEV    ... level of output of computation history
 
 #  Returns:
-#  WFDOBJ    functional data basis object defining final smooth function.
-#  FLIST     List containing
+#  WFDOBJ    functional data object defining final smooth function.
+#  FLIST      Struct object containing
 #               FLIST$f     final log likelihood
 #               FLIST$norm  final norm of gradient
 #  ITERNUM   Number of iterations
 #  ITERHIST  History of iterations
 
-#  last modified 1 April 2003
+#  last modified 26 October 2005
 
-   if (!(inherits(Wfdobj, "fd")))
-		stop("Argument WFD not a functional data object.")
 
-	basis  <- Wfdobj$basis
-	nbasis <- basis$nbasis
-	rangex <- basis$rangeval
+   if (!(inherits(WfdParobj, "fdPar")))
+		stop("Argument WFDPAROBJ not a functional parameter object.")
+	
+	Wfdobj   <- WfdParobj$fd
+	Lfdobj   <- WfdParobj$Lfd
+	basisobj <- Wfdobj$basis
+	nbasis   <- basisobj$nbasis
+	rangex   <- basisobj$rangeval
 
-#  check some arguments
-
-   if (any(wt < 0))  stop("One or more weights are negative.")
-   if (all(wt == 0)) stop("All weights are zero.")
-
-	N  <- length(x)
-	if (length(y) != N) stop("x and Y are not of the same length.")
+	N  <- length(argvals)
+	if (length(y) != N) stop("ARGVALS and Y are not of the same length.")
 	
 	#  check for argument values out of range
 	
-	inrng <- (1:N)[x >= rangex[1] & x <= rangex[2]]
+	inrng <- (1:N)[argvals >= rangex[1] & argvals <= rangex[2]]
 	if (length(inrng) != N)
-    	warning("Some values in x out of range and not used.")
+    	warning("Some values in argvals out of range and not used.")
 
-	x <- x[inrng]
+	argvals <- argvals[inrng]
 	y       <- y[inrng]
-	nobs    <- length(x)
+	nobs    <- length(argvals)
 
 	#  set up some arrays
 
 	climit  <- c(rep(-50,nbasis),rep(400,nbasis))
-	cvec0   <- getcoef(Wfdobj)
+	cvec0   <- Wfdobj$coefs
 	hmat    <- matrix(0,nbasis,nbasis)
 	active  <- 1:nbasis
 	dbgwrd  <- dbglev > 1
@@ -59,12 +55,12 @@ smooth.pos <- function(x, y, wt=rep(1,nobs), Wfdobj, Lfdobj=2, lambda=0,
 	#  initialize matrix Kmat defining penalty term
 
 	if (lambda > 0)
-	  	Kmat <- lambda*getbasispenalty(basis, Lfdobj)
+	  	Kmat <- lambda*eval.penalty(basisobj, Lfdobj)
 
 	#  evaluate log likelihood
 	#    and its derivatives with respect to these coefficients
 
-	result <- loglfnpos(x, y, wt, basis, cvec0)
+	result <- loglfnpos(argvals, y, basisobj, cvec0, Kmat, wt)
 	logl   <- result[[1]]
 	Dlogl  <- result[[2]]
 
@@ -73,14 +69,14 @@ smooth.pos <- function(x, y, wt=rep(1,nobs), Wfdobj, Lfdobj=2, lambda=0,
 	f0    <- -logl
 	gvec0 <- -Dlogl
 	if (lambda > 0) {
-   		gvec0 <- gvec0 + 2*(Kmat %*% cvec0)
-   		f0 <- f0 + t(cvec0) %*% Kmat %*% cvec0
+   		gvec0 <- gvec0 +            2*Kmat %*% cvec0
+   		f0    <- f0    + t(cvec0) %*% Kmat %*% cvec0
 	}
-	Foldstr <- list(f = f0, norm = sqrt(mean(gvec0^2)))
+	Foldlist <- list(f = f0, norm = sqrt(mean(gvec0^2)))
 
 	#  compute the initial expected Hessian
 
-	hmat0 <- Varfnpos(x, wt, basis, cvec0)
+	hmat0 <- loglhesspos(argvals, y, basisobj, cvec0, Kmat, wt)
 	if (lambda > 0) hmat0 <- hmat0 + 2*Kmat
 
 	#  evaluate the initial update vector for correcting the initial bmat
@@ -91,7 +87,7 @@ smooth.pos <- function(x, y, wt=rep(1,nobs), Wfdobj, Lfdobj=2, lambda=0,
 	#  initialize iteration status arrays
 
 	iternum <- 0
-	status <- c(iternum, Foldstr$f, -logl, Foldstr$norm)
+	status <- c(iternum, Foldlist$f, -logl, Foldlist$norm)
 	cat("Iteration  Criterion  Neg. Log L  Grad. Norm\n")
 	cat("      ")
 	cat(format(iternum))
@@ -101,9 +97,9 @@ smooth.pos <- function(x, y, wt=rep(1,nobs), Wfdobj, Lfdobj=2, lambda=0,
 	iterhist <- matrix(0,iterlim+1,length(status))
 	iterhist[1,]  <- status
 	if (iterlim == 0) {
-    	Flist     <- Foldstr
+    	Flist     <- Foldlist
     	iterhist <- iterhist[1,]
-		return( list("Wfdobj"=Wfdobj, "Flist"=Flist, 
+		return( list("Wfdobj"=Wfdobj, "Flist"=Flist,
 			          "iternum"=iternum, "iterhist"=iterhist) )
 	} else {
 		gvec <- gvec0
@@ -121,12 +117,12 @@ smooth.pos <- function(x, y, wt=rep(1,nobs), Wfdobj, Lfdobj=2, lambda=0,
 	for (iter in 1:iterlim) {
    		iternum <- iternum + 1
 	   	#  take optimal stepsize
-   		dblwrd <- c(0,0)
-		limwrd <- c(0,0)
-		stpwrd <- 0
+   		dblwrd <- c(FALSE,FALSE)
+		limwrd <- FALSE
+		stpwrd <- FALSE
 		ind    <- 0
 	   	#  compute slope
-      	Flist <- Foldstr
+      	Flist <- Foldlist
       	linemat[2,1] <- sum(deltac*gvec)
       	#  normalize search direction vector
       	sdg     <- sqrt(sum(deltac^2))
@@ -148,7 +144,7 @@ smooth.pos <- function(x, y, wt=rep(1,nobs), Wfdobj, Lfdobj=2, lambda=0,
       	}
       	linemat[1,1:4] <- 0
       	linemat[2,1:4] <- linemat[2,1]
-      	linemat[3,1:4] <- Foldstr$f
+      	linemat[3,1:4] <- Foldlist$f
       	stepiter  <- 0
       	if (dbglev > 1) {
 			cat("              ")
@@ -171,7 +167,7 @@ smooth.pos <- function(x, y, wt=rep(1,nobs), Wfdobj, Lfdobj=2, lambda=0,
 			limwrd       <- result[[3]]
        	if (linemat[1,5] <= 1e-9) {
           		#  Current step size too small  terminate
-          		Flist    <- Foldstr
+          		Flist    <- Foldlist
           		cvecnew <- cvec
           		gvecnew <- gvec
           		if (dbglev > 1) print(paste("Stepsize too small:", linemat[1,5]))
@@ -180,7 +176,7 @@ smooth.pos <- function(x, y, wt=rep(1,nobs), Wfdobj, Lfdobj=2, lambda=0,
         	}
         	cvecnew <- cvec + linemat[1,5]*deltac
         	#  compute new function value and gradient
-			result <- loglfnpos(x, y, wt, basis, cvecnew)
+			result <- loglfnpos(argvals, y, basisobj, cvecnew, Kmat, wt)
 			logl  <- result[[1]]
 			Dlogl <- result[[2]]
         	Flist$f  <- -logl
@@ -206,14 +202,14 @@ smooth.pos <- function(x, y, wt=rep(1,nobs), Wfdobj, Lfdobj=2, lambda=0,
 			ind     <- result[[3]]
 			dblwrd  <- result[[4]]
         	trial   <- linemat[1,5]
-        	#  ind == 0 implies convergence
+        	#  ind == 0 implies Foldlistergence
         	if (ind == 0 | ind == 5) break
         	#  end of line search loop
      	}
 
      	cvec <- cvecnew
      	gvec <- gvecnew
-	  	Wfdobj <- putcoef(cvec, Wfdobj)
+	  	Wfdobj$coefs <- cvec
      	status <- c(iternum, Flist$f, -logl, Flist$norm)
      	iterhist[iter+1,] <- status
 		cat("      ")
@@ -221,15 +217,15 @@ smooth.pos <- function(x, y, wt=rep(1,nobs), Wfdobj, Lfdobj=2, lambda=0,
 		cat("    ")
 		cat(format(status[2:4]))
 		cat("\n")
-     	#  test for convergence
-     	if (abs(Flist$f-Foldstr$f) < conv) {
+     	#  test for Foldlistergence
+     	if (as.numeric(abs(Flist$f - Foldlist$f)) < conv) {
        	iterhist <- iterhist[1:(iternum+1),]
-			return( list("Wfdobj"=Wfdobj, "Flist"=Flist, 
+			return( list("Wfdobj"=Wfdobj, "Flist"=Flist,
 			             "iternum"=iternum, "iterhist"=iterhist) )
      	}
-     	if (Flist$f >= Foldstr$f) break
+     	if (Flist$f >= Foldlist$f) break
      	#  compute the Hessian
-     	hmat <- Varfnpos(x, wt, basis, cvec)
+     	hmat <- loglhesspos(argvals, y, basisobj, cvec, Kmat, wt)
      	if (lambda > 0) hmat <- hmat + 2*Kmat
      	#  evaluate the update vector
      	deltac <- -solve(hmat,gvec)
@@ -238,42 +234,42 @@ smooth.pos <- function(x, y, wt=rep(1,nobs), Wfdobj, Lfdobj=2, lambda=0,
        	if (dbglev > 1) print("cos(angle) negative")
        	deltac <- -gvec
      	}
-     	Foldstr <- Flist
+     	Foldlist <- Flist
 		#  end of iterations
   	}
 	#  compute final normalizing constant
-	return( list("Wfdobj"=Wfdobj, "Flist"=Flist, 
+	return( list("Wfdobj"=Wfdobj, "Flist"=Flist,
 			      "iternum"=iternum, "iterhist"=iterhist) )
 }
 
 #  ---------------------------------------------------------------
 
-loglfnpos <- function(x, y, wt, basis, cvec) {
+loglfnpos <- function(argvals, y, basisobj, cvec, Kmat, wt) {
 	#  Computes the log likelihood and its derivative with
 	#    respect to the coefficients in CVEC
-   	N       <- length(x)
-   	nbasis  <- basis$nbasis
-   	phimat  <- getbasismatrix(x, basis)
+   	N       <- length(argvals)
+   	nbasis  <- basisobj$nbasis
+   	phimat  <- getbasismatrix(argvals, basisobj)
 	Wvec    <- phimat %*% cvec
 	EWvec   <- exp(Wvec)
 	res     <- y - EWvec
-   	logl    <- -mean(wt.*res^2)
-  	Dlogl   <- 2*crossprod(phimat,wt*res*EWvec)/N
+   	logl    <- -mean(wt*res^2) - t(cvec) %*% Kmat %*% cvec
+  	Dlogl   <- 2*crossprod(phimat,wt*res*EWvec)/N - 2*Kmat %*% cvec
 	return( list(logl, Dlogl) )
 }
 
 #  ---------------------------------------------------------------
 
-Varfnpos <- function(x, wt, basis, cvec) {
+loglhesspos <- function(argvals, y, basisobj, cvec, Kmat, wt) {
 	#  Computes the expected Hessian
-   	N       <- length(x)
-   	nbasis  <- basis$nbasis
-   	phimat  <- getbasismatrix(x, basis)
+   	N       <- length(argvals)
+   	nbasis  <- basisobj$nbasis
+   	phimat  <- getbasismatrix(argvals, basisobj)
 	Wvec    <- phimat %*% cvec
 	EWvec   <- exp(Wvec)
 	res     <- y - EWvec
-	Dres    <- ((res*EWvec) %*% matrix(1,1,nbasis)) * phimat
-	D2logl  <- 2*t(Dres) %*% Dres/N
+	Dres    <- ((wt*res*EWvec) %*% matrix(1,1,nbasis)) * phimat
+  	D2logl  <- 2*crossprod(Dres)/N + 2*Kmat
 	return(D2logl)
 }
 	

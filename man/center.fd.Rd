@@ -1,25 +1,38 @@
 \name{center.fd}
 \alias{center.fd}
-\title{Center Functional Data}
+\title{
+  Center Functional Data
+}
 \description{
-Subtract the pointwise mean from each of the functions in a functional data object; that is, to center them on the mean function. 
+Subtract the pointwise mean from each of the functions
+in a functional data object; that is, to center them on the mean function.
 }
 \usage{
-center.fd(fd)
+center.fd(fdobj)
 }
 \arguments{
-  \item{fd}{A functional data object. }
+\item{fdobj}{
+a functional data object to be centered.
 }
-\details{
 }
 \value{
-Returns a functional data object with same dimensions as fd that contains the centered versions of the functions in the object fd. 
+a functional data object whose mean is zero.
 }
-\references{}
-\note{}
-\author{}
 \seealso{
-sumFd, meanFd, std.fd 
+mean.fd, sum.fd, stddev.fd, std.fd
 }
-\examples{}
-\keyword{}
+\examples{
+daytime    <- (1:365)-0.5
+daybasis   <- create.fourier.basis(c(0,365), 365)
+harmLcoef  <- c(0,(2*pi/365)^2,0)
+harmLfd    <- vec2Lfd(harmLcoef, c(0,365))
+templambda <- 0.01
+tempfdPar  <- fdPar(daybasis, harmLfd, templambda)
+tempfd     <- smooth.basis(daytime, daily$tempav, tempfdPar)$fd
+tempctrfd  <- center.fd(tempfd)
+par(mfrow=c(1,1),pty="m")
+plot(tempctrfd, xlab="Day", ylab="deg. C",
+     main = "Centered temperature curves")
+}
+% docclass is function
+\keyword{smooth}

@@ -4,7 +4,7 @@ eval.bifd <- function(sevalarg, tevalarg, bifd, sLfd = 0, tLfd = 0) {
   #  SEVALARG and TEVALARG.  Differential operators SLFD and TLFD are
   #     applied to BIFD if present.
 
-  #  Last modified 6 Feb 2001
+  #  Last modified 26 October 2005
 
   if (!is.vector(sevalarg)) stop(
      "First argument is not a vector.")
@@ -16,84 +16,48 @@ eval.bifd <- function(sevalarg, tevalarg, bifd, sLfd = 0, tLfd = 0) {
 
   if (!(inherits(bifd, "bifd"))) stop("Third argument is not a bifd object")
 
-  sbasisfd <- bifd[[2]]
-  snbasis  <- sbasisfd$nbasis
-  rangeval <- sbasisfd$rangeval
+  sbasisobj <- bifd$sbasis
+  snbasis   <- sbasisobj$nbasis
+  rangeval  <- sbasisobj$rangeval
   if (min(sevalarg) < rangeval[1] || max(sevalarg) > rangeval[2]) stop(
     "Values of the first argument are outside of permitted range.")
 
-  tbasisfd <- bifd[[3]]
-  tnbasis  <- tbasisfd$nbasis
-  rangeval <- tbasisfd$rangeval
+  tbasisobj <- bifd$tbasis
+  tnbasis   <- tbasisobj$nbasis
+  rangeval  <- tbasisobj$rangeval
   if (min(tevalarg) < rangeval[1] || max(tevalarg) > rangeval[2]) stop(
     "Values of the second argument are outside of permitted range.")
 
-  coef  <- bifd[[1]]
+  coef  <- bifd$coefs
   coefd <- dim(coef)
   ndim  <- length(coefd)
 
-  if (is.numeric(sLfd)) {
-    if (length(sLfd) == 1) {
-      snderiv <- sLfd
-      if (snderiv != as.integer(snderiv)) {
-        stop("Order of derivative must be an integer")
-      }
-      if (snderiv < 0) {
-        stop("Order of derivative must be 0 or positive")
-      }
-    } else {
-      stop("Order of derivative must be a single number")
-    }
-    sLfd <- NULL
-    if (snderiv < 0) stop ("Order of derivative cannot be negative")
-  } else if (inherits(sLfd, "fd")) {
-    sderivcoef <- getcoef(sLfd)
-    snderiv <- ncol(sderivcoef)
-  } else {
-    stop("Third argument must be an integer or a functional data object")
-  }
+  sLfd <- int2Lfd(sLfd)
+  tLfd <- int2Lfd(tLfd)
 
-  sbasismat <- getbasismatrix(sevalarg, sbasisfd, snderiv)
+  snderiv <- sLfd$nderiv
+  tnderiv <- tLfd$nderiv
+
+  sbasismat <- getbasismatrix(sevalarg, sbasisobj, snderiv)
   if (snderiv > 0 && !is.null(sLfd)) {
     sLfdmat <- eval.fd(sevalarg, sLfd)
-    onerow <- rep(1,snbasis)
+    onerow  <- rep(1,snbasis)
     for (j in 1:snderiv) {
       if (any(abs(sLfdmat[,j])) > 1e-7) {
         sbasismat <- sbasismat + outer(sLfdmat[,j],onerow)*
-                         getbasismatrix(sevalarg, sbasisfd, j-1)
+                         getbasismatrix(sevalarg, sbasisobj, j-1)
       }
     }
   }
 
-  if (is.numeric(tLfd)) {
-    if (length(tLfd) == 1) {
-      tnderiv <- tLfd
-      if (tnderiv != as.integer(tnderiv)) {
-        stop("Order of derivative must be an integer")
-      }
-      if (tnderiv < 0) {
-        stop("Order of derivative must be 0 or positive")
-      }
-    } else {
-      stop("Order of derivative must be a single number")
-    }
-    tLfd <- NULL
-    if (tnderiv < 0) stop ("Order of derivative cannot be negative")
-  } else if (inherits(tLfd, "fd")) {
-    tderivcoef <- getcoef(tLfd)
-    tnderiv <- ncol(tderivcoef)
-  } else {
-    stop("Third argument must be an integer or a functional data object")
-  }
-
-  tbasismat <- getbasismatrix(tevalarg, tbasisfd, tnderiv)
+  tbasismat <- getbasismatrix(tevalarg, tbasisobj, tnderiv)
   if (tnderiv > 0 && !is.null(tLfd)) {
     tLfdmat <- eval.fd(tevalarg, tLfd)
     onerow <- rep(1,tnbasis)
     for (j in 1:tnderiv) {
       if (any(abs(tLfdmat[,j])) > 1e-7) {
         tbasismat <- tbasismat + outer(tLfdmat[,j],onerow)*
-                         getbasismatrix(tevalarg, tbasisfd, j-1)
+                         getbasismatrix(tevalarg, tbasisobj, j-1)
       }
     }
   }

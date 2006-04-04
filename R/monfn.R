@@ -13,20 +13,20 @@ monfn <- function(x, Wfd, basislist=vector("list",JMAX)) {
 #  Returns:
 #  HVAL   ... value of h at input argument array X in first column.
 
-#  Last modified 1 January 2001
+#  Last modified 26 October 2003
 
   JMAX <- 15
   JMIN <- 11
   EPS  <- 1E-5
 
-  coef  <- getcoef(Wfd)
+  coef  <- Wfd$coefs
   coefd <- dim(coef)
   ndim  <- length(coefd)
   if (ndim > 1 && coefd[2] != 1) stop("Wfd is not a single function")
 
-  basis  <- getbasis(Wfd)
-  rangeval <- basis$rangeval
- 
+  basisobj  <- Wfd$basis
+  rangeval <- basisobj$rangeval
+
   #  set up first iteration
 
   width <- rangeval[2] - rangeval[1]
@@ -43,7 +43,7 @@ monfn <- function(x, Wfd, basislist=vector("list",JMAX)) {
   tval <- rangeval
   j   <- 1
   if (is.null(basislist[[j]])) {
-      bmat <- getbasismatrix(tval, basis)
+      bmat <- getbasismatrix(tval, basisobj)
       basislist[[j]] <- bmat
   } else {
       bmat <- basislist[[j]]
@@ -60,7 +60,7 @@ monfn <- function(x, Wfd, basislist=vector("list",JMAX)) {
     tj   <- seq(rangeval[1]+del/2, rangeval[2]-del/2, del)
     tval <- c(tval, tj)
     if (is.null(basislist[[j]])) {
-        bmat <- getbasismatrix(tj, basis)
+        bmat <- getbasismatrix(tj, basisobj)
         basislist[[j]] <- bmat
     } else {
         bmat <- basislist[[j]]

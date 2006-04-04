@@ -7,34 +7,49 @@ fourier <- function(x, nbasis = n, period = span, nderiv = 0)
   #  Note:  The number of basis functions always odd.  If the argument
   #   NBASIS is even, it is increased by one.
 
-  #  last modified 8 June 99
+  #  last modified 15 December 2005
+
+  #  check x and set up range
 
   x      <- as.vector(x)
   n      <- length(x)
   onen   <- rep(1,n)
   xrange <- range(x)
   span   <- xrange[2] - xrange[1]
-  if (nbasis <= 0) stop('NBASIS not positive')
-  if (period <= 0) stop('PERIOD not positive')
-  if (nderiv <  0) stop('NDERIV negative')
 
-  if (2*(nbasis %/% 2) == nbasis) nbasis <- nbasis + 1
-  basis  <- matrix(0,n,nbasis)
+  #  check period and set up omega
+
+  if (period <= 0) stop("PERIOD not positive.")
   omega  <- 2*pi/period
   omegax <- omega*x
 
+  #  check nbasis
+
+  if (nbasis <= 0) stop("NBASIS not positive")
+
+  #  check nderiv
+
+  if (nderiv <  0) stop("NDERIV is negative.")
+
+  #  if nbasis is even, add one
+
+  if ((nbasis %/% 2)*2 == nbasis) nbasis <- nbasis + 1
+
+  #  compute basis matrix
+
+  basismat <- matrix(0,n,nbasis)
   if (nderiv == 0) {
     #  The fourier series itself is required.
-    basis[,1] <- 0.7071068
+    basismat[,1] <- 1/sqrt(2)
     j    <- seq(2,nbasis-1,2)
     k    <- j/2
     args <- outer(omegax,k)
-    basis[,j]   <- sin(args)
-    basis[,j+1] <- cos(args)
+    basismat[,j]   <- sin(args)
+    basismat[,j+1] <- cos(args)
   } else {
-    #  A derivative of the fourier series is required.
-    basis[,1] <- 0.0
-    if (nderiv == floor(nderiv/2)*2) {
+    #  The derivative of order nderiv is required.
+    basismat[,1] <- 0.0
+    if (nderiv == (nderiv %/% 2)*2) {
       mval  <- nderiv/2
       ncase <- 1
     } else {
@@ -46,13 +61,13 @@ fourier <- function(x, nbasis = n, period = span, nderiv = 0)
     fac  <- outer(onen,((-1)^mval)*(k*omega)^nderiv)
     args <- outer(omegax,k)
     if (ncase == 1) {
-      basis[,j]   <-  fac * sin(args)
-      basis[,j+1] <-  fac * cos(args)
+      basismat[,j]   <-  fac * sin(args)
+      basismat[,j+1] <-  fac * cos(args)
     } else {
-      basis[,j]   <-  fac * cos(args)
-      basis[,j+1] <- -fac * sin(args)
+      basismat[,j]   <-  fac * cos(args)
+      basismat[,j+1] <- -fac * sin(args)
     }
   }
-  basis <- basis/sqrt(period/2)
-  return(basis)
+  basismat <- basismat/sqrt(period/2)
+  return(basismat)
 }

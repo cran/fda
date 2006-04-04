@@ -1,7 +1,7 @@
-is.fd <- function(fd) {
-#  check whether FD is a functional data object
+is.fd <- function(fdobj) {
+#  check whether FDOBJ is a functional data object
 
-#  Last modified 20 Feb 2003
+#  Last modified 20 November 2005
 
-  if (inherits(fd, "fd")) return(TRUE) else return(FALSE)
+  if (inherits(fdobj, "fd")) return(TRUE) else return(FALSE)
 }

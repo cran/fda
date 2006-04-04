@@ -1,16 +1,14 @@
-getbasismatrix <- function(evalarg, basisfd, Lfd=0) {
+getbasismatrix <- function(evalarg, basisobj, nderiv=0) {
 #  Computes the basis matrix evaluated at arguments in EVALARG associated
-#    with basis.fd object BASISFD.  The basis matrix contains the values   
-#    at argument value vector EVALARG of applying the nonhomogeneous 
+#    with basis.fd object BASISOBJ.  The basis matrix contains the values
+#    at argument value vector EVALARG of applying the nonhomogeneous
 #    linear differential operator LFD to the basis functions.  By default
 #    LFD is 0, and the basis functions are simply evaluated at argument
 #    values in EVALARG.
 #
 #  If LFD is a functional data object with m + 1 functions c_1, ... c_{m+1}, then it
-#    is assumed to define the order m NONHOMOGENEOUS linear differential operator
+#    is assumed to define the order m HOMOGENEOUS linear differential operator
 #  Lx(t) = c_1(t) + c_2(t)x(t) + c_3(t)Dx(t) + ... + c_{m+1}D^{m-1}x(t) + D^m x(t).
-#  This is a change from previous usage where LFD was assumed to define a HOMOGONEOUS
-#  differential operator, for which the forcing function c_1(t) = 0.  
 #
 #  If the basis type is either polygonal or constant, LFD is ignored.
 #
@@ -21,151 +19,95 @@ getbasismatrix <- function(evalarg, basisfd, Lfd=0) {
 #              values varies from curve to curve, pad out unwanted positions in
 #              each column with NA.  The number of rows is equal to the maximum
 #              of number of evaluation points.
-#  BASISFD ... A basis object
-#  LFD     ... If an integer, defines NDERIV, the order of derivative to be evaluated
-#              If a functional data object, defines weight
-#              functions for computing the value of a nonhomogeneous linear 
-#              differential operator applied to the functions that are evaluated.
+#  BASISOBJ ... A basis object
+#  NDERIV   ... A nonnegative integer indicating a derivative to be evaluated.
+
 #
 #  Note that the first two arguments may be interchanged.
 #
-#  Last modified 13 December 2002
- 
-#  Exchange the first two arguments if the first is an BASIS.FD object 
+#  Last modified 26 October 2005
+
+#  Exchange the first two arguments if the first is an BASIS.FD object
 #    and the second numeric
 
-if (is.numeric(basisfd) && inherits(evalarg, "basis.fd")) {
-    temp    <- basisfd
-    basisfd <- evalarg
-    evalarg <- temp
+if (is.numeric(basisobj) && inherits(evalarg, "basisfd")) {
+    temp     <- basisobj
+    basisobj <- evalarg
+    evalarg  <- temp
 }
 
-if (!(inherits(basisfd, "basis.fd"))) stop(
+#  check EVALARG
+
+if (!(is.numeric(evalarg)))  stop("Argument EVALARG is not numeric.")
+	
+#  check basisobj
+	
+if (!(inherits(basisobj, "basisfd"))) stop(
     "Second argument is not a basis object.")
 
-type   <- getbasistype(basisfd)
-nbasis <- basisfd$nbasis
+#  Extract information about the basis
 
-#  determine the highest order of derivative NDERIV required
-
-if (is.numeric(Lfd)) {
-   	if (length(Lfd) == 1) {
-      	nderiv <- Lfd
-      	if (nderiv != as.integer(nderiv)) {
-        	stop("Order of derivative must be an integer")
-      	}
-      	if (nderiv < 0) {
-        	stop("Order of derivative must be 0 or positive")
-      	}
-   	} else {
-      	stop("Order of derivative must be a single number")
-   	}
-   	Lfd <- NULL
-   	if (nderiv < 0) stop ("Order of derivative cannot be negative")
-} else if (inherits(Lfd, "fd")) {
-   	derivcoef <- getcoef(Lfd)
-   	if (length(dim(derivcoef))==3) derivcoef <- derivcoef[,,1]
-   	nderiv <- dim(derivcoef)[2] - 1
-   	if (nderiv < 0) {
-   		stop("Order of derivative must be 0 or positive")
-   	}
-} else {
-   	stop("Argument LFD must be an integer or a functional data object")
-}
-
-onerow <- rep(1,nbasis)
-
-#  -------------------------------  Fourier basis  -------------------
-
-if        (type == "fourier") {
-   	period <- basisfd$params[1]
-   	basis  <- fourier(evalarg, nbasis, period, nderiv)
-   	if (nderiv > 0 && !is.null(Lfd)) {
-        Lfdmat <- eval.fd(evalarg, Lfd)
-        if (length(dim(Lfdmat)) == 3) Lfdmat <- Lfdmat[,,1]
-        for (j in 1:nderiv) {
-            if (any(abs(Lfdmat[,j+1])) > 1e-7) basis <- 
-                basis + outer(Lfdmat[,j+1],onerow)*
-                         fourier(evalarg, nbasis, period, j-1)
-        }
-    }
+type     <- basisobj$type
+nbasis   <- basisobj$nbasis
+params   <- basisobj$params
+rangeval <- basisobj$rangeval
+dropind  <- basisobj$dropind
 
 #  -----------------------------  B-spline basis  -------------------
 
-} else if (type == "bspline") {
-   	rangex <- basisfd$rangeval
-   	breaks <- c(rangex[1], basisfd$params, rangex[2])
-   	norder <- basisfd$nbasis - length(breaks) + 2
-   	basis  <- bsplineS(evalarg, breaks, norder, nderiv)
-   	if (nderiv > 0 && !is.null(Lfd)) {
-        Lfdmat <- eval.fd(evalarg, Lfd)
-        if (length(dim(Lfdmat)) == 3) Lfdmat <- Lfdmat[,,1]
-        for (j in 1:nderiv) {
-            if (any(abs(Lfdmat[,j+1])) > 1e-7) basis <- 
-                basis + outer(Lfdmat[,j+1],onerow)*
-                         bsplineS(evalarg, breaks, norder, j-1)
-        }
-    }
-
-#  -----------------------------  Polynomial basis  -------------------
-
-} else if (type == "poly") {
-   	norder <- basisfd$nbasis
-   	ctr    <- basisfd$params[1]
-   	basis  <- polynom(evalarg, norder, nderiv, ctr)
-   	if (nderiv > 0 && !is.null(Lfd)) {
-        Lfdmat <- eval.fd(evalarg, Lfd)
-        if (length(dim(Lfdmat)) == 3) Lfdmat <- Lfdmat[,,1]
-        for (j in 1:nderiv) {
-            if (any(abs(Lfdmat[,j+1])) > 1e-7) basis <- 
-                basis + outer(Lfdmat[,j+1],onerow)*
-                         polynom(evalarg, norder, j-1, ctr)
-        }
-    }
-
-#  -----------------------------  Exponential basis  -------------------
-
-} else if (type == "expon") {
-   	basis  <- expon(evalarg, basisfd$params, nderiv)
-   	if (nderiv > 0 && !is.null(Lfd)) {
-        Lfdmat <- eval.fd(evalarg, Lfd)
-        if (length(dim(Lfdmat)) == 3) Lfdmat <- Lfdmat[,,1]
-        for (j in 1:nderiv) {
-            if (any(abs(Lfdmat[,j+1])) > 1e-7) basis <- 
-                basis + outer(Lfdmat[,j+1],onerow)*
-                         expon(evalarg, basisfd$params, j-1)
-        }
-    }
-
-#  -----------------------------  Polygonal basis  -------------------
-
-} else if (type == "polyg") {
-    basis  <- polyg(evalarg, basisfd$params)
-
-#  -----------------------------  Power basis  -------------------
-
-} else if (type == "power") {
-    basis  <- powerbasis(evalarg, basisfd$params, nderiv)
-   	if (nderiv > 0 && !is.null(Lfd)) {
-        Lfdmat <- eval.fd(evalarg, Lfd)
-        if (length(dim(Lfdmat)) == 3) Lfdmat <- Lfdmat[,,1]
-        for (j in 1:nderiv) {
-            if (any(abs(Lfdmat[,j+1])) > 1e-7) basis <- 
-                basis + outer(Lfdmat[,j+1],onerow)*
-                         powerbasis(evalarg, basisfd$params, j-1)
-        }
-    }
+if (type == "bspline") {
+   	breaks   <- c(rangeval[1], params, rangeval[2])
+   	norder   <- nbasis - length(breaks) + 2
+   	basismat <- bsplineS(evalarg, breaks, norder, nderiv)
 
 #  -----------------------------  Constant basis  --------------------
 
 } else if (type == "const") {
-   	basis  <- rep(1,length(evalarg))
+   	basismat  <- matrix(1,length(evalarg),1)
+
+#  -----------------------------  Exponential basis  -------------------
+
+} else if (type == "expon") {
+   	basismat  <- expon(evalarg, params, nderiv)
+
+#  -------------------------------  Fourier basis  -------------------
+
+} else if (type == "fourier") {
+   	period   <- params[1]
+   	basismat <- fourier(evalarg, nbasis, period, nderiv)
+
+#  -----------------------------  Monomial basis  -------------------
+
+} else if (type == "monom") {
+   	basismat  <- monomial(evalarg, params, nderiv)
+
+#  -----------------------------  Polygonal basis  -------------------
+
+} else if (type == "polyg") {
+    basismat  <- polyg(evalarg, params)
+
+#  -----------------------------  Polynomial basis  -------------------
+
+} else if (type == "polynom") {
+   	norder   <- nbasis
+   	ctr      <- params[1]
+   	basismat <- polynom(evalarg, norder, ctr, nderiv)
+
+#  -----------------------------  Power basis  -------------------
+
+} else if (type == "power") {
+    basismat  <- powerbasis(evalarg, params, nderiv)
+
+#  -----------------------  Unrecognizable basis  --------------------
 
 } else {
    	stop("Basis type not recognizable")
 }
+	
+#  remove columns for bases to be dropped
 
-if(length(evalarg) == 1) basis <- matrix(basis,1,nbasis)
-return(basis)
+if (length(dropind) > 0) basismat <- basismat[,-dropind]
+
+return(basismat)
 
 }

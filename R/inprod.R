@@ -1,96 +1,253 @@
-inprod <- function(fd1, fd2, Lfd1=0, Lfd2=0, JMAX=15, EPS=1e-4) {
+inprod <- function(fdobj1, fdobj2, Lfdobj1=int2Lfd(0), Lfdobj2=int2Lfd(0),
+                   rng = range1, wtfd = 0)
+{
 
 #  computes matrix of inner products of functions by numerical integration
 #    using Romberg integration
 
 #  Arguments:
-#  FD1 and FD2  ...  these may be either functional data or basis function
+#  FDOBJ1 and FDOBJ2    these may be either functional data or basis function
 #                    objects.  In the latter case, a functional data object
 #                    is created from a basis function object by using the
 #                    identity matrix as the coefficient matrix.
 #                    Both functional data objects must be univariate.
 #                    If inner products for multivariate objects are needed,
-#                    use a loop and call inprod(fd1[i],fd2[i]).
-#  LFD1 and LFD2 ... order of derivatives for inner product for
-#                    FD1 and FD2, respectively, or functional data objects
+#                    use a loop and call inprod(FDOBJ1[i],FDOBJ2[i]).
+#  LFDOBJ1 and LFDOBJ2  order of derivatives for inner product for
+#                    FDOBJ1 and FDOBJ2, respectively, or functional data objects
 #                    defining linear differential operators
-#  JMAX ...  maximum number of allowable iterations
-#  EPS  ...  convergence criterion for relative error
+#  RNG    Limits of integration
+#  WTFD   A functional data object defining a weight
+#  JMAX   maximum number of allowable iterations
+#  EPS    convergence criterion for relative stop
 
 #  Return:
 #  A matrix of NREP1 by NREP2 of inner products for each possible pair
 #  of functions.
 
-#  Last modified 6 Mar 2001
+#  Last modified 26 October 2005
 
-  #  check arguments, and convert basis objects to functional data objects
-  fdclass <- TRUE
-  if (inherits(fd1, "fd") || inherits(fd1, "basis.fd")) {
-    if (inherits(fd1, "basis.fd")) {
-      coef1 <- diag(rep(1,fd1$nbasis))
-      fd1   <- create.fd(coef1, fd1)
-    } else coef1 <- getcoef(fd1)
-  } else fdclass <- FALSE
-  if (inherits(fd2, "fd") || inherits(fd2, "basis.fd")) {
-    if (inherits(fd2, "basis.fd")) {
-      coef2 <- diag(rep(1,fd2$nbasis))
-      fd2 <- create.fd(coef2, fd2)
-    } else coef2 <- getcoef(fd2)
-  } else fdclass <- FALSE
-  if (!fdclass) stop (
-     paste("One or both of the first two arguments are neither",
-           "functional data objects nor basis objects."))
+#  Check FDOBJ1 and get no. replications and basis object
 
-  #  determine NREP1 and NREP2, and check for common range
-  coefd1 <- dim(coef1)
-  coefd2 <- dim(coef2)
-  ndim1  <- length(coefd1)
-  ndim2  <- length(coefd2)
-  if (ndim1 > 2 || ndim2 > 2) stop(
-    "Functional data objects must be univariate")
-  if (ndim1 > 1) nrep1 <- coefd1[2] else nrep1 <- 1
-  if (ndim2 > 1) nrep2 <- coefd2[2] else nrep2 <- 1
-  range1 <- fd1$basis$rangeval
-  range2 <- fd2$basis$rangeval
-  if ( any(range1-range2) != 0) stop("Ranges are not equal")
+result1   <- fdchk(fdobj1)
+nrep1     <- result1[[1]]
+fdobj1    <- result1[[2]]
+coef1     <- fdobj1$coefs
+basisobj1 <- fdobj1$basis
+type1     <- basisobj1$type
+range1    <- basisobj1$rangeval
 
-  #  check for either coefficient array being zero
-  if (all(c(coef1) == 0) || all(c(coef2) == 0)) return(matrix(0,nrep1,nrep2))
+#  Check FDOBJ2 and get no. replications and basis object
 
-  #  set up first iteration
-  width <- range1[2] - range1[1]
-  JMAXP <- JMAX + 1
-  h <- rep(1,JMAXP)
-  h[2] <- 0.25
-  s <- array(0,c(JMAXP,nrep1,nrep2))
-  #  the first iteration uses just the endpoints
-  fx1 <- eval.fd(range1, fd1, Lfd1)
-  fx2 <- eval.fd(range1, fd2, Lfd2)
-  s[1,,]  <- width*crossprod(fx1,fx2)/2
-  tnm <- 0.5
-  j <- 1
+result2   <- fdchk(fdobj2)
+nrep2     <- result2[[1]]
+fdobj2    <- result2[[2]]
+coef2     <- fdobj2$coefs
+basisobj2 <- fdobj2$basis
+type2     <- basisobj2$type
+range2    <- basisobj2$rangeval
 
-  #  now iterate to convergence
-  for (j in 2:JMAX) {
-    tnm <- tnm*2
-    if (j == 2) {
-     x <- mean(range1)
-    } else {
-      del <- width/tnm
-      x   <- seq(range1[1]+del/2, range1[2]-del/2, del)
-    }
-    fx1 <- eval.fd(x, fd1, Lfd1)
-    fx2 <- eval.fd(x, fd2, Lfd2)
-    s[j,,] <- (s[j-1,,] + width*crossprod(fx1,fx2)/tnm)/2
-    if (j >= 5) {
-      ind <- (j-4):j
-      result <- polintmat(h[ind],s[ind,,],0)
-      ss  <- result[[1]]
-      dss <- result[[2]]
-      if (all(abs(dss) < EPS*max(abs(ss)))) return(ss)
-    }
-    s[j+1,,] <- s[j,,]
-    h[j+1]   <- 0.25*h[j]
-  }
-  warning(paste("No convergence after",JMAX," steps in INPROD"))
+# check ranges
+
+if (rng[1] < range1[1] || rng[2] > range1[2]) stop(
+	 "Limits of integration are inadmissible.")
+
+#  Call B-spline version if
+#  [1] both functional data objects are univariate
+#  [2] both bases are B-splines
+#  (3) the two bases are identical
+#  (4) both differential operators are integers
+#  (5) there is no weight function
+#  (6) RNG is equal to the range of the two bases.
+
+if (inherits(fdobj1,"fd")       && inherits(fdobj2,"fd")   &&
+    type1 == "bspline"          && type2 == "bspline"      &&
+    is.eqbasis(basisobj1, basisobj2)                       &&
+    is.integer(Lfdobj1)         && is.integer(Lfdobj2)      &&
+    wtfd == 0                   && all(rng == range1)) {
+	
+    inprodmat <- inprod.bspline(fdobj1, fdobj2,
+                     Lfdobj1$nderiv, Lfdobj2$nderiv)
+    return(inprodmat)
 }
+
+#  Else proceed with the use of the Romberg integration.
+
+#  ------------------------------------------------------------
+#  Now determine the number of subintervals within which the
+#  numerical integration takes.  This is important if either
+#  basis is a B-spline basis and has multiple knots at a
+#  break point.
+#  ------------------------------------------------------------
+
+#  set iter
+
+iter <- 0
+
+# The default case, no multiplicities.
+
+rngvec <- rng
+
+#  check for any knot multiplicities in either argument
+
+knotmult <- numeric(0)
+if (type1 == "bspline") knotmult <- knotmultchk(basisobj1, knotmult)
+if (type2 == "bspline") knotmult <- knotmultchk(basisobj2, knotmult)
+
+#  Modify RNGVEC defining subinvervals if there are any
+#  knot multiplicities.
+
+if (length(knotmult) > 0) {
+    knotmult <- sort(unique(knotmult))
+    knotmult <- knotmult[knotmult > rng[1] && knotmult < rng[2]]
+    rngvec   <- c(rng[1], knotmult, rng[2])
+}
+
+#  check for either coefficient array being zero
+if ((all(c(coef1) == 0) || all(c(coef2) == 0)))
+	return(matrix(0,nrep1,nrep2))
+
+#  -----------------------------------------------------------------
+#                   loop through sub-intervals
+#  -----------------------------------------------------------------
+
+#  Set constants controlling convergence tests
+
+JMAX <- 15
+JMIN <-  5
+EPS  <- 1e-4
+
+inprodmat <- matrix(0,nrep1,nrep2)
+
+nrng <- length(rngvec)
+for (irng  in  2:nrng) {
+    rngi <- c(rngvec[irng-1],rngvec[irng])
+    #  change range so as to avoid being exactly on
+    #  multiple knot values
+    if (irng > 2   ) rngi[1] <- rngi[1] + 1e-10
+    if (irng < nrng) rngi[2] <- rngi[2] - 1e-10
+
+    #  set up first iteration
+
+    iter  <- 1
+    width <- rngi[2] - rngi[1]
+    JMAXP <- JMAX + 1
+    h <- rep(1,JMAXP)
+    h[2] <- 0.25
+    s <- array(0,c(JMAXP,nrep1,nrep2))
+    sdim <- length(dim(s))
+    #  the first iteration uses just the endpoints
+    fx1 <- eval.fd(rngi, fdobj1, Lfdobj1)
+    fx2 <- eval.fd(rngi, fdobj2, Lfdobj2)
+    #  multiply by values of weight function if necessary
+    if (!is.numeric(wtfd)) {
+        wtd <- eval.fd(wtfd, rngi)
+        fx2 <- outer(wtd,matrix(1,nrep2,1)) * fx2
+    }
+    s[1,,] <- width*crossprod(fx1,fx2)/2
+    tnm <- 0.5
+    j <- 1
+
+    #  now iterate to convergence
+    for (iter in 2:JMAX) {
+        tnm <- tnm*2
+        if (j == 2) x <- mean(range1)
+        else {
+            del <- width/tnm
+            x   <- seq(range1[1]+del/2, range1[2]-del/2, del)
+        }
+        fx1 <- eval.fd(x, fdobj1, Lfdobj1)
+        fx2 <- eval.fd(x, fdobj2, Lfdobj2)
+        chs <- width*crossprod(fx1,fx2)/tnm
+        s[iter,,] <- (s[iter-1,,] + chs)/2
+        if (iter >= 5) {
+            ind <- (iter-4):iter
+            ya <- s[ind,,]
+            ya <- array(ya,c(5,nrep1,nrep2))
+            xa <- h[ind]
+            absxa <- abs(xa)
+            absxamin <- min(absxa)
+            ns <- min((1:length(absxa))[absxa == absxamin])
+            cs <- ya
+            ds <- ya
+            y  <- ya[ns,,]
+            ns <- ns - 1
+            for (m in 1:4) {
+                for (i in 1:(5-m)) {
+                    ho      <- xa[i]
+                    hp      <- xa[i+m]
+                    w       <- (cs[i+1,,] - ds[i,,])/(ho - hp)
+                    ds[i,,] <- hp*w
+                    cs[i,,] <- ho*w
+                }
+                if (2*ns < 5-m) {
+                    dy <- cs[ns+1,,]
+                } else {
+                    dy <- ds[ns,,]
+                    ns <- ns - 1
+                }
+                y <- y + dy
+            }
+            ss     <- y
+            errval <- max(abs(dy))
+            ssqval <- max(abs(ss))
+            if (all(ssqval > 0)) crit <- errval/ssqval
+            else                 crit <- errval
+            if (crit < EPS && iter >= JMIN) break
+        }
+        s[iter+1,,] <- s[iter,,]
+        h[iter+1]   <- 0.25*h[iter]
+        if (iter == JMAX) warning("Failure to converge.")
+    }
+
+    inprodmat <- inprodmat + ss
+
+}
+
+return(inprodmat)
+
+}
+
+#  -------------------------------------------------------------------------------
+
+fdchk <- function(fdobj) {
+	
+    #  check the class of FDOBJ and extract coefficient matrix
+
+    if (inherits(fdobj, "fd")) coef  <- fdobj$coefs
+    else
+	    if (inherits(fdobj, "basisfd")) {
+    	    coef  <- diag(rep(1,fdobj$nbasis))
+    	    fdobj <- fd(coef, fdobj)
+	    }
+    else stop("FDOBJ is not an FD object.")
+
+    #  extract the number of replications and basis object
+
+    coefd <- dim(as.matrix(coef))
+    if (length(coefd) > 2) stop("Functional data object must be univariate")
+    nrep     <- coefd[2]
+    basisobj <- fdobj$basis
+	
+    return(list(nrep, fdobj))
+
+}
+
+#  -------------------------------------------------------------------------------
+
+knotmultchk <- function(basisobj, knotmult) {
+	type <- basisobj$type
+    if (type == "bspline") {
+        # Look for knot multiplicities in first basis
+        params  <- basisobj$params
+        nparams <- length(params)
+        for (i in 2:nparams) {
+            if (params[i] == params[i-1]) {
+                knotmult <- c(knotmult, params[i])
+            }
+        }
+    }
+    return(knotmult)
+}
+
+

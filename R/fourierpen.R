@@ -1,4 +1,4 @@
-fourierpen <- function(basisobj, Lfdobj=2)
+fourierpen <- function(basisobj, Lfdobj=int2Lfd(2))
 {
 
   #  Computes the Fourier penalty matrix.
@@ -13,58 +13,29 @@ fourierpen <- function(basisobj, Lfdobj=2)
   #  functions is increased by 1, and this function returns a matrix of
   #  order one larger.
 
-  #  Last modified 21 January 2003
+  #  Last modified 26 October 2005
 
-  if (!(inherits(basisobj, "basis.fd"))) stop(
-    "First argument is not a basis.fd object.")
+  if (!(inherits(basisobj, "basisfd"))) stop(
+		"First argument is not a basis object.")
 
   nbasis <- basisobj$nbasis
   if (2*(nbasis %/% 2) == nbasis) basisobj$nbasis <- nbasis + 1
 
-  type <- getbasistype(basisobj)
+  type <- basisobj$type
   if (type != "fourier") stop ("Wrong basis type")
 
-  if (is.numeric(Lfdobj)) {
-    if (length(Lfdobj) == 1) {
-      nderiv <- Lfdobj
-      if (nderiv != as.integer(nderiv)) {
-        stop("Order of derivative must be an integer")
-      }
-      if (nderiv < 0) {
-        stop("Order of derivative must be 0 or positive")
-      }
-    } else {
-      stop("Order of derivative must be a single number")
-    }
-    if (nderiv < 0) stop ("Order of derivative cannot be negative")
-  } else if (inherits(Lfdobj, "fd")) {
-    derivcoef <- getcoef(Lfdobj)
-    nderiv    <- ncol(derivcoef)
-    Lfdbasis  <- getbasis(Lfdobj)
-  } else {
-    stop("Second argument must be an integer or a functional data object")
-  }
-
-  if (nderiv < 0) stop("NDERIV is negative")
+  Lfdobj=int2Lfd(Lfdobj)
 
   width  <- basisobj$rangeval[2] - basisobj$rangeval[1]
   period <- basisobj$params[1]
+  ratio  <- round(width/period)
+  nderiv <- Lfdobj$nderiv
 
-  if (period == width &&
-      (is.numeric(Lfdobj) || getbasistype(Lfdbasis) == "const")) {
+  if ((width/period) == ratio && is.integer(Lfdobj)) {
 
     #  Compute penalty matrix for penalizing integral over one period.
 
-    pendiag <- pendiagfn(basisobj, nderiv)
-
-    if (!is.numeric(Lfdobj)) {
-      for (i in 1:nderiv) {
-        if (derivcoef[1,i] != 0)
-          pendiag <- pendiag + derivcoef[1,i]*pendiagfn(basisobj,i-1)
-      }
-    }
-
-    penaltymatrix <- diag(pendiag)
+    penaltymatrix <- diag(pendiagfn(basisobj, nderiv))
 
   } else {
 
@@ -79,11 +50,11 @@ fourierpen <- function(basisobj, Lfdobj=2)
 
 #  ------------------------------------------------------------------
 
-pendiagfn <- function(basisfd, nderiv) {
+pendiagfn <- function(basisobj, nderiv) {
 
-    nbasis  <- basisfd$nbasis
-    period  <- basisfd$params[1]
-    rangev  <- basisfd$rangeval
+    nbasis  <- basisobj$nbasis
+    period  <- basisobj$params[1]
+    rangev  <- basisobj$rangeval
     omega   <- 2*pi/period
     halfper <- period/2
     twonde  <- 2*nderiv

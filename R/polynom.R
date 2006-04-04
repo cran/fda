@@ -1,4 +1,4 @@
-polynom <- function (x, norder=1, nderiv=0, ctr=midrange)
+polynom <- function (x, norder=1, ctr=midrange, nderiv)
 {
 #  This computes values of the polynomials,
 #        P_l(x) = (x-ctr)^l, l=0,...,NORDER-1
@@ -9,15 +9,15 @@ polynom <- function (x, norder=1, nderiv=0, ctr=midrange)
 #  Arguments are as follows:
 #  X      ... array of values at which the polynomials are to
 #             evaluated
-#  NORDER ... highest degree plus one
+#  NORDER ... the polynomial basis object
 #  NDERIV ... highest order derivative.  0 means only function values
 #             are returned.
-#  CTR    ... a constant shift that helps to keep the polynomials from
-#             getting too ill-conditioned.  A good choice is the mid-range.
+#  CTR    ... a constant to be subtracted from a value prior to taking
+#             its power
 #  Return is a matrix with length(X) rows and NORDER columns containing
 #  the values of the polynomials
 
-#  last modified 8 June 1999
+#  last modified 17 January 2006
 
   x        <- as.vector(x)
   n        <- length(x)
