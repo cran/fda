@@ -119,3 +119,4 @@ to use this function, so no examples are provided.
 % docclass is function
 \keyword{smooth}
 \keyword{internal}
+

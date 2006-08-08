@@ -9,7 +9,7 @@ varmx.pca.fd <- function(pcafd, nharm = scoresd[2], nx=501)
 
 #  Note that pcafd is an oldClass type object
 
-#  Last modified 29 October 2005
+#  Last modified 22 August 2006
 
   if (!(inherits(pcafd, "pca.fd"))) stop(
 		"Argument PCAFD is not a pca.fd object.")
@@ -34,13 +34,9 @@ varmx.pca.fd <- function(pcafd, nharm = scoresd[2], nx=501)
      harmmat  <- aperm(harmmat, c(1, 3, 2))
      dim(harmmat) <- c(harmmatd[1] * harmmatd[3], harmmatd[2])
   }
+
   #  compute rotation matrix for varimax rotation of harmmat
   rotm <- varmx(harmmat)
-
-  varsum  <- delta*sum(harmmat^2)
-  harmmat <- harmmat %*% rotm
-  harmvar <- delta*apply(harmmat^2,2,sum)
-  propvar <- harmvar/varsum
 
   #  rotate coefficients and scores
   if(ndim == 2)
@@ -48,8 +44,13 @@ varmx.pca.fd <- function(pcafd, nharm = scoresd[2], nx=501)
   else
     for(j in (1:coefd[3]))
 		harmcoef[,1:nharm,j] <- harmcoef[,1:nharm,j] %*% rotm
-		
-  pcafd$scores[,1:nharm] <- pcafd$scores[,1:nharm] %*% rotm
+  harmscrs <- pcafd$scores[,1:nharm]		
+  harmscrs <- harmscrs %*% rotm
+
+  #  compute proportions of variance
+  harmvar <- apply(harmscrs^2,2,sum)
+  varsum  <- sum(harmvar)
+  propvar <- harmvar/varsum
 
   #  modify pcafd object
 
@@ -58,4 +59,5 @@ varmx.pca.fd <- function(pcafd, nharm = scoresd[2], nx=501)
   pcafd$varprop   <- propvar
   return(pcafd)
 }
+
 

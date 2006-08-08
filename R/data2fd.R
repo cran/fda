@@ -130,7 +130,7 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisobj,
 #    DATA2FD may first be used with a generous number of basis functions,
 #    followed by smoothing using function SMOOTH.
 
-#  Last modified:  26 October 2005
+#  Last modified:  22 August 2006
 
 #
 #  set up default fdnames, using dimnames of Y if there are any.
@@ -150,7 +150,7 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisobj,
 #
 #  Make Y an array, and determine its dimensions
 #
-  if (is.array(y) == FALSE) y <- as.array(y)
+  if (is.array(y) == F) y <- as.array(y)
   yd   <- dim(y)
   ndim <- length(yd)
   if (ndim == 1) {
@@ -173,7 +173,7 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisobj,
 #
 #  Make ARGVALS an array and check for compatibility with Y
 #
-  if(is.array(argvals) == FALSE) argvals <- as.array(argvals)
+  if(is.array(argvals) == F) argvals <- as.array(argvals)
   argd  <- dim(argvals)
   nargd <- length(argd)
   if (nargd > 2) stop(
@@ -216,7 +216,7 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisobj,
       if (nbasis <= n) {
         coef <- project.basis(y, argvals, basisobj)
       } else {
-        coef <- project.basis(y, argvals, basisobj, TRUE)
+        coef <- project.basis(y, argvals, basisobj, T)
       }
     } else {
 #  Second case: ARGVALS a vector, but missing data present
@@ -226,8 +226,10 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisobj,
 #
 # set up penalty and basis matrices
 #
-      index    <- !is.na(argvals)
-      basismat <- eval.basis(argvals, basisobj)
+      argv     <- c(argvals)
+      index    <- !is.na(argv)
+      argv     <- unique(argv[index])
+      basismat <- eval.basis(argv, basisobj)
       penmat   <- getbasispenalty(basisobj)
       # add a small amount to diagonal of penalty to ensure conditioning
       penmat   <- penmat + 1e-10 * max(penmat) * diag(dim(penmat)[1])
@@ -287,7 +289,7 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisobj,
               paste("Less than 2 data values available for curve",
                     j,"."))
         coef[, j] <-
-            project.basis(yy[index], argv[index], basisobj, TRUE)
+            project.basis(yy[index], argv[index], basisobj, T)
       }
     } else {
       #  Multivariate functions
@@ -299,7 +301,7 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisobj,
               paste("Less than 2 data values available for curve",
                     j," and variable",k,"."))
         coef[, j, k] <-
-            project.basis(yy[index], argv[index], basisobj, TRUE)
+            project.basis(yy[index], argv[index], basisobj, T)
       }
     }
   }
@@ -310,4 +312,5 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisobj,
 
   fd
 }
+
 

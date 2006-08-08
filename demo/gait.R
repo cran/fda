@@ -28,11 +28,33 @@
 
 #  Last modified 27 March 2006
 
+#  attach the FDA functions
+
+#  Windows ... R
+
+attach("c:\\Program Files\\R\\R-2.2.0\\fdaR\\R\\.RData")
+
+#  Windows ... S-PLUS
+
+attach("c:\\Program Files\\Insightful\\Splus70\\fdaS\\functions\\.Data")
+
+
+#  -------------  input the data for the two measures  ---------------
+
+hip  <- matrix(scan("../data/hip.txt", 0), 20, 39)
+knee <- matrix(scan("../data/knee.txt",0), 20, 39)
 
 #  set up the argument values
 
 gaittime  <- (1:20)/21
 gaitrange <- c(0,1)
+
+#  set up a three-dimensional array of function values
+
+gaitarray <- array(0, c(20, 39, 2))
+dimnames(gaitarray) <- list(NULL, NULL, c("Hip Angle", "Knee Angle"))
+gaitarray[,,1] <- hip
+gaitarray[,,2] <- knee
 
 # -----------  set up the harmonic acceleration operator  ----------
 
@@ -62,7 +84,7 @@ gcvsave <- rep(0,nlam)
 for (ilam in 1:nlam) {
 	lambda <- 10^loglam[ilam]
 	fdParobj <- fdPar(gaitbasis, harmaccelLfd, lambda)
-	smoothlist <- smooth.basis(gaittime, gait, fdParobj)
+	smoothlist <- smooth.basis(gaittime, gaitarray, fdParobj)
 	df  <- smoothlist$df
 	gcv <- smoothlist$gcv
 	dfsave[ilam]  <- df
@@ -90,7 +112,7 @@ plot(loglam, dfsave, type="b",
 lambda    <- 10^(-11.5)
 gaitfdPar <- fdPar(gaitbasis, harmaccelLfd, lambda)
 
-gaitfd <- smooth.basis(gaittime, gait, gaitfdPar)$fd
+gaitfd <- smooth.basis(gaittime, gaitarray, gaitfdPar)$fd
 
 names(gaitfd$fdnames) = c("Normalized time", "Child", "Angle")
 gaitfd$fdnames[[3]] = c("Hip", "Knee")
@@ -103,12 +125,12 @@ plot(gaitfd, cex=1.2)
 #  plot each pair of curves interactively
 
 par(mfrow=c(1,2), mar=c(3,4,2,1), pty="s")
-plotfit.fd(gait, gaittime, gaitfd, cex=1.2)
+plotfit.fd(gaitarray, gaittime, gaitfd, cex=1.2)
 
 #  plot the residuals, sorting cases by residual sum of squares
 
 par(mfrow=c(1,2), mar=c(3,4,2,1), pty="s")
-plotfit.fd(gait, gaittime, gaitfd, residual=TRUE, sort=TRUE, cex=1.2)
+plotfit.fd(gaitarray, gaittime, gaitfd, residual=T, sort=T, cex=1.2)
 
 #  plot first derivative of all curves
 
@@ -137,12 +159,12 @@ gaitpca.fd <- varmx.pca.fd(gaitpca.fd)
 #  plot harmonics using cycle plots
 
 par(mfrow=c(1,1), mar=c(3,4,2,1), pty="s")
-plot.pca.fd(gaitpca.fd, cycle=TRUE)
+plot.pca.fd(gaitpca.fd, cycle=T)
 
 #  ------  Canonical correlation analysis of knee-hip curves  ------
 
-hipfd  <- gaitfd[,,1]
-kneefd <- gaitfd[,,2]
+hipfd  <- gaitfd[,1]
+kneefd <- gaitfd[,2]
 
 hipfdPar  <- fdPar(hipfd,  harmaccelLfd, 1e-8)
 kneefdPar <- fdPar(kneefd, harmaccelLfd, 1e-8)
@@ -205,7 +227,7 @@ lambda <- 1e-2
 Wfd    <- fd(matrix(0,nwbasis,39),wbasis)
 WfdPar <- fdPar(Wfd, 3, lambda)
 
-regstr <- register.fd(Dgaitmeanfd, Dgaitfd, WfdPar, periodic=TRUE)
+regstr <- register.fd(Dgaitmeanfd, Dgaitfd, WfdPar, periodic=T)
 
 xfine       <- seq(0,1,len=101)
 Dgaitregfd  <- regstr$regfd
@@ -222,8 +244,8 @@ matplot(xfine, warpmat, type="l", xlab="t", ylab="h(t)",
 #  plot both the unregistered and registered versions of the curves
 
 par(mfrow=c(2,2))
-plot(Dgaitfd,    ask=FALSE)
-plot(Dgaitregfd, ask=FALSE)
+plot(Dgaitfd,    ask=F)
+plot(Dgaitregfd, ask=F)
 
 #  plot the deformation functions, def(t) = warp(t) - t
 
