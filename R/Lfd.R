@@ -197,27 +197,3 @@ plot.Lfd <- function(x, ...)
 	}
 	invisible(NULL)
 }
-	
-# "is.integer" method for "Lfd"
-
-is.integer.Lfd <- function(Lfdobj)
-{
-	nderiv  <- Lfdobj$nderiv
-	bintwrd <- TRUE
-	if (nderiv > 0) {
-		bwtlist <- Lfdobj$bwtlist
-   		if (!is.null(bwtlist)) {
-    		nderiv <- Lfdobj$nderiv
-    		for (j in 1:nderiv) {
-        		bfdj <- bwtlist[[j]]
-        		if (any(bfdj$coefs != 0.0)) bintwrd <- FALSE
-    		}
-		}
-	}
-
-   bintwrd
-
-}
-
-
-	

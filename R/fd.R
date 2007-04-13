@@ -38,7 +38,7 @@ fd <- function(coef=matrix(0,2,1), basisobj=basisfd(), fdnames=defaultnames)
   #  Returns:
   #  FD ... a functional data object
 
-  #  last modified 20 March 2006
+  #  last modified 30 January 2007
 
     #  check basisobj
 
@@ -52,7 +52,9 @@ fd <- function(coef=matrix(0,2,1), basisobj=basisfd(), fdnames=defaultnames)
     if (!is.numeric(coef)) stop("coef must be numerical vector or matrix")
     else if (is.vector(coef)) {
             coef  <- as.matrix(coef)
-            if (type == "constant") coef <- t(coef)
+            if (type %in% c("const", "constant")) coef <- t(coef)
+# changed from =="constant" to %in% c(...) 
+# 2007.01.30 Spencer Graves            
             coefd <- dim(coef)
             ndim  <- length(coefd)
         }

@@ -1,29 +1,29 @@
 \name{smooth.fd}
 \alias{smooth.fd}
 \title{
-  Smooth a Functional Data Object Using a Roughness Penalty
+  Smooth a Functional Data Object Using an Indirectly Specified
+  Roughness Penalty 
 }
 \description{
-This function is intended to apply a roughness penalized smooth to
-data already set up as a functional data object.  For example, data
-may have been converted to a functional data object using function
-\code{data2fd} using a fairly large set of basis functions, and
-subsequently it was desired to smooth the functional data object
-that resulted.
+  Smooth data already converted to a functional data object, fdobj,
+  using criteria consolidated in a functional data parameter object,
+  fdParobj.  For example, data may have been converted to a functional
+  data object using function \code{data2fd} using a fairly large set of
+  basis functions.  This 'fdobj' is then smoothed as specified in
+  'fdParobj'.
 }
 \usage{
 smooth.fd(fdobj, fdParobj)
 }
 \arguments{
-\item{fdobj}{
-a functional data object to be smoothed.
-}
-\item{fdParobj}{
-a functional parameter object. This object is defined by a
-roughness penalty in slot \code{Lfd} and a smoothing
-parameter lambda in slot \code{lambda}, and this
-information is used to further smooth argument \code{fdobj}.
-}
+  \item{fdobj}{
+    a functional data object to be smoothed.
+  }
+  \item{fdParobj}{
+    a functional parameter object. This object is defined by a roughness
+    penalty in slot \code{Lfd} and a smoothing parameter lambda in slot
+    \code{lambda}, and this information is used to further smooth argument \code{fdobj}.
+  }
 }
 \value{
 a functional data object.
@@ -44,11 +44,21 @@ basisobj <- create.bspline.basis(c(-1,1),81)
 #  convert to a functional data object that interpolates the data.
 result <- smooth.basis(x, y, basisobj)
 yfd  <- result$fd
+
 #  set up a functional parameter object with smoothing
 #  parameter 1e-6 and a penalty on the 3rd derivative.
-# FIXME: using 3rd derivative here gave error
 yfdPar <- fdPar(yfd, 2, 1e-6)
 yfd1 <- smooth.fd(yfd, yfdPar)
+
+\dontrun{
+# FIXME: using 3rd derivative here gave error?????
+yfdPar3 <- fdPar(yfd, 3, 1e-6)
+yfd1.3 <- smooth.fd(yfd, yfdPar3)
+#Error in bsplinepen(basisobj, Lfdobj, rng) : 
+#	Penalty matrix cannot be evaluated
+#  for derivative of order 3 for B-splines of order 4
+}
+
 #  set up a functional parameter object with smoothing
 #  parameter 1 and a penalty on the 3rd derivative.
 yfdPar <- fdPar(yfd, 2, 1)

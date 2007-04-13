@@ -53,7 +53,10 @@ ncasem <- 39
 ncasef <- 54
 nage   <- 31
 
-age <- c( seq(1, 2, 0.25), seq(3, 8, 1), seq(8.5, 18, 0.5))
+attach(growth)
+#age <- c( seq(1, 2, 0.25), seq(3, 8, 1), seq(8.5, 18, 0.5))
+# attribute of growth;  don't need to create 'age'
+#  when we attach growth.  
 rng <- c(1,18)
 agefine <- seq(1,18,length=101)
 
@@ -80,6 +83,7 @@ Lfdobj <- 4
 lambda <- 1e-2
 growfdPar <- fdPar(hgtbasis, Lfdobj, lambda)
 
+# Need 'hgtm', 'hgtf', e.g., from attach(growth)
 hgtmfd <- smooth.basis(age, hgtm, growfdPar)$fd
 hgtffd <- smooth.basis(age, hgtf, growfdPar)$fd
 
@@ -192,6 +196,7 @@ cvecm <- matrix(0, nbasis, ncasem)
 betam <- matrix(0, 2,      ncasem)
 RMSEm <- matrix(0, 1,      ncasem)
 
+attach(growth)
 children <- 1:ncasem
 for (icase in children) {
    hgt     <- hgtm[,icase]
@@ -372,6 +377,7 @@ WfdPar  <- fdPar(Wfd, 2, lambda)
 
 smoothList   <- smooth.monotone(day, hgt, wgt, WfdPar, zmat)
 
+names(smoothList)
 Wfd     <- smoothList$Wfd
 beta    <- smoothList$beta
 Flist   <- smoothList$Flist
@@ -379,8 +385,9 @@ iternum <- smoothList$iternum
 
 #  plot the function W <- log Dh
 
-par(mfrow=c(1,1),pty="s",ask=FALSE)
+op <- par(mfrow=c(1,1),pty="s",ask=FALSE)
 plot(Wfd)
+#par(op)
 
 #  plot the data plus smooth
 

@@ -74,7 +74,7 @@ basisfd <- function(type, rangeval, nbasis, params, dropind=NULL,
 
 #  last modified 8 December 2005
 
-if (nargs()==0) {
+  if (nargs()==0) {
     type      <- "bspline"
     rangeval  <- c(0,1)
     nbasis    <- 2
@@ -88,89 +88,89 @@ if (nargs()==0) {
                       values=values)
     oldClass(basisobj) <- "basisfd"
     basisobj
-}
+  }
 
 #  if first argument is a basis object, return
 
-if (class(type)=="basisfd"){
+  if (class(type)=="basisfd"){
     basisobj <- type
     return(basisobj)
-}
+  }
 
 #  check basistype
 
-type <- use.proper.basis(type)
-if (type=="unknown"){
+  type <- use.proper.basis(type)
+  if (type=="unknown"){
     stop("TYPE unrecognizable.")
-}
+  }
 
 #  check if QUADVALS is present, and set to default if not
-if (missing(quadvals)) quadvals <- NULL
-else if(!is.null(quadvals)){
-     nquad <- dim(quadvals)[1]
-     ncol  <- dim(quadvals)[2]
-     if ((nquad == 2) && (ncol > 2)){
-         quadvals <- t(quadvals)
-         nquad    <- dim(quadvals)[1]
-         ncol     <-dim(quadvals)[2]
-     }
-     if (nquad < 2) stop("Less than two quadrature points are supplied.")
-     if (ncol != 2) stop("QUADVALS does not have two columns.")
-}
+  if (missing(quadvals)) quadvals <- NULL
+  else if(!is.null(quadvals)){
+    nquad <- dim(quadvals)[1]
+    ncol  <- dim(quadvals)[2]
+    if ((nquad == 2) && (ncol > 2)){
+      quadvals <- t(quadvals)
+      nquad    <- dim(quadvals)[1]
+      ncol     <-dim(quadvals)[2]
+    }
+    if (nquad < 2) stop("Less than two quadrature points are supplied.")
+    if (ncol != 2) stop("QUADVALS does not have two columns.")
+  }
 
 #  check VALUES if present, and set to a single empty cell if not.
-if(!missing(values) && !is.null(values) && !is.null(quadvals)) {
- 	 n <- dim(values)[1]
-	 k <- dim(values)[2]
+  if(!missing(values) && !is.null(values) && !is.null(quadvals)) {
+    n <- dim(values)[1]
+    k <- dim(values)[2]
     if (n != nquad)   
-        stop("Number of rows in VALUES not equal to number of quadrature points.")
+      stop("Number of rows in VALUES not equal to number of quadrature points.")
     if (k != nbasis)  
-        stop("Number of columns in VALUES not equal to number of basis functions.")
-}
-else values <- NULL
+      stop("Number of columns in VALUES not equal to number of basis functions.")
+  }
+  else values <- NULL
 
 #  check if DROPIND is present, and set to default if not
 
-if(missing(dropind)) dropind<-NULL
+  if(missing(dropind)) dropind<-NULL
 
 #  select the appropriate type and process
 
-if (type=="fourier"){
+  if (type=="fourier"){
     paramvec   <- rangeval[2] - rangeval[1]
     period     <- params[1]
     if (period <= 0)  stop("Period must be positive for a Fourier basis")
     params <- period
     if ((2*floor(nbasis/2)) == nbasis)  nbasis <- nbasis + 1
-} else if(type=="bspline"){
+  } else if(type=="bspline"){
     if (!missing(params)){
-        nparams  <- length(params)
-        if (params[1] <= rangeval[1])       
-            stop("Smallest value in BREAKS not within RANGEVAL")
-        if (params[nparams] >= rangeval[2]) 
-            stop("Largest value in BREAKS not within RANGEVAL")
+      nparams  <- length(params)
+      if (params[1] <= rangeval[1])       
+        stop("Smallest value in BREAKS not within RANGEVAL")
+      if (params[nparams] >= rangeval[2]) 
+        stop("Largest value in BREAKS not within RANGEVAL")
     }
-} else if(type=="expon") {
+  } else if(type=="expon") {
     if (length(params) != nbasis) 
-        stop("No. of parameters not equal to no. of basis fns for exponential basis.")
-} else if(type=="polyg") {
+      stop("No. of parameters not equal to no. of basis fns for exponential basis.")
+  } else if(type=="polyg") {
     if (length(params) != nbasis) 
-        stop("No. of parameters not equal to no. of basis fns for polygonal basis.")
-} else if(type=="power") {
+      stop("No. of parameters not equal to no. of basis fns for polygonal basis.")
+  } else if(type=="power") {
     if (length(params) != nbasis) 
-        stop("No. of parameters not equal to no. of basis fns for power basis.")
-} else if(type=="const") {
+      stop("No. of parameters not equal to no. of basis fns for power basis.")
+  } else if(type=="const") {
     params <- 0
-} else if(type=="monom") {
+  } else if(type=="monom") {
     if (length(params) != nbasis) 
-        stop("No. of parameters not equal to no. of basis fns for monomial basis.")
-} else if(type=="polynom") {
+      stop("No. of parameters not equal to no. of basis fns for monomial basis.")
+  } else if(type=="polynom") {
     if (length(params) > 1) 
-        stop("More than one parameter for a polynomial basis.")
-} else stop("Unrecognizable basis")
-
+      stop("More than one parameter for a polynomial basis.")
+  } else stop("Unrecognizable basis")
+  
 #  Save call
 
-obj.call <- match.call()
+  obj.call <- match.call()
 
 #  S4 definition
 # basisobj <- new("basisfd", call=obj.call, type=type, rangeval=rangeval, nbasis=nbasis, 
@@ -178,11 +178,11 @@ obj.call <- match.call()
 
 #  S3 definition
 
-basisobj <- list(call=obj.call, type=type, rangeval=rangeval, nbasis=nbasis, 
+  basisobj <- list(call=obj.call, type=type, rangeval=rangeval, nbasis=nbasis, 
                  params=params, dropind=dropind, quadvals=quadvals, values=values)
-oldClass(basisobj) <- "basisfd"
+  oldClass(basisobj) <- "basisfd"
 
-basisobj
+  basisobj
 
 }
 

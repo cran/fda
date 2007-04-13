@@ -1,5 +1,6 @@
-create.fourier.basis <- function (rangeval=c(0,1), nbasis=3, period=width,
-                                  dropind=NULL, quadvals=NULL, values=NULL)
+create.fourier.basis <- function (rangeval=c(0,1), nbasis=3,
+          period=width, dropind=NULL, quadvals=NULL, values=NULL,
+          longNames=TRUE)
 {
 
 #  This function creates a fourier functional data basis.
@@ -29,50 +30,65 @@ create.fourier.basis <- function (rangeval=c(0,1), nbasis=3, period=width,
 #  Returns
 #  BASISOBj  ... a functional data basis object of type "fourier"
 
-#  Last modified 20 November 2005
+#  Last modified 21 February 2007 by Spencer Graves
+#  Previously modified 20 November 2005
 
-type <- "fourier"
+  type <- "fourier"
 
-if (length(rangeval)==1) {
+  if (length(rangeval)==1) {
     if (rangeval<=0) stop("RANGEVAL a single value that is not positive.")
     rangeval <- c(0,rangeval)
-}
+  }
 
-if (!rangechk(rangeval)) stop("Argument RANGEVAL is not correct.")
-
-width <- rangeval[2] - rangeval[1]
-if ((period <= 0) || !is.numeric(period))
+  if (!rangechk(rangeval)) stop("Argument RANGEVAL is not correct.")
+  
+  width <- rangeval[2] - rangeval[1]
+  if ((period <= 0) || !is.numeric(period))
     stop ("Period must be positive number for a Fourier basis")
-params <- period
+  params <- period
 
 #  increase the number of basis functions by one if even
 
-if ((nbasis <= 0) || !is.numeric(nbasis))
-    stop ("nBasis must be odd positive number for a Fourior basis")
-nbasis <- ceiling(nbasis)
-if (2*floor(nbasis/2) == nbasis) nbasis <- nbasis + 1
+  if ((nbasis <= 0) || !is.numeric(nbasis))
+    stop ("nbasis must be odd positive number for a Fourior basis")
+  nbasis <- ceiling(nbasis)
+  if (2*floor(nbasis/2) == nbasis) nbasis <- nbasis + 1
 
 #  check DROPIND
 
-if (missing(dropind)) dropind <- NULL
+  if (missing(dropind)) dropind <- NULL
 
-if (length(dropind) > 0){
-    if(length(dropind) >= nbasis)  stop("Too many index values in DROPIND.")
+  if (length(dropind) > 0){
+    if(length(dropind) >= nbasis)  stop("Too many index values in 'dropind'.")
     dropind = sort(dropind)
     if(length(dropind) > 1) {
-        if(min(diff(dropind)) == 0) stop("Multiple index values in DROPIND.")
+      if(min(diff(dropind)) == 0) stop("Duplicate index values in 'dropind'.")
     }
     for(i in 1:length(dropind)) {
-   	    if(dropind[i] < 1 || dropind[i] > nbasis)
-            stop("An index value is out of range.")
+      if(dropind[i] < 1 || dropind[i] > nbasis)
+        stop("An index value is out of range.")
     }
-}
-
+  }
+  
 #  set up the basis object
 
-basisobj <- basisfd(type=type, rangeval=rangeval, nbasis=nbasis, params=params,
-                    dropind=dropind, quadvals=quadvals, values=values)
-
-basisobj
-
+  basisobj <- basisfd(type=type, rangeval=rangeval, nbasis=nbasis,
+               params=params, dropind=dropind, quadvals=quadvals,
+                      values=values)
+# Names?
+  if(!is.na(longNames)){
+    nb2 <- floor(nbasis/2)
+    Nms <- "const"
+    if(nb2>0){
+      sinCos <- as.vector(outer(c("sin", "cos"), 1:nb2,
+                                paste, sep="") )
+      if(longNames)
+        sinCos <- paste(sinCos, signif(period, 4), sep=".")
+      Nms <- c(Nms, sinCos)
+    }
+#    
+    basisobj$names <- Nms
+  }
+#  
+  basisobj
 }

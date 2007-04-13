@@ -16,7 +16,7 @@ eval.monfd <- function(evalarg, Wfd, Lfdobj=int2Lfd(0)) {
   #  The interval over which the integration takes places is defined in
   #  the basisfd object in WFD.
 
-  #  Last modified 26 October 2005
+  #  Last modified 9 February 2007
 
   coef  <- Wfd$coefs
   coefd <- dim(coef)
@@ -28,7 +28,7 @@ eval.monfd <- function(evalarg, Wfd, Lfdobj=int2Lfd(0)) {
 
   Lfdobj <- int2Lfd(Lfdobj)
 
-  if (!is.integer(Lfdobj)) stop(
+  if (!is.integerLfd(Lfdobj)) stop(
 		"LFDOBJ is not an integer operator.")
 
   nderiv <- Lfdobj$nderiv

@@ -11,47 +11,50 @@ bifd <- function (coef=matrix(0,2,1), sbasisobj=basis(), tbasisobj=basis(),
                   fdnames=defaultnames)
 {
   #  This function creates a bivariate functional data object.
-  #    A bivariate functional data object consists of two bases for expanding
-  #      a bivariate functional observation and a set of coefficients defining
-  #      this expansion.
-  #    The bases are contained in "basisfd" objects; that is, a realization
-  #    of the "basisfd" class.
+  #    A bivariate functional data object consists of two bases for
+  #    expanding a bivariate functional observation and a set of
+  #    coefficients defining this expansion.  The bases are contained
+  #    in "basisfd" objects; that is, a realization of the "basisfd"
+  #    class.
 
   #  Arguments:
   #  COEF     ... a two-, three-, or four-dimensional array containing
-  #               coefficient values for the expansion of each set of bivariate
-  #               function values=terms of a set of basis function values
-  #               If COEF is a two-way, it is assumed that there is only
-  #                 one variable and only one replication, and then
-  #                 the first and second dimensions correspond to
-  #                 the basis functions for the first and second argument,
-  #                 respectively.
-  #               If COEF is a three-way, it is assumed that there is only
-  #                 one variable per replication, and then
-  #                 the first and second dimensions correspond to
-  #                 the basis functions for the first and second argument,
-  #                 respectively, and the third dimension corresponds to
-  #                 replications.
-  #               If COEF is a four-way array, then the fourth dimension
+  #      coefficient values for the expansion of each set of bivariate
+  #      function values=terms of a set of basis function values
+  #      If COEF is a two-way, it is assumed that there is only
+  #      one variable and only one replication, and then
+  #      the first and second dimensions correspond to
+  #      the basis functions for the first and second argument,
+  #      respectively.
+  #      If COEF is a three-way, it is assumed that there is only
+  #      one variable per replication, and then
+  #      the first and second dimensions correspond to
+  #      the basis functions for the first and second argument,
+  #      respectively, and the third dimension corresponds to
+  #      replications.
+  #      If COEF is a four-way array, then the fourth dimension
   #                 corresponds to variables
-  #  SBASISOBJ ... a functional data basis object for the first  argument s
-  #  TBASISOBJ ... a functional data basis object for the second argument t
+  #  SBASISOBJ ... a functional data basis object
+  #      for the first  argument s
+  #  TBASISOBJ ... a functional data basis object
+  #      for the second argument t
   #  BIFDNAMES ... A list of length 3 with members containing
-  #               1. a single name for the argument domain, such as 'Time'
-  #               2. a name for the replications or cases
-  #               3. a name for the function.
+  #      1. a single name for the argument domain, such as 'Time'
+  #      2. a name for the replications or cases
+  #      3. a name for the function.
 
   #  Returns:
   #  BIFDOBJ ... a bivariate functional data object
 
-  #  last modified 20 September 2005
+  #  last modified 22 Februray 2007 by Spencer Graves
+  #  previously modified 20 September 2005
 
   #  check COEF and get its dimensions
 
     if(!is.numeric(coef)) stop(
-		"coef must be numerical vector or matrix")
+		"'coef' must be numerical vector or matrix")
     else if (is.vector(coef)) stop(
-		"Argument COEF is not at least 2 dimensional.")
+		"Argument 'coef' is not at least 2 dimensional.")
     else if (is.matrix(coef)) {
             coefd <- dim(coef)
             ndim  <- length(coefd)
@@ -60,28 +63,28 @@ bifd <- function (coef=matrix(0,2,1), sbasisobj=basis(), tbasisobj=basis(),
             coefd <- dim(coef)
             ndim  <- length(coefd)
         }
-    else stop("argument COEF is not correct")
+    else stop("argument 'coef' is not correct")
 
     if (ndim > 4) stop(
-        "First argument not of dimension 2, 3 or 4.")
+        "First argument 'coef' not of dimension 2, 3 or 4.")
 
-    #  check SBASISOBJ
+#  check SBASISOBJ
 
     if (!inherits(sbasisobj, "basisfd")) stop(
-        "Argument SBASISOBJ is not of basis class")
+        "Argument 'sbasisobj' is not of basis class")
 
     if (dim(coef)[1] != sbasisobj$nbasis) stop(
         paste("Number of coefficients does not match number of ",
-              "basis functions for SBASISOBJ."))
+              "basis functions for 'sbasisobj'."))
 
-    #  check TBASISOBJ
+#  check TBASISOBJ
 
     if (!inherits(tbasisobj, "basisfd")) stop(
-        "Argument TBASISOBJ is not of basis class.")
+        "Argument 'tbasisobj' is not of basis class.")
 
     if (dim(coef)[2] != tbasisobj$nbasis) stop(
         paste("Number of coefficients does not match number of ",
-              "basis functions for TBASISOBJ."))
+              "basis functions for 'tbasisobj'."))
 
     #  setup number of replicates and number of variables
 
@@ -90,27 +93,44 @@ bifd <- function (coef=matrix(0,2,1), sbasisobj=basis(), tbasisobj=basis(),
 
     #  set up default fdnames
 
-    if (ndim == 2) defaultnames <- list("time", "reps", "values")
-    if (ndim == 2) defaultnames <- list("time",
-                                        paste("reps",as.character(1:nrep)),
-                                        "values")
-    if (ndim == 4) defaultnames <- list("time",
-                                        paste("reps",as.character(1:nrep)),
-                                        paste("values",as.character(1:nvar)) )
+    sNames={
+      if(is.null(sbasisobj$names) ||
+         length(sbasisobj$names)!=coefd[1])
+        paste("sbasis", 1:coefd[1], sep="")
+      else sbasisobj$names
+    }
+    tNames={
+      if(is.null(tbasisobj$names) ||
+         length(tbasisobj$names)!=coefd[2])
+        paste("tbasis", 1:coefd[2], sep="")
+      else tbasisobj$names
+    }
+#
+    if (ndim == 2)
+      defaultnames <- list(s.time=sNames, t.time=tNames, 
+                           reps=1, funs="values") 
+    if (ndim == 3)
+      defaultnames <- list(s.time=sNames, t.time=tNames, 
+                           reps=paste("reps",as.character(1:nrep)),
+                           funs="values")
+    if (ndim == 4)
+      defaultnames <- list(s.time=sNames, t.time=tNames,
+                           reps=paste("reps",as.character(1:nrep)),
+                           funs=paste("values",as.character(1:nvar)) )
 
-    names(defaultnames) <- c("args", "reps", "funs")
-
+#    names(defaultnames) <- c("args", "reps", "funs")
 #  S4 definition
 #	bifdobj <- new("bifd", coefs=coef, sbasis=sbasisobj, tbasis=tbasisobj,
-#	               bifdnames=fdnames)
-
+#	               bifdnames=fdnames)    
+    
 #  S3 definition
-
-	bifdobj <- list(coefs=coef, sbasis=sbasisobj, tbasis=tbasisobj,
+    coef. <- objAndNames(coef, fdnames, defaultnames)
+#
+    bifdobj <- list(coefs=coef., sbasis=sbasisobj, tbasis=tbasisobj,
 	               bifdnames=fdnames)
-	oldClass(bifdobj) <- "bifd"
-	
-	bifdobj
+    oldClass(bifdobj) <- "bifd"
+    
+    bifdobj
 }
 
 #  "show" method for "bifd"

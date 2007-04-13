@@ -32,7 +32,8 @@
 # movements, such as speech, juggling and so on.
 #  -----------------------------------------------------------------------
 
-#  Last modified 20 March 2006
+#  Last modified 2 March 2007 by spencer Graves
+#  Previously  modified 20 March 2006
 
 
 #  Input the data.  These 20 records have already been
@@ -46,14 +47,14 @@
 
 #  input the data
 
-temp <- array(scan("../data/fdareg.txt",0),c(20,2,1401))
+#temp <- array(scan("../data/fdareg.txt",0),c(20,2,1401))
 
 #  set up a three-dimensional array
 
-fdaarray <- array(0, c(1401, 20, 2))
-fdaarray[,,1] <- t(temp[,1,])/1000
-fdaarray[,,2] <- t(temp[,2,])/1000
-dimnames(fdaarray) <- list(NULL, NULL, c("X", "Y") )
+#fdaarray <- array(0, c(1401, 20, 2))
+#fdaarray[,,1] <- t(temp[,1,])/1000
+#fdaarray[,,2] <- t(temp[,2,])/1000
+#imnames(fdaarray) <- list(NULL, NULL, c("X", "Y") )
 
 #  Set up time values and range.
 #  It is best to choose milliseconds as a time scale

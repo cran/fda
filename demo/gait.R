@@ -14,8 +14,8 @@
 #  As with the daily weather data, the harmonic acceleration roughness
 #  penalty is used throughout since the data are periodic with a strong
 #  sinusoidal component of variation.
-#  After setting up the data, smoothing the data using GCV or generalized
-#  cross-validation to select a smoothing parameter, and displaying
+#  After setting up the data, smoothing the data using GCV (generalized
+#  cross-validation) to select a smoothing parameter, and displaying
 #  various descriptive results, the data are subjected to a principal
 #  components analysis, followed by a canonical correlation analysis of the
 #  joint variation of hip and knee angle, and finally a registration of the
@@ -26,35 +26,40 @@
 #
 #  -----------------------------------------------------------------------
 
-#  Last modified 27 March 2006
+#  Previously modified 27 March 2006
+#  Last modified 25 February 2007 by Spencer Graves
 
 #  attach the FDA functions
 
 #  Windows ... R
-
-attach("c:\\Program Files\\R\\R-2.2.0\\fdaR\\R\\.RData")
+library(fda)
+#attach("c:\\Program Files\\R\\R-2.2.0\\fdaR\\R\\.RData")
 
 #  Windows ... S-PLUS
 
-attach("c:\\Program Files\\Insightful\\Splus70\\fdaS\\functions\\.Data")
+#attach("c:\\Program Files\\Insightful\\Splus70\\fdaS\\functions\\.Data")
 
 
 #  -------------  input the data for the two measures  ---------------
 
-hip  <- matrix(scan("../data/hip.txt", 0), 20, 39)
-knee <- matrix(scan("../data/knee.txt",0), 20, 39)
+#hip  <- matrix(scan("../data/hip.txt", 0), 20, 39)
+#knee <- matrix(scan("../data/knee.txt",0), 20, 39)
 
 #  set up the argument values
 
-gaittime  <- (1:20)/21
-gaitrange <- c(0,1)
+#gaittime  <- (1:20)/21
+# Match Matlab 
+# gaittime  <- seq(0.025, 0.975, length=20)
+(gaittime <- as.numeric(dimnames(gait)[[1]]))
 
 #  set up a three-dimensional array of function values
 
-gaitarray <- array(0, c(20, 39, 2))
-dimnames(gaitarray) <- list(NULL, NULL, c("Hip Angle", "Knee Angle"))
-gaitarray[,,1] <- hip
-gaitarray[,,2] <- knee
+#gait <- array(0, c(20, 39, 2))
+#dimnames(gait) <- list(NULL, paste("child", 1:39, sep=""), 
+#                       c("Hip Angle", "Knee Angle") )
+#gait[,,1] <- hip
+#gait[,,2] <- knee
+apply(gait, 3, range)
 
 # -----------  set up the harmonic acceleration operator  ----------
 
@@ -64,7 +69,37 @@ harmaccelLfd <- vec2Lfd(c(0, 0, (2*pi)^2, 0))
 #  there are 20 data points per curve, and this set up defines 21 basis
 #  functions. Recall that a fourier basis has an odd number of basis functions.
 
-gaitbasis <- create.fourier.basis(gaitrange,21)
+gaitbasis3 <- create.fourier.basis(nbasis=3)
+gaitfd3 <- data2fd(gait, basisobj=gaitbasis3)
+str(gaitfd3)
+gaitVar.fd3 <- var.fd(gaitfd3)
+str(gaitVar.fd3)
+
+# Check the answers with manual computations 
+all.equal(var(t(gaitfd3$coefs[,,1])), gaitVar.fd3$coefs[,,,1])
+# TRUE
+all.equal(var(t(gaitfd3$coefs[,,2])), gaitVar.fd3$coefs[,,,3])
+# TRUE
+all.equal(var(t(gaitfd3$coefs[,,2]), t(gaitfd3$coefs[,,1])),
+          gaitVar.fd3$coefs[,,,2])
+# TRUE
+
+# See help("var.fd") examples 
+
+
+
+
+
+
+
+
+
+
+
+gaitVar.fd3$coefs
+
+gaitbasis5 <- create.fourier.basis(nbasis=5)
+gaitbasis21 <- create.fourier.basis(nbasis=21)
 
 #  -----------  create the fd object   -----------
 
@@ -73,68 +108,86 @@ gaitbasis <- create.fourier.basis(gaitrange,21)
 
 #  set up range of smoothing parameters in log_10 units
 
-loglam <- seq(-13,-10,0.5)
-nlam   <- length(loglam)
+gaitLoglam <- seq(-13,-10,0.5)
+nglam   <- length(gaitLoglam)
 
-dfsave  <- rep(0,nlam)
-gcvsave <- rep(0,nlam)
+gaitSmoothStats <- array(NA, dim=c(nglam, 3),
+      dimnames=list(gaitLoglam, c("log10.lambda", "df", "gcv") ) )
+gaitSmoothStats[, 1] <- gaitLoglam
 
 #  loop through smoothing parameters
 
-for (ilam in 1:nlam) {
-	lambda <- 10^loglam[ilam]
-	fdParobj <- fdPar(gaitbasis, harmaccelLfd, lambda)
-	smoothlist <- smooth.basis(gaittime, gaitarray, fdParobj)
-	df  <- smoothlist$df
-	gcv <- smoothlist$gcv
-	dfsave[ilam]  <- df
-	gcvsave[ilam] <- sum(gcv)  # note: gcv is a matrix in this case
+for (ilam in 1:nglam) {
+#	lambda <- 10^loglam[ilam]
+#   	fdParobj <- fdPar(gaitbasis, harmaccelLfd, lambda)
+	gaitSmooth <- smooth.basisPar(gaittime, gait, gaitbasis21, 
+                  Lfdobj=harmaccelLfd, lambda=10^gaitLoglam[ilam])
+        gaitSmoothStats[ilam, "df"] <- gaitSmooth$df
+        gaitSmoothStats[ilam, "gcv"] <- sum(gaitSmooth$gcv)
+# note: gcv is a matrix in this case
 }
 
 #  display and plot GCV criterion and degrees of freedom
 
-cbind(loglam, dfsave, gcvsave)
+gaitSmoothStats
 
 #  set up plotting arrangements for one and two panel displays allowing
 #  for larger fonts
 
-par(mfrow=c(1,2), mar=c(3,4,2,1), pty="s")
-plot(loglam, gcvsave, type="b",
+op <- par(mfrow=c(2,1))
+plot(gaitLoglam, gaitSmoothStats[, "gcv"], type="b",
      xlab="Log_10 lambda", ylab="GCV Criterion", 
-     main="Gait Smoothing")
+     main="Gait Smoothing", log="y")
 
-plot(loglam, dfsave, type="b",
+plot(gaitLoglam, gaitSmoothStats[, "df"], type="b",
      xlab="Log_10 lambda", ylab="Degrees of freedom", 
      main="Gait Smoothing")
+par(op)
 
-#  lambda value minimizing GCV is 10^(-11.5)
+# With gaittime =  seq(0.025, 0.975, length=20), 
+#    GCV is minimized with lambda = 10^(-11).
+# With gaittime = (1:20)/21,
+#    GCV is minimized with lambda = 10^(-11.5).
 
-lambda    <- 10^(-11.5)
-gaitfdPar <- fdPar(gaitbasis, harmaccelLfd, lambda)
+#lambda    <- 10^(-11.5)
+#gaitfdPar <- fdPar(gaitbasis21, harmaccelLfd, lambda)
 
-gaitfd <- smooth.basis(gaittime, gaitarray, gaitfdPar)$fd
+str(gait)
+gaitfd <- smooth.basisPar(gaittime, gait,
+       gaitbasis21, Lfdobj=harmaccelLfd, lambda=1e-11)$fd
 
+str(gaitfd)
 names(gaitfd$fdnames) = c("Normalized time", "Child", "Angle")
 gaitfd$fdnames[[3]] = c("Hip", "Knee")
 
 #  --------  plot curves and their first derivatives  ----------------
 
-par(mfrow=c(1,2), mar=c(3,4,2,1), pty="s")
+#par(mfrow=c(1,2), mar=c(3,4,2,1), pty="s")
+op <- par(mfrow=c(2,1))
 plot(gaitfd, cex=1.2)
+par(op)
 
 #  plot each pair of curves interactively
 
-par(mfrow=c(1,2), mar=c(3,4,2,1), pty="s")
-plotfit.fd(gaitarray, gaittime, gaitfd, cex=1.2)
+#par(mfrow=c(1,2), mar=c(3,4,2,1), pty="s")
+op <- par(mfrow=c(2,1))
+plotfit.fd(gait, gaittime, gaitfd, cex=1.2)
+# Problem:  does not work properly;
+# ask=TRUE with appropriate choices for lty, etc., 
+# might make it stop after each one,
+# but would not fix the overplotting
+# Need to modify plotfit.fd to accept ylim = array,
+# not just a vector of length 2.  
+par(op)
 
 #  plot the residuals, sorting cases by residual sum of squares
 
-par(mfrow=c(1,2), mar=c(3,4,2,1), pty="s")
-plotfit.fd(gaitarray, gaittime, gaitfd, residual=T, sort=T, cex=1.2)
+#par(mfrow=c(1,2), mar=c(3,4,2,1), pty="s")
+plotfit.fd(gait, gaittime, gaitfd, residual=T, sort=T, cex=1.2)
 
 #  plot first derivative of all curves
 
-par(mfrow=c(1,2), mar=c(3,4,2,1), pty="s")
+#par(mfrow=c(1,2), mar=c(3,4,2,1), pty="s")
 plot(gaitfd, Lfdob=1)
 
 #  ------------  compute the mean functions  --------------------
@@ -143,23 +196,30 @@ gaitmeanfd <- mean.fd(gaitfd)
 
 #  plot these functions and their first two derivatives
 
-par(mfcol=c(2,3),pty="s")
+#par(mfcol=c(2,3),pty="s")
+#op <- par(mfrow=c(3,2))
+op <- par(mfcol=2:3)
 plot(gaitmeanfd)
 plot(gaitmeanfd, Lfdobj=1)
 plot(gaitmeanfd, Lfdobj=2)
+par(op)
 
 #  --------------  PCA of gait data  --------------------
 
 #  do the PCA with varimax rotation
 
+# Smooth with lambda as determined above
+gaitfdPar <- fdPar(gaitbasis, harmaccelLfd, lambda=1e-11)
 gaitpca.fd <- pca.fd(gaitfd, nharm=4, gaitfdPar)
 
 gaitpca.fd <- varmx.pca.fd(gaitpca.fd)
 
 #  plot harmonics using cycle plots
 
-par(mfrow=c(1,1), mar=c(3,4,2,1), pty="s")
+#par(mfrow=c(1,1), mar=c(3,4,2,1), pty="s")
+op <- par(mfrow=c(2,2))
 plot.pca.fd(gaitpca.fd, cycle=T)
+par(op)
 
 #  ------  Canonical correlation analysis of knee-hip curves  ------
 
@@ -175,8 +235,9 @@ ccafd    <- cca.fd(hipfd, kneefd, ncan=3, hipfdPar, kneefdPar)
 
 #  each harmonic in turn
 
-par(mfrow=c(2,1), mar=c(3,4,2,1), pty="m")
+op <- par(mfrow=c(2,1), mar=c(3,4,2,1), pty="m")
 plot.cca.fd(ccafd, cex=1.2)
+par(op)
 
 #  display the canonical correlations
 
@@ -184,11 +245,12 @@ round(ccafd$ccacorr[1:6],3)
 
 %  ----------  compute the variance and covariance functions  -------
 
-gaitvarbifd = var.fd(gaitfd)
+gaitvarbifd <- var.fd(gaitfd)
+str(gaitvarbifd)
 
 gaitvararray = eval.bifd(gaittime, gaittime, gaitvarbifd)
 
-par(mfrow=c(1,1), mar=c(3,4,2,1), pty="m")
+#par(mfrow=c(1,1), mar=c(3,4,2,1), pty="m")
 
 #  plot variance and covariance functions as contours
 
@@ -212,22 +274,46 @@ title("Knee - Hip")
 persp(gaittime, gaittime, gaitvararray[,,1,3], cex=1.2)
 title("Hip - Hip")
 
+#par(mfrow=c(1,1), mar=c(3,4,2,1), pty="m")
+
+#  plot correlation functions as contours
+
+gaitCorArray <- cor.fd(gaittime, gaitfd)
+
+quantile(gaitCorArray)
+
+contour(gaittime, gaittime, gaitCorArray[,,1,1], cex=1.2)
+title("Knee - Knee")
+
+contour(gaittime, gaittime, gaitCorArray[,,1,2], cex=1.2)
+title("Knee - Hip")
+
+contour(gaittime, gaittime, gaitCorArray[,,1,3], cex=1.2)
+title("Hip - Hip")
+
+
+
+
 #  ----  Register the first derivative of the gait data  --------
 
 #  set up basis for warping function
 
 nwbasis <- 7
-wbasis  <- create.bspline.basis(gaitrange,nwbasis,5)
+#wbasis  <- create.bspline.basis(gaitrange,nwbasis,5)
+warpbasis  <- create.bspline.basis(nbasis=nwbasis,norder=5)
 
 Dgaitfd <- deriv.fd(gaitfd)
 
 Dgaitmeanfd  <- mean.fd(Dgaitfd)
 
-lambda <- 1e-2
-Wfd    <- fd(matrix(0,nwbasis,39),wbasis)
-WfdPar <- fdPar(Wfd, 3, lambda)
+#lambda <- 1e-2
+Warpfd    <- fd(matrix(0,nwbasis,39),warpbasis)
+WarpfdPar <- fdPar(Warpfd, 3, lambda=0.01)
 
-regstr <- register.fd(Dgaitmeanfd, Dgaitfd, WfdPar, periodic=T)
+regstr <- register.fd(Dgaitmeanfd, Dgaitfd, WarpfdPar, periodic=T)
+#-------  Curve  1   --------
+#Error in yregmat[, 1, ] : incorrect number of dimensions
+#?????
 
 xfine       <- seq(0,1,len=101)
 Dgaitregfd  <- regstr$regfd

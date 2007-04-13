@@ -7,7 +7,7 @@ plot.basisfd <- function(x, ...) {
     #  check BASISOBJ
 
     if (!inherits(basisobj, "basisfd")) stop(
-        "BASISOBJ is not a basis object.")
+        "'x' is not a 'basisfd' object.")
 		
 	dot.args <- list(...)
 
@@ -22,7 +22,7 @@ plot.basisfd <- function(x, ...) {
 
 	nbasis   <- basisobj$nbasis
 	ltype <- dot.args$lty
-	if (is.null(ltype)) ltype=rep(c(1,2,3),nbasis/3)
+	if (is.null(ltype)) ltype=rep(c(1,2,3),max(1, nbasis/3))
 
 	nx       <- max(101,10*nbasis)
 	rangex   <- basisobj$rangeval

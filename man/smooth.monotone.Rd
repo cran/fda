@@ -4,16 +4,20 @@
   Monotone Smoothing of Data
 }
 \description{
-When the discrete data that are observed reflect a smooth strictly
-increasing or strictly decreasing function, it is often desirable to
-smooth the data with a strictly monotone function, even though the data
-themselves may not be monotone due to observational error.  An example
-is when data are collected on the size of a growing organism over time.
-This function computes such a smoothing function, but, unlike other
-smoothing functions, for only for one curve at a time.
-The smoothing function minimizes a weighted error sum of squares
-criterion.  This minimization requires iteration, and therefore is more
-computationally intensive than normal smoothing.
+  When the discrete data that are observed reflect a smooth strictly
+  increasing or strictly decreasing function, it is often desirable to
+  smooth the data with a strictly monotone function, even though the
+  data themselves may not be monotone due to observational error.  An
+  example is when data are collected on the size of a growing organism
+  over time.  This function computes such a smoothing function, but,
+  unlike other smoothing functions, for only for one curve at a time.
+  The smoothing function minimizes a weighted error sum of squares
+  criterion.  This minimization requires iteration, and therefore is
+  more computationally intensive than normal smoothing.
+
+  The monotone smooth is beta[1]+beta[2]*integral(exp(Wfdobj)), where
+  Wfdobj is a functional data object.  Since exp(Wfdobj)>0, its integral
+  is monotonically increasing.   
 }
 \usage{
 smooth.monotone(x, y, wt=rep(1,nobs), WfdParobj,
@@ -65,8 +69,8 @@ helpful to turn off the output buffering feature of S-PLUS.
 a named list of length 5 containing:
 
 \item{Wfdobj}{
-a functional data object defining function $W(x)$ that that
-optimizes the fit to the data of the monotone function that it defines.
+a functional data object defining function $W(x)$ that optimizes the fit
+to the data of the monotone function that it defines. 
 }
 \item{beta}{
 the optimal regression coefficient values.
@@ -83,25 +87,28 @@ a named list containing three results for the final converged solution:
 \item{iternum}{
 the number of iterations.
 }
-\item{iternum}{
-the number of iterations.
-}
 \item{iterhist}{
 \code{iternum+1} by 5 matrix containing the iteration
 history.
 }
 }
 \details{
-The
-smoothing function  $f(x)$ is determined by
+The smoothing function  $f(x)$ is determined by
 three objects that need to be estimated from the data:
 
 \itemize{
-	\item $W(x)$, a functional data object that is first exponentiated and then the result integrated.  This is the heart of the monotone smooth.  The closer $W(x)$ is to zero, the closer the monotone smooth becomes a straight line.  The closer $W(x)$ becomes a constant, the more the monotone smoother becomes an exponential function.  It is assumed that $W(0) = 0.$
+	\item $W(x)$, a functional data object that is first
+	exponentiated and then the result integrated.  This is the heart
+	of the monotone smooth.  The closer $W(x)$ is to zero, the
+	closer the monotone smooth becomes a straight line.  The closer
+	$W(x)$ becomes a constant, the more the monotone smoother
+	becomes an exponential function.  It is assumed that $W(0) = 0.$
+	
+	\item $b0$, an intercept term that determines the value of the
+	smoothing function at $x = 0$. 
 
-	\item $b0$, an intercept term that determines the value of the smoothing function at $x = 0$. 
-
-	\item $b1$, a regression coefficient that determines the slope of the smoothing function at $x = 0$.
+	\item $b1$, a regression coefficient that determines the slope
+	of the smoothing function at $x = 0$. 
 }
 In addition, it is possible to have the intercept $b0$
 depend in turn on the values of one or more covariates through the

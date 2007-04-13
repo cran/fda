@@ -31,9 +31,10 @@ harmLcoef  <- c(0,(2*pi/365)^2,0)
 harmLfd    <- vec2Lfd(harmLcoef, c(0,365))
 templambda <- 0.01
 tempfdPar  <- fdPar(daybasis, harmLfd, templambda)
-tempfd     <- smooth.basis(daytime, daily$tempav, tempfdPar)$fd
+tempfd     <- smooth.basis(daytime,
+       CanadianWeather$dailyAv[,,"Temperature.C"], tempfdPar)$fd
 tempctrfd  <- center.fd(tempfd)
-par(mfrow=c(1,1),pty="m")
+
 plot(tempctrfd, xlab="Day", ylab="deg. C",
      main = "Centered temperature curves")
 }

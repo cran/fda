@@ -17,7 +17,7 @@ either a nonnegative integer or a linear differential operator object.
 }
 }
 \value{
-e linear differential operator object of the "Lfd" class that is
+a linear differential operator object of the "Lfd" class that is
 equivalent to the integer argument.
 }
 % docclass is function

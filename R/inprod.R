@@ -63,7 +63,7 @@ if (rng[1] < range1[1] || rng[2] > range1[2]) stop(
 if (inherits(fdobj1,"fd")       && inherits(fdobj2,"fd")   &&
     type1 == "bspline"          && type2 == "bspline"      &&
     is.eqbasis(basisobj1, basisobj2)                       &&
-    is.integer(Lfdobj1)         && is.integer(Lfdobj2)      &&
+    is.integerLfd(Lfdobj1)         && is.integerLfd(Lfdobj2)      &&
     wtfd == 0                   && all(rng == range1)) {
 	
     inprodmat <- inprod.bspline(fdobj1, fdobj2,

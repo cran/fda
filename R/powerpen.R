@@ -21,7 +21,7 @@ powerpen <- function(basisobj, Lfdobj=int2Lfd(2)) {
 
   Lfdobj <- int2Lfd(Lfdobj)
 
-  if (is.integer(Lfdobj)) {
+  if (is.integerLfd(Lfdobj)) {
       nderiv <- Lfdobj$nderiv
 
     	if (any(exponents - nderiv < 0) && rang[1] == 0)

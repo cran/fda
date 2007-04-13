@@ -1,10 +1,10 @@
-stddev.fd <- function(fdobj)
+sd.fd <- function(fdobj)
 {
   #  Compute the standard deviation functions for functional observations
   #  Argument:
-  #  FDOBJ    ... a functional data object
+  #  fdobj    ... a functional data object
   #  Return:
-  #  STDdevFD ... a functional data for the standard deviation function
+  #  STDFD ... a functional data for the standard deviation functions
 
   #  Last modified 26 October 2005
 
@@ -46,6 +46,10 @@ stddev.fd <- function(fdobj)
   stdcoef <- project.basis(stdmat, evalarg, basisobj)
   names(fdnames)[2] <- "Std. Dev."
   names(fdnames)[3] <- paste("Std. Dev.",names(fdnames)[3])
-  stddevfd <- fd(stdcoef, basisobj, fdnames)
-  return(stddevfd)
+  stdfd <- fd(stdcoef, basisobj, fdnames)
+  return(stdfd)
 }
+
+std.fd <- function(fdobj)sd.fd(fdobj)
+stdev.fd <- function(fdobj)sd.fd(fdobj)
+stddev.fd <- function(fdobj)sd.fd(fdobj)

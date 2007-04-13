@@ -1,5 +1,5 @@
-smooth.basis <- function (argvals, y, fdParobj, wtvec=rep(1,n), dffactor=1,
-                          fdnames=list(NULL, dimnames(y)[2], NULL))
+smooth.basis <- function (argvals, y, fdParobj, wtvec=rep(1,n),
+            dffactor=1, fdnames=list(NULL, dimnames(y)[2], NULL))
 {
 
 #  ARGVALS  ... A set of argument values, set by default to equally spaced on
@@ -42,7 +42,8 @@ smooth.basis <- function (argvals, y, fdParobj, wtvec=rep(1,n), dffactor=1,
 #    PENMAT ...  the penalty matrix.
 #    Y2CMAP ...  the matrix mapping the data to the coefficients.
 
-#  Last modified:  26 October 2005
+#  Last modified:  20 February 2007 by Spencer Graves
+#  Previously modified:  26 October 2005
 
 #  check ARGVALS
 
@@ -104,17 +105,25 @@ lambda   <- fdParobj$lambda
     nrep <- 1
     nvar <- 1
     coef <- rep(0,nbasis)
+    yNms <- names(y)
     y <- matrix(y,n,1)
+    if(!is.null(yNms))dimnames(y) <- list(yNms, NULL)
   }
   if (ndim == 2)  {
     nrep <- ncol(y)
     nvar <- 1
     coef <- matrix(0,nbasis,nrep)
+    yNms <- dimnames(y)   
+    if(!is.null(yNms[[2]]))
+      dimnames(coef) <- list(NULL, yNms[[2]])
   }
   if (ndim == 3)  {
     nrep <- dim(y)[2]
     nvar <- dim(y)[3]
     coef <- array(0,c(nbasis,nrep,nvar))
+    yNms <- dimnames(y)
+    if(any(!sapply(yNms[-1], is.null)))
+      dimnames(coef) <- list(NULL, yNms[[2]], yNms[[3]])
   }
 
   #  set up matrix of basis function values
@@ -243,13 +252,22 @@ lambda   <- fdParobj$lambda
     #  set up default fdnames
 
     if (ndim == 1) defaultnames <- list("time", "reps", "values")
-    if (ndim == 2) defaultnames <- list("time",
-                                        paste("reps",as.character(1:nrep)),
+    if (ndim == 2){
+      defaultnames <- list("time", paste("reps",as.character(1:nrep)),
                                         "values")
-    if (ndim == 3) defaultnames <- list("time",
-                                        paste("reps",as.character(1:nrep)),
-                                        paste("values",as.character(1:nvar)) )
+      if(!is.null(dimnames(coef)[[2]]))
+        defaultnames[[2]] <- dimnames(coef)[[2]]
+      
+    }
+    if (ndim == 3){
+      defaultnames <- list("time", paste("reps",as.character(1:nrep)),
+                           paste("values",as.character(1:nvar)) )
+      if(!is.null(dimnames(coef)[[2]]))
+        defaultnames[[2]] <- dimnames(coef)[[2]]
+      if(!is.null(dimnames(coef)[[3]]))
+        defaultnames[[3]] <- dimnames(coef)[[3]]      
 
+    }
     names(defaultnames) <- c("args", "reps", "funs")
 
   fdobj <- fd(coef, basisobj, defaultnames)

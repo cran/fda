@@ -55,7 +55,7 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), WfdParobj, zmat=matrix(1,nobs,
 #  the starting values for the coefficients are in FD object WFDOBJ
 
   if (!(inherits(WfdParobj, "fdPar"))) stop(
-		"Argument WFDPAROBJ is not a functional data object.")
+		"Argument WfdParobj is not a functional data object.")
 
   Wfdobj   <- WfdParobj$fd
   Lfdobj   <- WfdParobj$Lfd
@@ -130,10 +130,14 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), WfdParobj, zmat=matrix(1,nobs,
   }
 
   iterhist <- matrix(0,iterlim+1,length(status))
+  if(length(status)==5)
+    dimnames(iterhist) <- list(NULL,
+        c("Iter", "PENSSE", "Grad Length", "Intercept", "Slope"))  
   iterhist[1,]  <- status
   if (iterlim == 0)
     return ( list( "Wfdobj" = Wfdobj, "beta" = beta, "Flist" = Flist,
-                 "iternum" = iternum, "iterhist" = iterhist ) )
+                 "iternum" = iternum,
+                  "iterhist" = iterhist[1,,drop=FALSE] ) )
 
 #  -------  Begin iterations  -----------
 
@@ -293,7 +297,8 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), WfdParobj, zmat=matrix(1,nobs,
      }
   }
   return ( list( "Wfdobj" = Wfdobj, "beta" = beta, "Flist" = Flist,
-                 "iternum" = iternum, "iterhist" = iterhist ) )
+                 "iternum" = iternum,
+     "iterhist" = iterhist[1:max(1, iternum),,drop=FALSE] ) )
 }
 
 #  ----------------------------------------------------------------

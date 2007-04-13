@@ -36,7 +36,7 @@ the sum of squared errors in predicting \code{yvec}.
 \code{\link{fRegress.stderr}}
 }
 \examples{
-#See the analyses of the daily weather data.
+#See the analyses of the Canadian daily weather data.
 }
 % docclass is function
 \keyword{smooth}

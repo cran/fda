@@ -1,5 +1,6 @@
 data2fd <- function(y, argvals = seq(0, 1, len = n), basisobj,
-                    fdnames = defaultnames, argnames = c("time", "reps", "values") )
+                    fdnames = defaultnames,
+                    argnames = c("time", "reps", "values") )
 {
 #  DATA2FD Converts an array Y of function values plus an array
 #    ARGVALS of argument values into a functional data object.
@@ -34,32 +35,33 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisobj,
 #    and the fourth is optional.
 #
 #  Y ... (necessary)
-#  The array Y stores curve values used to create functional data object FDOBJ.
-#  Y can have one, two, or three dimensions according to whether whether
-#    the sample size, the number of variables in each observation.  Its
-#    dimensions are:
+#  The array Y stores curve values used to create functional data object 
+#    FDOBJ.  Y can have one, two, or three dimensions according to whether 
+#    whether the sample size, the number of variables in each observation.  
+#    Its dimensions are:
 #     1.  argument values  ...  size = no. argument values in ARGVAL
 #     2.  replications     ...  size = sample size
 #     3.  variables        ...  size = no. variables per observation
 #  If Y is a one-way array, either as a vector or a matrix with one column,
-#     it's single non-trivial dimension = no. argument values.  If Y
-#     is two-dimensional, each observation is assumed to have one variable.
-#     If Y is three-dimensional, each observation is assumed to have
+#     it's single non-trivial dimension = no. argument values.  If Y is 
+#     two-dimensional, each observation is assumed to have one variable.
+#     If Y is three-dimensional, each observation is assumed to have 
 #     multiple variables.  Note:  a single multivariate observation must
-#     be an array Y with three dimensions, the middle of which is of length 1.
-#  The values in Y may be missing, indicated by NaN.  The presence of missing
-#     values will slow down the computation somewhat since each observation
-#     must then be processed separately.
+#     be an array Y with three dimensions, the middle of which is of length
+#     1.
+#  The values in Y may be missing, indicated by NaN.  The presence of 
+#     missing values will slow down the computation somewhat since each 
+#     observation must then be processed separately.
 #  Example:  For monthly temperature data for 35 weather stations,
-#     Y will be 12 by 35.  For both temperature and precipitation observations,
-#     Y will be 12 by 35 by 2.  For temperature/precipitation data at Montreal
-#     only, Y will be 12 by 1 by 2.
+#     Y will be 12 by 35.  For both temperature and precipitation 
+#     observations, Y will be 12 by 35 by 2.  For temperature/precipitation 
+#     data at Montreal only, Y will be 12 by 1 by 2.
 #  This argument is necessary, and there is no default value.
 #
 #  ARGVALS  ... (necessary)
-#  A set of argument values.  In most situations, these will be common to all
-#    observations, and ARGVALS will be a one-dimensional vector, with one
-#    element per observation.  These values need not be increasing.
+#  A set of argument values.  In most situations, these will be common to 
+#    all observations, and ARGVALS will be a one-dimensional vector, with 
+#    one element per observation.  These values need not be increasing.
 #    In the weather station example for monthly data, ARGVALS is
 #    a vector of length 12, with values 0.5, 1.5,..., 11.5.
 #    However, ARGVALS may also be a matrix if the argument values vary from
@@ -81,8 +83,8 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisobj,
 #    the number of basis functions, and fixed parameters determining these
 #    basis functions (eg. period for 'fourier' bases or knots for 'bspline'
 #    bases.
-#    In most applications, BASISOBJ will be supplied.  If BASISOBJ is supplied,
-#    the next three arguments are ignored.
+#    In most applications, BASISOBJ will be supplied.  If BASISOBJ is 
+#    supplied, the next three arguments are ignored.
 #    If BASISOBJ is an essential argument, and there no default value.  But
 #    see function MAKE.BASIS for a simplified technique for defining this
 #    basis.  For example, function call
@@ -91,9 +93,9 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisobj,
 #    a 'fourier' basis over an interval of 12 months containing 7 basis
 #    functions (the 3rd argument species the basis to be periodic.)
 #    This argument is necessary, and there is no default value.
-#    Earlier releases of DATA2FD supplied additional arguments for constructing
-#    a default basis, but these have been eliminated in favor of using new
-#    function MAKE.BASIS.
+#    Earlier releases of DATA2FD supplied additional arguments for 
+#    constructing a default basis, but these have been eliminated in favor 
+#    of using new function MAKE.BASIS.
 #
 #  FDNAMES  ... (optional)
 #    A list of length 3 with members containing
@@ -109,10 +111,10 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisobj,
 #
 #  ARGNAMES ...
 #    A vector  of type "character" of length 3 containing
-#               1. the name of the argument, e.g. "time" or "age"
-#               2. a description of the cases, e.g. "weather stations"
-#               3. the name for the function(s), e.g."temperature" or "position"
-#               These names are used as names for the members of list FDNAMES.
+#        1. the name of the argument, e.g. "time" or "age"
+#        2. a description of the cases, e.g. "weather stations"
+#        3. the name for the function(s), e.g."temperature" or "position"
+#           These names are used as names for the members of list FDNAMES.
 #
 #  DATA2FD Returns the object FDOBJ of functional data class containing
 #    coefficients for the expansion and the functional data basis object
@@ -130,73 +132,99 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisobj,
 #    DATA2FD may first be used with a generous number of basis functions,
 #    followed by smoothing using function SMOOTH.
 
-#  Last modified:  22 August 2006
+#  Last modified:  3 March 2007 by Spencer Graves 
+#  Previously modified:  22 August 2006
 
 #
 #  set up default fdnames, using dimnames of Y if there are any.
 #
-  defaultnames      <- vector("list",3)
-# defaultnames[[1]] <- dimnames(argvals)[[1]]
-# defaultnames[[2]] <- dimnames(y)[[2]]
+  defaultnames <- vector("list",3)
+  basisNames <- basisobj$names
+  if(!is.null(basisNames))defaultnames[[1]] <- basisNames
+#  defaultnames[[2]] <- dimnames(y)[[2]]
 # defaultnames[[3]] <- dimnames(y)[[3]]
 
 #
 #  check basisobj argument.
 #
   if(!(inherits(basisobj, "basisfd"))) stop(
-      "BASISOBJ is not a functional data basis.")
+                 "'basisobj' is not a functional data basis.")
   nbasis <- basisobj$nbasis
-
 #
 #  Make Y an array, and determine its dimensions
 #
-  if (is.array(y) == F) y <- as.array(y)
-  yd   <- dim(y)
+  yName <- make.names(deparse(substitute(y))[1])
+# end in a digit?
+  if(regexpr("[0-9]", substring(yName, nchar(yName)))>0)
+    yName <- paste(yName, ".", sep="")
+#  
+  if(!is.array(y)) y <- as.array(y)
+  yd <- dim(y)
   ndim <- length(yd)
-  if (ndim == 1) {
-	 y <- as.matrix(y)
-	 yd <- dim(y)
-	 ndim <- length(yd)
+  if(ndim == 1) {
+    y <- as.matrix(y)
+    yd <- dim(y)
+    ndim <- length(yd)
   }
   if (ndim > 3) stop(
-      "Too many dimensions for argument Y.")
-  #  Determine the maximum number of argument values, number of replicates, and
-  #    number of variables
+      "Too many dimensions for argument 'y'.")
+#  Determine the maximum number of argument values, number of 
+#    replicates, and number of variables
   n  <- yd[1]
-  if (n == 1) stop(
-      "Only one argument value not allowed.")
-  if (ndim > 1) nrep <- yd[2] else nrep <- 1
-  if (ndim > 2) nvar <- yd[3] else nvar <- 1
-  if (is.null(defaultnames[[3]])) defaultnames[[3]] <- as.character(1:nvar)
+  if (n == 1) stop("dim(y)[1]==1  not allowed.")
+  {
+    if (ndim > 1){
+      nrep <- yd[2]
+      yNames2 <- dimnames(y)[[2]]      
+      if(!is.null(yNames2))defaultnames[[2]] <- yNames2
+    }
+    else 
+      nrep <- 1    
+  }
+  {
+    if (ndim > 2){
+      nvar <- yd[3]
+      yNames3 <- dimnames(y)[[3]]
+      if(!is.null(yNames3))defaultnames[[3]] <- yNames3
+    }
+    else nvar <- 1
+  }
+  if (is.null(defaultnames[[3]])){
+    yNm <- substring(yName, 1, 11)
+    defaultnames[[3]] <- paste(yNm, 1:nvar, sep="")
+  }
   names(defaultnames)[1:length(argnames)] <- argnames
-
 #
 #  Make ARGVALS an array and check for compatibility with Y
 #
-  if(is.array(argvals) == F) argvals <- as.array(argvals)
+  if(!is.array(argvals)) argvals <- as.array(argvals)
   argd  <- dim(argvals)
   nargd <- length(argd)
   if (nargd > 2) stop(
-     "ARGVALS has too many dimensions.")
+     "'argvals' has too many dimensions.")
   if (argd[1] != n) stop(
-    "Number of argument values incompatible with number of data.")
+    "Number of 'argvals' incompatible with dimensions of 'y'.")
   if (nargd==2 && argd[2] != nrep) stop(
     paste("Matrix argvals must have same number of columns\n",
           "as the number of replicates."))
-#  Issue a warning of arguments are outside of the in the basisobj.
+#  Issue a warning of arguments are outside of rangeval in basisobj.
   rangeval <- basisobj$rangeval
   temp <- c(argvals)
   temp <- temp[!is.na(temp)]
   if (min(temp) < rangeval[1] | max(temp) > rangeval[2]) {
-    warning(c("Some arguments values are outside of the range in basisobj,\n",
-          " and some data values will not be used."))
+    warning(c("Some 'argvals' are outside basisobj[['rangeval']];,\n",
+          "corresponding 'y' values will not be used."))
     if (nargd == 1) {
-       index <- argvals < rangeval[1] | argvals > rangeval[2]
+#       index <- argvals < rangeval[1] | argvals > rangeval[2]
+        index <- which((argvals >= rangeval[1])
+                       & (argvals <= rangeval[2]))
        argvals[index] <- NA
     } else {
        for (irep in 1:nrep) {
-          index <- argvals[,irep] < rangeval[1] | argvals[,irep] > rangeval[2]
-          argvals[index,irep] <- NaN
+#        index <- argvals[,irep]<rangeval[1] | argvals[,irep]>rangeval[2]
+         index <- which((argvals[,irep] >= rangeval[1])
+                       & (argvals[,irep] <= rangeval[2]))
+         argvals[index,irep] <- NaN
        }
     }
   }
@@ -216,7 +244,7 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisobj,
       if (nbasis <= n) {
         coef <- project.basis(y, argvals, basisobj)
       } else {
-        coef <- project.basis(y, argvals, basisobj, T)
+        coef <- project.basis(y, argvals, basisobj, TRUE)
       }
     } else {
 #  Second case: ARGVALS a vector, but missing data present
@@ -289,7 +317,7 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisobj,
               paste("Less than 2 data values available for curve",
                     j,"."))
         coef[, j] <-
-            project.basis(yy[index], argv[index], basisobj, T)
+            project.basis(yy[index], argv[index], basisobj, TRUE)
       }
     } else {
       #  Multivariate functions
@@ -301,15 +329,18 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisobj,
               paste("Less than 2 data values available for curve",
                     j," and variable",k,"."))
         coef[, j, k] <-
-            project.basis(yy[index], argv[index], basisobj, T)
+            project.basis(yy[index], argv[index], basisobj, TRUE)
       }
     }
   }
   #
   #  Now that coefficient array has been computed, create functional data object
   #
-  fd <- fd(coef, basisobj, fdnames = fdnames)
-
+# names(coef) <- fdnames or defaultnames?
+  coef. <- objAndNames(coef, fdnames, defaultnames)
+#
+  fd <- fd(coef., basisobj, fdnames = fdnames)
+#
   fd
 }
 

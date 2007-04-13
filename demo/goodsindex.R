@@ -23,7 +23,7 @@
 #                    Set up the data for analysis
 #  ------------------------------------------------------------------------
 
-
+ndur <- 12
 durtime <- (0:(ndur-1))/12 + 1919
 goodsrange <- c(1919,2000)
 monthlabs <- c("j","F","m","A","M","J","J","A","S","O","N","D")
@@ -79,7 +79,7 @@ lognondursmthvec <- eval.fd(durfine, lognondursmthfd)
 #  smooth.Pspline not available at this time.
 
 #  smoothlist <- smooth.Pspline(durtime, lognondur, w=wtvec, norder=4,
-                             spar=lambda, method=1)
+#                             spar=lambda, method=1)
 # lognondursmth <- smoothlist$ysmth
 
 #  plot the data and smooth for 1964-1966

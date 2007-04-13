@@ -31,7 +31,7 @@ fourierpen <- function(basisobj, Lfdobj=int2Lfd(2))
   ratio  <- round(width/period)
   nderiv <- Lfdobj$nderiv
 
-  if ((width/period) == ratio && is.integer(Lfdobj)) {
+  if ((width/period) == ratio && is.integerLfd(Lfdobj)) {
 
     #  Compute penalty matrix for penalizing integral over one period.
 

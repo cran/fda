@@ -101,7 +101,8 @@ use this function, but rather either \code{ls} or \code{lsfit}.
 \code{\link{linmod}}
 }
 \examples{
-#See the weather data analyses in the file \code{daily.ssc} for
+#See the Canadian daily weather data analyses in the file
+# \code{daily.R} for 
 #examples of all the cases covered by \code{fRegress}.
 }
 % docclass is function

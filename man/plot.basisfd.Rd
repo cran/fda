@@ -4,25 +4,25 @@
   Plot a Basis Object
 }
 \description{
-Plots all the basis functions.
+  Plots all the basis functions.
 }
 \usage{
 plot.basisfd(x, ...)
 }
 \arguments{
-\item{x}{
-a basis object
-}
-\item{\dots }{
-additional plotting parameters that can be used
-in \code{plot}
-}
+  \item{x}{
+    a basis object
+  }
+  \item{\dots }{
+    additional plotting parameters that can be used
+    in \code{plot}
+  }
 }
 \value{
-none
+  none
 }
 \section{Side Effects}{
-a plot of the basis functions
+  a plot of the basis functions
 }
 \seealso{
 \code{\link{plot.fd}}

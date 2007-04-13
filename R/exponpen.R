@@ -24,7 +24,7 @@ Lfdobj <- int2Lfd(Lfdobj)
 
 #  Compute penalty matrix
 
-if (is.integer(Lfdobj)) {
+if (is.integerLfd(Lfdobj)) {
     nderiv  <- Lfdobj$nderiv
     ratevec <- basisobj$params
     nrate   <- length(ratevec)

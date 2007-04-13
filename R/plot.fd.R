@@ -26,7 +26,8 @@ plot.fd <- function(x, Lfdobj=0, href=TRUE, nx=201, titles=NULL,
   #    must be set up before calling plot by using something such as
   #    par(mfrow=c(1,nvar),pty="s")
 
-  #  Last modified 21 March 2006
+  #  Last modified 2 February 2007 Spencer Graves
+  #  Previously modified 21 March 2006
 
   #  check fdobj
 
@@ -43,10 +44,12 @@ plot.fd <- function(x, Lfdobj=0, href=TRUE, nx=201, titles=NULL,
   coef   <- fdobj$coefs
   coefd  <- dim(coef)
   ndim   <- length(coefd)
+# Number of basis functions   
   nbasis <- coefd[1]
+# Number of functional observations   
   nrep   <- coefd[2]
   if (ndim > 2) nvar <- coefd[3] else nvar <- 1
-
+#
   basisobj <- fdobj$basis
   rangex   <- basisobj$rangeval
   x        <- seq(rangex[1],rangex[2],length=nx)
@@ -59,28 +62,34 @@ plot.fd <- function(x, Lfdobj=0, href=TRUE, nx=201, titles=NULL,
   if (is.character(ylabel) == FALSE) ylabel <- ""
   crvnames <- fdobj$fdnames[[2]]
   varnames <- fdobj$fdnames[[3]]
-
+# A single line?  
   if (ndim < 2) {
     plot (x, fdmat, type="l", xlim=xlim, ylim=ylim,
           xlab=xlab, ylab=ylab, ...)
     if (zerofind(fdmat) && href) abline(h=0,lty=2)
+    invisible(NULL)
   }
+# Several copies of one function?    
   if (ndim ==2 ) {
     if (!ask) {
       matplot(x, fdmat, type="l", xlim=xlim, ylim=ylim,
            		xlab=xlab, ylab=ylab, ...)
       if (zerofind(fdmat) && href) abline(h=0,lty=2)
     } else  {
-      #par(ask = TRUE)
+      op <- par(ask = TRUE)
+      on.exit(par(op))
       for (irep in 1:nrep) {
         plot (x, fdmat[,irep], type="l", xlim=xlim, ylim=ylim,
                 xlab=xlab, ylab=ylab, ...)
         if (zerofind(fdmat[,irep]) && href) abline(h=0,lty=2)
         if (!is.null(titles)) title(titles[irep])
-        else title(paste("Curve",irep,crvnames[irep]))
+        else title(paste("Curve",irep,crvnames[irep]), line=0.2)
+#       ... "line=0.2" to allow "main" in "..."         
       }
     }
+    invisible(NULL)
   }
+# Possibly multiple copies of different functions   
   if (ndim == 3) {
     if (!ask) {
       for (ivar in 1:nvar) {
@@ -92,7 +101,16 @@ plot.fd <- function(x, Lfdobj=0, href=TRUE, nx=201, titles=NULL,
     } else {
       for (irep in 1:nrep) {
         for (ivar in 1:nvar) {
-          #if (ivar==1) par(ask = TRUE) else par(ask = FALSE)
+          {
+            if (ivar==1){
+              op <- par(ask = TRUE)
+              on.exit(par(op))
+            }
+            else {
+              op <- par(ask = FALSE)
+              on.exit(par(op))
+            }
+          }
           plot(x,fdmat[,irep,ivar],type="l", xlim=xlim, ylim=ylim,
                 xlab=xlab, ylab=ylab, ...)
           if (zerofind(fdmat[,irep,ivar]) && href) abline(h=0,lty=2)
@@ -104,11 +122,3 @@ plot.fd <- function(x, Lfdobj=0, href=TRUE, nx=201, titles=NULL,
   }
   invisible(NULL)
 }
-
-zerofind <- function(fmat)
-{
-  frng <- range(fmat)
-  if (frng[1] <= 0 && frng[2] >= 0) zeroin <- TRUE else zeroin <- FALSE
-  return(zeroin)
-}
-
