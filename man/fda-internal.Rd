@@ -16,7 +16,6 @@ center.fd(fdobj)
 \alias{derivchk}
 \alias{derivs}
 \alias{eigchk}
-\alias{expect.phi}
 \alias{expect.phiphit}
 \alias{fd2list}
 \alias{fdchk}

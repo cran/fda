@@ -10,8 +10,8 @@ as closely as possible to that of the target by means of a smooth
 increasing transformation of the argument, or a warping function.
 }
 \usage{
-register.fd(y0fd, yfd, WfdParobj, conv=0.01,
-            iterlim=10, dbglev=1, periodic=FALSE, crit=2)
+register.fd(y0fd, yfd, WfdParobj, conv=1e-04,
+            iterlim=20, dbglev=1, periodic=FALSE, crit=2)
 }
 \arguments{
 \item{y0fd}{

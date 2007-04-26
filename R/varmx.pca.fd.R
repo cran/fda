@@ -9,7 +9,7 @@ varmx.pca.fd <- function(pcafd, nharm = scoresd[2], nx=501)
 
 #  Note that pcafd is an oldClass type object
 
-#  Last modified 22 August 2006
+#  Last modified 15 November 2006
 
   if (!(inherits(pcafd, "pca.fd"))) stop(
 		"Argument PCAFD is not a pca.fd object.")
@@ -48,9 +48,10 @@ varmx.pca.fd <- function(pcafd, nharm = scoresd[2], nx=501)
   harmscrs <- harmscrs %*% rotm
 
   #  compute proportions of variance
+
   harmvar <- apply(harmscrs^2,2,sum)
   varsum  <- sum(harmvar)
-  propvar <- harmvar/varsum
+  propvar <- sum(pcafd$varprop)*harmvar/varsum
 
   #  modify pcafd object
 
@@ -59,5 +60,4 @@ varmx.pca.fd <- function(pcafd, nharm = scoresd[2], nx=501)
   pcafd$varprop   <- propvar
   return(pcafd)
 }
-
 

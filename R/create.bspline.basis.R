@@ -15,12 +15,12 @@ create.bspline.basis <- function (rangeval=c(0,1), nbasis=NULL, norder=4,
 #               They must satisfy BREAKS[1] = RANGEVAL[1] and
 #               BREAKS[NBREAKS] = RANGEVAL[2], where NBREAKS is the total
 #               number of BREAKS.  There must be at least 3 BREAKS.
-#  There is a potential for inconsistency among arguments NBASIS, NORDER,
-#  and BREAKS.  It is resolved as follows:
+#  There is a potential for inconsistency among arguments NBASIS, NORDER, and
+#  BREAKS.  It is resolved as follows:
 #     If BREAKS is supplied, NBREAKS = length(BREAKS), and
 #     NBASIS = NBREAKS + NORDER - 2, no matter what value for NBASIS is
 #     supplied.
-#     If BREAKS is not supplied but NBASIS is, NBREAKS = NBASIS-NORDER+2,
+#     If BREAKS is not supplied but NBASIS is, NBREAKS = NBASIS - NORDER + 2,
 #        and if this turns out to be less than 3, an error message results.
 #     If neither BREAKS nor NBASIS is supplied, NBREAKS is set to 21.
 #  DROPIND  ... A vector of integers specificying the basis functions to
@@ -44,7 +44,7 @@ create.bspline.basis <- function (rangeval=c(0,1), nbasis=NULL, norder=4,
 #  BASISFD  ... a functional data basis object
 
 # Last modified 3 March 2007 by Spencer Graves
-# Previously modified 20 November 2005.  
+#  Last modified 20 November 2005
 
   type <- "bspline"
 
@@ -101,7 +101,7 @@ create.bspline.basis <- function (rangeval=c(0,1), nbasis=NULL, norder=4,
 #  check NBREAKS
 
   if (nbreaks < 2) stop ("Number of values in BREAKS less than 2.")
-  
+
 #  check BREAKS
 
   breaks <- sort(breaks)
@@ -110,7 +110,7 @@ create.bspline.basis <- function (rangeval=c(0,1), nbasis=NULL, norder=4,
   if (breaks[nbreaks] != rangeval[2])   stop(
               "Largest  value in BREAKS not equal to RANGEVAL[2].")
   if (min(diff(breaks)) < 0) stop(
-                                  "Values in BREAKS not increasing")
+              "Values in BREAKS not increasing")
 
 #  Set up the PARAMS vector.
 #  PARAMS contains only the interior knots
@@ -135,7 +135,7 @@ create.bspline.basis <- function (rangeval=c(0,1), nbasis=NULL, norder=4,
         stop("An index value of dropind is out of range.")
     }
   }
-  
+
   basisobj <- basisfd(type=type, rangeval=rangeval, nbasis=nbasis, params=params,
                     dropind=dropind, quadvals=quadvals, values=values)
   basisobj$names <- {
@@ -143,4 +143,5 @@ create.bspline.basis <- function (rangeval=c(0,1), nbasis=NULL, norder=4,
     else paste(names, norder, ".", 1:nbasis, sep="")
   }
   basisobj
+
 }

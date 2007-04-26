@@ -62,7 +62,7 @@ create.polygonal.basis(argvals=NULL, dropind=NULL,
 \examples{
 #  Create a polygonal basis over the interval [0,1]
 #  with break points at 0, 0.1, ..., 0.95, 1
-basisobj <- create.polygonal.basis(seq(0,1,0.1))
+(basisobj <- create.polygonal.basis(seq(0,1,0.1)))
 #  plot the basis
 plot(basisobj)
 }

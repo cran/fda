@@ -104,7 +104,8 @@ plot(monthbasis)
 # Create a false Fourier basis using 1 basis function.  
 falseFourierBasis <- create.fourier.basis(nbasis=1)
 #  plot the basis
-plot(falseFourierBasis)
+# This plot command should work but doesn't:  2007.05.01
+#plot(falseFourierBasis)
 
 }
 % docclass is function

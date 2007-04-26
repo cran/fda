@@ -71,7 +71,7 @@ if (nderiv >= norder) {
 
 if (nderiv > 0 && nderiv == norder - 1)
     stop(paste("Penalty matrix cannot be evaluated for derivative of order ",
-               nderiv, " for B-splines of order ", norder, sep=""))
+               nderiv, " for B-splines of order ", norder))
 
 #  special case where LFD is D^NDERIV and NDERIV = NORDER - 1
 

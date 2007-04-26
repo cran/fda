@@ -6,12 +6,12 @@
 
 #  Generator function of class fd
 
-fd <- function(coef=matrix(0,2,1), basisobj=basisfd(), fdnames=defaultnames)
+fd <- function (coef=matrix(0,2,1), basisobj=basisfd(), fdnames=defaultnames)
 {
   #  This function creates a functional data object.
   #    A functional data object consists of a basis for expanding a functional
   #    observation and a set of coefficients defining this expansion.
-  #    The basis is contained in a "basisfd" object; that is, a realization
+  #    The basis is contained in a "basisfd" object that is, a realization
   #    of the "basisfd" class.
 
   #  Arguments
@@ -37,8 +37,8 @@ fd <- function(coef=matrix(0,2,1), basisobj=basisfd(), fdnames=defaultnames)
 
   #  Returns:
   #  FD ... a functional data object
-
-  #  last modified 30 January 2007
+# last modified 2007 May 3 by Spencer Graves 
+  #  Previously modified 26 October 2005
 
     #  check basisobj
 
@@ -52,9 +52,7 @@ fd <- function(coef=matrix(0,2,1), basisobj=basisfd(), fdnames=defaultnames)
     if (!is.numeric(coef)) stop("coef must be numerical vector or matrix")
     else if (is.vector(coef)) {
             coef  <- as.matrix(coef)
-            if (type %in% c("const", "constant")) coef <- t(coef)
-# changed from =="constant" to %in% c(...) 
-# 2007.01.30 Spencer Graves            
+            if (type == "constant") coef <- t(coef)
             coefd <- dim(coef)
             ndim  <- length(coefd)
         }
@@ -92,264 +90,798 @@ fd <- function(coef=matrix(0,2,1), basisobj=basisfd(), fdnames=defaultnames)
     names(defaultnames) <- c("args", "reps", "funs")
 
 #  S4 definition
-#	fdobj <- new("fd", coefs=coef, basis=basisobj, fdnames=fdnames)
+#   fdobj <- new("fd", coefs=coef, basis=basisobj, fdnames=fdnames)
 
 #  S3 definition
 
-	fdobj <- list(coefs=coef, basis=basisobj, fdnames=fdnames)
-	oldClass(fdobj) <- "fd"
-	
-	fdobj
+    fdobj <- list(coefs=coef, basis=basisobj, fdnames=fdnames)
+    oldClass(fdobj) <- "fd"
+
+    fdobj
 }
 
+#  -------------------------------------------------------------------------
 #  "print" method for "fd"
+#  -------------------------------------------------------------------------
 
-print.fd <- function(x, ...)
+print.fd <- function(x, ... )
 {
-	
-	cat("Functional data x:\n")
-	cat(" Dimensions of the data:\n")
-	cat("", paste(names(x$fdnames), collapse=", "), "\n")
-	
-	print.basisfd(x$basis)
-	
+  object <- x
+    cat("Functional data object:\n\n")
+
+    cat(" Dimensions of the data:\n")
+    cat(paste("   ",names(object$fdnames),"\n"))
+
+    print.basisfd(object$basis)
+
 }
 
+#  -------------------------------------------------------------------------
+#  "summary" method for "fd"
+#  -------------------------------------------------------------------------
 
+summary.fd <- function(object,...)
+{
+    cat("Functional data object:\n\n")
+    cat(" Dimensions of the data:\n")
+    cat(paste("   ",names(object$fdnames),"\n"))
+    print.basisfd(object$basis)
+    cat("\nCoefficient matrix:\n\n")
+    object$coefs
+}
+
+#  -----------------------------------------------------------------
 #  plus method for "fd"
+#  -----------------------------------------------------------------
 
-"+.fd" <- function(fd1, fd2)
+"+.fd" <- function(e1, e2, basisobj=basisobj1*basisobj2)
 {
-	#  Arguments:
-	#  FD1  ...  A functional data object
-	#  FD2  ...  A functional data object
-	#  Returns:
-	#  FDDIF  ...  A functional data object that is FD1 plus FD2
-	#  Last modified:  25 October 2005
+#  PLUS: Pointwise sum of two functional data objects,
+#    the sum of a scalar and a functional data object,
+#    or the sum of a vector and a functional data obect
+#       where the length of the vector is the same as the
+#       number of replications of the object.
+#  When both arguments are functional data objects,
+#  they need not have the same bases,
+#  but they must either (1)  have the same number of replicates, or
+#  [2] one function must have a single replicate and other multiple
+#  replicates.  In the second case, the singleton function is
+#  replicated to match the number of replicates of the other function.
+#  In either case, they must have the same number of functions.
+#  When both arguments are functional data objects, and the
+#  bases are not the same,
+#  the basis used for the sum is constructed to be of higher
+#  dimension than the basis for either factor according to rules
+#  described in function TIMES for two basis objects.
+#  Finally, in the simple case where both arguments are
+#  functional data objects, the bases are the same, and the
+#  coefficient matrices are the same dims, the coefficient
+#  matrices are simply added.
 
-  coef1 <- fd1$coefs
-  coef2 <- fd2$coefs
-  if (any(dim(coef1) != dim(coef2))) stop("Coefficient arrays are not of same dimensions for +.fd")
-  fdsum <- fd(coef1+coef2, fd1$basis, fd1$fdnames)
-  fdsum
+#  last modified 3 January 2007
+
+if (!(inherits(e1, "fd") || inherits(e2, "fd")))
+      stop("Neither argument for + is a functional data object.")
+
+if (inherits(e1, "fd") && inherits(e2, "fd")) {
+    #  both arguments are functional data objects
+    #  check to see of the two bases are identical
+    #  and if (the coefficient matrices are conformable.
+    basisobj1 <- e1$basis
+    basisobj2 <- e2$basis
+    type1     <- basisobj1$type
+    type2     <- basisobj2$type
+    nbasis1   <- basisobj1$nbasis
+    nbasis2   <- basisobj2$nbasis
+    range1    <- basisobj1$rangeval
+    range2    <- basisobj2$rangeval
+    params1   <- basisobj1$params
+    params2   <- basisobj2$params
+    coef1     <- e1$coefs
+    coef2     <- e2$coefs
+    coefd1    <- dim(coef1)
+    coefd2    <- dim(coef2)
+    #  test to see if the two objects match completely
+    if (basisobj1 == basisobj2) {
+        #  the two coefficient matrices can be simply added
+        fdnames <- names(e1)
+        plusfd  <- fd(coef1 + coef2, basisobj1, fdnames)
+        return(plusfd)
+    }
+    #  check to see if (the number of dimensions match
+    ndim1  <- length(coefd1)
+    ndim2  <- length(coefd2)
+    if (ndim1 != ndim2)
+        stop("Dimensions of coefficient matrices not compatible.")
+    #  allow for one function being a single replicate,
+    #  and if (so, copy it as many times as there are replicates
+    #  in the other function.
+    if (coefd1[2] == 1 && coefd2[2] > 1) {
+        if      (ndim1 == 2) coef1 <- outer(coef1,rep(1,coefd2[2]))
+        else if (ndim1 == 3) {
+            temp <- array(0,coefd2)
+            for (j in 1:coefd1[3])
+                temp[,,j] <- outer(coef1[,1,j],rep(1,coefd2[2]))
+            coef1 <- temp
+        } else
+            stop("Dimensions of coefficient matrices not compatible.")
+        coefd1 <- dim(coef1)
+        e1$coefs <- coef1
+    }
+    if (coefd1[2] >  1 && coefd2[2] == 1) {
+        if      (ndim2 == 2) coef2 <- outer(coef2,rep(1,coefd1[2]))
+        else if (ndim1 == 3) {
+            temp <- zeros(coefd1)
+            for (j in 1:coefd2[3])
+                temp[,,j] <- squeeze(coef2[,1,j])*ones(1,coefd1[2])
+            coef2 <- temp
+        } else
+            stop("Dimensions of coefficient matrices not compatible.")
+        coefd2 <- dim(coef2)
+        e2$coefs <- coef2
+    }
+    #  check for equality of dimensions of coefficient matrices
+    if (coefd1[2] != coefd2[2])
+        stop("Number of replications are not equal.")
+    #  check for equality of numbers of functions
+    if (ndim1 > 2 && ndim2 > 2 && ndim1 != ndim2)
+        stop(paste("Both arguments multivariate, ",
+                   "but involve different numbers ",
+                   "of functions."))
+    basisobj1 <- e1$basis
+    basisobj2 <- e2$basis
+    #  check for equality of two bases
+    if (basisobj1 == basisobj2) {
+        #  if equal, just difference coefficient matrices
+        fdnames <- names(e1)
+        plusfd <- fd(coef1 + coef2, basisobj1, fdnames)
+        return(plusfd)
+    } else {
+        nbasis1   <- basisobj1$nbasis
+        nbasis2   <- basisobj2$nbasis
+        rangeval1 <- basisobj1$rangeval
+        rangeval2 <- basisobj2$rangeval
+        if (any(rangeval1 != rangeval2))
+            stop("The ranges of the arguments are not equal.")
+        neval     <- max(10*max(nbasis1+nbasis2) + 1, 201)
+        evalarg   <- seq(rangeval1[1], rangeval2[2], len=neval)
+        fdarray1  <- eval.fd(e1, evalarg)
+        fdarray2  <- eval.fd(e2, evalarg)
+        if ((ndim1 <= 2 && ndim2 <= 2) ||
+            (ndim1 >  2 && ndim2 >  2))
+            fdarray <- fdarray1 + fdarray2
+        if (ndim1 == 2 && ndim2 > 2) {
+            fdarray <- array(0,coefd2)
+            for (ivar in 1:coefd2[3])
+                fdarray[,,ivar] <- fdarray1 + fdarray2[,,ivar]
+        }
+        if (ndim1 > 2 && ndim2 == 2) {
+            fdarray <- array(0,coefd1)
+            for (ivar  in  1:coefd1[3])
+                fdarray[,,ivar] <- fdarray1[,,ivar] + fdarray2
+        }
+        #  set up basis for sum
+        coefsum  <- project.basis(fdarray, evalarg, basisobj, 1)
+        fdnames1 <- e1$fdnames
+        fdnames2 <- e2$fdnames
+        fdnames  <- fdnames1
+        fdnames[[3]] <- paste(fdnames1[[3]],"+",fdnames2[[3]])
+    }
+ } else {
+    #  one argument is numeric and the other is functional
+    if (!(isnumeric(e1) || isnumeric(e2)))
+        stop("Neither argument for + is numeric.")
+    if (isnumeric(e1) && isa_fd(e2)) {
+        fac   <- e1
+        fdobj <- e2
+    } else if (isa_fd(e1) && isnumeric(e2)) {
+        fac   <- e2
+        fdobj <- e1
+    } else
+        stop("One of the arguments for + is of the wrong class.")
+    coef     <- fdobj$coefs
+    coefd    <- dim(coef)
+    basisobj <- fd$basis
+    nbasis   <- basisobj$nbasis
+    rangeval <- basisobj$rangeval
+    neval    <- max(10*nbasis + 1,201)
+    neval    <- min(neval,201)
+    evalarg  <- seq(rangeval(1),rangeval[2], len=neval)
+    fdmat    <- eval.fd(evalarg, fd)
+    #  If one of the objects has length 1 and the other
+    #  is longer, expand the scalar object into a vector
+    if (length(fac) != coefd[2] || length(fac) == 1 && coefd[2] > 1) {
+        if (length(fac) > 1 && coefd[2] == 1) {
+            fdmat <- outer(fdmat,rep(1,length(fac)))
+            fac   <- t(outer(rep(neval,1),fac))
+        } 
+    } else stop(paste("Dimensions of numerical factor and functional",
+                       " factor cannot be reconciled."))
+    fdarray <- fac + fdmat
+    coefsum <- project_basis(fdarray, evalarg, basisobj)
+    fdnames <- fdobj$fdnames
+    if (length(fac) == 1)
+        fdnames[[3]] <- paste(fac," + ",fdnames[[3]])
 }
 
+plusfd <- fd(coefsum, basisobj, fdnames)
+return(plusfd)
+
+}
+
+#  ----------------------------------------------------------------------
 #  minus method for "fd"
+#  --------------------------------------------------------------------------
 
-"-.fd" <- function(fd1, fd2)
+"-.fd" <- function(e1, e2, basisobj=basisobj1*basisobj2)
 {
-	#  Arguments:
-	#  FD1  ...  A functional data object
-	#  FD2  ...  A functional data object
-	#  Returns:
-	#  FDDIF  ...  A functional data object that is FD1 plus FD2
-	#  Last modified:  17 September 2005
+#  MINUS: Pointwise difference two functional data objects,
+#    the between a scalar and a functional data object,
+#    or the difference between a vector and a functional data obect
+#       where the length of the vector is the same as the
+#       number of replications of the object.
+#  When both arguments are functional data objects,
+#  they need not have the same bases,
+#  but they must either (1)  have the same number of replicates, or
+#  [2] one function must have a single replicate and other multiple
+#  replicates.  In the second case, the singleton function is
+#  replicated to match the number of replicates of the other function.
+#  In either case, they must have the same number of functions.
+#  When both arguments are functional data objects, and the
+#  bases are not the same,
+#  the basis used for the sum is constructed to be of higher
+#  dimension than the basis for either factor according to rules
+#  described in function TIMES for two basis objects.
+#  Finally, in the simple case where both arguments are
+#  functional data objects, the bases are the same, and the
+#  coefficient matrices are the same dims, the coefficient
+#  matrices are simply added.
 
-  coef1 <- fd1$coefs
-  coef2 <- fd2$coefs
-  if (any(dim(coef1) != dim(coef2))) stop("Coefficient arrays are not of same dimensions for -.fd")
-  fddif <- fd(coef1-coef2, fd1$basis, fd1$fdnames)
-  fddif
+#  last modified 3 January 2007
+
+if (!(inherits(e1, "fd") || inherits(e2, "fd")))
+      stop("Neither argument for - is a functional data object.")
+
+if (inherits(e1, "fd") && inherits(e2, "fd")) {
+    #  both arguments are functional data objects
+    #  check to see of the two bases are identical
+    #  and if (the coefficient matrices are conformable.
+    basisobj1 <- e1$basis
+    basisobj2 <- e2$basis
+    type1     <- basisobj1$type
+    type2     <- basisobj2$type
+    nbasis1   <- basisobj1$nbasis
+    nbasis2   <- basisobj2$nbasis
+    range1    <- basisobj1$rangeval
+    range2    <- basisobj2$rangeval
+    params1   <- basisobj1$params
+    params2   <- basisobj2$params
+    coef1     <- e1$coefs
+    coef2     <- e2$coefs
+    coefd1    <- dim(coef1)
+    coefd2    <- dim(coef2)
+    #  test to see if the two objects match completely
+    if (basisobj1 == basisobj2) {
+        #  the two coefficient matrices can be simply added
+        fdnames <- names(e1)
+        minusfd  <- fd(coef1 - coef2, basisobj1, fdnames)
+        return(minusfd)
+    }
+    #  check to see if (the number of dimensions match
+    ndim1  <- length(coefd1)
+    ndim2  <- length(coefd2)
+    if (ndim1 != ndim2)
+        stop("Dimensions of coefficient matrices not compatible.")
+    #  allow for one function being a single replicate,
+    #  and if (so, copy it as many times as there are replicates
+    #  in the other function.
+    if (coefd1[2] == 1 && coefd2[2] > 1) {
+        if      (ndim1 == 2) coef1 <- outer(coef1,rep(1,coefd2[2]))
+        else if (ndim1 == 3) {
+            temp <- array(0,coefd2)
+            for (j in 1:coefd1[3])
+                temp[,,j] <- outer(coef1[,1,j],rep(1,coefd2[2]))
+            coef1 <- temp
+        } else
+            stop("Dimensions of coefficient matrices not compatible.")
+        coefd1 <- dim(coef1)
+        e1$coefs <- coef1
+    }
+    if (coefd1[2] >  1 && coefd2[2] == 1 ) {
+        if      (ndim2 == 2) coef2 <- outer(coef2,rep(1,coefd1[2]))
+        else if (ndim1 == 3) {
+            temp <- zeros(coefd1)
+            for (j in 1:coefd2[3])
+                temp[,,j] <- squeeze(coef2[,1,j])*ones(1,coefd1[2])
+            coef2 <- temp
+        } else
+            stop("Dimensions of coefficient matrices not compatible.")
+        coefd2 <- dim(coef2)
+        e2$coefs <- coef2
+    }
+    #  check for equality of dimensions of coefficient matrices
+    if (coefd1[2] != coefd2[2])
+        stop("Number of replications are not equal.")
+    #  check for equality of numbers of functions
+    if (ndim1 > 2 && ndim2 > 2 && ndim1 != ndim2)
+        stop(paste("Both arguments multivariate, ",
+                   "but involve different numbers ",
+                   "of functions."))
+    basisobj1 <- e1$basis
+    basisobj2 <- e2$basis
+    #  check for equality of two bases
+    if (basisobj1 == basisobj2) {
+        #  if equal, just difference coefficient matrices
+        fdnames <- names(e1)
+        minusfd <- fd(coef1 - coef2, basisobj1, fdnames)
+        return(minusfd)
+    } else {
+        nbasis1   <- basisobj1$nbasis
+        nbasis2   <- basisobj2$nbasis
+        rangeval1 <- basisobj1$rangeval
+        rangeval2 <- basisobj2$rangeval
+        if (any(rangeval1 != rangeval2))
+            stop("The ranges of the arguments are not equal.")
+        neval     <- max(10*max(nbasis1+nbasis2) + 1, 201)
+        evalarg   <- seq(rangeval1[1], rangeval2[2], len=neval)
+        fdarray1  <- eval.fd(e1, evalarg)
+        fdarray2  <- eval.fd(e2, evalarg)
+        if ((ndim1 <= 2 && ndim2 <= 2) ||
+            (ndim1 >  2 && ndim2 >  2))
+            fdarray <- fdarray1 - fdarray2
+        if (ndim1 == 2 && ndim2 > 2) {
+            fdarray <- array(0,coefd2)
+            for (ivar in 1:coefd2[3])
+                fdarray[,,ivar] <- fdarray1 - fdarray2[,,ivar]
+        }
+        if (ndim1 > 2 && ndim2 == 2) {
+            fdarray <- array(0,coefd1)
+            for (ivar  in  1:coefd1[3])
+                fdarray[,,ivar] <- fdarray1[,,ivar] - fdarray2
+        }
+        #  set up basis for sum
+        coefsum  <- project.basis(fdarray, evalarg, basisobj, 1)
+        fdnames1 <- e1$fdnames
+        fdnames2 <- e2$fdnames
+        fdnames  <- fdnames1
+        fdnames[[3]] <- paste(fdnames1[[3]], "-", fdnames2[[3]])
+    }
+ } else {
+    #  one argument is numeric and the other is functional
+    if (!(isnumeric(e1) || isnumeric(e2)))
+        stop("Neither argument for - is numeric.")
+    if (isnumeric(e1) && isa_fd(e2)) {
+        fac   <- e1
+        fdobj <- e2
+    } else if (isa_fd(e1) && isnumeric(e2)) {
+        fac   <- e2
+        fdobj <- e1
+    } else
+        stop("One of the arguments for - is of the wrong class.")
+    coef     <- fdobj$coefs
+    coefd    <- dim(coef)
+    basisobj <- fd$basis
+    nbasis   <- basisobj$nbasis
+    rangeval <- basisobj$rangeval
+    neval    <- max(10*nbasis + 1,201)
+    neval    <- min(neval,201)
+    evalarg  <- seq(rangeval(1),rangeval[2], len=neval)
+    fdmat    <- eval.fd(evalarg, fd)
+    #  If one of the objects has length 1 and the other
+    #  is longer, expand the scalar object into a vector
+    if (length(fac) != coefd[2] || length(fac) == 1 && coefd[2] > 1) {
+        if (length(fac) > 1 && coefd[2] == 1) {
+            fdmat <- outer(fdmat,rep(1,length(fac)))
+            fac   <- t(outer(rep(neval,1),fac))
+        } 
+    } else stop(paste("Dimensions of numerical factor and functional",
+                       " factor cannot be reconciled."))
+    fdarray <- fac - fdmat
+    coefsum <- project_basis(fdarray, evalarg, basisobj)
+    fdnames <- fdobj$fdnames
+    if (length(fac) == 1)
+        fdnames[[3]] <- paste(fac," - ",fdnames[[3]])
 }
 
+minusfd <- fd(coefsum, basisobj, fdnames)
+return(minusfd)
+
+}
+
+#  -----------------------------------------------------------------
 #  point-wise product method for "fd"
-"*.fd" <- function(fd1, fd2)
+#  --------------------------------------------------------------------------
+
+"*.fd" <- function(e1, e2, basisobj=basisobj1*basisobj2)
 {
-	#  Arguments:
-	#  FD1  ...  Either a functional data object or a number
-	#  FD2  ...  Either a functional data object or a number
-	#  At least one of FD1 and FD2 must be a functional data object.
-	#  Returns:
-	#  FDAPROD  ...  A functional data object that is FD1 times FD2
-	#  Last modified:  17 September 2005
-	
-   if ((!(inherits(fd1, "fd") | inherits(fd2, "fd")))) stop(
-      "Neither argument for * is a functional data object.")
-    if (inherits(fd1, "fd") & inherits(fd2, "fd") ) {
-    	coef1     <- fd1$coefs
-    	coefd1    <- dim(coef1)
-    	coef2     <- fd2$coefs
-    	coefd2    <- dim(coef2)
-    	if (length(coefd1) != length(coefd2)) stop(
-      		"Number of dimensions of coefficient arrays do not match.")
-    	if (any(coefd1 != coefd2)) stop(
-      		"Dimensions of coefficient arrays do not match.")
-    	basisfd1  <- fd1$basis
-    	basisfd2  <- fd2$basis
-   		nbasis1   <- basisfd1$nbasis
-    	nbasis2   <- basisfd2$nbasis
-    	rangeval1 <- basisfd1$rangeval
-    	rangeval2 <- basisfd2$rangeval
-    	if (any(rangeval1 != rangeval2)) stop(
-      		"The ranges of the arguments are not equal.")
-    	neval     <- max(10*max(nbasis1,nbasis2) + 1, 101)
-    	evalarg   <- seq(rangeval1[1],rangeval2[2], length=neval)
-    	fdarray1  <- eval.fd(evalarg, fd1)
-    	fdarray2  <- eval.fd(evalarg, fd2)
-    	fdarray   <- fdarray1*fdarray2
-    	if (nbasis1 > nbasis2) {
-      		basisfd  <- basisfd1
-      		coefprod <- project.basis(fdarray, evalarg, basisfd)
-    	} else {
-      		basisfd  <- basisfd2
-      		coefprod <- project.basis(fdarray, evalarg, basisfd)
-    	}
-    	fdnames1 <- fd1$fdnames
-    	fdnames2 <- fd2$fdnames
-    	fdnames  <- fdnames1
-    	fdnames[[3]] <- paste(fdnames1[[3]],"*",fdnames2[[3]])
-    	fdprod   <- fd(coefprod, basisfd, fdnames)
-    	return(fdprod)
-  	} else {
-    	if ((!(is.numeric(fd1) | is.numeric(fd2)))) stop(
-      		"Neither argument for * is numeric.")
-    	if (is.numeric(fd1)) {
-      		fac <- fd1
-      		fd  <- fd2
-    	} else {
-      		fac <- fd2
-      		fd  <- fd1
-    	}
-    	coef     <- fd$coefs
-    	coefd    <- dim(coef)
-    	basisfd  <- fd$basis
-    	nbasis   <- basisfd$nbasis
-    	rangeval <- basisfd$rangeval
-    	neval    <- max(10*nbasis + 1,101)
-    	evalarg  <- seq(rangeval[1],rangeval[2], length=neval)
-    	fdarray  <- fac*eval.fd(evalarg, fd)
-    	coefprod <- project.basis(fdarray, evalarg, basisfd)
-    	fdnames  <- fd$fdnames
-    	fdnames[[3]] <- paste(as.character(fac),"*",fdnames[[3]])
-    	fdprod   <- fd(coefprod, basisfd, fdnames)
-    	return(fdprod)
- 	}
+#  TIMES: Pointwise product of two functional data objects,
+#    the product of a scalar and a functional data object,
+#    or the product of a vector and a functional data obect
+#       where the length of the vector is the same as the
+#       number of replications of the object.
+#  When both arguments are functional data objects,
+#  they need not have the same bases,
+#  but they must either (1)  have the same number of replicates, or
+#  (2) one function must have a single replicate and other multiple
+#  replicates.  In the second case, each function in the multiple
+#  replicate object is multiplied by the singleton function in the
+#  other objects.
+#  In either case, they must have the same number of functions.
+
+#  When both arguments are functional data objects, the
+#  basis used for the product is constructed to be of higher
+#  dimension than the basis for either factor according to rules
+#  described in function TIMES for two basis objects.
+
+#  Arguments:
+#  e1   ... Either a functional data object or a number
+#  e2   ... Either a functional data object or a number
+#  BASISOBJ ... An optional basis for the product.
+#  At least one of e1 and e2 must be a functional data object.
+#  Returns:
+#  FDAPROD  ...  A functional data object that is e1 times e2
+
+#  Last modified:  3 January 2007
+
+# Check if at least one argument is a functional data object
+
+if ((!(inherits(e1, "fd") | inherits(e2, "fd")))) stop(
+   "Neither argument for * is a functional data object.")
+
+#  Determine which of two cases hold:
+#   1.  both variables are functional
+#   2.  only one of them is functional
+
+if ( inherits(e1, "fd") & inherits(e2, "fd") ) {
+
+    #  --------------------------------------------------------
+    #       both arguments are functional data objects
+    #  --------------------------------------------------------
+
+
+    #  get the dimensions of the two objects
+
+    coef1  <- e1$coefs
+    coef2  <- e2$coefs
+    coefd1 <- dim(coef1)
+    coefd2 <- dim(coef2)
+    ndim1  <- length(coefd1)
+    ndim2  <- length(coefd2)
+
+    #  check that the two coefficient arrays have the same
+    #  number of dimensions
+
+    if (length(coefd1) != length(coefd2)) stop(
+        "Number of dimensions of coefficient arrays do not match.")
+
+    #  allow for one function having a single replicate,
+    #  and if so, copy it as many times as there are replicates
+    #  in the other function.
+
+
+    #  e1 is single,  e2 has replications
+
+    if (coefd1[2] == 1 && coefd2[2] > 1) {
+        if     (ndim1 == 2) {
+           coef1 <- matrix(coef1,coefd1[1],coefd2[2])
+         } else if (ndim1 == 3) {
+            temp <- array(0,coefd2)
+            for (j in 1:coefd1[3])
+                temp[,,j] <- outer(coef1[,1,j],rep(1,coefd2[2]))
+            coef1 <- temp
+        } else {
+            stop("Dimensions of coefficient matrices not compatible.")
+        }
+        coefd1       <- dim(coef1)
+        e1$coefs <- coef1
+    } 
+
+    #  e2 is single,  e1 has replications
+
+    if (coefd1[2] >  1 && coefd2[2] == 1) {
+
+        if      (ndim2 == 2) {
+            coef2 <- matrix(coef2,coefd2[1],coefd1[2])
+        } else if (ndim1 == 3) {
+            temp <- array(0,coefd1)
+            for (j in 1:coefd2[3])
+                temp[,,j] <- outer(coef2[,1,j],rep(1,coefd1[2]))
+            coef2 <- temp
+        } else {
+            stop("Dimensions of coefficient matrices not compatible.")
+        }
+        coefd2       <- dim(coef2)
+        e2$coefs <- coef2
+    } 
+
+    #  check that numbers of replications are equal
+
+    if (coefd1[2] != coefd2[2]) stop("Number of replications are not equal.")
+
+    #  check for matching in the multivariate case
+
+    if (ndim1 > 2 && ndim2 > 2 && ndim1 != ndim2)
+        stop(paste("Both arguments multivariate, ",
+                   "but involve different numbers ",
+                   "of functions."))
+
+    #  extract the two bases
+
+    basisobj1 <- e1$basis
+    basisobj2 <- e2$basis
+    nbasis1   <- basisobj1$nbasis
+    nbasis2   <- basisobj2$nbasis
+    if (basisobj1 == basisobj2) basisobj = basisobj1
+
+    #  check that the ranges match if a range not supplied
+
+    rangeval1 <- basisobj1$rangeval
+    rangeval2 <- basisobj2$rangeval
+    if (any(rangeval1 != rangeval2)) stop(
+        "The ranges of the arguments are not equal.")
+
+    #  set up a fine mesh for evaluating the product
+
+    neval   <- max(10*max(nbasis1,nbasis2) + 1, 201)
+    evalarg <- seq(rangeval1[1],rangeval2[2], length=neval)
+
+    #  set up arrays of function values
+
+    fdarray1  <- eval.fd(evalarg, e1)
+    fdarray2  <- eval.fd(evalarg, e2)
+
+    #  compute product arrays
+
+    if ((ndim1 <= 2 && ndim2 <= 2) || (ndim1 > 2 && ndim2 > 2)) {
+        #  product array where the number of dimensions match
+        fdarray = fdarray1*fdarray2
+    } else {
+        #  product array where the number of dimensions don't match
+        if (ndim1 == 2 && ndim2 > 2) {
+            fdarray = array(0,coefd2)
+            for (ivar in 1:coefd2[3])
+                fdarray[,,ivar] <- fdarray1*fdarray2[,,ivar]
+        }
+        if (ndim1 > 2 && ndim2 == 2) {
+            fdarray = array(0,coefd1)
+            for (ivar in 1:coefd1[3])
+                fdarray[,,ivar] <- fdarray1[,,ivar]*fdarray2
+        }
+    }
+
+    #  set up the coefficient by projecting on to the
+    #  product basis
+
+    coefprod = project.basis(fdarray, evalarg, basisobj)
+
+    #  set up the names
+
+    fdnames1 <- e1$fdnames
+    fdnames2 <- e2$fdnames
+    fdnames  <- fdnames1
+    fdnames[[3]] <- paste(fdnames1[[3]],"*",fdnames2[[3]])
+
+} else {
+
+    #  --------------------------------------------------------
+    #    one argument is numeric and the other is functional
+    #  --------------------------------------------------------
+
+    if ((!(is.numeric(e1) || is.numeric(e2)))) stop(
+        "Neither argument for * is numeric.")
+    #  make the numerical factor the first objec
+    if        (is.numeric(e1) && inherits(e2, "fd")) {
+        fac   <- e1
+        fdobj <- e2
+    } else if (is.numeric(e2) && inherits(e1, "fd")) {
+        fac   <- e2
+        fdobj <- e1
+    } else top("One of the arguments for * is of the wrong class.")
+    coef     <- fdobj$coefs
+    coefd    <- dim(coef)
+    fac <- as.vector(fac)
+    #  check the length of the factor
+    if (!(length(fac) == coefd[2] || length(fac) == 1)) stop(
+        "The length of the numerical factor is incorrect.")
+    #  compute the coefficients for the product
+    coefprod <- fac*coef
+    basisobj <- fdobj$basis
+
+    #  set up the names
+
+    fdnames  <- fdobj$fdnames
+    fdnames[[3]] <- paste(as.character(fac),"*",fdnames[[3]])
+
 }
 
-#  point-wise quotient method for "fd"
+#  set up the functional data object
 
-"/.fd" <- function(fd1, fd2)
-{
-	#  Arguments:
-	#  FD1  ...  Either a functional data object or a number
-	#  FD2  ...  Either a functional data object or a number
-	#  At least one of FD1 and FD2 must be a functional data object.
-	#  Returns:
-	#  FDAQUOT  ...  A functional data object that is FD1 times FD2
-	#  Last modified:  17 September 2005
-	
-   if ((!(inherits(fd1, "fd") | inherits(fd2, "fd")))) stop(
-      "Neither argument for * is a functional data object.")
-    if (inherits(fd1, "fd") & inherits(fd2, "fd") ) {
-	    #  both arguments are functional data objects
-    	coef1     <- fd1$coefs
-    	coefd1    <- dim(coef1)
-    	coef2     <- fd2$coefs
-    	coefd2    <- dim(coef2)
-    	if (length(coefd1) != length(coefd2)) stop(
-      		"Number of dimensions of coefficient arrays do not match.")
-    	if (any(coefd1 != coefd2)) stop(
-      		"Dimensions of coefficient arrays do not match.")
-    	basisfd1  <- fd1$basis
-    	basisfd2  <- fd2$basis
-   		nbasis1   <- basisfd1$nbasis
-    	nbasis2   <- basisfd2$nbasis
-    	rangeval1 <- basisfd1$rangeval
-    	rangeval2 <- basisfd2$rangeval
-    	if (any(rangeval1 != rangeval2)) stop(
-      		"The ranges of the arguments are not equal.")
-    	neval     <- max(10*max(nbasis1,nbasis2) + 1, 101)
-    	evalarg   <- seq(rangeval1[1],rangeval2[2], length=neval)
-    	fdarray1  <- eval.fd(evalarg, fd1)
-    	fdarray2  <- eval.fd(evalarg, fd2)
-    	fdarray   <- fdarray1/fdarray2
-    	if (nbasis1 > nbasis2) {
-      		basisfd  <- basisfd1
-      		coefquot <- project.basis(fdarray, evalarg, basisfd)
-    	} else {
-      		basisfd  <- basisfd2
-      		coefquot <- project.basis(fdarray, evalarg, basisfd)
-    	}
-    	fdnames1 <- fd1$fdnames
-    	fdnames2 <- fd2$fdnames
-    	fdnames  <- fdnames1
-    	fdnames[[3]] <- paste(fdnames1[[3]],"*",fdnames2[[3]])
-    	fdquot   <- fd(coefquot, basisfd, fdnames)
-    	return(fdquot)
-  	} else {
-	   #  first object is functional and second object is numeric
-    	if (!is.numeric(fd2)) stop(
-      		"second argument for * is not numeric.")
-    	coef     <- fd1$coefs
-    	coefd    <- dim(coef)
-    	basisfd  <- fd1$basis
-    	nbasis   <- basisfd$nbasis
-    	rangeval <- basisfd$rangeval
-    	neval    <- max(10*nbasis + 1,101)
-    	evalarg  <- seq(rangeval[1],rangeval[2], length=neval)
-    	fdarray  <- eval.fd(evalarg, fd1)/fd2
-    	coefquot <- project.basis(fdarray, evalarg, basisfd)
-    	fdnames  <- fd1$fdnames
-    	fdnames[[3]] <- paste(as.character(fd2),"*",fdnames[[3]])
-    	fdquot   <- fd(coefquot, basisfd, fdnames)
-    	return(fdquot)
- 	}
+fdprod   <- fd(coefprod, basisobj, fdnames)
+
+return(fdprod)
+
 }
 
+#  --------------------------------------------------------------------------
 #  power method for "fd"
+#  --------------------------------------------------------------------------
 
 "^.fd" <- function(fdobj, power)
 {
-   	#  Arguments:
-	#  FD     ...  A functional data object
-	#  POWER  ...  An exponent
-	#  Returns:
-	#  FDAPOWR  ...  A functional data object that is FD to the power POWER
-	#  Last modified:  17 September 2005
-	
-  	if ((!(inherits(fdobj, "fd")))) stop(
-      "First argument for ^ is not a functional data object.")
-  	if ((!(is.numeric(power)))) stop(
-      "Second argument for ^ is not numeric.")
-  	coef     <- fdobj$coefs
-  	coefd    <- dim(coef)
-  	basisfd  <- fdobj$basis
-  	nbasis   <- basisfd$nbasis
-  	rangeval <- basisfd$rangeval
-  	neval    <- max(10*nbasis + 1,101)
-  	evalarg  <- seq(rangeval[1],rangeval[2], length=neval)
-  	fdnames  <- fdobj$fdnames
-  	fdarray  <- eval.fd(evalarg, fdobj)^power
-  	coefpowr <- project.basis(fdarray, evalarg, basisfd)
-  	fdpowr   <- fd(coefpowr, basisfd, fdnames)
-  	fdpowr
+    #  Arguments:
+    #  FDOBJ  ...  A functional data object
+    #  POWER  ...  An exponent
+    #  Returns:
+    #  FDAPOWR  ...  A functional data object that is FD to the power POWER
+
+    #  Last modified:  17 September 2005
+
+    if ((!(inherits(fdobj, "fd")))) 
+        stop("First argument for ^ is not a functional data object.")
+    if ((!(is.numeric(power)))) 
+        stop("Second argument for ^ is not numeric.")
+    coef     <- fdobj$coefs
+    coefd    <- dim(coef)
+    basisfd  <- fdobj$basis
+    nbasis   <- basisfd$nbasis
+    rangeval <- basisfd$rangeval
+    neval    <- max(10*nbasis + 1,101)
+    evalarg  <- seq(rangeval[1],rangeval[2], length=neval)
+    fdnames  <- fdobj$fdnames
+    fdarray  <- eval.fd(evalarg, fdobj)^power
+    coefpowr <- project.basis(fdarray, evalarg, basisfd)
+    fdpowr   <- fd(coefpowr, basisfd, fdnames)
+    fdpowr
 }
 
-
+#  --------------------------------------------------------------------------
 #  sqrt method for "fd"
+#  --------------------------------------------------------------------------
 
-sqrt.fd <- function(fdobj)
+sqrt.fd <- function(x)
 {
-   	#  Arguments:
-	#  FDPBJ ...  A functional data object
-	#  Returns:
-	#  FDAROOT  ...  A functional data object that is the square root of FDOBJ
-	#  Last modified:  17 September 2005
-	
-  	if ((!(inherits(fdobj, "fd")))) stop(
+    #  Arguments:
+    #  x ...  A functional data object
+    #  Returns:
+    #  FDAROOT  ...  A functional data object that is the square root of x
+    #  Last modified:  17 September 2005
+
+    if ((!(inherits(x, "fd")))) stop(
       "First argument for ^ is not a functional data object.")
-  	coef     <- fdobj$coefs
-  	coefd    <- dim(coef)
-  	basisfd  <- fdobj$basis
-  	nbasis   <- basisfd$nbasis
-  	rangeval <- basisfd$rangeval
-  	neval    <- max(10*nbasis + 1,101)
-  	evalarg  <- seq(rangeval[1],rangeval[2], length=neval)
-  	fdnames  <- fdobj$fdnames
-  	fdarray  <- sqrt(eval.fd(evalarg, fdobj))
-  	coefroot <- project.basis(fdarray, evalarg, basisfd)
-  	fdroot   <- fd(coefroot, basisfd, fdnames)
-  	return(fdroot)
+    coef     <- x$coefs
+    coefd    <- dim(coef)
+    basisfd  <- x$basis
+    nbasis   <- basisfd$nbasis
+    rangeval <- basisfd$rangeval
+    neval    <- max(10*nbasis + 1,101)
+    evalarg  <- seq(rangeval[1],rangeval[2], length=neval)
+    fdnames  <- x$fdnames
+    fdarray  <- sqrt(eval.fd(evalarg, x))
+    coefroot <- project.basis(fdarray, evalarg, basisfd)
+    fdroot   <- fd(coefroot, basisfd, fdnames)
+    return(fdroot)
 }
 
+#  -----------------------------------------------------------------------
+#       mean for fd class
+#  -----------------------------------------------------------------------
 
+mean.fd <- function(x, ...)
+{
+	coef      <- x$coefs
+  	coefd     <- dim(coef)
+  	ndim      <- length(coefd)
+  	basisobj  <- x$basis
+  	nbasis    <- basisobj$nbasis
+ 	if (ndim == 2) {
+    	coefmean  <- matrix(apply(coef,1,mean),nbasis,1)
+    	coefnames <- list(dimnames(coef)[[1]],"Mean")
+  	} else {
+    	nvar <- coefd[3]
+    	coefmean  <- array(0,c(coefd[1],1,nvar))
+    	for (j in 1:nvar) coefmean[,1,j] <- apply(coef[,,j],1,mean)
+    	coefnames <- list(dimnames(coef)[[1]], "Mean", dimnames(coef)[[3]])
+  	}
+  	fdnames <- x$fdnames
+  	fdnames[[2]] <- "mean"
+  	fdnames[[3]] <- paste("mean",fdnames[[3]])
+  	meanfd <- fd(coefmean, basisobj, fdnames)
+
+  	meanfd
+}
+
+#  -----------------------------------------------------------------------
+#       sum for fd class
+#  -----------------------------------------------------------------------
+
+sum.fd <- function(..., na.rm=FALSE)
+{
+  #  Compute sum function for functional observations
+
+  #  Last modified 5 March 2007
+
+  fd <- list(...)[[1]]
+
+  if (!(inherits(fd, "fd"))) stop("Argument FD not a functional data object.")
+
+  coef   <- fd$coefs
+  coefd  <- dim(coef)
+  ndim   <- length(coefd)
+  basis  <- fd$basis
+  nbasis <- basis$nbasis
+  if (ndim == 2) {
+    coefsum   <- matrix(apply(coef,1,sum),nbasis,1)
+    coefnames <- list(dimnames(coef)[[1]],"Sum")
+  } else {
+    nvar <- coefd[3]
+    coefsum  <- array(0,c(coefd[1],1,nvar))
+    for (j in 1:nvar) coefsum[,1,j] <- apply(coef[,,j],1,sum)
+    coefnames <- list(dimnames(coef)[[1]], "Sum", dimnames(coef)[[3]])
+  }
+  fdnames <- fd$fdnames
+  fdnames[[2]] <- "1"
+  names(fdnames)[2] <- "Sum"
+  names(fdnames)[3] <- paste("Sum",names(fdnames)[3])
+  sumfd <- fd(coefsum, basis, fdnames)
+
+  sumfd
+}
+
+#  -----------------------------------------------------------------------
+#       c for fd class
+#  -----------------------------------------------------------------------
+
+"c.fd"<- function(...)
+{
+#
+#   concatenates a number of .fd objects.  It is assumed that all the
+#   objects have the same basisfd objects, and that all the coef arrays
+#   have the same number of dimensions
+#
+
+#  Last modified 17 September 2005
+
+  	fdlist <- list(...)
+  	n      <- length(fdlist)
+  	fd1    <- fdlist[[1]]
+  	if (n == 1) return(fd1)
+  	coef    <- fd1$coefs
+  	coefd   <- dim(coef)
+  	ndim    <- length(coefd)
+  	basisfd <- fd1$basis
+  	fdnames <- fd1$fdnames
+  	#  check that the fd objects are consistent with each other
+  	if(!inherits(fd1, "fd")) stop("Objects must be of class fd")
+  	for(j in (2:n)) {
+    	fdj <- fdlist[[j]]
+    	if(!inherits(fdj, "fd")) stop("Objects must be of class fd")
+    	if(any(unlist(fdj$basis) != unlist(basisfd)))
+      		stop("Objects must all have the same basis")
+    	if(length(dim(fdj$coefs)) != ndim)
+      		stop("Objects must all have the same number of multiple functions")
+  	}
+  	#  concatenate by concatenate coefficient matrices
+  	if (ndim == 2) {
+    	for (j in 2:n) {
+      		nameslist <- dimnames(coef)
+      		fdj       <- fdlist[[j]]
+      		coefj     <- fdj$coefs
+      		coef      <- cbind(coef, coefj)
+      		nameslist[[2]] <- c(nameslist[[2]], dimnames(coefj)[[2]])
+    	}
+  	} else {
+    	for(j in (2:n)) {
+      		nameslist <- dimnames(coef)
+      		fdj       <- fdlist[[j]]
+      		coefj     <- fdj$coefs
+      		coef      <- c(coef, aperm(coefj, c(1, 3, 2)))
+      		nameslist[[2]] <- c(nameslist[[2]], dimnames(coefj)[[2]])
+    	}
+    	dim(coef) <- c(coefd[1], coefd[3],
+				length(coef)/(coefd[1] * coefd[3]))
+   		coef <- aperm(coef, c(1, 3, 2))
+  }
+  dimnames(coef) <- nameslist
+  concatfd <- fd(coef, basisfd, fdnames)
+  return(concatfd)
+}

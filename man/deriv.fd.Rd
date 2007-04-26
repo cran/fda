@@ -24,7 +24,7 @@ the derivative to be computed.
 \item{Lfdobj}{
 either a positive integer or a linear differential operator object.
 }
-\item{...}{Other arguments to match generic}
+\item{...}{Other arguments to match generic for 'deriv'}
 }
 \value{
 a functional data object for the derivative
@@ -38,6 +38,7 @@ the variation in the derivative satisfactorily.
 \seealso{
 \code{\link{getbasismatrix}}, 
 \code{\link{eval.basis}}
+\code{\link{deriv}}
 }
 \examples{
 

@@ -15,6 +15,7 @@ fRegress.stderr <- function(fRegressList, y2cMap, SigmaE) {
 #                   with FREGRESS.
 #
 #  Returns:
+#
 #  BETASTDERRLIST ... a list object, each list containing a fdPar object
 #                     for the standard error of a regression function.
 #  BVAR           ... the symmetric matrix of sampling variances and
@@ -24,16 +25,17 @@ fRegress.stderr <- function(fRegressList, y2cMap, SigmaE) {
 #  C2BMAP         ... the matrix mapping from response variable coefficients
 #                     to coefficients for regression coefficients
 
-#  Last modified 26 October 2005
+#  Last modified 5 March 2005
 
 #  get number of independent variables
 
-xfdlist <- fRegressList$xfdlist
+xfdlist  <- fRegressList$xfdlist
+yfdPar   <- fRegressList$yfdPar
+betalist <- fRegressList$betalist
+Cmatinv  <- fRegressList$Cmatinv
+
 p <- length(xfdlist)
 
-yfdPar <- fRegressList$yfdPar
-
-betalist <- fRegressList$betalist
 
 #  compute number of coefficients
 
@@ -43,8 +45,6 @@ for (j in 1:p) {
 	ncoefj     <- betaParfdj$fd$basis$nbasis
 	ncoef      <- ncoef + ncoefj
 }
-
-Cmatinv   <- fRegressList$Cmatinv
 
 if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
 	
@@ -93,7 +93,7 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
             indexk <- mk1:mk2
             tempk  <- bbasismatj*ybasismat[,k]
 		     basisprodmat[indexj,indexk] <-
-								deltat*crossprod(tempk,tempj)
+                     deltat*crossprod(tempk,tempj)
         }
     }
 

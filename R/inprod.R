@@ -25,7 +25,7 @@ inprod <- function(fdobj1, fdobj2, Lfdobj1=int2Lfd(0), Lfdobj2=int2Lfd(0),
 #  A matrix of NREP1 by NREP2 of inner products for each possible pair
 #  of functions.
 
-#  Last modified 26 October 2005
+#  Last modified 3 January 2007
 
 #  Check FDOBJ1 and get no. replications and basis object
 
@@ -63,7 +63,7 @@ if (rng[1] < range1[1] || rng[2] > range1[2]) stop(
 if (inherits(fdobj1,"fd")       && inherits(fdobj2,"fd")   &&
     type1 == "bspline"          && type2 == "bspline"      &&
     is.eqbasis(basisobj1, basisobj2)                       &&
-    is.integerLfd(Lfdobj1)         && is.integerLfd(Lfdobj2)      &&
+    is.integer(Lfdobj1)         && is.integer(Lfdobj2)      &&
     wtfd == 0                   && all(rng == range1)) {
 	
     inprodmat <- inprod.bspline(fdobj1, fdobj2,
@@ -142,22 +142,28 @@ for (irng  in  2:nrng) {
     #  multiply by values of weight function if necessary
     if (!is.numeric(wtfd)) {
         wtd <- eval.fd(wtfd, rngi)
-        fx2 <- outer(wtd,matrix(1,nrep2,1)) * fx2
+        fx2 <- matrix(wtd,dim(wtd)[1],dim(fx2)[2]) * fx2
     }
     s[1,,] <- width*crossprod(fx1,fx2)/2
     tnm <- 0.5
     j <- 1
 
     #  now iterate to convergence
+
     for (iter in 2:JMAX) {
         tnm <- tnm*2
-        if (j == 2) x <- mean(range1)
-        else {
+        if (j == 2) {
+            x <- mean(range1)
+        } else {
             del <- width/tnm
             x   <- seq(range1[1]+del/2, range1[2]-del/2, del)
         }
         fx1 <- eval.fd(x, fdobj1, Lfdobj1)
         fx2 <- eval.fd(x, fdobj2, Lfdobj2)
+        if (!is.numeric(wtfd)) {
+            wtd <- eval.fd(wtfd, x)
+            fx2 <- matrix(wtd,dim(wtd)[1],dim(fx2)[2]) * fx2
+        }
         chs <- width*crossprod(fx1,fx2)/tnm
         s[iter,,] <- (s[iter-1,,] + chs)/2
         if (iter >= 5) {
@@ -191,8 +197,11 @@ for (irng  in  2:nrng) {
             ss     <- y
             errval <- max(abs(dy))
             ssqval <- max(abs(ss))
-            if (all(ssqval > 0)) crit <- errval/ssqval
-            else                 crit <- errval
+            if (all(ssqval > 0)) {
+                crit <- errval/ssqval
+            } else {                
+                crit <- errval
+            }
             if (crit < EPS && iter >= JMIN) break
         }
         s[iter+1,,] <- s[iter,,]
@@ -236,14 +245,16 @@ fdchk <- function(fdobj) {
 #  -------------------------------------------------------------------------------
 
 knotmultchk <- function(basisobj, knotmult) {
-	type <- basisobj$type
+    type <- basisobj$type
     if (type == "bspline") {
         # Look for knot multiplicities in first basis
         params  <- basisobj$params
         nparams <- length(params)
-        for (i in 2:nparams) {
-            if (params[i] == params[i-1]) {
-                knotmult <- c(knotmult, params[i])
+        if (nparams > 1) {
+            for (i in 2:nparams) {
+                if (params[i] == params[i-1]) {
+                    knotmult <- c(knotmult, params[i])
+                }
             }
         }
     }

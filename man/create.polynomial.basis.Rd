@@ -70,7 +70,8 @@ create.polynomial.basis(rangeval=c(0, 1), nbasis=2,
 #  and center the basis functions on 1950.
 basisobj <- create.polynomial.basis(c(1900, 2000), nbasis=3, ctr=1950)
 #  plot the basis
-plot(basisobj)
+# The following should work but doesn't;  2007.05.01
+#plot(basisobj)
 }
 % docclass is function
 \keyword{smooth}

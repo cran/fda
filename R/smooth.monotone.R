@@ -1,6 +1,6 @@
-smooth.monotone <- function(x, y, wt=rep(1,nobs), WfdParobj, zmat=matrix(1,nobs,1),
-                            conv=.0001, iterlim=20, active=c(FALSE,rep(TRUE,ncvec-1)),
-                            dbglev=1) {
+smooth.monotone <- function(x, y, WfdParobj, wt=rep(1,nobs),
+       zmat=matrix(1,nobs,1), conv=.0001, iterlim=20,
+       active=c(FALSE,rep(TRUE,ncvec-1)), dbglev=1) {
 #  Smooths the relationship of Y to X using weights in WT by fitting a
 #     monotone function of the form
 #                   f(x) = b_0 + b_1 D^{-1} exp W(x)
@@ -45,6 +45,7 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), WfdParobj, zmat=matrix(1,nobs,
 #  ITERNUM   ...  number of iterations
 #  ITERHIST  ...  ITERNUM+1 by 5 array containing iteration history
 
+# Last modified 30 April 2007 by Spencer Graves  
 #  Last modified 26 October 2005
 
 #  initialize some arrays
@@ -55,7 +56,7 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), WfdParobj, zmat=matrix(1,nobs,
 #  the starting values for the coefficients are in FD object WFDOBJ
 
   if (!(inherits(WfdParobj, "fdPar"))) stop(
-		"Argument WfdParobj is not a functional data object.")
+		"Argument 'WfdParobj' is not a functional data object.")
 
   Wfdobj   <- WfdParobj$fd
   Lfdobj   <- WfdParobj$Lfd
@@ -90,12 +91,13 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), WfdParobj, zmat=matrix(1,nobs,
 
 #  initialize matrix Kmat defining penalty term
 
-  if (WfdParobj$lambda > 0) Kmat <- WfdParobj$lambda*getbasispenalty(basisobj, Lfdobj)
+  lambda = WfdParobj$lambda
+  if (lambda > 0) Kmat <- lambda*getbasispenalty(basisobj, Lfdobj)
   else            Kmat <- NULL
 
 #  Compute initial function and gradient values
 
-  result <- fngrad.smooth.monotone(y, x, zmat, wt, Wfdobj, WfdParobj$lambda,
+  result <- fngrad.smooth.monotone(y, x, zmat, wt, Wfdobj, lambda,
                                    Kmat, inact, basislist)
   Flist  <- result[[1]]
   beta   <- result[[2]]
@@ -103,7 +105,8 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), WfdParobj, zmat=matrix(1,nobs,
 
 #  compute the initial expected Hessian
 
-  hessmat <- hesscal.smooth.monotone(beta, Dyhat, wtroot, WfdParobj$lambda, Kmat, inact)
+  hessmat <- hesscal.smooth.monotone(beta, Dyhat, wtroot,
+                                     lambda, Kmat, inact)
 
 #  evaluate the initial update vector for correcting the initial cvec
 
@@ -130,14 +133,10 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), WfdParobj, zmat=matrix(1,nobs,
   }
 
   iterhist <- matrix(0,iterlim+1,length(status))
-  if(length(status)==5)
-    dimnames(iterhist) <- list(NULL,
-        c("Iter", "PENSSE", "Grad Length", "Intercept", "Slope"))  
   iterhist[1,]  <- status
   if (iterlim == 0)
     return ( list( "Wfdobj" = Wfdobj, "beta" = beta, "Flist" = Flist,
-                 "iternum" = iternum,
-                  "iterhist" = iterhist[1,,drop=FALSE] ) )
+                 "iternum" = iternum, "iterhist" = iterhist ) )
 
 #  -------  Begin iterations  -----------
 
@@ -216,7 +215,7 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), WfdParobj, zmat=matrix(1,nobs,
         #  compute new function value and gradient
         cvecnew <- cvec + linemat[1,5]*deltac
         Wfdnew$coefs <- as.matrix(cvecnew)
-        result  <- fngrad.smooth.monotone(y, x, zmat, wt, Wfdnew, WfdParobj$lambda,
+        result  <- fngrad.smooth.monotone(y, x, zmat, wt, Wfdnew, lambda,
                                           Kmat, inact, basislist)
         Flist   <- result[[1]]
         beta    <- result[[2]]
@@ -273,7 +272,8 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), WfdParobj, zmat=matrix(1,nobs,
        cvecold  <- cvec
        betaold  <- beta
        Foldlist <- Flist
-       hessmat  <- hesscal.smooth.monotone(beta, Dyhat, wtroot, WfdParobj$lambda, Kmat, inact)
+       hessmat  <- hesscal.smooth.monotone(beta, Dyhat, wtroot,
+                                           lambda, Kmat, inact)
        #  udate the line search direction
        result   <- linesearch.smooth.monotone(Flist, hessmat, dbglev)
        deltac   <- result[[1]]
@@ -297,8 +297,7 @@ smooth.monotone <- function(x, y, wt=rep(1,nobs), WfdParobj, zmat=matrix(1,nobs,
      }
   }
   return ( list( "Wfdobj" = Wfdobj, "beta" = beta, "Flist" = Flist,
-                 "iternum" = iternum,
-     "iterhist" = iterhist[1:max(1, iternum),,drop=FALSE] ) )
+                 "iternum" = iternum, "iterhist" = iterhist ) )
 }
 
 #  ----------------------------------------------------------------

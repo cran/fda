@@ -1,4 +1,5 @@
-pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj), centerfns = TRUE)
+pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
+                   centerfns = TRUE)
 {
 #  Carry out a functional PCA with regularization
 #  Arguments:
@@ -16,6 +17,7 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj), centerfns = TRUE)
 #  meanfd     ... A functional data object giving the mean function
 #
 
+# last modified 2007 April 26 by Spencer Graves
   #  Last modified:  26 October 2005
 
   #  Check arguments
@@ -128,8 +130,9 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj), centerfns = TRUE)
   harmfd   <- fd(harmcoef, basisobj, harmnames)
 
   pcafd        <- list(harmfd, eigvalc, harmscr, varprop, meanfd)
+  setOldClass("pca.fd")
+  oldClass(pcafd) <- "pca.fd"
   names(pcafd) <- c("harmonics", "values", "scores", "varprop", "meanfd")
-  class(pcafd) <- c("pca.fd", class(pcafd))
 
   return(pcafd)
 }

@@ -13,7 +13,7 @@ fourierpen <- function(basisobj, Lfdobj=int2Lfd(2))
   #  functions is increased by 1, and this function returns a matrix of
   #  order one larger.
 
-  #  Last modified 26 October 2005
+  #  Last modified 9 February 2007
 
   if (!(inherits(basisobj, "basisfd"))) stop(
 		"First argument is not a basis object.")

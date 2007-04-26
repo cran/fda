@@ -31,7 +31,7 @@ create.fourier.basis <- function (rangeval=c(0,1), nbasis=3,
 #  BASISOBj  ... a functional data basis object of type "fourier"
 
 #  Last modified 21 February 2007 by Spencer Graves
-#  Previously modified 20 November 2005
+#  previously modified 20 November 2005
 
   type <- "fourier"
 
@@ -41,7 +41,7 @@ create.fourier.basis <- function (rangeval=c(0,1), nbasis=3,
   }
 
   if (!rangechk(rangeval)) stop("Argument RANGEVAL is not correct.")
-  
+
   width <- rangeval[2] - rangeval[1]
   if ((period <= 0) || !is.numeric(period))
     stop ("Period must be positive number for a Fourier basis")
@@ -50,7 +50,7 @@ create.fourier.basis <- function (rangeval=c(0,1), nbasis=3,
 #  increase the number of basis functions by one if even
 
   if ((nbasis <= 0) || !is.numeric(nbasis))
-    stop ("nbasis must be odd positive number for a Fourior basis")
+    stop ("nBasis must be odd positive number for a Fourior basis")
   nbasis <- ceiling(nbasis)
   if (2*floor(nbasis/2) == nbasis) nbasis <- nbasis + 1
 
@@ -59,21 +59,21 @@ create.fourier.basis <- function (rangeval=c(0,1), nbasis=3,
   if (missing(dropind)) dropind <- NULL
 
   if (length(dropind) > 0){
-    if(length(dropind) >= nbasis)  stop("Too many index values in 'dropind'.")
+    if(length(dropind) >= nbasis)  stop("Too many index values in DROPIND.")
     dropind = sort(dropind)
     if(length(dropind) > 1) {
-      if(min(diff(dropind)) == 0) stop("Duplicate index values in 'dropind'.")
+      if(min(diff(dropind)) == 0) stop("Multiple index values in DROPIND.")
     }
     for(i in 1:length(dropind)) {
       if(dropind[i] < 1 || dropind[i] > nbasis)
         stop("An index value is out of range.")
     }
   }
-  
+
 #  set up the basis object
 
   basisobj <- basisfd(type=type, rangeval=rangeval, nbasis=nbasis,
-               params=params, dropind=dropind, quadvals=quadvals,
+                      params=params, dropind=dropind, quadvals=quadvals,
                       values=values)
 # Names?
   if(!is.na(longNames)){
@@ -90,5 +90,7 @@ create.fourier.basis <- function (rangeval=c(0,1), nbasis=3,
     basisobj$names <- Nms
   }
 #  
+
   basisobj
+
 }

@@ -1,4 +1,4 @@
-eval.bifd <- function(sevalarg, tevalarg, bifd, sLfd = 0, tLfd = 0) {
+eval.bifd <- function(sevalarg, tevalarg, bifd, sLfdobj = 0, tLfdobj = 0) {
 
   #  Evaluates a bi-functional data object BIFD at argument values in arrays
   #  SEVALARG and TEVALARG.  Differential operators SLFD and TLFD are
@@ -32,11 +32,11 @@ eval.bifd <- function(sevalarg, tevalarg, bifd, sLfd = 0, tLfd = 0) {
   coefd <- dim(coef)
   ndim  <- length(coefd)
 
-  sLfd <- int2Lfd(sLfd)
-  tLfd <- int2Lfd(tLfd)
+  sLfdobj <- int2Lfd(sLfdobj)
+  tLfdobj <- int2Lfd(tLfdobj)
 
-  snderiv <- sLfd$nderiv
-  tnderiv <- tLfd$nderiv
+  snderiv <- sLfdobj$nderiv
+  tnderiv <- tLfdobj$nderiv
 
   sbasismat <- getbasismatrix(sevalarg, sbasisobj, snderiv)
   if (snderiv > 0 && !is.null(sLfd)) {

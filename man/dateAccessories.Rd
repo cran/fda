@@ -45,7 +45,7 @@
     monthEnd.5)/2  
   }
   \item{monthLetters}{
-    A character vector of c("j", "F", "m", "A", "M", "J", "J", "A", "S",
+    A character vector of c("j", "FALSE", "m", "A", "M", "J", "J", "A", "S",
     "O", "N", "D"), with 'month.abb' as the names.  
   }
   \item{weeks}{

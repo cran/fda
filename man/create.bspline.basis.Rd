@@ -13,9 +13,8 @@
 }
 \usage{
 
-create.bspline.basis(rangeval, nbasis=NULL, norder=4, breaks=NULL,
+create.bspline.basis(rangeval=c(0, 1), nbasis=NULL, norder=4, breaks=NULL,
                dropind=NULL, quadvals=NULL, values=NULL, names="bspl")
-
 }
 \arguments{
   \item{rangeval}{

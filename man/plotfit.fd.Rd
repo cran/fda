@@ -17,15 +17,15 @@
   the next page unless ask==FALSE.  
 }
 \usage{
-plotfit.fd(x, argvals, fdobj, rng = rangeval,
+plotfit.fd(y, argvals, fdobj, rng = rangeval,
            index = 1:nrep, nfine = 101, residual = FALSE,
            sortwrd = FALSE, titles=NULL, ylim=NULL,
            ask=FALSE, type=c("p", "l")[1+residual],
-           col=1:9, lty=1:9, lwd=1, cex.pch=1, 
-           ...)
+           xlab=argname, ylab, sub=Sub, col=1:9, lty=1:9,
+           lwd=1, cex.pch=1, ...)
 }
 \arguments{
-  \item{x}{
+  \item{y}{
     a vector, matrix or array containing the discrete observations used
     to estimate the functional data object.
   }
@@ -66,7 +66,7 @@ plotfit.fd(x, argvals, fdobj, rng = rangeval,
     a numeric vector of length 2 giving the y axis limits;  see 'par'.  
   }
   \item{ask}{
-    If TRUE and if 'x' has more levels than the max length of col, lty,
+    If TRUE and if 'y' has more levels than the max length of col, lty,
     lwd and cex.pch, the user must confirm page change before the next
     plot will be created.  The number of lines / cases per plot is
     controled by the maximum of the lengths of col, lty, lwd and cex.pch
@@ -79,6 +79,19 @@ plotfit.fd(x, argvals, fdobj, rng = rangeval,
     will typically be 'p' to plot points but not lines;  'fdobj' will
     always plot as a line.  If residual == TRUE, the default type ==
     "l";  an alternative is "b" for both.  
+  }
+  \item{xlab}{
+    x axis label.  
+  }
+  \item{ylab}{
+    Character vector of y axis labels.  
+    y axis label.  If(residual), ylab defaults to 'Residuals', else to
+    varnames derived from names(fdnames[[3]] or fdnames[[3]] or
+    dimnames(y)[[3]]. 
+  }
+  \item{sub}{
+    subtitle under the x axis label.  Defaults to the RMS residual from
+    the smooth.  
   }
   \item{col, lty, lwd, cex.pch}{
     Numeric or character vectors specifying the color (col), line type
@@ -146,7 +159,7 @@ daytempfd <- with(CanadianWeather, data2fd(
        dailyAv[,,"Temperature.C"], day.5, 
        daybasis65, argnames=list("Day", "Station", "Deg C")) )
  
-with(CanadianWeather, plotfit.fd(x=dailyAv[, , "Temperature.C"],
+with(CanadianWeather, plotfit.fd(dailyAv[, , "Temperature.C"],
           argvals= day.5, daytempfd, index=1, titles=place, axes=FALSE) )
 # Label the horizontal axis with the month names
 axis(1, monthBegin.5, labels=FALSE)

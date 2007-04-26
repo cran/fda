@@ -183,7 +183,7 @@ par(op)
 #  plot the residuals, sorting cases by residual sum of squares
 
 #par(mfrow=c(1,2), mar=c(3,4,2,1), pty="s")
-plotfit.fd(gait, gaittime, gaitfd, residual=T, sort=T, cex=1.2)
+plotfit.fd(gait, gaittime, gaitfd, residual=TRUE, sort=TRUE, cex=1.2)
 
 #  plot first derivative of all curves
 
@@ -218,7 +218,7 @@ gaitpca.fd <- varmx.pca.fd(gaitpca.fd)
 
 #par(mfrow=c(1,1), mar=c(3,4,2,1), pty="s")
 op <- par(mfrow=c(2,2))
-plot.pca.fd(gaitpca.fd, cycle=T)
+plot.pca.fd(gaitpca.fd, cycle=TRUE)
 par(op)
 
 #  ------  Canonical correlation analysis of knee-hip curves  ------
@@ -310,7 +310,7 @@ Dgaitmeanfd  <- mean.fd(Dgaitfd)
 Warpfd    <- fd(matrix(0,nwbasis,39),warpbasis)
 WarpfdPar <- fdPar(Warpfd, 3, lambda=0.01)
 
-regstr <- register.fd(Dgaitmeanfd, Dgaitfd, WarpfdPar, periodic=T)
+regstr <- register.fd(Dgaitmeanfd, Dgaitfd, WarpfdPar, periodic=TRUE)
 #-------  Curve  1   --------
 #Error in yregmat[, 1, ] : incorrect number of dimensions
 #?????
@@ -330,8 +330,8 @@ matplot(xfine, warpmat, type="l", xlab="t", ylab="h(t)",
 #  plot both the unregistered and registered versions of the curves
 
 par(mfrow=c(2,2))
-plot(Dgaitfd,    ask=F)
-plot(Dgaitregfd, ask=F)
+plot(Dgaitfd,    ask=FALSE)
+plot(Dgaitregfd, ask=FALSE)
 
 #  plot the deformation functions, def(t) = warp(t) - t
 

@@ -1,11 +1,12 @@
 deriv.fd <- function(expr, Lfdobj=int2Lfd(1), ...)
 {
-  fdobj <- expr
   #  Applies linear differential operator LFD to functional data object FD
   #    and returns the result as functional data object DERIVFD.
 
-  #  Last modified 26 October 2005
+# Last modified 2007 May 3 by Spencer Graves  
+  #  Previously modified 26 October 2005
 
+  fdobj <- expr
   if (!inherits(fdobj, "fd")) stop(
 		"Argument  FD not a functional data object.")
 		

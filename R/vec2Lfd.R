@@ -10,33 +10,33 @@ vec2Lfd <- function(bwtvec, rangeval=c(0,1))
 
 #  return BWTVEC if it is of class LFD
 
-  if (inherits(bwtvec, "Lfd")) {
+if (inherits(bwtvec, "Lfd")) {
     Lfdobj <- bwtvec
     return(Lfdobj)
-  }
+}
 
 #  check BWTVEC
 
-  if (!is.vector(bwtvec)) 
+if (!is.vector(bwtvec)) 
     stop("Argument not a vector and not a linear differential operator.")
  
-  m <- length(bwtvec)
+m <- length(bwtvec)
 
 #  set up the list object for the homogeneous part
 
-  if (m==0) {
+if (m==0) {
     #  if derivative is zero, BWTLIST is empty
     bwtlist <- NULL
-  } else {
+} else {
     conbasis <- create.constant.basis(rangeval)
     bwtlist  <- vector("list", m)
     for (j in 1:m) bwtlist[[j]] <- fd(bwtvec[j], conbasis)
-  }
+}
 
 #  define the Lfd object
 
-  Lfdobj <- Lfd(m, bwtlist)
+Lfdobj <- Lfd(m, bwtlist)
 
-  return(Lfdobj)
+return(Lfdobj)
 
 }

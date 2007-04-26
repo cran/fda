@@ -1,5 +1,5 @@
-smooth.basis <- function (argvals, y, fdParobj, wtvec=rep(1,n),
-            dffactor=1, fdnames=list(NULL, dimnames(y)[2], NULL))
+smooth.basis <- function (argvals, y, fdParobj, wtvec=rep(1,n), dffactor=1,
+                          fdnames=list(NULL, dimnames(y)[2], NULL)) 
 {
 
 #  ARGVALS  ... A set of argument values, set by default to equally spaced on
@@ -42,47 +42,41 @@ smooth.basis <- function (argvals, y, fdParobj, wtvec=rep(1,n),
 #    PENMAT ...  the penalty matrix.
 #    Y2CMAP ...  the matrix mapping the data to the coefficients.
 
-#  Last modified:  20 February 2007 by Spencer Graves
-#  Previously modified:  26 October 2005
+#  Last modified:  1 March 2007
 
-#  check ARGVALS
+  #  -----------------------------------------------------------------------
+  #                      Check argments
+  #  -----------------------------------------------------------------------
 
-arvals <- as.vector(argvals)
+  #  check ARGVALS
 
-#  check Y
+  if (!is.numeric(y)) stop("ARGVALS is not numeric.")
 
-if (is.vector(y)) y <- as.matrix(y)
+  arvals <- as.vector(argvals)
+  n      <- length(argvals)
+
+  #  check Y
+
+  if (is.vector(y)) y <- as.matrix(y)
 	
-if (!inherits(y, "matrix") & !inherits(y, "array"))
+  if (!inherits(y, "matrix") & !inherits(y, "array"))
     stop("Y is not of class matrix or class array.")
 
-ydim <- dim(y);
+  ydim <- dim(y);
 
-n    <- length(argvals)
-
-if (ydim[1] != n)
+  if (ydim[1] != n)
     stop("Y is not the same length as ARGVALS.")
 
-#  check fdParobj
+  #  check fdParobj
 
-if (!inherits(fdParobj, "fdPar")) {
+  if (!inherits(fdParobj, "fdPar")) {
     if (inherits(fdParobj, "fd") || inherits(fdParobj, "basisfd"))
         fdParobj <- fdPar(fdParobj)
     else
         stop(paste("FDPAROBJ is not a functional parameter object,",
                "not a functional data object, and",
                "not a basis object."))
-}
-
-#  extract information from fdParobj
-
-Lfdobj   <- fdParobj$Lfd
-nderiv   <- Lfdobj$nderiv
-fdobj    <- fdParobj$fd
-basisobj <- fdobj$basis
-nbasis   <- basisobj$nbasis
-onebasis <- rep(1,nbasis)
-lambda   <- fdParobj$lambda
+  }
 
   #  check WTVEC
 
@@ -90,12 +84,26 @@ lambda   <- fdParobj$lambda
   if (length(wtvec) != n) stop("WTVEC of wrong length")
   if (min(wtvec) <= 0)    stop("All values of WTVEC must be positive.")
 
+  #  extract information from fdParobj
+
+  Lfdobj   <- fdParobj$Lfd
+  nderiv   <- Lfdobj$nderiv
+  fdobj    <- fdParobj$fd
+  basisobj <- fdobj$basis
+  nbasis   <- basisobj$nbasis
+  onebasis <- rep(1,nbasis)
+  lambda   <- fdParobj$lambda
+
   #  check LAMBDA
 
   if (lambda < 0) {
     warning ("Value of LAMBDA was negative, and 0 used instead.")
     lambda <- 0
   }
+
+  #  -----------------------------------------------------------------------
+  #                      Set up analysis
+  #  -----------------------------------------------------------------------
 
   #  set number of curves and number of variables
 
@@ -105,32 +113,26 @@ lambda   <- fdParobj$lambda
     nrep <- 1
     nvar <- 1
     coef <- rep(0,nbasis)
-    yNms <- names(y)
     y <- matrix(y,n,1)
-    if(!is.null(yNms))dimnames(y) <- list(yNms, NULL)
   }
   if (ndim == 2)  {
     nrep <- ncol(y)
     nvar <- 1
     coef <- matrix(0,nbasis,nrep)
-    yNms <- dimnames(y)   
-    if(!is.null(yNms[[2]]))
-      dimnames(coef) <- list(NULL, yNms[[2]])
   }
   if (ndim == 3)  {
     nrep <- dim(y)[2]
     nvar <- dim(y)[3]
     coef <- array(0,c(nbasis,nrep,nvar))
-    yNms <- dimnames(y)
-    if(any(!sapply(yNms[-1], is.null)))
-      dimnames(coef) <- list(NULL, yNms[[2]], yNms[[3]])
   }
 
   #  set up matrix of basis function values
 
   basismat <- eval.basis(argvals, basisobj)
 
-  #  set up the linear equations for smoothing
+  #  ------------------------------------------------------------------
+  #                set up the linear equations for smoothing
+  #  ------------------------------------------------------------------
 
   if (n >= nbasis || lambda > 0) {
 
@@ -146,7 +148,7 @@ lambda   <- fdParobj$lambda
     } else {
 	 	Dmat <- array(0, c(nbasis, nrep, nvar))
       	for (ivar in 1:nvar)
-        	Dmat[,,ivar] <- crossprod(basisw,y[,,ivar])
+        	    Dmat[,,ivar] <- crossprod(basisw,y[,,ivar])
     }
     if (lambda > 0) {
         #  smoothing required, set up coefficient matrix for normal equations
@@ -172,6 +174,11 @@ lambda   <- fdParobj$lambda
     Lmatinv <- solve(Lmat)
     Bmatinv <- Lmatinv %*% t(Lmatinv)
 
+    #  ------------------------------------------------------------------
+    #       Compute the coefficients defining the smooth and 
+    #            summary properties of the smooth
+    #  ------------------------------------------------------------------
+
     #  compute map from y to c
 
     y2cMap = Bmatinv %*% t(basisw)
@@ -188,8 +195,10 @@ lambda   <- fdParobj$lambda
 
   } else {
 
+    #  ------------------------------------------------------------------
     #  The following code is for the underdetermined coefficients:
-    #     the number of basis functions exceeds the number of argument values.
+    #  the number of basis functions exceeds the number of argument values.
+    #  ------------------------------------------------------------------
 
     qrlist <- qr(t(basismat))
     Qmat   <- qr.Q(qrlist, complete=TRUE)
@@ -212,6 +221,10 @@ lambda   <- fdParobj$lambda
       }
     }
   }
+
+  #  ------------------------------------------------------------------
+  #            compute SSE, yhat, GCV and other fit summaries
+  #  ------------------------------------------------------------------
 
   #  compute error sum of squares
 
@@ -249,26 +262,21 @@ lambda   <- fdParobj$lambda
     	gcv <- NA
   }
 
-    #  set up default fdnames
+  #  ------------------------------------------------------------------
+  #          Set up the functional data objects for the smooths
+  #  ------------------------------------------------------------------
 
-    if (ndim == 1) defaultnames <- list("time", "reps", "values")
-    if (ndim == 2){
-      defaultnames <- list("time", paste("reps",as.character(1:nrep)),
-                                        "values")
-      if(!is.null(dimnames(coef)[[2]]))
-        defaultnames[[2]] <- dimnames(coef)[[2]]
-      
-    }
-    if (ndim == 3){
-      defaultnames <- list("time", paste("reps",as.character(1:nrep)),
-                           paste("values",as.character(1:nvar)) )
-      if(!is.null(dimnames(coef)[[2]]))
-        defaultnames[[2]] <- dimnames(coef)[[2]]
-      if(!is.null(dimnames(coef)[[3]]))
-        defaultnames[[3]] <- dimnames(coef)[[3]]      
+  #  set up default fdnames
 
-    }
-    names(defaultnames) <- c("args", "reps", "funs")
+  if (ndim == 1) defaultnames <- list("time", "reps", "values")
+  if (ndim == 2) defaultnames <- list("time",
+                                      paste("reps",as.character(1:nrep)),
+                                      "values")
+  if (ndim == 3) defaultnames <- list("time",
+                                      paste("reps",as.character(1:nrep)),
+                                      paste("values",as.character(1:nvar)) )
+
+  names(defaultnames) <- c("args", "reps", "funs")
 
   fdobj <- fd(coef, basisobj, defaultnames)
 

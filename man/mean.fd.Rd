@@ -13,7 +13,7 @@ mean.fd(x, ...)
 \item{x}{
 a functional data object.
 }
-\item{...}{Other arguments to match generic}
+\item{...}{Other arguments to match the generic function for 'mean'}
 }
 \value{
 a functional data object with a single replication
@@ -24,6 +24,7 @@ that contains the mean of the functions in the object \code{fd}.
 \code{\link{var.fd}}, 
 \code{\link{sum.fd}}, 
 \code{\link{center.fd}}
+\code{\link{mean}}
 }
 \examples{
 liptime  <- seq(0,1,.02)

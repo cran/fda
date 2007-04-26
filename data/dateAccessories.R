@@ -89,7 +89,7 @@ structure(c(15.5, 45, 74.5, 105, 135.5, 166, 196.5, 227.5, 258,
 288.5, 319, 349.5), .Names = c("Jan", "Feb", "Mar", "Apr", "May", 
 "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
 `monthLetters` <-
-structure(c("j", "F", "m", "A", "M", "J", "J", "A", "S", "O", 
+structure(c("j", "FALSE", "m", "A", "M", "J", "J", "A", "S", "O", 
 "N", "D"), .Names = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
 `weeks` <-

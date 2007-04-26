@@ -82,7 +82,7 @@ daytempfd <- with(CanadianWeather, data2fd(
        daybasis65, argnames=list("Day", "Station", "Deg C")) )
  
 with(CanadianWeather, plotfit.fd(
-      x=dailyAv[,,"Temperature.C"], argvals=day.5,
+      dailyAv[,,"Temperature.C"], argvals=day.5,
           daytempfd, index=1, titles=place, axes=FALSE) )
 # Label the horizontal axis with the month names
 axisIntervals(1) 

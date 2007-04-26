@@ -8,7 +8,7 @@ fourier <- function(x, nbasis = n, period = span, nderiv = 0)
   #   NBASIS is even, it is increased by one.
 
   #  last modified 23 February 2006 by Spencer Graves
-  #  previously modified 15 December 2005
+  #  Previously modified 15 December 2005
 
   #  check x and set up range
 
@@ -22,17 +22,17 @@ fourier <- function(x, nbasis = n, period = span, nderiv = 0)
 
   #  check period and set up omega
 
-  if (period <= 0) stop("'period' not positive, = ", period)
+  if (period <= 0) stop("PERIOD not positive.")
   omega  <- 2*pi/period
   omegax <- omega*x
 
   #  check nbasis
 
-  if (nbasis <= 0) stop("'nbasis' not positive, = ", nbasis)
+  if (nbasis <= 0) stop("NBASIS not positive")
 
   #  check nderiv
 
-  if (nderiv <  0) stop("'nderiv' is negative, = ", nderiv)
+  if (nderiv <  0) stop("NDERIV is negative.")
 
   #  if nbasis is even, add one
 
@@ -85,5 +85,6 @@ fourier <- function(x, nbasis = n, period = span, nderiv = 0)
   }
 # 
   dimnames(basismat) <- list(xNames, fNames)
+#  
   return(basismat)
 }

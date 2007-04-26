@@ -67,7 +67,7 @@ smooth.basis(argvals, y, fdParobj, wtvec=rep(1,n),
 \value{
   a named list of length 7 containing:
 
-  \item{fdobj}{
+  \item{fd}{
     a functional data object that smooths the data.
   }
   \item{df}{
@@ -159,7 +159,6 @@ fdPar3 <- fdPar(b3.4, lambda=1)
 # second derivative Lfdobj=2 is discontinuous.
 fd3.4s0 <- smooth.basis(0:1, 0:1, fdPar3)
 plot(fd3.4s0$fd)
-
 
 
 #  Shows the effects of three levels of smoothing

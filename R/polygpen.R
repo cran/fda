@@ -16,7 +16,7 @@ if (!(inherits(basisobj, "basisfd"))) stop(
 
 Lfdobj <- int2Lfd(Lfdobj)
 
-type <- basisobj$type
+type <- basisobj$basis
 if (type != "polyg") stop("BASISOBJ not of type polyg")
 
 nderiv <- Lfdobj$nderiv
@@ -38,7 +38,7 @@ if (nderiv > 0) {
 	}
 }
 
-if (isintLfd) {
+if (isisintLfd) {
     args    <- basisobj$params
     n       <- length(args)
     argdiff <- diff(args)
@@ -56,7 +56,7 @@ if (isintLfd) {
       	penaltymatrix[1,1] <- argdiff[  1]
       	penaltymatrix[n,n] <- argdiff[n-1]
       	indx <- 2:(n-1)
-      	diag(penaltymatrix[indx,  indx  ]) <- argdiff[indx]+argdiff[indx-1]
+      	diag(penaltymatrix[indx,  indx  ]) <- argdiff[ind]+argdiff[ind-1]
       	indx <- 2:n
       	diag(penaltymatrix[indx  ,indx-1]) <- -argdiff
       	diag(penaltymatrix[indx-1,indx  ]) <- -argdiff

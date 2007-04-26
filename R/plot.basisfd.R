@@ -1,13 +1,14 @@
 plot.basisfd <- function(x, ...) {
   basisobj <- x
 	#  plot a basis object
-	
+
+  # last modified 2007 May 3 Spencer Graves 
 	#  Last modified 26 October 2005
 
     #  check BASISOBJ
 
     if (!inherits(basisobj, "basisfd")) stop(
-        "'x' is not a 'basisfd' object.")
+        "BASISOBJ is not a basis object.")
 		
 	dot.args <- list(...)
 
@@ -45,4 +46,3 @@ plot.basisfd <- function(x, ...) {
 	         xlim=c(argvals[1],argvals[nx]),
 	         ylim=c(minval, maxval))
 }
-

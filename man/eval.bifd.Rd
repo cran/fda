@@ -8,7 +8,7 @@
   functional data object to be evaluated.
 }
 \usage{
-eval.bifd(sevalarg, tevalarg, bifd, sLfd=0, tLfd=0)
+eval.bifd(sevalarg, tevalarg, bifd, sLfdobj=0, tLfdobj=0)
 }
 \arguments{
   \item{sevalarg}{
@@ -22,13 +22,13 @@ eval.bifd(sevalarg, tevalarg, bifd, sLfd=0, tLfd=0)
   \item{bifd}{
     a two-argument functional data object.
   }
-  \item{sLfd}{
+  \item{sLfdobj}{
     either a nonnegative integer or a linear differential operator
     object.  If present, the derivative or the value of applying the
     operator to the object as a function of the first argument \code{s}
     is evaluated rather than the functions themselves.
   }
-  \item{tLfd}{
+  \item{tLfdobj}{
     either a nonnegative integer or a linear differential operator
     object.  If present, the derivative or the value of applying the
     operator to the object as a function of the second argument \code{t}

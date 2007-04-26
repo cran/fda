@@ -1,7 +1,11 @@
 fRegress.CV <- function(yvec, xfdlist, betalist) {
-# FREGRESS.CV computes cross-validated error sum of squares
 
-#  Last modified 21 March 2006
+# FREGRESS.CV computes cross-validated error sum of squares
+# only for scalar dependent variable
+
+#  Last modified 11 November 2006
+
+if (!inherits(yvec, "numeric")) stop("Dependent variable is not scalar.")
 
 N <- length(yvec)
 p <- length(xfdlist)
@@ -17,9 +21,7 @@ for (i in 1:N) {
         else                    coefj <- as.matrix(coefj[,-i])
         xfdlisti[[j]] <- fd(coefj,basisj)
     }
-    indexi <- 1:N
-    indexi <- indexi[-i]
-    yveci <- yvec[indexi]
+    yveci <- yvec[-i]
     fRegressListi <- fRegress(yveci, xfdlisti, betalist)
     betaestlisti  <- fRegressListi$betaestlist
     yhati <- 0

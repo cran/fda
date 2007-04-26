@@ -8,7 +8,7 @@ exponpen <- function(basisobj, Lfdobj=int2Lfd(2))
 #                linear differential operator to be penalized.
 #  Returns the penalty matrix.
 
-#  Last modified 26 October 2005
+#  Last modified 9 February 2007
 
 #  Check BASISOBJ
 

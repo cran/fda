@@ -33,7 +33,8 @@ density.fd <- function(x, WfdParobj, conv=0.0001, iterlim=20,
 #  exponentiate the resulting vector, and then divide by the normalizing
 #  constant C.
 
-#  last modified 26 October 2005
+# last modified 2007 May 3 by Spencer Graves   
+#  last modified 24 March 2006
 
 	#  check WfdParobj
 	
@@ -163,7 +164,7 @@ density.fd <- function(x, WfdParobj, conv=0.0001, iterlim=20,
 	if (iterlim == 0) {
     	Flist     <- Foldstr
     	iterhist <- iterhist[1,]
-    	C        <- normalize.phi(basisobj, cvec0)
+    	C        <- normden.phi(basisobj, cvec0)
     	return( list(Wfdobj=Wfdobj, C=C, Flist=Flist, iternum=iternum, iterhist=iterhist) )
 	} else {
 		gvec <- gvec0
@@ -291,7 +292,7 @@ density.fd <- function(x, WfdParobj, conv=0.0001, iterlim=20,
 
      	if (abs(Flist$f-Foldstr$f) < conv) {
        	iterhist <- iterhist[1:(iternum+1),]
-  			C <- normalize.phi(basisobj, cvec)
+  			C <- normden.phi(basisobj, cvec)
 			denslist <- list("Wfdobj" = Wfdobj, "C" = C, "Flist" = Flist,
 			          			"iternum" = iternum, "iterhist" = iterhist)
 			return( denslist )
@@ -316,7 +317,7 @@ density.fd <- function(x, WfdParobj, conv=0.0001, iterlim=20,
 		#  end of iterations
   	}
 	#  compute final normalizing constant
-  	C <- normalize.phi(basisobj, cvec)
+  	C <- normden.phi(basisobj, cvec)
 	denslist <- list("Wfdobj" = Wfdobj, "C" = C, "Flist" = Flist,
 			          "iternum" = iternum, "iterhist" = iterhist)
  	return( denslist )
@@ -333,9 +334,9 @@ loglfnden <- function(x, f, basisobj, cvec) {
    	fsum    <- sum(f)
    	nobs    <- length(x)
    	phimat  <- getbasismatrix(x, basisobj)
-   	cval    <- normalize.phi(basisobj, cvec)
+   	cval    <- normden.phi(basisobj, cvec)
    	logl    <- sum((phimat %*% cvec) * f - fsum*log(cval)/N)
-   	EDW     <- outer(rep(1,nobs),expect.phi(basisobj, cvec, cval))
+   	EDW     <- outer(rep(1,nobs),expectden.phi(basisobj, cvec, cval))
    	Dlogl   <- apply((phimat - EDW)*fmat,2,sum)
 	return( list(logl, Dlogl) )
 }
@@ -346,9 +347,9 @@ Varfnden <- function(x, basisobj, cvec) {
 	#  Computes the expected Hessian
    	nbasis  <- basisobj$nbasis
    	nobs    <- length(x)
-   	cval    <- normalize.phi(basisobj, cvec)
-   	EDw     <- outer(rep(1,nobs),expect.phi(basisobj, cvec, cval))
-   	EDwDwt  <- nobs*expect.phiphit(basisobj, cvec, cval)
+   	cval    <- normden.phi(basisobj, cvec)
+   	EDw     <- outer(rep(1,nobs),expectden.phi(basisobj, cvec, cval))
+   	EDwDwt  <- nobs*expectden.phiphit(basisobj, cvec, cval)
    	Varphi  <- EDwDwt - crossprod(EDw)
 	return(Varphi)
 }
@@ -356,7 +357,7 @@ Varfnden <- function(x, basisobj, cvec) {
 
 #  ---------------------------------------------------------------
 
-normalize.phi <- function(basisobj, cvec, JMAX=15, EPS=1e-7) {
+normden.phi <- function(basisobj, cvec, JMAX=15, EPS=1e-7) {
 
 #  Computes integrals of
 #      p(x) = exp phi"(x) %*% cvec
@@ -432,13 +433,13 @@ normalize.phi <- function(basisobj, cvec, JMAX=15, EPS=1e-7) {
     	smat[j+1] <- smat[j]
     	h[j+1]    <- 0.25*h[j]
  	}
-  	warning(paste("No convergence after ",JMAX," steps in NORMALIZE.PHI"))
+  	warning(paste("No convergence after ",JMAX," steps in NORMDEN.PHI"))
 	return(ss)
 }
 
 #  ---------------------------------------------------------------
 
-expect.phi <- function(basisobj, cvec, Cval=1, nderiv=0, rng=rangeval,
+expectden.phi <- function(basisobj, cvec, Cval=1, nderiv=0, rng=rangeval,
                      JMAX=15, EPS=1e-7) {
 #  Computes expectations of basis functions with respect to density
 #      p(x) <- Cval^{-1} exp t(c)*phi(x)
@@ -532,13 +533,13 @@ expect.phi <- function(basisobj, cvec, Cval=1, nderiv=0, rng=rangeval,
     	smat[j+1,] <- smat[j,]
     	h[j+1] <- 0.25*h[j]
   	}
-  	warning(paste("No convergence after ",JMAX," steps in EXPECT.PHI"))
+  	warning(paste("No convergence after ",JMAX," steps in EXPECTDEN.PHI"))
 	return(ss)
 }
 
 #  ---------------------------------------------------------------
 
-expect.phiphit <- function(basisobj, cvec, Cval=1, nderiv1=0, nderiv2=0,
+expectden.phiphit <- function(basisobj, cvec, Cval=1, nderiv1=0, nderiv2=0,
                              rng=rangeval, JMAX=15, EPS=1e-7) {
 
 #  Computes expectations of cross product of basis functions with
@@ -638,7 +639,7 @@ expect.phiphit <- function(basisobj, cvec, Cval=1, nderiv1=0, nderiv2=0,
     	smat[j+1,,] <- smat[j,,]
     	h[j+1] <- 0.25*h[j]
   	}
-  	warning(paste("No convergence after ",JMAX," steps in EXPECT.PHIPHIT"))
+  	warning(paste("No convergence after ",JMAX," steps in EXPECTDEN.PHIPHIT"))
 	return(ss)
 }
 #  ---------------------------------------------------------------

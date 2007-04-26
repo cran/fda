@@ -2,13 +2,12 @@ var.fd <- function(fdobj1, fdobj2 = fdobj1)
 {
   #  compute the variance and covariance functions for functional observations
 
-  #  Last modified 22 February 2007 by Spencer Graves
-  #  Previously  modified 26 October 2005
+  #  Last modified 26 October 2005
 
   if (!(inherits(fdobj1, "fd"))) stop(
-		"Argument 'fdobj1' is not a functional data object.")
+		"Argument FDX not a functional data object.")
   if (!(inherits(fdobj2, "fd"))) stop(
-		"Argument 'fdobj2' is not a functional data object.")
+		"Argument FDY not a functional data object.")
 
   coefx   <- fdobj1$coefs
   coefy   <- fdobj2$coefs
@@ -26,8 +25,7 @@ var.fd <- function(fdobj1, fdobj2 = fdobj1)
       		coefvar   <- var(t(coefx),t(coefy))
       		coefnames <- list(dimnames(coefx)[[1]], dimnames(coefy)[[1]])
       		varbifd   <- bifd(coefvar, basisx, basisy, coefnames)
-    	} else stop("fdobj1 is univariate, ",
-                    "so fdobj2 must also be univariate.")
+    	} else stop("Both arguments must be univariate.")
   } else {
     	nvar    <- coefdobj1[3]
     	npair   <- nvar*(nvar+1)/2
@@ -40,9 +38,8 @@ var.fd <- function(fdobj1, fdobj2 = fdobj1)
       		coefvar[,,1,m] <- var(t(coefx[,,i]),t(coefx[,,j]))
           bivarnames[m] <- paste(varnames[i],"vs",varnames[j])
     	}
-       bifdnames = list(s.time=fdobj1$fdnames[[1]],
-         t.time=fdobj2$fdnames[[1]], reps="mean",
-         values=bivarnames)
+       bifdnames = fdobj1$fdnames
+       bifdnames[[3]] <- bivarnames
     	varbifd <- bifd(coefvar, basisx, basisx, bifdnames)
   }
   return(varbifd)

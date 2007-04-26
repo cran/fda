@@ -67,15 +67,15 @@ if        (ndim == 2) {
         ncurves   <- coefd[3]
         evalarray <- matrix(0,n,ncurves)
         for (i in 1:ncurves)
-            evalarray(,i) <- diag(sbasismat %*% coef(,,i) %*% t(tbasismat))
+            evalarray[,i] <- diag(sbasismat %*% coef[,,i] %*% t(tbasismat))
 } else if (ndim == 4) {
         ncurves  <- coefd[3]
         nvar     <- coefd[4]
         evalarray <- array(0,c(n,ncurves,nvar))
         for (i in 1:ncurves) {
             for (j in 1:nvar) {
-                evalarray(,i,j) <-
-                    diag(sbasismat %*% coef(,,i,j) %*% t(tbasismat))
+                evalarray[,i,j] <-
+                    diag(sbasismat %*% coef[,,i,j] %*% t(tbasismat))
             }
         }
 } else {

@@ -7,7 +7,7 @@ powerpen <- function(basisobj, Lfdobj=int2Lfd(2)) {
 #  Returns a list the first element of which is the basis matrix
 #   and the second element of which is the diagonal of the penalty matrix.
 
-#  Last modified:  26 October 2005
+#  Last modified:  9 February 2007
 
 	if (!inherits(basisobj, "basisfd")) stop(
     	"First argument is not a basis object.")
@@ -22,7 +22,7 @@ powerpen <- function(basisobj, Lfdobj=int2Lfd(2)) {
   Lfdobj <- int2Lfd(Lfdobj)
 
   if (is.integerLfd(Lfdobj)) {
-      nderiv <- Lfdobj$nderiv
+  nderiv <- Lfdobj$nderiv
 
     	if (any(exponents - nderiv < 0) && rang[1] == 0)
         	stop(paste("A negative exponent is needed and",

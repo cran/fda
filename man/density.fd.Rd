@@ -4,8 +4,6 @@
   Compute a Probability Density Function
 }
 \description{
-
-
  Like the regular S-PLUS function \code{density}, this function
 computes a probability density function for a sample of values of a
 random variable.  However, in this case the density function is defined
@@ -56,7 +54,7 @@ each iteration, with 0 implying no output, 1 intermediate output level,
 and 2 full output.  If levels 1 and 2 are used, it is helpful to
 turn off the output buffering option in S-PLUS.
 }
-\item{...}{Other arguments to match generic}
+\item{...}{Other arguments to match the generic function 'density'}
 }
 \value{
 a named list of length 4 containing:
@@ -102,6 +100,7 @@ constant \code{C}.
 }
 \seealso{
 \code{\link{intensity.fd}}
+\code{\link{density}}
 }
 \examples{
 

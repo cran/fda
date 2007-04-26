@@ -1,6 +1,7 @@
 \name{CanadianWeather}
+\docType{data}
 \alias{CanadianWeather}
-\non_function{}
+\alias{daily}
 \title{
   Canadian average annual weather cycle
 }
@@ -8,15 +9,25 @@
   Daily temperature and precipitation at 35 different locations
   in Canada averaged over 1960 to 1994.  
 }
+\usage{
+CanadianWeather
+daily
+}
 \format{
-  A list with the following components:
-  \describe{
+  'CanadianWeather' and 'daily' are lists containing essentially the
+  same data.  'CanadianWeather' may be preferred for most purposes;
+  'daily' is included primarily for compatability with scripts written
+  before the other format became available and for compatability with
+  the Matlab 'fda' code.    
+
+  \item{CanadianWeather}{
+    A list with the following components:
     \item{dailyAv}{
       a three dimensional array c(365, 35, 3) summarizing data collected
       at 35 different weather stations in Canada on the following:
 
       [[1]] Temperature.C:  average daily temperature for each day of the year
-
+      
       [[2]] Precipitation.mm:  average daily rainfall for each day of
       the year rounded to 0.1 mm.  
 
@@ -26,7 +37,10 @@
     }    
     \item{place}{
       Names of the 35 different weather stations in Canada whose data
-      are summarized in 'dailyAv'.  
+      are summarized in 'dailyAv'.  These names vary between 6 and 11
+      characters in length.  By contrast, daily[["place"]] which are all
+      11 characters, with names having fewer characters being extended
+      with trailing blanks.  
     }
     \item{monthlyTemp}{
       A matrix of dimensions (12, 35) giving the average temperature
@@ -40,6 +54,27 @@
       Order the weather stations from East to West to North 
     }
   }
+
+  \item{daily}{
+    A list with the following components:
+    \item{place}{
+      Names of the 35 different weather stations in Canada whose data
+      are summarized in 'dailyAv'.  These names are all 11 characters,
+      with shorter names being extended with trailing blanks.  This is
+      different from CanadianWeather[["place"]], where trailing blanks
+      have been dropped.   
+    }
+    \item{tempav}{
+      a matrix of dimensions (365, 35) giving the average temperature in
+      degrees celcius for each day of the year.  This is essentially the
+      same as CanadianWeather[["dailyAv"]][,,"Temperature.C"].  
+    }
+    \item{precipav}{
+      a matrix of dimensions (365, 35) giving the average temperature in
+      degrees celcius for each day of the year.  This is essentially the
+      same as CanadianWeather[["dailyAv"]][,,"Precipitation.mm"].  
+    }
+  }  
 }
 \details{
 }

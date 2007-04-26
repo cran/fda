@@ -1,4 +1,4 @@
-monomial <- function(evalarg, exponents, nderiv=0)
+monomial <- function(evalarg, exponents=1:nbasis, nderiv=0)
 {
 #  MONOMIAL Values of monomials, or their derivatives.
 #  The powers of EVALARG are the NBASIS nonnegative integers in EXPONENTS.
@@ -39,8 +39,8 @@ monomial <- function(evalarg, exponents, nderiv=0)
 	monommat <- matrix(0,n,nbasis)
 
 	if (nderiv == 0) {
-    #  use the recursion formula to compute monomnomial values
-    for (ibasis in 1:nbasis) { 
+    	#  use the recursion formula to compute monomnomial values
+    	for (ibasis in 1:nbasis) { 
 			monommat[,ibasis] <- evalarg^exponents[ibasis] 
 		}
 	} else {

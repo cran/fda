@@ -4,11 +4,13 @@
 #                                  Lfd      = "Lfd",
 #                                  lambda   = "numeric",
 #                                  estimate = "logical",
-#                                  penmat   = "matrix"))
+#                                  penmat   = "matrix",))
 
 #  Generator function of class fdPar
 
-fdPar <- function(fdobj=fd(), Lfdobj=int2Lfd(0), lambda=0, estimate=TRUE, penmat=NULL){
+fdPar <- function(fdobj=fd(), Lfdobj=int2Lfd(0), lambda=0, estimate=TRUE, 
+                  penmat=NULL){
+		
 # Sets up a functional parameter object
 #  Arguments:
 #  FDOBJ    ... A functional data object.
@@ -40,11 +42,16 @@ fdPar <- function(fdobj=fd(), Lfdobj=int2Lfd(0), lambda=0, estimate=TRUE, penmat
 #
 #  Return:
 #  FDPAROBJ ... A functional parameter object
+#  Last modified 3 May 2007 by Spencer Graves
+#  Previously modified 1 March 2007
 
-#  last modified 17 September 2005
+#  ----------------------------------------------------------------------
+#                            Check parameters
+#  ----------------------------------------------------------------------
 
 if (nargs()==0) {
-	#  case of no argument
+	#  case of no argument:  no default argument defined at this point
+      stop("fdPar called with no arguments.")
 }  else {
 	if (inherits(fdobj, "basisfd")) {
        #  if the first argument is a basis object, convert it to
@@ -88,7 +95,9 @@ if (!is.null(penmat)) {
     if (any(penmatsize != nbasis)) stop("Dimensions of PENMAT are not correct.")
 }
 
-#  set up the fdPar object
+#  ----------------------------------------------------------------------
+#                    set up the fdPar object
+#  ----------------------------------------------------------------------
 
 #  S4 definition
 # fdParobj <- new("fdPar", fd=fdobj, Lfd=Lfdobj, lambda=lambda, estimate=estimate,
@@ -105,28 +114,41 @@ fdParobj
 
 }
 
+#  ----------------------------------------------------------------------
+
 #  "print" method for "fdPar"
 
 print.fdPar <- function(x, ...)
 {
-	
-	cat("Functional parameter x:\n\n")
-	
-	print.fd(x$fd)
-	
-	print.Lfd(x$Lfd)
-	
-	cat(paste("\nSmoothing parameter =",x$lambda,"\n"))
-	
-	cat(paste("\nEstimation status =",x$estimate,"\n"))
-	
+  object <- x
+	cat("Functional parameter object:\n\n")	
+      print("Functional data object:")
+	print.fd(object$fd)	
+      print("Linear differential operator object:")
+	print.Lfd(object$Lfd)	
+	cat(paste("\nSmoothing parameter =",object$lambda,"\n"))	
+	cat(paste("\nEstimation status =",object$estimate,"\n"))
+      if (!is.null(object$penmat)) {
+          print("Penalty matrix:")
+          print(object$penmat)
+      }	
 }
+
+#  ----------------------------------------------------------------------
 
 #  "summary" method for "fdPar"
 
 summary.fdPar <- function(object, ...)
 {
-	print(object)
+	cat("Functional parameter object:\n\n")	
+      print("Functional data object:")
+	summary.fd(object$fd)	
+      print("Linear differential operator object:")
+	summary.Lfd(object$Lfd)	
+	cat(paste("\nSmoothing parameter =",object$lambda,"\n"))	
+	cat(paste("\nEstimation status =",object$estimate,"\n"))
+      if (!is.null(object$penmat)) 
+          print(paste("Penalty matrix dimensions:",dim(penmat)))
 }
 
 

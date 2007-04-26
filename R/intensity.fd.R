@@ -20,7 +20,7 @@ intensity.fd <- function(x, WfdParobj, conv=0.0001, iterlim=20, dbglev=1) {
 #  ITERNUM   Number of iterations
 #  ITERHIST  History of iterations
 
-#  last modified 8 December 2005
+#  last modified 24 March 2006
 
 	#  check WfdParobj
 	
@@ -276,7 +276,7 @@ loglfninten <- function(x, basisobj, cvec) {
 	#  Computes the log likelihood and its derivative with
 	#    respect to the coefficients in CVEC
    	nobs    <- length(x)
-   	cval    <- normalize.phi(basisobj, cvec)
+   	cval    <- normint.phi(basisobj, cvec)
    	phimat  <- getbasismatrix(x, basisobj)
    	logl    <- sum(phimat %*% cvec) - cval
 	EDW     <- expect.phi(basisobj, cvec)
@@ -295,7 +295,7 @@ Varfninten <- function(basisobj, cvec) {
 
 #  ---------------------------------------------------------------
 
-normalize.phi <- function(basisobj, cvec, JMAX=15, EPS=1e-7) {
+normint.phi <- function(basisobj, cvec, JMAX=15, EPS=1e-7) {
 
 #  Computes integrals of
 #      p(x) = exp phi'(x) %*% cvec

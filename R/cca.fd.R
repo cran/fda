@@ -16,7 +16,7 @@ cca.fd <- function(fdobj1, fdobj2=fdobj1, ncan = 2,
 #  CCAFDPAROBJ2  ... A functional parameter object for the second set of
 #                    canonical variables.
 #  CENTERFNS     ... A logical variable indicating whether or not to
-#                    center the functions before analysis.  Default is T.
+#                    center the functions before analysis.  Default is TRUE.
 #
 #  Returns:  An object of the CCA.FD class containing:
 #  CCWTFD1       ... A functional data object for the first set of
@@ -146,4 +146,3 @@ cca.fd <- function(fdobj1, fdobj2=fdobj1, ncan = 2,
 
   return(ccafd)
 }
-

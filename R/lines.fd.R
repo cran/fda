@@ -1,13 +1,14 @@
 lines.fd <- function(x, Lfdobj=int2Lfd(0), ...)
 {
-  fdobj <- x
   #  Plot a functional data object FD using lines in a pre-existing plot.
   #  If there are multiple variables, each curve will appear in the same plot.
   #  The remaining optional arguments are the same as those available
   #     in the regular "lines" function.
-
-  #  Last modified 1 October 2005
-
+  
+# Last modified 2007 May 3 by Spencer Graves
+  #  previously modified 1 October 2005
+  fdobj <- x
+  
   if (!inherits(fdobj,  "fd"))  stop(
 		"First argument is not a functional data object.")
   if (!inherits(Lfdobj, "Lfd")) stop(

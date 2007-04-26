@@ -1,7 +1,6 @@
 plot.pca.fd <- function(x, nx = 128, pointplot = TRUE, harm = 0,
                         expand = 0, cycle = FALSE, ...)
 {
-  pcafd <- x
 #
 #  Plots the harmonics produced by PCA.FD.
 #
@@ -19,8 +18,10 @@ plot.pca.fd <- function(x, nx = 128, pointplot = TRUE, harm = 0,
 
 #  Note that PCAFD is an oldClass type object
 
-#  Last modified 20 March 2006
+# last modified 2007 May 3 by Spencer Graves  
+#  previously modified 20 March 2006
 
+  pcafd <- x
   if (!(inherits(pcafd, "pca.fd"))) stop(
 		"Argument PCAFD is not a pca.fd object.")
 
@@ -32,7 +33,7 @@ plot.pca.fd <- function(x, nx = 128, pointplot = TRUE, harm = 0,
   meanmat <- eval.fd(x, pcafd$meanfd)
   dimfd   <- dim(fdmat)
   nharm   <- dimfd[2]
-  #if (nharm > 1) par(ask = TRUE) else par(ask = FALSE)
+  if (nharm > 1) par(ask = TRUE) else par(ask = FALSE)
   harm    <- as.vector(harm)
   if(harm[1] == 0) harm <- (1:nharm)
   if(length(dimfd) == 2) {

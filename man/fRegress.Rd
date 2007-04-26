@@ -14,7 +14,7 @@ defined in terms of the behavior of all variables at a fixed time,
 or in terms of "now" behavior.
 }
 \usage{
-fRegress(yfdPar, xfdlist, betalist)
+fRegress(yfdPar, xfdlist, betalist, wt=rep(1,N))
 }
 \arguments{
 \item{yfdPar}{
@@ -49,6 +49,9 @@ independent variable is scalar, its regression coefficient will be
 functional if the dependent variable is functional.  Each of these
 functional parameter objects defines a single functional data object,
 that is, with only one replication.
+}
+\item{wt}{
+  weights for weighted least squares 
 }
 }
 \value{

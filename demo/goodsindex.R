@@ -26,7 +26,7 @@
 ndur <- 12
 durtime <- (0:(ndur-1))/12 + 1919
 goodsrange <- c(1919,2000)
-monthlabs <- c("j","F","m","A","M","J","J","A","S","O","N","D")
+monthlabs <- c("j","FALSE","m","A","M","J","J","A","S","O","N","D")
 
 #  compute log nondurables
 lognondur <- log10(nondurables)

@@ -91,7 +91,7 @@ if (type == "bspline") {
 } else if (type == "polynom") {
    	norder   <- nbasis
    	ctr      <- params[1]
-   	basismat <- polynom(evalarg, norder, ctr, nderiv)
+   	basismat <- polynom(evalarg, norder, nderiv, ctr)
 
 #  -----------------------------  Power basis  -------------------
 

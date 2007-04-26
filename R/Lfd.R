@@ -60,7 +60,8 @@ Lfd = function(nderiv=0, bwtlist=vector("list",0))
 #
 #  LFDOBJ  a functional data object
 
-#  last modified 9 October 2005
+# last modified 2007 May 3 by Spencer Graves
+#  Previously modified 9 October 2005
 
 #  check nderiv
 
@@ -162,8 +163,9 @@ Lfdobj
 
 print.Lfd <- function(x, ...)
 {
-	nderiv  <- x$nderiv
-	bwtlist <- x$bwtlist
+  object <- x
+	nderiv  <- object$nderiv
+	bwtlist <- object$bwtlist
 	
 	cat("Lfd:\n")
 	
@@ -173,7 +175,7 @@ print.Lfd <- function(x, ...)
 		cat("\nbwtlist:\n")
 		for (ideriv in 1:nderiv) {
 			cat(paste("\nWeight function:",ideriv-1,"\n\n"))
-			print(x$bwtlist[[ideriv]])
+			print(object$bwtlist[[ideriv]])
 		}
 	}
 }
@@ -197,3 +199,7 @@ plot.Lfd <- function(x, ...)
 	}
 	invisible(NULL)
 }
+	
+
+
+	

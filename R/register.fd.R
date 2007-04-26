@@ -1,5 +1,5 @@
 register.fd <- function(y0fd, yfd, WfdParobj,
-                        conv=1e-2, iterlim=10, dbglev=1, periodic=FALSE, crit=2)
+                        conv=1e-4, iterlim=20, dbglev=1, periodic=FALSE, crit=2)
 {
 #REGISTERFD registers a set of curves YFD to a target function Y0FD.
 #  Arguments are:
@@ -37,35 +37,63 @@ register.fd <- function(y0fd, yfd, WfdParobj,
 #                         warping fns
 #    REGSTR$SHIFT ... Shift parameter value if curves are periodic
 
-#  last modified 26 October 2005
+#  last modified 13 March 2007
 
-#  check target function(s)
+#  check classes of first two arguments
 
 if (!(inherits(y0fd, "fd")))
-	stop('First argument is not a functional data object.')
-	
-y0dim  <- dim(y0fd$coefs)
-ndimy0 <- length(y0dim)
-if (y0dim[ndimy0] == 1) ndimy0 <- ndimy0 - 1
-if (ndimy0 <= 1) nvar <- 1 else  nvar <- y0dim[ndimy0]
-if (ndimy0 == 3)
-   if (y0dim[2] > 1) stop("Y0FD is not a single function.")
-
-#  check functions to be registered
+	stop("First argument is not a functional data object.")
 
 if (!(inherits(yfd, "fd")))
-	stop('Second argument is not a functional data object.')
-ydim <- dim(yfd$coefs)
+	stop("Second argument is not a functional data object.")
+	
+#  Check target function to determine number of variables.
+
+#  If the coefficient matrix is 3-dimensional, then the second
+#  dimension size must be 1, and if not, an error will be declared.
+#  If it is 1, however, then it the size of the third dimension will
+#  be taken to be the number of variables for a multivariate set
+#  of curves.  A 3-dimensional coefficient matrix for the target 
+#  will then be contracted to two dimensions.  
+
+y0coefs <- y0fd$coefs
+y0dim   <- dim(y0coefs)
+ndimy0  <- length(y0dim)
+if (ndimy0 == 3) {
+   if (y0dim[2] > 1) {
+       stop("Y0FD is not a single function.")
+   } else {
+       y0coefs <- y0coefs[,1,]
+       y0fd$coefs <- y0coefs
+   }
+}
+
+#  The target function coefficient matrix is now taken to be 
+#  2-dimensional, and the size of the second dimension is taken to be
+#  the number of variables to be registered. If this size
+#  is greater than one, the functional data objects to be registered 
+#  are assumed to be multivariate.
+
+y0coefs <- y0fd$coefs
+y0dim   <- dim(y0coefs)
+nvar    <- y0dim[2]
+    
+#  check functions to be registered
+
+ydim   <- dim(yfd$coefs)
 ncurve <- ydim[2]
-ndimy <- length(ydim)
-if (ydim[ndimy] == 1) ndimy <- ndimy - 1
-if (ndimy == 1)
-   if (ndimy0 > 1) stop("YFD is not compatible with Y0FD.")
-if (ndimy == 2)
-   if (ndimy0 > 2) stop("YFD is not compatible with Y0FD.")
-if (ndimy == 3)
-   if (ndimy0 < 3) stop("YFD is not compatible with Y0FD.")
+ndimy  <- length(ydim)
+
 if (ndimy > 3) stop("YFD is more than 3-dimensional.")
+
+if (ndimy == 2) {
+   if (nvar > 1) stop(
+       paste("Y0FD indicates function are multivariate,",
+             "but is YFD is only 2-dimensional."))
+}
+
+#  Extract basis information from YFD
+
 ybasis  <- yfd$basis
 ynbasis <- ybasis$nbasis
 if (periodic && !(ybasis$type == "fourier"))
@@ -116,11 +144,12 @@ if (periodic) {
 
 #  initialize matrix Kmat defining penalty term
 
-if (WfdParobj$lambda > 0) {
+lambda <- WfdParobj$lambda
+if (lambda > 0) {
    Lfdobj <- WfdParobj$Lfd
    Kmat <- getbasispenalty(wbasis, Lfdobj)
    ind  <- 2:ncoef
-   Kmat <- WfdParobj$lambda*Kmat[ind,ind]
+   Kmat <- lambda*Kmat[ind,ind]
 } else {
    Kmat <- NULL
 }
@@ -142,7 +171,7 @@ wcoefnew <- wcoef
 if (dbglev == 0 && ncurve > 1) cat("Progress:  Each dot is a curve\n")
 
 for (icurve in 1:ncurve) {
-  if (dbglev == 0 && ncurve > 1) cat('.')
+  if (dbglev == 0 && ncurve > 1) cat(".")
   if (dbglev >= 1 && ncurve > 1)
       cat(paste("\n\n-------  Curve ",icurve,"  --------\n"))
   if (ncurve == 1) {
@@ -167,7 +196,7 @@ for (icurve in 1:ncurve) {
 
   #  first evaluate warping function and its derivative at fine mesh
 
-  ffine  <-    monfn(xfine, Wfdi, basislist)
+  ffine  <-   monfn(xfine, Wfdi, basislist)
   Dffine <- mongrad(xfine, Wfdi, basislist)
   fmax   <- ffine[nfine]
   Dfmax  <- Dffine[nfine,]
@@ -185,6 +214,7 @@ for (icurve in 1:ncurve) {
   Fstr <- regfngrad(xfine, y0fine, Dhfine, yregfdi, Wfdi, Kmat, periodic, crit)
 
   #  compute the initial expected Hessian
+
   if (crit == 2) {
      D2hwrtc <- monhess(xfine, Wfdi, basislist)
      D2fmax  <- D2hwrtc[nfine,]
@@ -217,7 +247,7 @@ for (icurve in 1:ncurve) {
   status <- c(iternum, Fstr$f, Fstr$norm)
   if (dbglev >= 1) {
         cat("\nIter.    Criterion   Grad Length")
-        cat('\n')
+        cat("\n")
         cat(iternum)
         cat("        ")
         cat(round(status[2],4))
@@ -256,7 +286,7 @@ for (icurve in 1:ncurve) {
       linemat[,1:4] <- matrix(c(0, linemat[2,1], Fstr$f),3,1) %*% matrix(1,1,4)
       stepiter  <- 0
       if (dbglev >= 2) {
-          cat('\n')
+          cat("\n")
           cat(paste("                 ", stepiter, "  "))
           cat(format(round(t(linemat[,1]),4)))
       }
@@ -315,7 +345,7 @@ for (icurve in 1:ncurve) {
         #  compute new directional derivative
         linemat[2,5] <- sum(deltac*Fstr$grad)
         if (dbglev >= 2) {
-          cat('\n')
+          cat("\n")
           cat(paste("                 ", stepiter, "  "))
           cat(format(round(t(linemat[,5]),4)))
         }
@@ -364,7 +394,7 @@ for (icurve in 1:ncurve) {
            status <- c(iternum, Fstr$f, Fstr$norm)
            iterhist[iter+1,] <- status
            if (dbglev >= 1) {
-              cat('\n')
+              cat("\n")
               cat(iternum)
               cat("        ")
               cat(round(status[2],4))
@@ -409,7 +439,7 @@ for (icurve in 1:ncurve) {
      status <- c(iternum, Fstr$f, Fstr$norm)
      iterhist[iter+1,] <- status
      if (dbglev >= 1) {
-        cat('\n')
+        cat("\n")
         cat(iternum)
         cat("        ")
         cat(round(status[2],4))
@@ -467,13 +497,13 @@ regfngrad <- function(xfine, y0fine, Dhwrtc, yregfd, Wfd, Kmat, periodic, crit)
   } else {
      Dhwrtc[,1] <- 0
   }
-  yregmat  <- eval.fd(yregfd, xfine)
-  Dyregmat <- eval.fd(yregfd, xfine, 1)
-  if (nvar > 1) {
-	 y0fine   <- y0fine[,1,]
-	 yregmat  <- yregmat[,1,]
-	 Dyregmat <- Dyregmat[,1,]
-  }
+  yregmat  <- eval.fd(xfine, yregfd)
+  Dyregmat <- eval.fd(xfine, yregfd, 1)
+  #if (nvar > 1) {
+  #	 y0fine   <- y0fine[,1,]
+  #	 yregmat  <- yregmat[,1,]
+  #	 Dyregmat <- Dyregmat[,1,]
+  #}
 
   #  loop through variables computing function and gradient values
 

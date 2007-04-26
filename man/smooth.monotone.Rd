@@ -20,11 +20,9 @@
   is monotonically increasing.   
 }
 \usage{
-smooth.monotone(x, y, wt=rep(1,nobs), WfdParobj,
-                zmat=matrix(1,nobs,1),
-                conv=.0001, iterlim=20,
-                active=c(FALSE,rep(TRUE,ncvec-1)),
-                dbglev=1)
+smooth.monotone(x, y, WfdParobj, wt=rep(1,nobs),
+                zmat=matrix(1,nobs,1), conv=.0001, iterlim=20,
+                active=c(FALSE,rep(TRUE,ncvec-1)), dbglev=1)
 }
 \arguments{
 \item{x}{
@@ -149,7 +147,7 @@ growfdPar <- fdPar(Wfd0, Lfdobj, lambda)
 wgt   <- rep(1,nage)
 #  Smooth the data for the first girl
 hgt1 = growth$hgtf[,1]
-result <- smooth.monotone(age, hgt1, wgt, growfdPar)
+result <- smooth.monotone(age, hgt1, growfdPar, wgt)
 #  Extract the functional data object and regression
 #  coefficients
 Wfd  <- result$Wfdobj

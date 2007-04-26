@@ -19,8 +19,8 @@ if (!inherits(fdParobj,"fdPar")) stop(
 
 #  check LFD
 
-Lfdobj. <- fdParobj$Lfd
-Lfdobj <- int2Lfd(Lfdobj.)
+Lfdobj <- fdParobj$Lfd
+Lfdobj <- int2Lfd(Lfdobj)
 nderiv <- Lfdobj$nderiv
 
 #  set up FDOBJ
@@ -60,7 +60,6 @@ if (ndim < 3){
      coef <- solve(Cmat, Dmat)
 } else {
 	coef <- array(0,coefd)
-        basis <- fdobj$basis
     for(ivar in 1:nvar){
         Dmat <- inprod(basis, fdobj[,ivar])
         coef[,,ivar] <- solve(Cmat, Dmat)

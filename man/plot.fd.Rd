@@ -11,13 +11,18 @@
   specification arguments that the regular \code{plot} does.
 }
 \usage{
-plot.fd(x, Lfdobj=0, href=TRUE, nx=201,
-        titles=NULL, xlab=xlabel, ylab=ylabel,
-        xlim=rangex, ylim=rangey, ask=FALSE, ...)
+plot.fd(x, y, Lfdobj=0, href=TRUE,
+        titles=NULL, xlim=rangex, ylim=rangey,
+        xlab=xlabel, ylab=ylabel, ask=FALSE, nx=201, ...)
 }
 \arguments{
   \item{x}{
-    a functional data object to be plotted.
+    functional data object(s) to be plotted.
+  }
+  \item{y}{
+    sequence of points at which to evaluate the functions 'x' and plot
+    on the horizontal axis.  Defaults to seq(rangex[1], rangex[2],
+    length = nx).  
   }
   \item{Lfdobj}{
     either a nonnegative integer or a linear differential operator
@@ -27,11 +32,6 @@ plot.fd(x, Lfdobj=0, href=TRUE, nx=201,
   \item{href}{
     a logical variable:  If \code{TRUE}, add a horizontal reference line
     at 0.  
-  }
-  \item{nx}{
-    the number of points to use to define the plot.  The default is
-    usually enough, but for a highly variable function more may be
-    required.
   }
   \item{titles}{
     a vector of strings for identifying curves
@@ -51,6 +51,11 @@ plot.fd(x, Lfdobj=0, href=TRUE, nx=201,
   \item{ask}{
     a logical value:  If \code{TRUE}, each curve is shown separately, and
     the plot advances with a mouse click
+  }
+  \item{nx}{
+    the number of points to use to define the plot.  The default is
+    usually enough, but for a highly variable function more may be
+    required.
   }
   \item{\dots }{
     additional plotting arguments that can be used with function
