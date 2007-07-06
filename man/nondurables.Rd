@@ -1,6 +1,5 @@
 \name{nondurables}
 \alias{nondurables}
-\non_function{}
 \title{
   Nondurable goods index
 }
@@ -10,9 +9,7 @@
 \format{
     An object of class 'ts'.  
 }
-\details{
 
-}
 \source{
   Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
     Data Analysis, 2nd ed.}, Springer, New York. 

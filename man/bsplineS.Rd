@@ -38,6 +38,10 @@ bsplineS(x, breaks, norder=4, nderiv=0)
   functions. 
 }
 \examples{
+# Minimal example:  A B-spline of order 1 (i.e., a step function)
+# with 0 interior knots:
+bsplineS(seq(0, 1, .2), 0:1, 1, 0)
+
 #  set up break values at 0.0, 0.2,..., 0.8, 1.0.
 breaks <- seq(0,1,0.2)
 #  set up a set of 11 argument values

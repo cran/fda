@@ -1,6 +1,7 @@
 ###
 ###
-### Ramsey & Silverman (2002) Applied Functional Data Analysis (Springer)
+### Ramsey & Silverman (2002) Applied Functional Data Analysis
+###                           (Springer)
 ###
 ### ch. 6.  Human growth 
 ###
@@ -17,7 +18,7 @@ str(growth)
 
 # pp.  84-85.  Figure 6.1.  the first 10 females
 # of the Berkeley growth study
-op <- par(cex=)
+op <- par(cex=1.1)
 with(growth, matplot(age, hgtf[, 1:10], type="b", pch="o", 
                      ylab="Height (cm.)") )
 par(op)
@@ -75,7 +76,7 @@ lines(dayfine, yhatfine.1, lwd=2) # lambda=0.1:  reasonable
 lines(dayfine, yhatfine.12, lty=2)
 # lambda=1e-12:too close to a straight line
 
-# p.  86, Figure 6.3.  Growth of the length of the tibia of a newborn
+# p.  86, Figure 6.3.  Growth of the length of the tibia of a newborn;  
 # data not available
 
 
@@ -151,88 +152,27 @@ Wfd0.oneCh <- fd(cvec0.oneCh, wbasis.oneCh)
 
 Lfdobj.oneCh    <- 3
 #  penalize curvature of acceleration
-growfdPar.oneCh1000 <- fdPar(Wfd0.oneCh, Lfdobj.oneCh,
-                 lambda=1000 )
 growfdPar.oneCh100 <- fdPar(Wfd0.oneCh, Lfdobj.oneCh,
                  lambda=100 )
-growfdPar.oneCh10 <- fdPar(Wfd0.oneCh, Lfdobj.oneCh,
-                 lambda=10 )
-growfdPar.oneCh1 <- fdPar(Wfd0.oneCh, Lfdobj.oneCh,
-                 lambda=1 )
-growfdPar.oneCh.3 <- fdPar(Wfd0.oneCh, Lfdobj.oneCh,
-                 lambda=sqrt(0.1) )
-growfdPar.oneCh.001 <- fdPar(Wfd0.oneCh, Lfdobj.oneCh,
-                 lambda=.001)
 
 # now smooth the data
 
 zmat.oneCh <- matrix(1, nDays, 1)
-smoothOneCh1000 <- with(onechild, smooth.monotone(x=day,
-       y=height, WfdParobj=growfdPar.oneCh1000, zmat=zmat.oneCh,
-       conv=0.001, active=TRUE, dbglev=0) )
 smoothOneCh100 <- with(onechild, smooth.monotone(x=day,
        y=height, WfdParobj=growfdPar.oneCh100, 
-       conv=0.001, active=TRUE, dbglev=0) )
-smoothOneCh10 <- with(onechild, smooth.monotone(x=day,
-       y=height, WfdParobj=growfdPar.oneCh10, zmat=zmat.oneCh,
-       conv=0.001, active=TRUE, dbglev=0) )
-smoothOneCh1 <- with(onechild, smooth.monotone(x=day,
-       y=height, WfdParobj=growfdPar.oneCh1, zmat=zmat.oneCh,
-       conv=0.001, active=TRUE, dbglev=0) )
-smoothOneCh.3 <- with(onechild, smooth.monotone(x=day,
-       y=height, WfdParobj=growfdPar.oneCh.3, zmat=zmat.oneCh,
-       conv=0.001, active=TRUE, dbglev=0) )
-smoothOneCh.001 <- with(onechild, smooth.monotone(x=day,
-       y=height, WfdParobj=growfdPar.oneCh.001, zmat=zmat.oneCh,
        conv=0.001, active=TRUE, dbglev=0) )
 
 dayFine <- with(onechild, seq(day[1], day[nDays], len=151))
 
-sm.OneCh1000 <- with(smoothOneCh1000,
-   beta[2]*eval.monfd(dayFine, Wfdobj, Lfdobj=1) )
 sm.OneCh100 <- with(smoothOneCh100,
    beta[2]*eval.monfd(dayFine, Wfdobj, Lfdobj=1) )
-sm.OneCh10 <- with(smoothOneCh10,
-   beta[2]*eval.monfd(dayFine, Wfdobj, Lfdobj=1) )
-smoothOneCh1 <- with(smoothOneCh1,
-   beta[2]*eval.monfd(dayFine, Wfdobj, Lfdobj=1) )
-smoothOneCh.3 <- with(smoothOneCh.3,
-   beta[2]*eval.monfd(dayFine, Wfdobj, Lfdobj=1) )
-smoothOneCh.001 <- with(smoothOneCh.001,
-   beta[2]*eval.monfd(dayFine, Wfdobj, Lfdobj=1) )
-
-plot(dayFine, sm.OneCh1000, type="l", xlab="day",
-     ylab="Growth velocity (cm/day)" )
-axis(3, labels=FALSE)
-axis(4, labels=FALSE)
-# Too smooth 
 
 plot(dayFine, sm.OneCh100, type="l", xlab="day",
      ylab="Growth velocity (cm/day)" )
 axis(3, labels=FALSE)
 axis(4, labels=FALSE)
 # Close to Figure 6.5
-
-plot(dayFine, sm.OneCh10, type="l", xlab="day",
-     ylab="Growth velocity (cm/day)" )
-axis(3, labels=FALSE)
-axis(4, labels=FALSE)
-# Shows more features than in Figure 6.5.  
-
-plot(dayFine, smoothOneCh1, type="l", xlab="day",
-     ylab="Growth velocity (cm/day)" )
-axis(3, labels=FALSE)
-axis(4, labels=FALSE)
-
-plot(dayFine, smoothOneCh.3, type="l", xlab="day",
-     ylab="Growth velocity (cm/day)" )
-axis(3, labels=FALSE)
-axis(4, labels=FALSE)
-
-plot(dayFine, smoothOneCh.001, type="l", xlab="day",
-     ylab="Growth velocity (cm/day)" )
-axis(3, labels=FALSE)
-axis(4, labels=FALSE)
+# closer than with lambda = 10 or 1000 
 
 # p. 88, Figure 6.6.  Estimated growth velocity of a baby
 
@@ -264,101 +204,20 @@ cvec0.growth <- matrix(0,nbasis.growth,1)
 Wfd0.growth  <- fd(cvec0.growth, wbasis.growth)
 
 Lfdobj.growth    <- 3          #  penalize curvature of acceleration
-lambda.growth    <- 10^(-0.5)  #  smoothing parameter
-growfdPar <- fdPar(Wfd0.growth, Lfdobj.growth, lambda.growth)
 
 #  ---------------------  Now smooth the data  --------------------
-
-ncasef <- 10
-smoothGirls <- vector("list", ncasef)
-for(icase in 1:ncasef){
-  smoothGirls[[icase]] <- with(growth, smooth.monotone(x=age,
-      y=hgtf[, icase], WfdParobj=growfdPar, conv=0.001,
-      active=TRUE, dbglev=0) )
-  cat(icase, "")
-}
 
 # Create a fine grid at which to evaluate the smooth
 nptsFine <- 151
 
-agefine  <- with(growth, seq(age[1], age[nage], len=nptsFine))
-smoothGirlsHt <- array(NA, dim=c(nptsFine, ncasef))
-smoothGirlsAcc <- smoothGirlsVel <- smoothGirlsHt
-for(icase in 1:ncasef)
-  smoothGirlsHt[, icase] <- with(smoothGirls[[icase]],
-       beta[1]+beta[2]*eval.monfd(agefine, Wfdobj, Lfdobj=0))
-
-with(growth, plot(age, hgtf[, 1]))
-lines(agefine, smoothGirlsHt[, 1])
-
-for(icase in 1:ncasef)
-  smoothGirlsVel[, icase] <- with(smoothGirls[[icase]],
-     beta[2]*eval.monfd(agefine, Wfdobj, Lfdobj=1) )
-
-tstVel <- diff(smoothGirlsHt[, 1])/diff(agefine)
-quantile(smoothGirlsHt[, 1])
-quantile(smoothGirlsVel[, 1])
-quantile(tstVel)
-
-plot(smoothGirlsVel[, 1])
-lines(tstVel)
-# GOOD:  eval.monfd computes velocity as expected 
-
-for(icase in 1:ncasef)
-  smoothGirlsAcc[, icase] <- with(smoothGirls[[icase]],
-     beta[2]*eval.monfd(agefine, Wfdobj, Lfdobj=2) )
-
-tstAcc <- diff(smoothGirlsVel[, 1])/diff(agefine)
-quantile(smoothGirlsAcc[, 1])
-quantile(tstAcc)
-
-plot(smoothGirlsAcc[, 1])
-lines(tstAcc)
-# GOOD:  eval.monfd computes acceleration as expected 
-
-op <- par(cex=1.5)
-matplot(agefine, smoothGirlsAcc, type="l", ylim=c(-4, 2),
-        xlab="Year", ylab="Growth acceleration (cm/year^2)")
-lines(agefine, apply(smoothGirlsAcc, 1, mean), lwd=3)
-par(op)
-# OK, but the image doesn't quite match Figure 6.7.
-# It's either smoother or it represents different girls (?) 
-
-
-
-
-
-
-
-
-
-
 #############################################
-lambda.gr.1 <- .1
-growfdPar.1 <- fdPar(Wfd0.growth, Lfdobj.growth, lambda.gr.1)
+# Experimented with other values of lambda.
+# Relative to Figure 6.7,
+# lambda = 0.01 undersmoothed, while 0.1 oversmoothed.
+# NOTE:  This script was prepared years after the original
+# figures were prepared, without knowledge of
+# exactly how the original figures were prepared.
 
-ncasef <- 10
-smoothGirls.1 <- vector("list", ncasef)
-for(icase in 1:ncasef){
-  smoothGirls.1[[icase]] <- with(growth, smooth.monotone(x=age,
-      y=hgtf[, icase], WfdParobj=growfdPar.1, conv=0.001,
-      active=TRUE, dbglev=0) )
-  cat(icase, "")
-}
-    
-agefine  <- with(growth, seq(age[1], age[nage], len=nptsFine))
-smoothGirlsAcc.1 <- array(NA, dim=c(nptsFine, ncasef))
-for(icase in 1:ncasef)
-  smoothGirlsAcc.1[, icase] <- with(smoothGirls.1[[icase]],
-     beta[2]*eval.monfd(agefine, Wfdobj, Lfdobj=2) )
-
-matplot(agefine, smoothGirlsAcc.1, type="l", ylim=c(-4, 2),
-        xlab="Year", ylab="Growth acceleration (cm/year^2)")
-lines(agefine, apply(smoothGirlsAcc.1, 1, mean), lwd=3)
-# Still possibly oversmoothed,
-# but perhaps not as bad as with lambda = 10^(-0.5)???
-
-#############################################
 lambda.gr2.3 <- .03
 growfdPar2.3 <- fdPar(Wfd0.growth, Lfdobj.growth, lambda.gr2.3)
 
@@ -377,13 +236,6 @@ for(icase in 1:ncasef)
   smoothGirlsAcc2.3[, icase] <- with(smoothGirls2.3[[icase]],
      beta[2]*eval.monfd(agefine, Wfdobj, Lfdobj=2) )
 
-matplot(agefine, smoothGirlsAcc2.3, type="l", ylim=c(-4, 2),
-        xlab="Year", ylab="Growth acceleration (cm/year^2)")
-lines(agefine, apply(smoothGirlsAcc2.3, 1, mean), lwd=3)
-abline(h=0, lty="dashed")
-# Good match
-
-
 op <- par(cex=1.5)
 matplot(agefine, smoothGirlsAcc2.3, type="l", ylim=c(-4, 2),
         xlab="age", ylab="Growth acceleration (cm/year^2)",
@@ -391,31 +243,9 @@ matplot(agefine, smoothGirlsAcc2.3, type="l", ylim=c(-4, 2),
 lines(agefine, apply(smoothGirlsAcc2.3, 1, mean), lwd=3)
 abline(h=0, lty="dashed")
 par(op)
+# Good match
 
 #############################################
-lambda.gr2 <- .01
-growfdPar2 <- fdPar(Wfd0.growth, Lfdobj.growth, lambda.gr2)
-
-ncasef <- 10
-smoothGirls2 <- vector("list", ncasef)
-for(icase in 1:ncasef){
-  smoothGirls2[[icase]] <- with(growth, smooth.monotone(x=age,
-      y=hgtf[, icase], WfdParobj=growfdPar2, conv=0.001,
-      active=TRUE, dbglev=0) )
-  cat(icase, "")
-}
-    
-agefine  <- with(growth, seq(age[1], age[nage], len=nptsFine))
-smoothGirlsAcc2 <- array(NA, dim=c(nptsFine, ncasef))
-for(icase in 1:ncasef)
-  smoothGirlsAcc2[, icase] <- with(smoothGirls2[[icase]],
-     beta[2]*eval.monfd(agefine, Wfdobj, Lfdobj=2) )
-
-matplot(agefine, smoothGirlsAcc2, type="l", ylim=c(-4, 2),
-        xlab="Year", ylab="Growth acceleration (cm/year^2)")
-lines(agefine, apply(smoothGirlsAcc2, 1, mean), lwd=3)
-# Clearly undersmoothed, but not as much as
-# with any smaller lambda 
 
 ##
 ## sec. 6.4.  An equation for growth 
@@ -455,265 +285,231 @@ abline(h=0, lty="dashed")
 # p. 92, Figure 6.9.  Acceleration curves
 #  differing in amplitude only and phase only
 
-# read numbers off the figure:  
-Fig6.9 <- cbind(Age=c(5, 6, 9, 11, 13, 15, 17, 20),
-                accel=c(-.5, -.4, -.5, 0, 1.4, -2.8, -.6, 0) )
-(n.Fig6.9 <- dim(Fig6.9)[1])
+# This figure was conceptual, not real data.
 
-Fig6.9basis <- create.bspline.basis(range(Fig6.9[, 1]), 
-                           breaks=Fig6.9[, 1])
-str(Fig6.9basis)
+# Recreate roughly by reading numbers off the figure
+Fig6.9 <- cbind(Age=3:20,
+                accel=c(-0.6, -0.5, -0.41, -0.4, -0.4, -0.405,
+                  -0.4, -0.25, 0.2, 1.9, 2.8, -1.8, -4.7,
+                  -3.2, -0.7, -0.2, -0.02, 0) ) 
+Fig6.9basis6 <- create.bspline.basis(Fig6.9[, 1], norder=5)
 
-#**** I can't make this work 
+# If Lfdobj = 0 (default), smooth.basisPar goes crazy
+# between points
+# Lfdobj = 3 works OK with lambda = 0.01
+Fig6.9s3.01 <- smooth.basisPar(argvals=Fig6.9[, 1], y=Fig6.9[, 2],
+               fdobj=Fig6.9basis6, 3, .01)
+plot(Fig6.9s3.01$fd, ylim=range(Fig6.9[, 2]))
 
-Fig6.9s <- smooth.basisPar(argvals=Fig6.9[, 1], y=Fig6.9[, 2],
-               fdobj=Fig6.9basis)
-#Error in df < n : comparison (3) is possible only for atomic and list types
+Fig6.9age <- seq(5, 20, length=101)
+Fig6.9a <- eval.fd(Fig6.9age, Fig6.9s3.01$fd)
+plot(Fig6.9age, 1.2*Fig6.9a, type="l", xlab="Age", ylab="")
+lines(Fig6.9age, Fig6.9a, lty=2, col=2)
+lines(Fig6.9age, 0.8*Fig6.9a, lty=3, col=3)
+title("Amplitude variation")
 
-Fig6.9basis. <- create.bspline.basis(range(Fig6.9[, 1]), n.Fig6.9,
-                           breaks=Fig6.9[, 1])
-Fig6.9basis.10 <- create.bspline.basis(range(Fig6.9[, 1]), 10,
-                           breaks=Fig6.9[, 1])
-Fig6.9basis.12 <- create.bspline.basis(range(Fig6.9[, 1]), 12,
-                           breaks=Fig6.9[, 1])
-Fig6.9basis.6 <- create.bspline.basis(range(Fig6.9[, 1]), 6,
-                           breaks=Fig6.9[, 1])
-str(Fig6.9basis)
-str(Fig6.9basis.)
-str(Fig6.9basis.6)
-str(Fig6.9basis.10)
-str(Fig6.9basis.12)
+Fig6.9b1 <- seq(3, 18, length=101)
+Fig6.9b2 <- seq(4, 19, length=101)
+Fig6.9b1. <- eval.fd(Fig6.9b1, Fig6.9s3.01$fd)
+Fig6.9b2. <- eval.fd(Fig6.9b2, Fig6.9s3.01$fd)
 
-Fig6.9sP <- smooth.basisPar(Fig6.9[, 1], Fig6.9[, 2], Fig6.9basis)
-#Error in df < n : comparison (3) is possible only for atomic and list types
-Fig6.9sP. <- smooth.basisPar(Fig6.9[, 1], Fig6.9[, 2], Fig6.9basis.)
-# OK
-Fig6.9sP.6 <- smooth.basisPar(Fig6.9[, 1], Fig6.9[, 2], Fig6.9basis.6)
-#Error in bsplineS(evalarg, breaks, norder, nderiv) : 
-#	NORDER less than 1.
-Fig6.9sP.10 <- smooth.basisPar(Fig6.9[, 1], Fig6.9[, 2], Fig6.9basis.10)
-#Error in df < n : comparison (3) is possible only for atomic and list types
-Fig6.9sP.12 <- smooth.basisPar(Fig6.9[, 1], Fig6.9[, 2], Fig6.9basis.12)
-#Error in df < n : comparison (3) is possible only for atomic and list types
-
-Fig6.9sP1 <- smooth.basisPar(Fig6.9[, 1], Fig6.9[, 2], Fig6.9basis.,
-                             lambda=1)
-
-str(Fig6.9sP)
-plot(Fig6.9sP$fd)
-points(Fig6.9)
-Age <- seq(5, 20, len=61)
-lines(Age, eval.fd(Age, Fig6.9sP$fd)) 
-# straight line segments, not smooth curves ????? 
-plot(Fig6.9sP$fd)
-Age <- seq(5, 20, len=61)
-lines(Age, eval.fd(Age, Fig6.9sP$fd)) 
-# straight line segments, not smooth curves ????? 
-
-# Start by creating a functional 0 from hgtbasis
-Fig6.9vec0 <- rep(0,n.Fig6.9)
-Fig6.9fd0   <- fd(Fig6.9vec0, Fig6.9basis)
-#  set parameters for the monotone smooth
-# with smoothing lambda = 1e-1 or 1e-12 
-
-Fig6.9Par.1  <- fdPar(Fig6.9fd0, 2, lambda=.1)
-Fig6.9Par.12  <- fdPar(Fig6.9fd0, 2, lambda=1e-12)
-
-Fig6.9s <- smooth.basis(Fig6.9[, 1], Fig6.9[, 2], Fig6.9basis)
-
-Fig6.9fd. <- data2fd(Fig6.9[, 2], Fig6.9[, 1], Fig6.9basis)
-
-str(Fig6.9fd.)
-plot(Fig6.9fd.)
-#  crazy between 17 and 20
-
-Fig6.9s.1 <- smooth.basisPar(Fig6.9[, 1], Fig6.9[, 2], Fig6.9basis,
-                           lambda=.1)
-plot(Fig6.9s.1$fd)
-plot(Fig6.9s$fd)
-
-nptsFine6.9 <- 151
-ageFine6.9 <- seq(5, 20, length=nptsFine6.9)
-plot(Fig6.9fd., Fig6.9[,1])
-plot(Fig6.9fd., ageFine6.9)
-#  crazy between 17 and 20
-
-Fig6.9fine <- eval.fd(ageFine6.9, Fig6.9fd.)
-Fig6.9s. <- eval.fd(ageFine6.9, Fig6.9s$fd)
-str(Fig6.9s.)
-range(Fig6.9s.)
-
-str(Fig6.9fine)
-range(Fig6.9fine)
-
-plot(Fig6.9)
-lines(ageFine6.9, Fig6.9s.)
-# over smoothing or ...??? 
-
-plot(Fig6.9, ylim=range(Fig6.9fine))
-lines(ageFine6.9, Fig6.9s.)
-# over smoothing or ...??? 
-
-str(ageFine6.9)
-str(Fig6.9fine)
-plot(Fig6.9fine[, 1], 3*Fig6.9fine[, 2], type="l")
-lines(Fig6.9fine)
-points(Fig6.9)
-plot(Fig6.9, type="l")
-
-#****** give up on this for now ... :(
+plot(Fig6.9age, Fig6.9a, type="l", xlab="Age", ylab="")
+lines(Fig6.9age, Fig6.9b1., lty=2, col=2)
+lines(Fig6.9age, Fig6.9b2., lty=3, col=3)
+title("Phase variation")
 
 # p. 93, Figure 6.10.  Time warping functions
 #  for 10 Berkeley girls
 
-str(smoothGirlsAcc)
+#  ---------------------------------------------------------------------
+#            Register the velocity curves for the girls
+#  ---------------------------------------------------------------------
 
-smGirlsAccAvg <- apply(smoothGirlsAcc, 1, mean)
-str(smGirlsAccAvg)
+# Duplicate setup from Figure 6.7
 
-warp10GirlsMon <- vector('list', 10)
-for(i in 1:10)
-  warp10GirlsMon[[i]] <- register.fd(smoothGirlsMean, smoothGirls[[i]]$Wfdobj,
-                                     growfdPar2.3)   
-agefine  <- with(growth, seq(age[1], age[nage], len=nptsFine))
-GirlsAccReg2.3 <- array(NA, dim=c(nptsFine, ncasef))
-for(i in 1:10){
-  bi2 <- smoothGirls[[i]]$beta[2]
-  GirlsAccReg2.3[, i] <- bi2*eval.monfd(agefine, 
-                                        warp10GirlsMon[[i]]$regfd, Lfdobj=2)
-}
-op <- par(cex=1.5)
-matplot(agefine, GirlsAccReg2.3, type="l", ylim=c(-4, 2),
-        xlab="warped age", ylab="Growth acceleration (cm/yr^2)",
-        bty="n")
-lines(agefine, apply(GirlsAccReg2.3, 1, mean), lwd=3)
-abline(h=0, lty="dashed")
+(nage <- length(growth$age))
+# 31
+norder.growth <- 6
+(nbasis.growth <- nage + norder.growth - 2)
+# 35 
+(rng.growth <- range(growth$age))
+# 1 18 
+wbasis.growth <- create.bspline.basis(rng.growth,
+                   nbasis.growth, norder.growth,
+                   growth$age)
+
+# Specify what to smooth, namely the rate of change of curvature
+Lfdobj.growth <- 2 
+# Specify smoothing weight (see Figure 6.7 above) 
+lambda.gr2.3 <- .03
+
+nage <- length(growth$age)
+norder.growth <- 6
+nbasis.growth <- nage + norder.growth - 2
+rng.growth <- range(growth$age)
+# 1 18 
+wbasis.growth <- create.bspline.basis(rangeval=rng.growth, norder=norder.growth,
+                   breaks=growth$age)
+
+# Smooth all girls;  subset later 
+cvec0.growth <- matrix(0,nbasis.growth,1)
+Wfd0.growth  <- fd(cvec0.growth, wbasis.growth)
+growfdPar2.3 <- fdPar(Wfd0.growth, Lfdobj.growth, lambda.gr2.3)
+# Create a functional data object for all the girls
+smG.fd.all <- with(growth, smooth.basis(age, hgtf, growfdPar2.3))
+
+# register the girls.  
+smGv <- deriv(smG.fd.all$fd, 1)
+
+et.G <- system.time(
+smG.reg.1 <- register.fd(smGv,
+               WfdParobj=c(Lfdobj=Lfdobj.growth, lambda=lambda.gr2.3))
+)
+et.G/60
+
+#save(list=c("smG.reg.1", "et.G"), file="registerGirls.Rdata")
+#load("registerGirls.Rdata")
+
+class(smG.reg.1)
+#  list
+sapply(smG.reg.1, class)
+#    regfd       Wfd     shift 
+#     "fd"      "fd" "numeric"
+
+nPts <- 151
+agefine  <- with(growth, seq(age[1], age[nage], len=nPts))
+
+smG.warpmat01 <- eval.monfd(agefine, smG.reg.1$Wfd)
+
+smG.warpmat <- 1+17*smG.warpmat01 / rep(smG.warpmat01[nPts,], each=nPts)
+range(smG.warpmat)
+#  1 18
+str(smG.warpmat)
+
+matplot(agefine, smG.warpmat[, 1:10], type="l")
+lines(c(1,18), c(1, 18), lty="dashed", lwd=2, col="black")
+
+# Matches the general look and feel of Figure 6.10
+# but not the details.
+# This difference is probably due to improvements made
+# to the algorithms since those used to produce the book.  
+
+##
+## sec. 6.6.  Amplitude and phase variation in growth 
+##
+
+# p. 94, Figure 6.11.  Height acceleration for boys and girls
+# (cm / year^2)  
+smG.regmean <- mean(smG.reg.1$regfd)
+
+# Create a functional data object for all the boys
+smB.fd.all <- with(growth, smooth.basis(age, hgtm, growfdPar2.3))
+
+# register the boys
+smBv <- deriv(smB.fd.all$fd, 1)
+
+(et.B <- system.time(
+smB.reg.1 <- register.fd(smBv,
+               WfdParobj=c(Lfdobj=Lfdobj.growth, lambda=lambda.gr2.3))
+))
+et.B/60
+
+#save(list=c("smB.reg.1", "et.B"), file="registerBoys.Rdata")
+#load("registerBoys.Rdata")
+
+smB.regmean <- mean(smB.reg.1$regfd)
+str(smB.regmean)
+all.equal(smB.regmean$basis, smG.regmean$basis)
+# TRUE
+all.equal(smB.regmean$fdnames, smG.regmean$fdnames)
+# TRUE
+
+smBG.regmean <- with(smB.regmean, fd(cbind(coefs, smG.regmean$coefs),
+                                     basis, fdnames) )
+plot(smBG.regmean)
+plot(deriv(smBG.regmean))
+
+# Not as smooth as Figure 6.11 but similar.
+#    A better match might be achieved with more smoothing.
+# However, registering the girls took 45 minutes and the boys took 30
+# 2007.09.22.  Therefore, I won't push that now.
+
+plot(deriv(smBG.regmean), seq(2, 18, length=101))
+# without the initial drop absent from Figure 6.11.  
+
+
+# p. 95, Figure 6.12.  Registering boys' height velocity to girls
+
+#plot(smBG.regmean)
+
+# After some experimentation, lambda = 0.1,
+# gave a rough match to Figure 6.12
+smBG.regG.1 <- register.fd(smG.regmean, smBG.regmean, WfdParobj=c(lambda=.1))
+
+sapply(smBG.regG.1, class)
+#    regfd       Wfd     shift 
+#     "fd"      "fd" "numeric"
+
+smB.warpG.1 <- eval.monfd(agefine, smBG.regG.1$Wfd[1])
+
+smB.wrpG.1 <- 1+17*smB.warpG.1 / rep(smB.warpG.1[nPts,], each=nPts)
+range(smB.wrpG.1)
+#  1 18
+#smG.warpB. <- 1+17*smG.warpB / rep(smG.warpB[nPts,], each=nPts)
+#range(smG.warpB.)
+#  1 18
+str(smB.warpG.)
+
+op <- par(mfrow=c(2,2))
+plot(agefine, smB.wrpG.1, type="l")
+lines(c(1,18), c(1, 18), lty="dashed", lwd=2, col="black")
+
+plot(deriv(smBG.regG.1$regfd))
+
 par(op)
 
-# Try crit = 1, because the default crit = 2 didn't seem great 
-warp10GirlsMonl <- vector('list', 10)
-for(i in 1:10)
-  warp10GirlsMonl[[i]] <- register.fd(smoothGirlsMean, smoothGirls[[i]]$Wfdobj,
-                                     growfdPar2.3, crit=1)   
-agefine  <- with(growth, seq(age[1], age[nage], len=nptsFine))
-GirlsAccReg2.3l <- array(NA, dim=c(nptsFine, ncasef))
-for(i in 1:10){
-  bi2 <- smoothGirls[[i]]$beta[2]
-  GirlsAccReg2.3l[, i] <- bi2*eval.monfd(agefine, 
-                                        warp10GirlsMonl[[i]]$regfd, Lfdobj=2)
-}
-op <- par(cex=1.5)
-matplot(agefine, GirlsAccReg2.3, type="l", ylim=c(-4, 2),
-        xlab="warped age", ylab="Growth acceleration (cm/yr^2)",
-        bty="n")
-lines(agefine, apply(GirlsAccReg2.3, 1, mean), lwd=3)
-abline(h=0, lty="dashed")
+# p. 96, Figure 6.13.  Principal components of registered growth acceleration
+# for girls
+
+sapply(smG.reg.1, class)
+
+pca.G <- pca.fd(deriv(smG.reg.1$regfd), nharm=3)
+class(pca.G)
+#[1] "pca.fd"
+
+str(pca.G)
+plot(pca.G)
+
+pcaVm.G <- varmx.pca.fd(pca.G)
+plot(pcaVm.G)
+
+op <- par(mfrow=c(2,2))
+plot(pcaVm.G, cex.main=.9, seq(4, 18, len=101))
 par(op)
-                                
+# Matches Figure 6.13 in broad outline
+# but many details are different.
+# Might more smoothing produce greater agreement?
 
-  
-#warpmat = monfn(agefine, Wfd);
-#warpmat = 1 + 17.*warpmat./(ones(101,1)*warpmat(101,:));
+# p. 96, Figure 6.14.  PCA of the warping functions
 
-#for i = 1:length(index)
-#   subplot(1,2,1)
-#  plot(agefine, yvec(:,i), '-', agefine, y0vec, '--', agefine, yregmat(:,i), '-');
-#  axis('square')
-#  title(['Case ',num2str(i)])
-#  subplot(1,2,2)
-#  plot(agefine, warpmat(:,i), '-', agefine, agefine, '--')
-#   axis('square')
-#   pause
-#end
+pca.G.w <- pca.fd(deriv(smG.reg.1$Wfd), nharm=3)
 
-  
+pcaVm.G.w <- varmx.pca.fd(pca.G.w)
 
-  
-for(icase in 1:ncasef)
-  smoothGirlsAcc2.3[, icase] <- with(smoothGirls2.3[[icase]],
-     beta[2]*eval.monfd(agefine, Wfdobj, Lfdobj=2) )
-
-
-
-
-
-
-                              
-
-
-op <- par(cex=1.5)
-plot(range(agefine), c(-4, 2), type="n", 
-matplot(agefine, smoothGirlsAcc2.3, type="l",
-        xlab="age (registered to mean)",
-        ylab="Growth acceleration (cm/year^2)", bty="n")
-
-     
-
-
-     
-lines(agefine, apply(smoothGirlsAcc2.3, 1, mean), lwd=3)
-abline(h=0, lty="dashed")
+op <- par(mfrow=c(2,2))
+plot(pcaVm.G.w, cex.main=.9, seq(4, 18, len=101))
 par(op)
 
+# Differences between the images produced here
+# and Figure 6.14 in the book may be due either one of two things:
+#
+# (a) This script was produced some time after the book was produced,
+#     without access to information about exactly what smoothing was used
+#     in the book.  More careful experimentation with alternative
+#     smoothing might produce a closer match to the book.  
+#
+# (b) The algorithms have been improved since the book was written,
+#     and the current images seem at least as good and perhaps
+#     better representations of the data then those in the book.  
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-nptsCoarse <- 18
-
-ageCoarse  <- with(growth, seq(age[1], age[nage], len=nptsCoarse))
-smoothGirlsAcc2.3c <- array(NA, dim=c(nptsCoarse, ncasf))
-for(icase in 1:ncasef)
-  smoothGirlsAcc2.3c[, icase] <- with(smoothGirls2.3[[icase]],
-     beta[2]*eval.monfd(ageCoarse, Wfdobj, Lfdobj=2) )
-
-matplot(agefine, smoothGirlsAcc2.3, type="l", ylim=c(-4, 2),
-        xlab="Year", ylab="Growth acceleration (cm/year^2)")
-for(icase in 1:ncasef)
-  text(ageCoarse, smoothGirlsAcc2.3c[, icase], icase)
-
-goodGirls <- c(1:2, 5:6, 8:9)
-matplot(agefine, smoothGirlsAcc2.3[, goodGirls], type="l",
-        ylim=c(-4, 2),
-        xlab="Year", ylab="Growth acceleration (cm/year^2)")
-for(icase in goodGirls)
-  text(ageCoarse, smoothGirlsAcc2.3c[, icase], icase)
-
-refGirl <- 9
-
-
-#smoothGirls2.3
-
-
-smoothGirls2.3
-tst9.1 <- with(growth, register.fd(smoothGirls2.3[[9]]$Wfdobj,
-                                   smoothGirls2.3[[1]]$Wfdobj) )
-
-
-
-
-
-
-
-
-matplot(ageCoarse, smoothGirlsAcc2.3, type="l", ylim=c(-4, 2),
-        xlab="Year", ylab="Growth acceleration (cm/year^2)")
-lines(agefine, apply(smoothGirlsAcc2.3, 1, mean), lwd=3)
-abline(h=0, lty="dashed")
-
-
-hgtRng <- range(growth$hgtf[, 1:10])
-with(growth, matplot(age, hgtf[, 1:10], type="b", pch="o", 
-                     ylab="Height (cm.)") )

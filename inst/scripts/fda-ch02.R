@@ -23,7 +23,9 @@
 ###
 ### It is hoped that these script files may still be useful,
 ### even with their gaps and even when they do not reproduce exactly
-### the published analyses.  
+### the published analyses.
+###
+### Spencer Graves
 ###
 ###
 ### ch. 2.  Tools for exploring functional data
@@ -44,18 +46,33 @@ library(fda)
 ## Section 2.3.  Summary statistics for functional data 
 ##
 # pp. 22-23, Figure 2.1.
-# Mean and starndard deviation of pinch force
+# Mean and standard deviation of pinch force
 # after alignment / registration.
 
-# complete after ch. 7
+matplot(pinchtime, pinch, type="l")
 
+# experiment with lambda to get a plot that looks
+# reasonably smooth but not too smooth
+pinch.fd <- smooth.basisPar(pinchtime, pinch)
+pinch.fd <- smooth.basisPar(pinchtime, pinch, lambda=1e-6)
 
+plot(pinch.fd$fd)
+# The default lambda = 1/diff(pinchtime) produces a straight line
+# lambda = 1e-8 undersmooths
+# lambda = 1e-6 comes close to matching Figure 2.1
+#   ... but with discrepancies
+#   suggesting that the 'pinch' data used for Figure 2.1
+#   may have differed by more than just an offset of 2
+#   from the 'pinch' data in the 'fda' package 
 
+plot(mean(pinch.fd$fd), xlab="Time (sec.)", ylab="Force mean (N)")
+abline(v=.1, lty="dotted")
 
+plot(sd(pinch.fd$fd), ylim=c(0, 1), xlab="Time (sec.)",
+     ylab="Force Std. Dev. (N)")
+abline(v=.1, lty="dotted")
 
-
-
-
+# Reconsider after ch. 7?  
 
 # pp. 23, Figure 2.2.  Perspective and contour plots of pinch force correlations
 

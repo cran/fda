@@ -9,7 +9,8 @@ polygpen <- function(basisobj, Lfdobj=int2Lfd(1))
 #          The highest derivative must be either 0 or 1.
 #  Returns the penalty matrix.
 
-#  Last modified 26 October 2005
+#  Last modified 2007.11.28 by Spencer Graves
+#  previously modified 26 October 2005
 
 if (!(inherits(basisobj, "basisfd"))) stop(
     "First argument is not a basis object.")
@@ -38,7 +39,7 @@ if (nderiv > 0) {
 	}
 }
 
-if (isisintLfd) {
+if (isintLfd) {
     args    <- basisobj$params
     n       <- length(args)
     argdiff <- diff(args)
@@ -56,7 +57,7 @@ if (isisintLfd) {
       	penaltymatrix[1,1] <- argdiff[  1]
       	penaltymatrix[n,n] <- argdiff[n-1]
       	indx <- 2:(n-1)
-      	diag(penaltymatrix[indx,  indx  ]) <- argdiff[ind]+argdiff[ind-1]
+      	diag(penaltymatrix[indx,  indx  ]) <- argdiff[indx]+argdiff[indx-1]
       	indx <- 2:n
       	diag(penaltymatrix[indx  ,indx-1]) <- -argdiff
       	diag(penaltymatrix[indx-1,indx  ]) <- -argdiff

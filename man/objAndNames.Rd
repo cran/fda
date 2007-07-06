@@ -36,7 +36,7 @@ objAndNames(object, preferred, default)
   names or dimnames added or changed.  
 }
 \author{ Spencer Graves  }
-}
+
 \seealso{
   \code{\link{data2fd}}, 
   \code{\link{bifd}}

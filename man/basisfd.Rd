@@ -100,6 +100,13 @@ basisfd(type, rangeval, nbasis, params,
   Normally only developers of new basis types will actually need
   to use this function, so no examples are provided.
 }
+\source{
+  Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
+    Data Analysis, 2nd ed.}, Springer, New York.
+
+  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
+    Functional Data Analysis}, Springer, New York
+}
 \keyword{smooth}
 \seealso{
 \code{\link{is.basis}}, 

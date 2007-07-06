@@ -7,8 +7,8 @@
 
 #  Generator function of class bifd
 
-bifd <- function (coef=matrix(0,2,1), sbasisobj=basis(), tbasisobj=basis(),
-                  fdnames=defaultnames)
+bifd <- function (coef=matrix(0,2,1), sbasisobj=create.bspline.basis(),
+                  tbasisobj=create.bspline.basis(), fdnames=defaultnames)
 {
   #  This function creates a bivariate functional data object.
   #    A bivariate functional data object consists of two bases for expanding

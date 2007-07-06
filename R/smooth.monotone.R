@@ -207,7 +207,7 @@ smooth.monotone <- function(x, y, WfdParobj, wt=rep(1,nobs),
           #  Current step size too small ... terminate
           if (dbglev >= 2) {
             print("Stepsize too small")
-            print(avec[5])
+            # print(avec[5])
           }
           if (limflg) ind <- 1 else ind <- 4
           break

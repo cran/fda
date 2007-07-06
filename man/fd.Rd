@@ -20,15 +20,14 @@ fd(coef=matrix(0, 2, 1), basisobj=basisfd(),
 }
 \arguments{
   \item{coef}{
-    a vector, matrix, or three-dimensional array of coefficients.
-    The first dimension of
-    matrices and arrays, as well as that of a vector, is corresponds to
-    basis functions.  The second dimension corresponds to the number of
-    functions or curves, or to replicates.  The third dimension if present
-    corresponds to variables for multivariate functional data objects.
-    A functional data object is referred to as "univariate" if this
-    argument is a vector or a matrix, and "multivariate" if it is a
-    three-dimensional array.
+    a vector, matrix, or three-dimensional array of coefficients.  The
+    first dimension of matrices and arrays, as well as that of a vector,
+    corresponds to basis functions.  The second dimension corresponds to
+    the number of functions or curves, or to replicates.  The third
+    dimension if present corresponds to variables for multivariate
+    functional data objects.  A functional data object is referred to as
+    "univariate" if this argument is a vector or a matrix, and
+    "multivariate" if it is a three-dimensional array.
   }
   \item{basisobj}{
     a functional basis object defining the basis
@@ -53,7 +52,15 @@ fd(coef=matrix(0, 2, 1), basisobj=basisfd(),
   functions will actually need to use this function, so no examples are
   provided.  
 }
+\source{
+  Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
+    Data Analysis, 2nd ed.}, Springer, New York.
 
+  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
+    Functional Data Analysis}, Springer, New York
+}
+\examples{
+}
 % docclass is function
 \keyword{smooth}
 \keyword{internal}

@@ -1,6 +1,5 @@
 \name{lip}
 \alias{lip}
-\non_function{}
 \title{
   Lip motion 
 }
@@ -9,8 +8,7 @@
 }
 \format{
 }
-\details{
-}
+
 \source{
   Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
     Functional Data Analysis}, Springer, New York, ch. 10. 

@@ -52,9 +52,7 @@ axisIntervals(side, atTick1=monthBegin.5, atTick2=monthEnd.5,
     \code{axis}. 
   }
 }
-\details{
 
-}
 \value{
   The value from the third (labels) call to 'axis'.  This function is
   usually invoked for its side effect, which is to add an axis to an
@@ -64,7 +62,7 @@ axisIntervals(side, atTick1=monthBegin.5, atTick2=monthEnd.5,
   An axis is added to the current plot.  
 }
 \author{ Spencer Graves  }
-}
+
 \seealso{
   \code{\link{axis}}, 
   \code{\link{par}}

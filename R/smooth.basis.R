@@ -42,7 +42,8 @@ smooth.basis <- function (argvals, y, fdParobj, wtvec=rep(1,n), dffactor=1,
 #    PENMAT ...  the penalty matrix.
 #    Y2CMAP ...  the matrix mapping the data to the coefficients.
 
-#  Last modified:  1 March 2007
+# last modified 2007.09.29 by Spencer Graves   
+#  previously modified:  1 March 2007
 
   #  -----------------------------------------------------------------------
   #                      Check argments
@@ -50,7 +51,7 @@ smooth.basis <- function (argvals, y, fdParobj, wtvec=rep(1,n), dffactor=1,
 
   #  check ARGVALS
 
-  if (!is.numeric(y)) stop("ARGVALS is not numeric.")
+  if (!is.numeric(y)) stop("'argvals' is not numeric.")
 
   arvals <- as.vector(argvals)
   n      <- length(argvals)
@@ -60,12 +61,12 @@ smooth.basis <- function (argvals, y, fdParobj, wtvec=rep(1,n), dffactor=1,
   if (is.vector(y)) y <- as.matrix(y)
 	
   if (!inherits(y, "matrix") & !inherits(y, "array"))
-    stop("Y is not of class matrix or class array.")
+    stop("'y' is not of class matrix or class array.")
 
   ydim <- dim(y);
 
   if (ydim[1] != n)
-    stop("Y is not the same length as ARGVALS.")
+    stop("'y' is not the same length as 'argvals'.")
 
   #  check fdParobj
 
@@ -73,16 +74,16 @@ smooth.basis <- function (argvals, y, fdParobj, wtvec=rep(1,n), dffactor=1,
     if (inherits(fdParobj, "fd") || inherits(fdParobj, "basisfd"))
         fdParobj <- fdPar(fdParobj)
     else
-        stop(paste("FDPAROBJ is not a functional parameter object,",
+        stop(paste("'fdParobj' is not a functional parameter object,",
                "not a functional data object, and",
                "not a basis object."))
   }
 
   #  check WTVEC
 
-  if (!is.vector(wtvec))  stop("WTVEC is not a vector.")
-  if (length(wtvec) != n) stop("WTVEC of wrong length")
-  if (min(wtvec) <= 0)    stop("All values of WTVEC must be positive.")
+  if (!is.vector(wtvec))  stop("'wtvec' is not a vector.")
+  if (length(wtvec) != n) stop("'wtvec' of wrong length")
+  if (min(wtvec) <= 0)    stop("All values of 'wtvec' must be positive.")
 
   #  extract information from fdParobj
 
@@ -97,7 +98,7 @@ smooth.basis <- function (argvals, y, fdParobj, wtvec=rep(1,n), dffactor=1,
   #  check LAMBDA
 
   if (lambda < 0) {
-    warning ("Value of LAMBDA was negative, and 0 used instead.")
+    warning ("Value of 'lambda' was negative;  0 used instead.")
     lambda <- 0
   }
 
@@ -163,16 +164,31 @@ smooth.basis <- function (argvals, y, fdParobj, wtvec=rep(1,n), dffactor=1,
         }
         Bmat <- Bmat0 + lambda*penmat
     } else {
-	  	penmat <- matrix(0,nbasis,nbasis)
-        Bmat   <- Bmat0
+      penmat <- matrix(0,nbasis,nbasis)
+      Bmat   <- Bmat0
     }
 
     #  compute inverse of Bmat
 
     Bmat    <- (Bmat+t(Bmat))/2
-    Lmat    <- chol(Bmat)
-    Lmatinv <- solve(Lmat)
-    Bmatinv <- Lmatinv %*% t(Lmatinv)
+    Lmat    <- try(chol(Bmat), silent=TRUE)
+    {
+      if(class(Lmat)=="try-error"){
+        Beig <- eigen(Bmat, symmetric=TRUE)
+        BgoodEig <- (Beig$values>0)
+        Brank <- sum(BgoodEig)
+        if(Brank<dim(Bmat)[1])
+          warning("Matrix of basis function values has rank ",
+                  Brank, " < dim(fdobj$basis)[2] = ",
+                  length(BgoodEig), ";  ignoring null space")
+        goodVec <- Beig$vectors[, BgoodEig]
+        Bmatinv <- (goodVec %*% (Beig$values[BgoodEig] * t(goodVec)))
+      }
+      else {
+        Lmatinv <- solve(Lmat)
+        Bmatinv <- Lmatinv %*% t(Lmatinv)
+      }
+    }
 
     #  ------------------------------------------------------------------
     #       Compute the coefficients defining the smooth and 

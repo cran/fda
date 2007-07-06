@@ -45,7 +45,7 @@ fdPar(fdobj=fd(), Lfdobj=int2Lfd(0), lambda=0,
   a functional parameter object
 }
 \details{
-  (p> Functional parameters are often needed to specify initial
+  Functional parameters are often needed to specify initial
   values for iteratively refined estimates, as is the case in
   functions \code{register.fd} and \code{smooth.monotone}.
 
@@ -54,6 +54,13 @@ fdPar(fdobj=fd(), Lfdobj=int2Lfd(0), lambda=0,
   considered known and must remain fixed during the analysis.  This is
   the case for functions \code{fRegress} and  \code{pda.fd}, for
   example.  
+}
+\source{
+  Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
+    Data Analysis, 2nd ed.}, Springer, New York.
+
+  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
+    Functional Data Analysis}, Springer, New York
 }
 \seealso{
   \code{\link{cca.fd}}, 
@@ -84,7 +91,8 @@ daytime  <- (1:365)-0.5
 #  Convert the data to a functional data object
 daybasis65 <- create.fourier.basis(dayrange, nbasis, dayperiod)
 templambda <- 1e1
-tempfdPar  <- fdPar(daybasis65, harmaccelLfd, templambda)
+tempfdPar  <- fdPar(fdobj=daybasis65, Lfdobj=harmaccelLfd, lambda=templambda)
+
 #FIXME
 #tempfd <- smooth.basis(CanadianWeather$tempav, daytime, tempfdPar)
 #  Set up the harmonic acceleration operator

@@ -22,7 +22,10 @@
 }
 \source{
   Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
-    Data Analysis, 2nd ed.}, Springer, New York. 
+    Data Analysis, 2nd ed.}, Springer, New York.
+
+  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
+    Functional Data Analysis}, Springer, New York. 
 }
 %\seealso{\code{\link{eval.penalty}}}
 \examples{

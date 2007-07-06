@@ -33,7 +33,7 @@ params <- basisobj$params
 
 if (length(params) == 0) {
     basisobj      <- create.monomial.basis(range, nbasis, 0:(nbasis-1))
-    penaltymatrix <- monompen(basisobj, Lfdobj, rng)
+    penaltymatrix <- monomialpen(basisobj, Lfdobj, rng)
     return(penaltymatrix)
 }
 
@@ -92,9 +92,9 @@ if (nderiv > 0) {
 if (isintLfd && nderiv == norder - 1) {
     #  special case of nderiv = norder - 1
     halfseq    <- (breaks[2:nbreaks] + breaks[1:(nbreaks-1)])/2
-    halfmat    <- bsplineM(halfseq, breaks, norder, nderiv)
+    halfmat    <- bsplineS(halfseq, breaks, norder, nderiv)
     brwidth    <- diff(breaks)
-    penaltymat <- sparse(t(halfmat) %*% diag(brwidth) %*% halfmat)
+    penaltymat <- (t(halfmat) %*% diag(brwidth) %*% halfmat)
     return(penaltymat)
 }
 

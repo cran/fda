@@ -1,6 +1,5 @@
 \name{melanoma}
 \alias{melanoma}
-\non_function{}
 \title{
   melanoma 1936-1972
 }

@@ -142,7 +142,6 @@ plotfit.fd(y, argvals, fdobj, rng = rangeval,
   the 'fd' object. 
 }
 
-}
 \seealso{
   \code{\link{plot.fd}}, 
   \code{\link{plot}}, 

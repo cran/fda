@@ -41,7 +41,6 @@ center.fd(fdobj)
 \alias{pendiagfn}
 \alias{plot.Lfd}
 \alias{plot.cca.fd}
-\alias{plot.pca.fd}
 \alias{polintarray}
 \alias{polintmat}
 \alias{polynom}

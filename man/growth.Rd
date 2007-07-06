@@ -1,6 +1,5 @@
 \name{growth}
 \alias{growth}
-\non_function{}
 \title{
   Berkeley Growth Study data 
 }

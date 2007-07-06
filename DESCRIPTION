@@ -1,8 +1,10 @@
 Package: fda
-Version: 1.2.2
+Version: 1.2.3
 Date: 2007-07-06
 Title: Functional Data Analysis
-Author: J. O. Ramsay <ramsay@psych.mcgill.ca>, Hadley Wickham <h.wickham@gmail.com>, Spencer Graves <spencer.graves@pdf.com>
+Author: J. O. Ramsay <ramsay@psych.mcgill.ca>, 
+	Hadley Wickham <h.wickham@gmail.com>, 
+	Spencer Graves <spencer.graves@pdf.com>
 Maintainer: J. O. Ramsay <ramsay@psych.mcgill.ca>
 Depends: R (>= 2.4.0), splines, zoo
 Suggests: graphics, odesolve, R.matlab 
@@ -15,7 +17,7 @@ Description: These functions were developed to support
    library. The library also contains a number of the
    data sets used in the book along with R code for the
    analyses that produced many of the figures in the book.
-License: GPL version 2 or later
+License: GPL (>= 2)
 URL: http://www.functionaldata.org
 LazyData: true
-Packaged: Sun Aug 12 10:18:48 2007; hadley
+Packaged: Thu Dec  6 08:16:24 2007; hornik

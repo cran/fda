@@ -47,6 +47,8 @@ varmx.cca.fd <- function(ccafd, nx=201)
   ccavarmxlist <- list(ccawtfd1, ccawtfd2, canvarvalues, rotmat)
   names(ccavarmxlist) <- c("weight function 1", "weight function 2",
                            "variates", "rotation matrix")
+  #
+#  class(ccavarmxlist) <- "cca.fd"
   return(ccavarmxlist)
 
 }

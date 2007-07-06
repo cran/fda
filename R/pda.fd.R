@@ -60,7 +60,8 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
 #  AWTLIST     list array of weights for u-variables
 #                 dimension J and K
 
-#  last modified 4 December 2005
+#  last modified 2007.11.28 by Spencer Graves
+#  previously modified 4 December 2005
 
 #  check dimensions of the lists
 
@@ -608,10 +609,10 @@ if (bwtlistd[1] != nvar | bwtlistd[2] != nvar) stop(
 if (difeorder > 0) {
     for (ivar1 in 1:nvar) for (ivar2 in 1:nvar) for (j in 1:difeorder) {
                 bfdPari1i2j <- bwtlist[[ivar1,ivar2,j]]
-                if (!inherits(bfdPari1i2j, "fdPar")) stop(
-						paste("BWTLIST[[",ivar1, ",",ivar2, ",",iu,
+                if (!inherits(bfdPari1i2j, "fdPar"))
+                  stop(paste("BWTLIST[[",ivar1, ",",ivar2, ",",iu,
                             "]] is not a functional parameter object."))
-                basisi1i2j <- bdPari1i2j$fd$basis
+                basisi1i2j <- bfdPari1i2j$fd$basis
                 if (any(basisi1i2j$rangeval != xrange)) stop(
 						"Ranges are incompatible for BWTLIST.")
                 nbasmax <- max(c(nbasmax,basisi$nbasis))
@@ -908,7 +909,7 @@ for (ivar in 1:nvar) {
             lambdaij1 <- bfdParij1$lambda
             if (lambdaij1 > 0) {
 	             Lfdobj <- bfdParij1$Lfd
-	             penmat <- lambdaij1*eval.penalty(bbasisij1,Lfddobj)
+	             penmat <- lambdaij1*eval.penalty(bbasisij1,Lfdobj)
 	             cmat[indexij1,indexij1] <- cmat[indexij1,indexij1] +
 	                  penmat
             }

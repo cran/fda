@@ -3,6 +3,13 @@ second edition (2006) and 'Applied Functional Data Analysis'
 (2002), both by James O. Ramsay and Bernard W. Silverman 
 (Springer).  
 
+Release 1.2.3 adds to previous versions a script to create most 
+of the figures of chapter 6 of "Applied Functional Data Analysis" 
+by Ramsay and Silverman.  Other changes offer simpler calls to 
+time warping / registration and functional principal component 
+functions. 
+
+############################
 Release 1.1.7 provides improved documentation and modifications 
 to some data sets.  Major modifications from previous releases: 
 

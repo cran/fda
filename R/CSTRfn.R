@@ -202,18 +202,23 @@ CSTRfn <- function(parvec, datstruct, fitstruct,
       if(is.na(F1)){
         n.na <- sum(is.na(res1))
         attr(coef1, "n.na.in.res1") <- n.na
-        ..CSTRfn.coef1.gen.NA <<- list(parvec=parvec, coef1=coef1)
-        warning(n.na, " NAs in res1;  coef1 saved in ",
-                "'..CSTRfn.coef1.gen.NA'")
+#        ..CSTRfn.coef1.gen.NA <<- list(parvec=parvec, coef1=coef1)
+        warning(n.na, " NAs in res1.")
+#        warning(n.na, " NAs in res1;  coef1 saved in ",
+#                "'..CSTRfn.coef1.gen.NA'")
       }
       if(alpha< 1e-4){
         pv <- paste(signif(parvec, 3), collapse=", ")
-        ..CSTRfn.coef1.gen.5 <<- list(parvec=parvec, coef1=coef1)
+#        ..CSTRfn.coef1.gen.5 <<- list(parvec=parvec, coef1=coef1)
+#        warning("Stepsize reduced below the minimum with parvec = ",
+#             pv, " on iteration ", iter,
+#             " in trying to optimize ", length(coef0),
+#             " coefficients;  using suboptimal coefficients;  ",
+#                "saved in '..CSTRfn.coef1.gen.5'")
         warning("Stepsize reduced below the minimum with parvec = ",
              pv, " on iteration ", iter,
              " in trying to optimize ", length(coef0),
-             " coefficients;  using suboptimal coefficients;  ",
-                "saved in '..CSTRfn.coef1.gen.5'")
+             " coefficients;  using suboptimal coefficients. ")
         break 
       }
 #
@@ -382,7 +387,7 @@ CSTRfn <- function(parvec, datstruct, fitstruct,
     if(any(oops)){
       warning(sum(oops), " of ", length(log.temp),
               " values of (-1e4*EoverR*Tdif) exceed the max = ",
-              log.max.betaCC, ";  thresholding.")
+              max.log.betaCC, ";  thresholding.")
       log.temp[oops] <- max.log.betaCC
     }
     temp <- exp(log.temp)

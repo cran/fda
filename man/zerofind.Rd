@@ -17,8 +17,7 @@
 \value{
   A logical value TRUE or FALSE.  
 }
-\details{
-}
+
 \seealso{
 \code{\link{range}}
 }

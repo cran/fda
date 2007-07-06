@@ -9,7 +9,6 @@
 \alias{monthMid}
 \alias{monthLetters}
 \alias{weeks}
-\non_function{}
 \title{
   Numeric and character vectors to facilitate working with dates 
 }
@@ -58,7 +57,11 @@
 }
 \source{
   Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
-    Data Analysis, 2nd ed.}, Springer, New York, pp. 5, 47-53.   
+    Data Analysis, 2nd ed.}, Springer, New York, pp. 5, 47-53.
+
+  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
+    Functional Data Analysis}, Springer, New York
+
 }
 \seealso{
   \code{\link{month.abb}} 

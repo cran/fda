@@ -60,9 +60,7 @@ times.fd(e1, e2, basisobj=basisobj1*basisobj2)
   constructed to be of higher dimension than the basis for either factor
   according to rules described in function TIMES for two basis objects.
 }
-\details{
 
-}
 \seealso{
 \code{\link{basisfd}}, 
 \code{\link{basisfd.product}}

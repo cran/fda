@@ -19,9 +19,7 @@
 \value{
   basisobj1 == basisobj2 returns a logical scalar.
 }
-\details{
 
-}
 \seealso{
 \code{\link{basisfd}}, 
 \code{\link{basisfd.product}}

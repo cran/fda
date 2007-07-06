@@ -8,9 +8,10 @@
   remaining arguments.   
 }
 \usage{
-smooth.basisPar(argvals, y, fdobj=fd(), Lfdobj=int2Lfd(0), lambda=0,
-      estimate=TRUE, penmat=NULL, wtvec=rep(1,n), dffactor=1,
-      fdnames=list(NULL, dimnames(y)[[2]], NULL))
+smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=int2Lfd(2),
+      lambda=1/diff(range(argvals)), estimate=TRUE, penmat=NULL,
+      wtvec=rep(1,n), dffactor=1,
+      fdnames=list(NULL, dimnames(y)[[2]], NULL) )
 }
 \arguments{
   \item{argvals}{
@@ -32,6 +33,8 @@ smooth.basisPar(argvals, y, fdobj=fd(), Lfdobj=int2Lfd(0), lambda=0,
     functional basis object or another functional parameter object.
     Basis objects are converted to functional data objects with the
     identity matrix as the coefficient matrix.
+
+    If NULL, fdobj = create.bspline.basis(argvals).  
   }
   \item{Lfdobj}{
     either a nonnegative integer or a linear differential operator
@@ -96,7 +99,7 @@ smooth.basisPar(argvals, y, fdobj=fd(), Lfdobj=int2Lfd(0), lambda=0,
   }
   \item{SSE}{
     the error sums of squares.  SSE is a vector or a matrix of the same
-    size as GCV. 
+    size as 'gcv'. 
   }
   \item{penmat}{
     the penalty matrix.
@@ -106,9 +109,11 @@ smooth.basisPar(argvals, y, fdobj=fd(), Lfdobj=int2Lfd(0), lambda=0,
   }
 }
 \details{
-  1.  dfPar
+  1.  if(is.null(fdobj))fdobj <- create.bspline.basis(argvals) 
+  
+  2.  fdPar
 
-  2.  smooth.basis 
+  3.  smooth.basis 
 }
 \seealso{
   \code{\link{data2fd}}, 
@@ -124,6 +129,15 @@ smooth.basisPar(argvals, y, fdobj=fd(), Lfdobj=int2Lfd(0), lambda=0,
   \code{\link{smooth.pos}}
 }
 \examples{
+# simplest call
+girlGrowthSm <- with(growth, smooth.basisPar(argvals=age, y=hgtf))
+plot(girlGrowthSm$fd, xlab="age", ylab="height (cm)",
+         main="Girls in Berkeley Growth Study" )
+plot(deriv(girlGrowthSm$fd), xlab="age", ylab="growth rate (cm / year)",
+         main="Girls in Berkeley Growth Study" )
+plot(deriv(girlGrowthSm$fd, 2), xlab="age",
+        ylab="growth acceleration (cm / year^2)",
+        main="Girls in Berkeley Growth Study" )
 
 #  Shows the effects of three levels of smoothing
 #  where the size of the third derivative is penalized.

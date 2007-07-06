@@ -6,7 +6,8 @@ std.fd <- function(fdobj)
   #  Return:
   #  STDFD ... a functional data for the standard deviation functions
 
-  #  Last modified 26 February 2007
+  #  Last modified 2007.11.28 by Spencer Graves
+  #  Previously modified 26 February 2007
 
   if (!(inherits(fdobj, "fd"))) stop(
 		"Argument  fdobj not a functional data object.")
@@ -15,6 +16,7 @@ std.fd <- function(fdobj)
   coefd    <- dim(coef)
   ndim     <- length(coefd)
   if (coefd[1] == 1) stop("Only one replication found.")
+  
   nrep     <- coefd[2]
   ones     <- rep(1,nrep)
 
@@ -49,3 +51,7 @@ std.fd <- function(fdobj)
   stdfd <- fd(stdcoef, basisobj, fdnames)
   return(stdfd)
 }
+
+sd.fd <- function(fdobj)std.fd(fdobj)
+stdev.fd <- function(fdobj)std.fd(fdobj)
+stddev.fd <- function(fdobj)std.fd(fdobj)

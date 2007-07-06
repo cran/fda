@@ -28,7 +28,8 @@ linmod <- function(xfdobj, yfdobj, wtvec=rep(1,nrep),
   #  ALPHA  ... a vector of intercept values
   #  REGFD  ... a functional data object for the regression function
 
-  #  Last modified:   4 December 2005
+  #  Last modified 2007.11.28 by Spencer Graves
+  #  Previously modified:   4 December 2005
 
   #  check XLfdobj and YLfdobj
 
@@ -109,7 +110,8 @@ linmod <- function(xfdobj, yfdobj, wtvec=rep(1,nrep),
     kmatx <- matrix(0,nbasisx+1,nbasisx+1)
     kmatx[index,index] <- penmatx
     if (wtvar) {
-      zmatw <- sweep(zmatx,2,wtmat,"*")
+#      zmatw <- sweep(zmatx,2,wtmat,"*")
+      zmatw <- sweep(zmatx,2,wtvec,"*")
       tempx <- solve(crossprod(zmatw,zmatx) + xlambda*kmatx)
       tempy <- solve(jmaty + ylambda*penmaty)
       gmat  <- tempx %*% crossprod(zmatw,t(coefy[,,1])) %*% jmaty %*% tempy
@@ -123,7 +125,7 @@ linmod <- function(xfdobj, yfdobj, wtvec=rep(1,nrep),
       }
     }
     yhatcoef <- t(zmatx %*% gmat)
-    bcoef <- matrix(0,nbasisx,nbasisy)
+#    bcoef <- matrix(0,nbasisx,nbasisy)
     bcoef <- gmat[index,]
     alpha <- as.matrix(gmat[1,])
 

@@ -1,6 +1,5 @@
 \name{handwrit}
 \alias{handwrit}
-\non_function{}
 \title{
   Cursive handwriting samples 
 }

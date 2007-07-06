@@ -24,9 +24,12 @@ smooth.pos <- function(argvals, y, WfdParobj, wt=rep(1,nobs), conv=1e-4,
 
    if (!(inherits(WfdParobj, "fdPar")))
 		stop("Argument WFDPAROBJ not a functional parameter object.")
+
+   lambda <- WfdParobj$lambda
 	
 	Wfdobj   <- WfdParobj$fd
 	Lfdobj   <- WfdParobj$Lfd
+	lambda   <- WfdParobj$lambda
 	basisobj <- Wfdobj$basis
 	nbasis   <- basisobj$nbasis
 	rangex   <- basisobj$rangeval

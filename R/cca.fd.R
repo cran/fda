@@ -28,7 +28,8 @@ cca.fd <- function(fdobj1, fdobj2=fdobj1, ncan = 2,
 #  CCAVAR2       ... A matrix of scores on the second canonical variable.
 #
 
-#  Last modified 27 March 2006
+# Last modified 2007.09.07 by Spencer Graves   
+#  previously modified 27 March 2006
 
   if (!(inherits(fdobj1, "fd"))) stop(
 		"Argument FDOBJ1 not a functional data object.")
@@ -78,9 +79,9 @@ cca.fd <- function(fdobj1, fdobj2=fdobj1, ncan = 2,
   #  add roughness penalty
 
   if (!inherits(ccafdParobj1, "fdPar")) stop(
-		"CCAFDPAROBJ1 is not a FDPAR object.")
+		"ccafdParobj1 is not a fdPar object.")
   if (!inherits(ccafdParobj2, "fdPar")) stop(
-		"CCAFDPAROBJ2 is not a FDPAR object.")
+		"ccafdParobj2 is not a fdPar object.")
 		
   Lfdobj1 <- ccafdParobj1$Lfd
   Lfdobj2 <- ccafdParobj2$Lfd
@@ -141,8 +142,9 @@ cca.fd <- function(fdobj1, fdobj2=fdobj1, ncan = 2,
   names(ccafd) <- c("ccwtfd1", "ccwtfd2", "ccacorr",
                     "ccavar1", "ccavar2")
 
-  setOldClass("cca.fd")
-  oldClass(ccafd) <- "cca.fd"
+#  setOldClass("cca.fd")
+#  oldClass(ccafd) <- "cca.fd"
+  class(ccafd) <- "cca.fd"
 
   return(ccafd)
 }

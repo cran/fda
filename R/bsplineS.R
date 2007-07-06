@@ -18,7 +18,8 @@ bsplineS <- function (x, breaks, norder=4, nderiv=0)
 #  Return is a matrix with length(X) rows and number of columns equal to
 #                   number of b-splines
 
-#  last modified 23 October 2002
+# last modified 2007.09.09 by Spencer Graves  
+#  previously modified 23 October 2002
 
   x <- as.vector(x)
   n <- length(x)
@@ -44,16 +45,18 @@ bsplineS <- function (x, breaks, norder=4, nderiv=0)
               rep(breaks[nbreaks],norder-1)  )
   derivs <- rep(nderiv,n)
   nbasis <- nbreaks + norder - 2
-  if (nbasis > norder) {
+#  if (nbasis > norder) {
   	  basismat <- spline.des(knots, x, norder, derivs)$design
-  } else {
-	  if (nbasis == norder) {
-		  #  CONSTRUCT BASISMAT FROM POWERS OF X HERE 	
-		  basismat <- matrix(0, n, norder)
-		  basismat[,1] <- 1
-		  for (i in 2:norder) basismat[,i] <- x^(i-1)			
-	  } else { 
-	     stop('NBASIS is less than NORDER.')
-     }
-  }
+#  } else {
+#	  if (nbasis == norder) {
+#		  #  CONSTRUCT BASISMAT FROM POWERS OF X HERE 	
+#		  basismat <- matrix(0, n, norder)
+#		  basismat[,1] <- 1
+#                 if(norder>1) 
+#                    for (i in 2:norder) basismat[,i] <- x^(i-1)			
+#	  } else { 
+#	     stop('NBASIS is less than NORDER.')
+#     }
+#  }
+  basismat
 }

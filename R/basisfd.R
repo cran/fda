@@ -74,7 +74,7 @@ basisfd <- function(type, rangeval, nbasis, params, dropind=NULL,
 #  CREATE_POLYGON_BASIS     ...  creates a polygonal basis
 #  CREATE_POLYNOMIAL_BASIS  ...  creates a polynomial basis
 #  CREATE_POWER_BASIS       ...  creates a monomial basis
-#  last modified 2007 May 3 by Spencer Graves
+#  last modified 2007.09.09 by Spencer Graves
 #  Previously modified 8 December 2005
 
 if (nargs()==0) {
@@ -104,7 +104,7 @@ if (class(type)=="basisfd"){
 
 type <- use.proper.basis(type)
 if (type=="unknown"){
-    stop("TYPE unrecognizable.")
+    stop("'type' unrecognizable.")
 }
 
 #  check if QUADVALS is present, and set to default if not
@@ -119,7 +119,7 @@ else if(!is.null(quadvals)){
          ncol     <-dim(quadvals)[2]
      }
      if (nquad < 2) stop("Less than two quadrature points are supplied.")
-     if (ncol != 2) stop("QUADVALS does not have two columns.")
+     if (ncol != 2) stop("'quadvals' does not have two columns.")
 }
 
 #  check VALUES if present, and set to a single empty cell if not.
@@ -127,9 +127,9 @@ if(!missing(values) && !is.null(values)) {
  	 n <- dim(values)[1]
 	 k <- dim(values)[2]
     if (n != nquad)   
-        stop("Number of rows in VALUES not equal to number of quadrature points.")
+        stop("Number of rows in 'values' not equal to number of quadrature points.")
     if (k != nbasis)  
-        stop("Number of columns in VALUES not equal to number of basis functions.")
+        stop("Number of columns in 'values' not equal to number of basis functions.")
 }
 else values <- NULL
 
@@ -148,10 +148,12 @@ if (type=="fourier"){
 } else if(type=="bspline"){
     if (!missing(params)){
         nparams  <- length(params)
-        if (params[1] <= rangeval[1])       
+        if(nparams>0){
+          if (params[1] <= rangeval[1])       
             stop("Smallest value in BREAKS not within RANGEVAL")
-        if (params[nparams] >= rangeval[2]) 
+          if (params[nparams] >= rangeval[2]) 
             stop("Largest value in BREAKS not within RANGEVAL")
+        }
     }
 } else if(type=="expon") {
     if (length(params) != nbasis) 
@@ -407,14 +409,23 @@ if (type1 == "bspline" && type2 == "bspline") {
     uniqueknots    <- union(interiorknots1, interiorknots2)
     nunique <- length(uniqueknots)
     multunique <- rep(0,nunique)
-    for (i in 1:nunique) {
-        mult1 <- length(interiorknots1[interiorknots1==uniqueknots[i]])
-        mult2 <- length(interiorknots2[interiorknots2==uniqueknots[i]])
-        multunique[i] <- max(mult1,mult2)
+    for (i in seq(length=nunique)) {
+      mult1 <- {
+        if(length(interiorknots1)>0)
+          length(interiorknots1[interiorknots1==uniqueknots[i]])
+        else 0
+      }
+      mult2 <- {
+        if(length(interiorknots2)>0) 
+          length(interiorknots2[interiorknots2==uniqueknots[i]])
+        else 0
+      }
+      multunique[i] <- max(mult1,mult2)
     }
+#        
     allknots <- rep(0,sum(multunique))
     m2 <- 0
-    for (i in 1:nunique) {
+    for (i in seq(length=nunique)) {
         m1 <- m2 + 1
         m2 <- m2 + multunique[i]
         allknots[m1:m2] <- uniqueknots[i]
@@ -428,6 +439,7 @@ if (type1 == "bspline" && type2 == "bspline") {
         create.bspline.basis(range1, nbasis, norder, allbreaks)
     return(prodbasisobj)
 }
+#  end if(type1 & type2 == 'bspline') 
  
 if (type1 == "fourier" && type2 == "fourier") {
     #  both bases Fourier

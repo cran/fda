@@ -20,13 +20,16 @@ a functional data object with a single replication
 that contains the mean of the functions in the object \code{fd}.
 }
 \seealso{
-\code{\link{stddev.fd}}, 
-\code{\link{var.fd}}, 
-\code{\link{sum.fd}}, 
-\code{\link{center.fd}}
-\code{\link{mean}}
+  \code{\link{stddev.fd}}, 
+  \code{\link{var.fd}}, 
+  \code{\link{sum.fd}}, 
+  \code{\link{center.fd}}
+  \code{\link{mean}}
 }
 \examples{
+##
+## 1.  univeriate:  lip motion
+##
 liptime  <- seq(0,1,.02)
 liprange <- c(0,1)
 
@@ -39,15 +42,30 @@ lipbasis <- create.bspline.basis(liprange, nbasis, norder)
 
 #  ------------  apply some light smoothing to this object  -------
 
-Lfdobj   <- int2Lfd(4)
-lambda   <- 1e-12
-lipfdPar <- fdPar(lipbasis, Lfdobj, lambda)
+lipLfdobj   <- int2Lfd(4)
+lipLambda   <- 1e-12
+lipfdPar <- fdPar(lipbasis, lipLfdobj, lipLambda)
 
 lipfd <- smooth.basis(liptime, lip, lipfdPar)$fd
 names(lipfd$fdnames) = c("Normalized time", "Replications", "mm")
 
 lipmeanfd <- mean.fd(lipfd)
 plot(lipmeanfd)
+
+##
+## 2.  Trivariate:  CanadianWeather
+##
+dayrng <- c(0, 365) 
+
+nbasis <- 51
+norder <- 6 
+
+weatherBasis <- create.fourier.basis(dayrng, nbasis)
+
+weather.fd <- smooth.basis(day.5, CanadianWeather$dailyAv,
+            weatherBasis)
+
+str(weather.fd.mean <- mean.fd(weather.fd$fd))
 
 }
 % docclass is function

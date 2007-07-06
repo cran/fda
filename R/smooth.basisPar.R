@@ -1,14 +1,19 @@
-smooth.basisPar <- function(argvals, y, fdobj=fd(),
-      Lfdobj=int2Lfd(0), lambda=0, estimate=TRUE, penmat=NULL,
+smooth.basisPar <- function(argvals, y, fdobj=NULL, Lfdobj=int2Lfd(2),
+      lambda=1/diff(range(argvals)), estimate=TRUE, penmat=NULL, 
       wtvec=rep(1,n), dffactor=1,
       fdnames=list(NULL, dimnames(y)[[2]], NULL) ){
 ##
 ## 1.  fdPar
 ##
+  if(is.null(fdobj))
+    fdobj <- create.bspline.basis(argvals) 
+##
+## 2.  fdPar
+##
   fdP <- fdPar(fdobj, Lfdobj=Lfdobj, lambda=lambda,
                estimate=estimate, penmat=penmat)
 ##
-## 2.  smooth.fd
+## 3.  smooth.fd
 ##
   n <- length(argvals)
   w <- wtvec

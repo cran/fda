@@ -1,7 +1,7 @@
 \name{phaseplanePlot}
 \alias{phaseplanePlot}
 \title{
-  Plane-plane plot 
+  Phase-plane plot 
 }
 \description{
   Plot acceleration (or Ldfobj2) vs. velocity (or Lfdobj1) of a function

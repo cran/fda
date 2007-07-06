@@ -81,15 +81,17 @@ harmaccelLfd <- vec2Lfd(c(0, 0, (2*pi)^2, 0))
 gaitfdPar <- fdPar(gaitbasis, harmaccelLfd, lambda)
 gaitfd <- smooth.basis(gaittime, gait, gaitfdPar)$fd
 
-#ccafdPar <- fdPar(gaitfd, harmaccelLfd, 1e-8)
-#ccafd    <- cca.fd(gaitfd[,1], gaitfd[,2], ncan=3, ccafdPar, ccafdPar)
+ccafdPar <- fdPar(gaitfd, harmaccelLfd, 1e-8)
+ccafd0    <- cca.fd(gaitfd[,1], gaitfd[,2], ncan=3, ccafdPar, ccafdPar)
 #  compute a VARIMAX rotation of the canonical variables
-#ccafd <- varmx.cca.fd(ccafd)
+ccafd <- varmx.cca.fd(ccafd0)
 #  plot the canonical weight functions
-#par(mfrow=c(2,1))
+op <- par(mfrow=c(2,1))
 #plot.cca.fd(ccafd, cex=1.2, ask=TRUE)
+#plot.cca.fd(ccafd, cex=1.2)
 #  display the canonical correlations
 #round(ccafd$ccacorr[1:6],3)
+par(op)
 }
 % docclass is function
 \keyword{smooth}

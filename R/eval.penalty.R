@@ -67,7 +67,7 @@ else if(type=="const") {
       }
 else if(type=="expon")    penaltymat <- exponpen(basisobj,   Lfdobj)
 else if(type=="fourier")  penaltymat <- fourierpen(basisobj, Lfdobj)
-else if(type=="monom")    penaltymat <- monompen(basisobj,   Lfdobj)
+else if(type=="monom")    penaltymat <- monomialpen(basisobj,   Lfdobj)
 else if(type=="polyg")    penaltymat <- polygpen(basisobj,   Lfdobj)
 else if(type=="power")    penaltymat <- powerpen(basisobj,   Lfdobj)
 else stop("Basis type not recognizable, can not find penalty matrix")

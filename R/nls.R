@@ -93,7 +93,7 @@ nls <-
       if(diff(range(n))>0){
 #       'data' is a list that can not be coerced to a data.frame
         mf <- data
-        if(missing(start))start <- getInitian(forumla, mf)
+        if(missing(start))start <- getInitial(formula, mf)
         startEnv <- new.env(parent = environment(formula))
         for (i in names(start)) assign(i, start[[i]], envir = startEnv)
         rhs <- eval(formula[[3]], data, startEnv)
@@ -126,7 +126,7 @@ nls <-
   varNamesRHS <- varNamesRHS[ varNamesRHS %in% varNames[varIndex] ]
 
   m <- switch(algorithm,
-              plinear = nlsModel.plinear(formula, mf, start, wts),
+              plinear = stats:::nlsModel.plinear(formula, mf, start, wts),
               port = stats:::nlsModel(formula, mf, start, wts, upper),
               ## Default:
               stats:::nlsModel(formula, mf, start, wts))

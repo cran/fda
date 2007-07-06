@@ -105,7 +105,12 @@ landmarkreg <- function(fdobj, ximarks, x0marks=xmeanmarks,
     if (monwrd) {
        wcoef  <- Wfd$coefs
        Wfdinv <- fd(-wcoef,wbasis)
+#       
+       lambda <- WfdPar$lambda
+       if(is.null(lambda))
+         stop("Need 'lambda'; not found in 'WfdPar'.  Where to find?")      
        WfdParinv <- fdPar(Wfdinv, wLfd, lambda)
+#       
        Wfdinv <- smooth.morph(h, x, WfdParinv, wtn)$Wfdobj
        hinv   <- monfn(x, Wfdinv, 1)
     } else {
@@ -127,6 +132,7 @@ landmarkreg <- function(fdobj, ximarks, x0marks=xmeanmarks,
     }
     if (length(dim(coef)) == 3) {
       #  multiple variable case
+      nvar <- dim(y)[3]
       for (ivar in 1:nvar) {
         # evaluate curve as a function of h at sampling points
         yregfd <- smooth.basis(hinv, y[,irep,ivar], fdParobj, wtn)$fd

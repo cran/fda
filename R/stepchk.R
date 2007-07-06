@@ -17,7 +17,7 @@ stepchk <- function(oldstep, cvec, deltac, limwrd, ind,
           anew <- min((bot[index]-cvec[index])/deltac[index])
           if (dbgwrd) {
             print("Lower limit reached ... new step:")
-            cat(c(stepiter, round(c(oldstep, anew),4)),"\n")
+            cat(c(stepi, round(c(oldstep, anew),4)),"\n")
             cat(round(cvec + anew*deltac,4),"\n")
           }
           newstep <- anew
@@ -32,7 +32,7 @@ stepchk <- function(oldstep, cvec, deltac, limwrd, ind,
           anew <- min((top[index]-cvec[index])/deltac[index])
           if (dbgwrd) {
             print("Upper limit reached ... new step:")
-            cat(c(stepiter, round(c(oldstep, anew),4)),"\n")
+            cat(c(stepi, round(c(oldstep, anew),4)),"\n")
           }
           newstep <- anew
           limflg <- TRUE

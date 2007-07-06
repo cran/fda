@@ -61,7 +61,7 @@ if (ndim < 3){
 } else {
 	coef <- array(0,coefd)
     for(ivar in 1:nvar){
-        Dmat <- inprod(basis, fdobj[,ivar])
+        Dmat <- inprod(basisobj, fdobj[,ivar])
         coef[,,ivar] <- solve(Cmat, Dmat)
     }
 }

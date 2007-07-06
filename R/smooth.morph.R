@@ -50,6 +50,7 @@ smooth.morph <- function(x, y, WfdParobj, wt=rep(1,nobs), conv=.0001,
 		"Argument WFDPAROBJ is not a functional data object.")
 
   Wfdobj   <- WfdParobj$fd
+	Lfdobj   <- WfdParobj$Lfd
   lambda   <- WfdParobj$lambda
   basisobj <- Wfdobj$basis     #  basis for W(x)
   nbasis   <- basisobj$nbasis  #  number of basis functions
@@ -65,14 +66,11 @@ smooth.morph <- function(x, y, WfdParobj, wt=rep(1,nobs), conv=.0001,
 		"Argument values are out of range.")
   if (any(wt < 0))  stop("One or more weights are negative.")
   if (all(wt == 0)) stop("All weights are zero.")
-  zdim <- dim(zmat)
-  if (zdim[1] != nobs) stop(
-    "First dimension of ZMAT not correct.")
 
 #  set up some variables
 
   wtroot <- sqrt(wt)
-  wtrtmt <- wtroot %*% matrix(1,1,ncovp1)
+  # wtrtmt <- wtroot %*% matrix(1,1,ncovp1)
   yroot  <- y*wtroot
   climit <- c(-100*rep(1,nbasis), 100*rep(1,nbasis))
   inact  <- !active   #  indices of inactive coefficients
@@ -90,6 +88,7 @@ smooth.morph <- function(x, y, WfdParobj, wt=rep(1,nobs), conv=.0001,
 #  Compute initial function and gradient values
 
   Flist <- fngrad.smooth.morph(y, x, wt, WfdParobj, Kmat, inact, basislist)
+  Dyhat  <- result[[3]]
 
 #  compute the initial expected Hessian
 
@@ -191,7 +190,7 @@ smooth.morph <- function(x, y, WfdParobj, wt=rep(1,nobs), conv=.0001,
           #  Current step size too small ... terminate
           if (dbglev >= 2) {
             print("Stepsize too small")
-            print(avec[5])
+            # print(avec[5])
           }
           if (limflg) ind <- 1 else ind <- 4
           break
@@ -295,21 +294,35 @@ linesearch.smooth.morph <- function(Flist, hessmat, dbglev)
 fngrad.smooth.morph <- function(y, x, wt, Wfdobj, lambda,
                                    Kmat, inact, basislist)
 {
+# last modified 2007.11.28 by Spencer Graves
+# set up   
   nobs   <- length(x)
   cvec   <- Wfdobj$coefs
   nbasis <- length(cvec)
+
+# Get unnormalized function and gradient values   
   h      <- monfn(x, Wfdobj, basislist)
   Dyhat  <- mongrad(x, Wfdobj, basislist)
-  #  adjust h and Dyhat for normalization
+  
+#  adjust h and Dyhat for normalization
   hmax   <- y[nobs]
   Dymax  <- Dyhat[nobs,]
+
+# Update residulas and function values 
   width  <- y[nobs] - y[1]
   Dyhat  <- width*(hmax*Dyhat - h*Dymax)/hmax^2
   h      <- y[1] + width*h/hmax
-  wtroot <- sqrt(wt)
-  wtrtmt <- wtroot %*% matrix(1,1,ncovp1)
-  yroot  <- y*wtroot
-  xroot  <- xmat*wtrtmt
+
+# 'ncovp1' and 'xmat were used but not defined;  
+#  wtroot, yroot, xroot were not used here
+#  I couldn't find them in the Matlab version,
+#  and I couldn't see any need for them, so I commented them out 
+#  
+#  wtroot <- sqrt(wt)
+#  wtrtmt <- wtroot %*% matrix(1,1,ncovp1)
+#  yroot  <- y*wtroot
+#  xroot  <- xmat*wtrtmt
+  
   #  update residuals and function values
   res    <- y - h
   f      <- mean(res^2*wt)

@@ -204,7 +204,7 @@ CSTR2in <- function(Time, condition =
     
     index = (Time < 10); 
     Tcinvec[index] = 400 - (400 - 365)*exp(-(Time[index])/tau);
-    index = ((10 <= Tiime) & (Time < 20)); 
+    index = ((10 <= Time) & (Time < 20)); 
     Tcinvec[index] = 344 - (344 - 400)*exp(-(Time[index] - 10)/tau);
     index = (20 <= Time); 
     Tcinvec[index] = 365 - (365 - 344)*exp(-(Time[index] - 20)/tau);

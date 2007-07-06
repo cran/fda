@@ -25,7 +25,8 @@ fRegress.stderr <- function(fRegressList, y2cMap, SigmaE) {
 #  C2BMAP         ... the matrix mapping from response variable coefficients
 #                     to coefficients for regression coefficients
 
-#  Last modified 5 March 2005
+#  Last modified 2007.11.28 by Spencer Graves
+#  previosly modified 5 March 2005
 
 #  get number of independent variables
 
@@ -179,7 +180,8 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
             bstderrfdj <- data2fd(bstderrj, tfine, betabasisj)
         } else {
 	         bsterrj    <- sqrt(diag(bvarj))
-	         bstderrfdj <- fd(t(bstderrj), onebasis)
+#	         bstderrfdj <- fd(t(bstderrj), onebasis)
+	         bstderrfdj <- fd(t(bstderrj), ynbasis)
         }
         betastderrlist[[j]] <- bstderrfdj
     }

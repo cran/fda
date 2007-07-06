@@ -2,6 +2,31 @@
 ###
 ### Ramsey & Silverman (2006) Functional Data Analysis, 2nd ed. (Springer)
 ###
+### DISCLAIMER:
+###
+### These script files are incomplete and where complete 
+### do not always reproduce exactly the images in the books.  
+### Reason for this include the following:
+###
+### (1) The authors were given permission to publish the results
+###     of thier analyses but not always the data.
+### (2) These script files were produced starting in 2007
+###     not by the authors to the books but by volunteer(s)
+###     (initially Spencer Graves).  The published analyses
+###     were conducted over more than a decade, and the details
+###     of exactly how the published analyses were performed were
+###     not in some cases still available.   
+### (3) The software and capabilities of computers available
+###     have improved over time.  In some cases, this produces
+###     a better fit today than at the times the published analyses
+###     were prepared.  
+###
+### It is hoped that these script files may still be useful,
+### even with their gaps and even when they do not reproduce exactly
+### the published analyses.
+###
+### Spencer Graves
+###
 ### ch. 1.  Introduction
 ###
 ###
@@ -10,54 +35,57 @@ library(fda)
 ## Section 1.1.  What are functional data?
 ##
 # pp. 1-2, Figure 1.1.  Heights of 10 girls measured at 31 ages 
-str(growth)
-sapply(growth, class)
+#str(growth)
+#sapply(growth, class)
+with(growth, matplot(age, hgtf[, 1:10], type="b"))
 
+# Compare on different scales:  
+op <- par(mfrow=c(2,2))
+
+# connecting the dots 
 with(growth, matplot(age, hgtf[, 1:10], type="b"))
 #with(growth, matplot(age, hgtf, type="b"))
 
+with(growth, matplot(age, hgtf[, 1:10], type="b", log='x'))
+with(growth, matplot(age, hgtf[, 1:10], type="b", log='y'))
+with(growth, matplot(age, hgtf[, 1:10], type="b", log='xy'))
+par(op)
+# Best scale (most nearly linear) of these 4:  log-log 
+
+# Alternative:  with smoothing  
+# Use bspline basis with a knot at each age 
+girlGrowthSm <- with(growth, smooth.basisPar(age, hgtf))
+
+sapply(girlGrowthSm, class)
+plot(girlGrowthSm$fd[1:10])
+with(growth, matpoints(age, hgtf[, 1:10]))
+
+# alternative plot
+
+with(growth, plotfit.fd(hgtf[, 1:10], age, girlGrowthSm$fd[1:10]))
+
+# Matches Figure 1.1 quite well.  
+
+
 # Figure 1.2.  Estimated accelerations for the heights of 10 girls 
 
-# Use bspline basis with a knot at each age 
-hgtbasis <- with(growth, create.bspline.basis(range(age), 
-                                              breaks=age, norder=6))
+plot(deriv(girlGrowthSm$fd[1:10], 2))
+# NOT smooth enough
 
-girlGrowthSm01 <- with(growth, smooth.basisPar(argvals=age,
-              y=hgtf, fdobj=hgtbasis, lambda=0.01))
-girlGrowthSm0 <- with(growth, smooth.basisPar(argvals=age,
-              y=hgtf, fdobj=hgtbasis, lambda=1))
-girlGrowthSm9 <- with(growth, smooth.basisPar(argvals=age,
-              y=hgtf, fdobj=hgtbasis, lambda=1e9))
-
-with(growth, plotfit.fd(hgtf, age, girlGrowthSm01$fd))
-with(growth, plotfit.fd(hgtf, age, girlGrowthSm0$fd))
-
-create.bspline.basis(breaks=c(0,.5, 1))
-
-
-#  b-spline of order 1 (degree 0 = step functions?)  
-(bspl1 <- create.bspline.basis(norder=1, breaks=c(0,.5, 1)))
-plot(bspl1)
-# 2 bases:
-# (1) constant 1 between 0 and 0.5 and 0 otherwise
-# (2) constant 1 between 0.5 and 1 and 0 otherwise.
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Experiment with the level of smoothing via lambda:  
+girlGrowthSm.25 <- with(growth, smooth.basisPar(age, hgtf, lambda=.25))
+plot(deriv(girlGrowthSm.25$fd[1:10], 2), ylim=c(-4, 2))
+# General match to Figure 1.2 but off in some details.
+# To get a better match, we may need to use a different smoothing
+# operator in place of the default 'Lfdobj=int2Lfd(2)'.
+lines(mean(deriv(girlGrowthSm.25$fd[1:10], 2)), lty="dashed", lwd=3)
 
 # pp. 3-4, Figure 1.3.  US nondurable goods manufacturing index
 Nondurables <- ts(nondurables, start=c(1919, 10), frequency=12)
 plot(Nondurables, ylab="Nondurable Goods Index")
+
+# Or on the log scale 
+plot(Nondurables, ylab="Nondurable Goods Index", log='y')
 
 # Figure 1.4.  Tray level & vapor flow during a refinery experiment
 op <- par(mfrow=c(2, 1), mar=c(2, 4, 4, 5)+0.1, cex.lab=1.5,
@@ -125,7 +153,7 @@ par(op)
 # to the estimated temperature functions in Figure 1.6
 
 plot(TempSmooth6.4places, Lfdobj=harmaccelLfd365, 
-     axes=FALSE, xlab="Month", ylab="Temperature (C)", bty="n")
+     axes=FALSE, xlab="Month", ylab="L-Temperature", bty="n")
 
 axisIntervals(1)
 axis(2, las=1)
@@ -134,8 +162,11 @@ axis(2, las=1)
 #The results of applying the harmonic differential operator
 # L = (pi/6)^2*D+D^3 to the estimated temperature functions in Figure 1.6
 
-# I suspect there may be an error both in Figure 1.7
-# and in the caption. ??? 
+# For Figure 1.7, ylim is approximately c(-22, 22).
+# This script produces a plot with ylim approximately c(-5e-4, 5e-4).  
+# Either there is an error in Figure 1.7
+# or Figure 1.6 was not produced using the harmonic differential operator.
+
 
 # p. 8, Figure 1.8.  Hip and knee angles through a gait cycle
 
@@ -173,7 +204,8 @@ par(op)
 # p. 9-10.  Figure 1.9.  Gait cycle in the sagittal plane
 
 plot(range(gait[,,"Hip Angle"]), range(gait[,,"Knee Angle"]),
-     xlab="Hip angle (degrees)", ylab="Knee angle (degrees)")
+     xlab="Hip angle (degrees)", ylab="Knee angle (degrees)",
+     type="n")
 subj <- 1
 lines(gait[,subj,], type="b")
 ltrs <- 4*(1:5)
@@ -200,7 +232,9 @@ precipSm7.Pr.Rupert <- smooth.basisPar(argvals=day.5,
      fdobj=daybasis65, Lfdobj=harmaccelLfd365, lambda=1e7)$fd
 
 plotfit.fd(CanadianWeather$dailyAv[,Pr.Rupert, "Precipitation.mm"],
-           day.5, precipSm7.Pr.Rupert, axes=FALSE, bty="n")
+           day.5, precipSm7.Pr.Rupert, axes=FALSE, bty="n",
+           ylab="Precipitation.mm", xlab="day of the year",  
+           main="Average daily rainfall at Prince Rupert")
 
 axisIntervals(1)
 axis(2, las=1)
@@ -213,13 +247,7 @@ axis(2, las=1)
 # 'pinch' = (x-2), adjusted to a common start time
 # from what is plotted in Figure 1.11.
 
-
-
-
-
-
-
-
+matplot(pinchtime, pinch, xlab="Seconds", ylab="Force (N)", type="l")
 
 
 # p. 14.  Figure 1.12.  Annual variation in mean temperature at Montreal
@@ -237,8 +265,7 @@ plot(tempSm6.Montreal, axes=FALSE,
      xlab="Month", ylab="Mean Temperature")
 axisIntervals(1)
 axis(2)
-text(monthMid, CanadianWeather$monthlyTemp[, "Montreal"],
-     monthLetters)
+text(monthMid, CanadianWeather$monthlyTemp[, "Montreal"],     monthLetters)
 title(paste(c("Montreal average daily temp\ndeviation from average",
               " (C)"), collapse=""))
 
@@ -248,8 +275,8 @@ title(paste(c("Montreal average daily temp\ndeviation from average",
               " (C)"), collapse=""))
 par(op)
 
-# NOTE:  This image seems more accurate than the right panel
-# of Figure 1.12, because the slope should be negative, since
+# NOTE:  Figure 1.12 has the wrong sign on one of the axes:  
+# The slope should be negative, since
 # D^2(sin) = -sin & D^2(cos) = -cos ... 
 
 

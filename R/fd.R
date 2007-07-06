@@ -37,40 +37,49 @@ fd <- function (coef=matrix(0,2,1), basisobj=basisfd(), fdnames=defaultnames)
 
   #  Returns:
   #  FD ... a functional data object
-# last modified 2007 May 3 by Spencer Graves 
-  #  Previously modified 26 October 2005
+# last modified 2007.11.28 by Spencer Graves 
+  #  Previously modified 26 October 2005 & 2007.09.18
 
     #  check basisobj
 
-    if (!(inherits(basisobj, "basisfd"))) stop(
-        "Argument basis must be of basis class")
+  if (!(inherits(basisobj, "basisfd")))
+    stop("Argument basis must be of basis class")
 
-    type <- basisobj$type
+  type <- basisobj$type
 
     #  check COEF and get its dimensions
 
-    if (!is.numeric(coef)) stop("coef must be numerical vector or matrix")
-    else if (is.vector(coef)) {
-            coef  <- as.matrix(coef)
-            if (type == "constant") coef <- t(coef)
-            coefd <- dim(coef)
-            ndim  <- length(coefd)
-        }
-    else if (is.matrix(coef)) {
-            coefd <- dim(coef)
-            ndim  <- length(coefd)
-        }
-    else if (is.array(coef)) {
-            coefd <- dim(coef)
-            ndim  <- length(coefd)
-        }
-    else stop("argument coef is not correct")
+  if (!is.numeric(coef)) stop("coef must be numerical vector or matrix")
+  else if (is.vector(coef)) {
+    coef  <- as.matrix(coef)
+    if (type == "constant") coef <- t(coef)
+    coefd <- dim(coef)
+    ndim  <- length(coefd)
+  }
+  else if (is.matrix(coef)) {
+    coefd <- dim(coef)
+    ndim  <- length(coefd)
+  }
+  else if (is.array(coef)) {
+    coefd <- dim(coef)
+    ndim  <- length(coefd)
+  }
+  else stop("argument coef is not correct")
 
-    if (ndim > 3) stop(
-        "First argument not of dimension 1, 2 or 3")
+  if (ndim > 3)
+    stop("First argument not of dimension 1, 2 or 3")
 
-    if (coefd[1] != basisobj$nbasis) stop(
-        "Number of coefficients does not match number of basis functions.")
+  dropind <- basisobj$dropind
+# coefd[1] should equal basisobj$nbasis - length(dropind)
+# However, fd is not yet programmed for dropind.
+# Therefore, trap it:
+  if(length(dropind)>0)
+    stop("'fd' not yet programmed to handle 'dropind'") 
+
+# If dropind is not trapped earlier, it will generate the following
+# cryptic error message:    
+  if (coefd[1] != basisobj$nbasis)
+    stop("Number of coefficients does not match number of basis functions.")
 
     #  setup number of replicates and number of variables
 
@@ -215,9 +224,11 @@ if (inherits(e1, "fd") && inherits(e2, "fd")) {
     if (coefd1[2] >  1 && coefd2[2] == 1) {
         if      (ndim2 == 2) coef2 <- outer(coef2,rep(1,coefd1[2]))
         else if (ndim1 == 3) {
-            temp <- zeros(coefd1)
+#            temp <- zeros(coefd1)
+            temp <- array(0, dim=coefd1)
             for (j in 1:coefd2[3])
-                temp[,,j] <- squeeze(coef2[,1,j])*ones(1,coefd1[2])
+#                temp[,,j] <- squeeze(coef2[,1,j])*ones(1,coefd1[2])
+                temp[,,j] <- (coef2[, 1, j, drop=TRUE] %o% rep(1, coefd1[2]))
             coef2 <- temp
         } else
             stop("Dimensions of coefficient matrices not compatible.")
@@ -273,12 +284,13 @@ if (inherits(e1, "fd") && inherits(e2, "fd")) {
     }
  } else {
     #  one argument is numeric and the other is functional
-    if (!(isnumeric(e1) || isnumeric(e2)))
+    if (!(is.numeric(e1) || is.numeric(e2)))
         stop("Neither argument for + is numeric.")
-    if (isnumeric(e1) && isa_fd(e2)) {
+#    if (is.numeric(e1) && isa_fd(e2)) {
+    if (is.numeric(e1) && is.fd(e2)) {
         fac   <- e1
         fdobj <- e2
-    } else if (isa_fd(e1) && isnumeric(e2)) {
+    } else if (is.fd(e1) && is.numeric(e2)) {
         fac   <- e2
         fdobj <- e1
     } else
@@ -302,7 +314,7 @@ if (inherits(e1, "fd") && inherits(e2, "fd")) {
     } else stop(paste("Dimensions of numerical factor and functional",
                        " factor cannot be reconciled."))
     fdarray <- fac + fdmat
-    coefsum <- project_basis(fdarray, evalarg, basisobj)
+    coefsum <- project.basis(fdarray, evalarg, basisobj)
     fdnames <- fdobj$fdnames
     if (length(fac) == 1)
         fdnames[[3]] <- paste(fac," + ",fdnames[[3]])
@@ -398,9 +410,11 @@ if (inherits(e1, "fd") && inherits(e2, "fd")) {
     if (coefd1[2] >  1 && coefd2[2] == 1 ) {
         if      (ndim2 == 2) coef2 <- outer(coef2,rep(1,coefd1[2]))
         else if (ndim1 == 3) {
-            temp <- zeros(coefd1)
+#            temp <- zeros(coefd1)
+            temp <- array(0, dim=coefd1)
             for (j in 1:coefd2[3])
-                temp[,,j] <- squeeze(coef2[,1,j])*ones(1,coefd1[2])
+#                temp[,,j] <- squeeze(coef2[,1,j])*ones(1,coefd1[2])
+                temp[,,j] <- (coef2[,1,j, drop=TRUE] %o% rep(1,coefd1[2]))
             coef2 <- temp
         } else
             stop("Dimensions of coefficient matrices not compatible.")
@@ -456,12 +470,12 @@ if (inherits(e1, "fd") && inherits(e2, "fd")) {
     }
  } else {
     #  one argument is numeric and the other is functional
-    if (!(isnumeric(e1) || isnumeric(e2)))
+    if (!(is.numeric(e1) || is.numeric(e2)))
         stop("Neither argument for - is numeric.")
-    if (isnumeric(e1) && isa_fd(e2)) {
+    if (is.numeric(e1) && is.fd(e2)) {
         fac   <- e1
         fdobj <- e2
-    } else if (isa_fd(e1) && isnumeric(e2)) {
+    } else if (is.fd(e1) && is.numeric(e2)) {
         fac   <- e2
         fdobj <- e1
     } else
@@ -485,7 +499,7 @@ if (inherits(e1, "fd") && inherits(e2, "fd")) {
     } else stop(paste("Dimensions of numerical factor and functional",
                        " factor cannot be reconciled."))
     fdarray <- fac - fdmat
-    coefsum <- project_basis(fdarray, evalarg, basisobj)
+    coefsum <- project.basis(fdarray, evalarg, basisobj)
     fdnames <- fdobj$fdnames
     if (length(fac) == 1)
         fdnames[[3]] <- paste(fac," - ",fdnames[[3]])
@@ -688,7 +702,7 @@ if ( inherits(e1, "fd") & inherits(e2, "fd") ) {
     } else if (is.numeric(e2) && inherits(e1, "fd")) {
         fac   <- e2
         fdobj <- e1
-    } else top("One of the arguments for * is of the wrong class.")
+    } else stop("One of the arguments for * is of the wrong class.")
     coef     <- fdobj$coefs
     coefd    <- dim(coef)
     fac <- as.vector(fac)
@@ -780,26 +794,29 @@ sqrt.fd <- function(x)
 
 mean.fd <- function(x, ...)
 {
-	coef      <- x$coefs
-  	coefd     <- dim(coef)
-  	ndim      <- length(coefd)
-  	basisobj  <- x$basis
-  	nbasis    <- basisobj$nbasis
- 	if (ndim == 2) {
-    	coefmean  <- matrix(apply(coef,1,mean),nbasis,1)
-    	coefnames <- list(dimnames(coef)[[1]],"Mean")
-  	} else {
-    	nvar <- coefd[3]
-    	coefmean  <- array(0,c(coefd[1],1,nvar))
-    	for (j in 1:nvar) coefmean[,1,j] <- apply(coef[,,j],1,mean)
-    	coefnames <- list(dimnames(coef)[[1]], "Mean", dimnames(coef)[[3]])
-  	}
-  	fdnames <- x$fdnames
-  	fdnames[[2]] <- "mean"
-  	fdnames[[3]] <- paste("mean",fdnames[[3]])
-  	meanfd <- fd(coefmean, basisobj, fdnames)
-
-  	meanfd
+  if(!inherits(x, 'fd'))
+    stop("'x' is not of class 'fd'")
+#   
+  coef      <- x$coefs
+  coefd     <- dim(coef)
+  ndim      <- length(coefd)
+  basisobj  <- x$basis
+  nbasis    <- basisobj$nbasis
+  if (ndim == 2) {
+    coefmean  <- matrix(apply(coef,1,mean),nbasis,1)
+    coefnames <- list(dimnames(coef)[[1]],"Mean")
+  } else {
+    nvar <- coefd[3]
+    coefmean  <- array(0,c(coefd[1],1,nvar))
+    for (j in 1:nvar) coefmean[,1,j] <- apply(coef[,,j],1,mean)
+    coefnames <- list(dimnames(coef)[[1]], "Mean", dimnames(coef)[[3]])
+  }
+  fdnames <- x$fdnames
+  fdnames[[2]] <- "mean"
+  fdnames[[3]] <- paste("mean",fdnames[[3]])
+  meanfd <- fd(coefmean, basisobj, fdnames)
+#  
+  meanfd
 }
 
 #  -----------------------------------------------------------------------

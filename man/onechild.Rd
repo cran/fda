@@ -1,6 +1,5 @@
 \name{onechild}
 \alias{onechild}
-\non_function{}
 \title{
   growth in height of one 10-year-old boy 
 }
@@ -21,9 +20,7 @@
 	}
     }
 }
-\details{
 
-}
 \source{
   Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
     Functional Data Analysis, 2nd ed.}, Springer, New York. 

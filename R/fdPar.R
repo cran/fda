@@ -42,41 +42,41 @@ fdPar <- function(fdobj=fd(), Lfdobj=int2Lfd(0), lambda=0, estimate=TRUE,
 #
 #  Return:
 #  FDPAROBJ ... A functional parameter object
-#  Last modified 3 May 2007 by Spencer Graves
+#  Last modified 2007.09.18 by Spencer Graves
 #  Previously modified 1 March 2007
 
 #  ----------------------------------------------------------------------
 #                            Check parameters
 #  ----------------------------------------------------------------------
 
-if (nargs()==0) {
+  if (nargs()==0) {
 	#  case of no argument:  no default argument defined at this point
-      stop("fdPar called with no arguments.")
-}  else {
-	if (inherits(fdobj, "basisfd")) {
+    stop("fdPar called with no arguments.")
+  }  else {
+    if (inherits(fdobj, "basisfd")) {
        #  if the first argument is a basis object, convert it to
        #  a default FD object with an empty coefficient matrix.
-		nbasis  <- fdobj$nbasis
-		dropind <- fdobj$dropind
-		nbasis  <- nbasis - length(dropind)
-		coef    <- matrix(0,nbasis,1)
-		fdobj   <- fd(coef, fdobj)
-	}
-	else if (inherits(fdobj,"fd")) {
-       basisobj <- fdobj$basis
-		nbasis   <- basisobj$nbasis
-		dropind  <- basisobj$dropind
-		nbasis   <- nbasis - length(dropind)
-   }
-	else stop("First argument is neither a functional data object nor a basis object.")
-}
+      nbasis  <- fdobj$nbasis
+      dropind <- fdobj$dropind
+      nbasis  <- nbasis - length(dropind)
+      coef    <- matrix(0,nbasis,1)
+      fdobj   <- fd(coef, fdobj)
+    }
+    else if (inherits(fdobj,"fd")) {
+      basisobj <- fdobj$basis
+      nbasis   <- basisobj$nbasis
+      dropind  <- basisobj$dropind
+      nbasis   <- nbasis - length(dropind)
+    }
+    else stop("First argument is neither a functional data object nor a basis object.")
+  }
 
 #  check Lfdobj
 
-Lfdobj <- int2Lfd(Lfdobj)
+  Lfdobj <- int2Lfd(Lfdobj)
 
-if (!inherits(Lfdobj, "Lfd"))
-	stop("LFDOBJ is not a linear differential operator object.")
+  if (!inherits(Lfdobj, "Lfd"))
+    stop("LFDOBJ is not a linear differential operator object.")
 
 #  check lambda
 
@@ -91,7 +91,8 @@ if (!is.logical(estimate)) stop("Class of ESTIMATE is not logical.")
 
 if (!is.null(penmat)) {
     if (!is.numeric(penmat)) stop("PENMAT is not numeric.")
-    penmatsize <- size(penmat)
+#    penmatsize <- size(penmat)
+    penmatsize <- dim(penmat)
     if (any(penmatsize != nbasis)) stop("Dimensions of PENMAT are not correct.")
 }
 
@@ -148,7 +149,7 @@ summary.fdPar <- function(object, ...)
 	cat(paste("\nSmoothing parameter =",object$lambda,"\n"))	
 	cat(paste("\nEstimation status =",object$estimate,"\n"))
       if (!is.null(object$penmat)) 
-          print(paste("Penalty matrix dimensions:",dim(penmat)))
+          print(paste("Penalty matrix dimensions:",dim(object$penmat)))
 }
 
 

@@ -24,9 +24,13 @@ plotfit.fd <- function(y, argvals, fdobj, rng = rangeval,
 #  SORTWRD  ... sort plots by mean square error
 #  TITLES   ... vector of title strings for curves
 
-# Last modified 2007.05.03 by Spencer Graves
+# Last modified 2007.10.03 by Spencer Graves
+  
 #  Previously modified 20 March 2006
-	
+
+  dots <- list(...)
+  if(is.null(titles) && ("main" %in% names(dots)))
+    titles <- dots$main
   if (!(inherits(fdobj, "fd"))) stop(
 		"Third argument is not a functional data object.")
 

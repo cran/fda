@@ -1,6 +1,5 @@
 \name{refinery}
 \alias{refinery}
-\non_function{}
 \title{
   Reflux and tray level in a refinery
 }
@@ -10,21 +9,20 @@
 }
 \format{
   A data.frame with the following components:  
-    \describe{
-	\item{Time}{
-	  observation time 0:193 
-	}
-	\item{Reflux}{
-	  reflux flow centered on the mean of the first 60 observations 
-	}
-	\item{Tray47}{
-	  tray 47 level centered on the mean of the first 60
-	  observations 
-	}
+  \describe{
+    \item{Time}{
+      observation time 0:193 
     }
+    \item{Reflux}{
+      reflux flow centered on the mean of the first 60 observations 
+    }
+    \item{Tray47}{
+      tray 47 level centered on the mean of the first 60
+      observations 
+    }
+  }
 }
-\details{
-}
+
 \source{
   Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
     Data Analysis, 2nd ed.}, Springer, New York, p. 4, Figure 1.4, and

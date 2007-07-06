@@ -61,7 +61,8 @@ plotscores <- function(pcafd, scores = c(1, 2), xlab = NULL, ylab = NULL,
       "; Score", scores[2], "=", signif(zz$y, 2))
    names(fdnames)[2] <- "Sample function"
    names(fdnames)[3] <- "Function value"
-   fd <- create.fd(coefs, pcafd$meanfd$basis, fdnames)
+#   fd <- create.fd(coefs, pcafd$meanfd$basis, fdnames)
+   fd <- fd(coefs, pcafd$meanfd$basis, fdnames)
    plot(fd, matplt = matplt2)
    return(zz)
 }

@@ -1,5 +1,5 @@
-register.fd <- function(y0fd, yfd, WfdParobj,
-                        conv=1e-4, iterlim=20, dbglev=1, periodic=FALSE, crit=2)
+register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=c(Lfdobj=2, lambda=1),
+                    conv=1e-4, iterlim=20, dbglev=1, periodic=FALSE, crit=2)
 {
 #REGISTERFD registers a set of curves YFD to a target function Y0FD.
 #  Arguments are:
@@ -37,85 +37,155 @@ register.fd <- function(y0fd, yfd, WfdParobj,
 #                         warping fns
 #    REGSTR$SHIFT ... Shift parameter value if curves are periodic
 
-#  last modified 13 March 2007
+# Last modified 2007.09.13 by Spencer Graves  
+#  previously modified 13 March 2007
 
+##
+## 1.  Check y0fd and yfd
+##  
 #  check classes of first two arguments
-
-if (!(inherits(y0fd, "fd")))
-	stop("First argument is not a functional data object.")
-
-if (!(inherits(yfd, "fd")))
-	stop("Second argument is not a functional data object.")
-	
+  if(is.null(yfd)){
+    yfd <- y0fd
+    y0fd <- NULL
+  }
+#  
+  if (!(inherits(yfd, "fd")))
+      stop("'yfd' must be a functional data object.  ",
+           "Instead, class(yfd) = ", class(yfd))
+#
+#  nobs <- dim(yfd$coefs)[2]
+#  if(nobs<2)stop("Only one observation supplied; no registration possible.")
+  {
+    if(is.null(y0fd))
+      y0fd <- mean.fd(yfd) 
+    else
+      if (!(inherits(y0fd, "fd")))
+        stop("First argument is not a functional data object.",
+             "Instead, class(y0fd) = ", class(y0fd))    
+  }
 #  Check target function to determine number of variables.
-
 #  If the coefficient matrix is 3-dimensional, then the second
 #  dimension size must be 1, and if not, an error will be declared.
-#  If it is 1, however, then it the size of the third dimension will
+#  If it is 1, however, then the size of the third dimension will
 #  be taken to be the number of variables for a multivariate set
 #  of curves.  A 3-dimensional coefficient matrix for the target 
 #  will then be contracted to two dimensions.  
-
-y0coefs <- y0fd$coefs
-y0dim   <- dim(y0coefs)
-ndimy0  <- length(y0dim)
-if (ndimy0 == 3) {
-   if (y0dim[2] > 1) {
-       stop("Y0FD is not a single function.")
-   } else {
-       y0coefs <- y0coefs[,1,]
-       y0fd$coefs <- y0coefs
-   }
-}
-
+  y0coefs0 <- y0fd$coefs
+  y0dim0   <- dim(y0coefs0)
+  ndimy00  <- length(y0dim0)
+# If y0coefs is 3 dimensional, convert it to 2.    
+  if (ndimy00 == 3) {
+    if (y0dim0[2] > 1) {
+      stop("'y0fd' must be a single functional observation ",
+           "matching 'yfd';  instead it is ", y0dim0[2],
+           " observations.")
+    } else {
+#     Convert y0coefs from 3 to 2 dimensions       
+      y0coefs. <- y0coefs0[,1,, drop=TRUE]
+      y0fd$coefs <- y0coefs.
+    }
+  }
 #  The target function coefficient matrix is now taken to be 
 #  2-dimensional, and the size of the second dimension is taken to be
 #  the number of variables to be registered. If this size
 #  is greater than one, the functional data objects to be registered 
 #  are assumed to be multivariate.
 
-y0coefs <- y0fd$coefs
-y0dim   <- dim(y0coefs)
-nvar    <- y0dim[2]
+  y0coefs <- y0fd$coefs
+  y0dim   <- dim(y0coefs)
+  nvar    <- y0dim[2]
     
 #  check functions to be registered
 
-ydim   <- dim(yfd$coefs)
-ncurve <- ydim[2]
-ndimy  <- length(ydim)
+  ydim   <- dim(yfd$coefs)
+  ncurve <- ydim[2]
+  ndimy  <- length(ydim)
 
-if (ndimy > 3) stop("YFD is more than 3-dimensional.")
+  if (ndimy > 3) stop("'yfd' is more than 3-dimensional.")
 
-if (ndimy == 2) {
-   if (nvar > 1) stop(
-       paste("Y0FD indicates function are multivariate,",
-             "but is YFD is only 2-dimensional."))
-}
+  if (ndimy == 2) {
+    if (nvar > 1) stop("'y0fd' indicates function are multivariate,", 
+                       "but is 'yfd' is only 2-dimensional.") 
+  }
 
 #  Extract basis information from YFD
 
-ybasis  <- yfd$basis
-ynbasis <- ybasis$nbasis
-if (periodic && !(ybasis$type == "fourier"))
-      stop("PERIODIC is true, basis not fourier type.")
+  ybasis  <- yfd$basis
+  ynbasis <- ybasis$nbasis
+  if (periodic && !(ybasis$type == "fourier"))
+    stop("'periodic' is TRUE but 'type' is not 'fourier'; ",
+         "periodic B-splines are not currently part of 'fda'")
+
+##
+## 2.  Check WfdParobj
+##
+  if(!inherits(WfdParobj, "fdPar")){
+#  2.1.  Extract Lfdobj and lambda from WfdParobj     
+    WfdPnames <- names(WfdParobj)
+    {
+      if(is.null(WfdPnames)){
+        if(length(WfdPnames)>2)
+          stop("'WfdParobj' is not of class 'fdPar' and does not ",
+               "have components 'Lfdobj' and 'lambda'")
+        Lfdobj <- WfdParobj[[1]]
+        {
+          if(length(WfdParobj>1))
+            lambda <- WfdParobj[[2]]
+          else
+            lambda <- 1
+        }
+      }
+      else {
+#    
+        WfdPargs <- c(WfdPnames %in% c("Lfdobj", "lambda"))
+        
+        if(sum(WfdPargs) < 1)
+          stop("'WfdParobj' is not of class 'fdPar' and does ",
+               "not have components 'Lfdobj' and 'lambda'")
+        {
+          if("Lfdobj" %in% WfdPnames)
+            Lfdobj <- as.list(WfdParobj)$Lfdobj
+          else
+            Lfdobj <- 2
+        }
+#
+        {
+          if("lambda" %in% WfdPnames)
+            lambda <- as.list(WfdParobj)$lambda
+          else
+            lambda <- 1
+        }
+      }
+    }
+#  2.2.  Create WfdParobj from Lfdobj and lambda
+#     start with a zero matrix     
+    WfdPc0 <- matrix(0, ynbasis, ncurve)
+#     convert to a functional data object
+    Wfd0 <- fd(WfdPc0, ybasis)
+#     convert to a functional parameter object
+    WfdParobj <- fdPar(Wfd0, Lfdobj, lambda)     
+  }
+##
+## 3.  Do the work   
+##  
 
 #  check functions W defining warping functions
 
-Wfd0   <- WfdParobj$fd
-wcoef  <- Wfd0$coefs
-wbasis <- Wfd0$basis
-nbasis <- wbasis$nbasis
-wtype  <- wbasis$type
-rangex <- wbasis$rangeval
-wdim   <- dim(wcoef)
-ncoef  <- wdim[1]
-ndimw  <- length(wdim)
-if (wdim[ndimw] == 1) ndimw <- ndimw - 1
-if (ndimw == 1 && ncurve > 1)
-      stop("WFD and YFD do not have the same dimensions.")
-if (ndimw == 2 && wdim[2] != ncurve)
-      stop("WFD and YFD do not have the same dimensions.")
-if (ndimw > 2)  stop("WFD is not univariate.")
+  Wfd0   <- WfdParobj$fd
+  wcoef  <- Wfd0$coefs
+  wbasis <- Wfd0$basis
+  nbasis <- wbasis$nbasis
+  wtype  <- wbasis$type
+  rangex <- wbasis$rangeval
+  wdim   <- dim(wcoef)
+  ncoef  <- wdim[1]
+  ndimw  <- length(wdim)
+  if (wdim[ndimw] == 1) ndimw <- ndimw - 1
+  if (ndimw == 1 && ncurve > 1)
+    stop("WFD and YFD do not have the same dimensions.")
+  if (ndimw == 2 && wdim[2] != ncurve)
+    stop("WFD and YFD do not have the same dimensions.")
+  if (ndimw > 2)  stop("WFD is not univariate.")
 
 #  set up a fine mesh of argument values
 

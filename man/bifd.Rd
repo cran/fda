@@ -5,15 +5,13 @@
 }
 \description{
   This function creates a bivariate functional data object, which
-  consists of two bases for expanding a functional data object of two
-  variables, s and t, 
-  and a set of coefficients defining this expansion.  The bases are
-  contained in "basisfd" objects.
+  consists of two bases for expanding a functional data object of two 
+  variables, s and t, and a set of coefficients defining this expansion.
+  The bases are contained in "basisfd" objects.
 }
 \usage{
-bifd (coef=matrix(0,2,1), sbasisobj=basis(), tbasisobj=basis(),
-                  fdnames=defaultnames)
-
+bifd (coef=matrix(0,2,1), sbasisobj=create.bspline.basis(),
+      tbasisobj=create.bspline.basis(), fdnames=defaultnames)
 }
 \arguments{
   \item{coef}{
@@ -70,10 +68,7 @@ bifd (coef=matrix(0,2,1), sbasisobj=basis(), tbasisobj=basis(),
     and of the proper length, and to 'var1', ..., otherwise.  
   }
 }
-\details{
-  
-  
-}
+
 \value{
   A bivariate functional data object = a list of class 'bifd' 
   with the following components:
@@ -97,7 +92,7 @@ bifd (coef=matrix(0,2,1), sbasisobj=basis(), tbasisobj=basis(),
   }
 }
 \author{ Spencer Graves  }
-}
+
 \seealso{
   \code{\link{basisfd}}
   \code{\link{data2fd}} 

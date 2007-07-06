@@ -402,7 +402,11 @@ CSTRsse(par, datstruct, fitstruct, CSTRbasis, lambda)
   Series B. To appear.
 
   Ramsay, J. O., and Silverman, B. W. (2006) Functional Data Analysis,
-  2nd ed. (Springer)  
+  2nd ed. (Springer)
+
+  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
+    Functional Data Analysis}, Springer, New York
+
 }
 
 \seealso{
