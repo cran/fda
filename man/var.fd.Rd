@@ -54,10 +54,10 @@ var.fd(fdobj1, fdobj2=fdobj1)
   cases.  
 }
 \seealso{
-\code{\link{mean.fd}}, 
-\code{\link{sd.fd}}, 
-\code{\link{std.fd}}
-\code{\link{stdev.fd}}
+  \code{\link{mean.fd}}, 
+  \code{\link{sd.fd}}, 
+  \code{\link{std.fd}}
+  \code{\link{stdev.fd}}
 }
 \examples{
 ##

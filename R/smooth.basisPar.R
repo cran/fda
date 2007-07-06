@@ -1,12 +1,24 @@
-smooth.basisPar <- function(argvals, y, fdobj=NULL, Lfdobj=int2Lfd(2),
+smooth.basisPar <- function(argvals, y, fdobj=NULL, Lfdobj=NULL,
       lambda=1/diff(range(argvals)), estimate=TRUE, penmat=NULL, 
-      wtvec=rep(1,n), dffactor=1,
-      fdnames=list(NULL, dimnames(y)[[2]], NULL) ){
+      wtvec=rep(1, length(argvals)), fdnames=NULL ){
 ##
-## 1.  fdPar
+## 1.  fdobj
 ##
-  if(is.null(fdobj))
-    fdobj <- create.bspline.basis(argvals) 
+  {
+    if(is.null(fdobj))
+      fdobj <- create.bspline.basis(argvals)
+    else {
+      if(is.numeric(fdobj)){
+        if(length(fdobj)==1) {
+          if(round(fdobj) != fdobj)
+            stop("'fdobj' is numeric but not an integer")
+          fdobj <- create.bspline.basis(argvals, norder=fdobj)
+        }
+        else
+          fdobj <- fd(fdobj)
+      }
+    }
+  }      
 ##
 ## 2.  fdPar
 ##
@@ -20,8 +32,5 @@ smooth.basisPar <- function(argvals, y, fdobj=NULL, Lfdobj=int2Lfd(2),
 #  smoothB <- smooth.basis(argvals, y, fdP, wtvec=w,
 #        dffactor=dffactor, fdnames=fdnames)
   smooth.basis(argvals, y, fdP, wtvec=w,
-        dffactor=dffactor, fdnames=fdnames)
+        fdnames=fdnames)
 }
-
-
-  

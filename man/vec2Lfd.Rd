@@ -32,6 +32,5 @@ a linear differential operator object
 #  analysis of the daily temperature data
 harmaccelLfd <- vec2Lfd(c(0,(2*pi/365)^2,0), c(0,365))
 }
-\keyword{}
 % docclass is function
 \keyword{smooth}

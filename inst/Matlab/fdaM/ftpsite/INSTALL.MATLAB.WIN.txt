@@ -1,0 +1,87 @@
+   Installation Notes for Matlab Functions in Windows Systems
+
+                     Jim Ramsay,  McGill University
+
+To install the Matlab functions and sample analyses in a Windows
+98/NT/2000/XP system, using Matlab Version 5 through 6.5, follow these
+instructions, which will install:
+--  the Matlab functions
+--  the sample analyses and the data that are analyzed
+
+
+A.  Installing the Matlab functions:
+
+1. Create a directory to contain the Matlab functions.  For example, on
+my system the directory is
+
+    c:\Matlab\fdaM
+
+2. Put the file "Matlabfunctions.zip" into this directory.
+
+3. Extract the function files, each with extension ".m", from this
+.zip file using a utility such as WinZip (available on the Web).  Each
+of these function files will contain a function with the same name as
+the file, and possibly some supporting functions only used by this
+function.  Documentation on the use of the functions is found in the
+leading lines of the file.
+
+4.  Within this directory, create a subdirectory with the name "@fd".
+That is, on my system, this would have the path
+
+    c:\Matlab\fdaM\@fd
+
+This subdirectory will contain functions that are process objects of the
+"fd" class.  Move the file "@fd.zip" into this directory, and extract
+the function files as you did in step 3.
+
+5.  Repeat step 4 with subdirectory names
+  -- @basis  containing .zip file basis.zip
+  -- @bifd   containing .zip file bifd.zip
+  -- @fdPar  containing .zip file fdPar.zip
+  -- @Lfd    containing .zip file Lfd.zip
+
+Thus, on my system, these five directories have paths
+
+    c:\Matlab\fdaM\@basis
+    c:\Matlab\fdaM\@bifd
+    c:\Matlab\fdaM\@fd
+    c:\Matlab\fdaM\@fdPar
+    c:\Matlab\fdaM\@Lfd
+
+and each subdirectory should now contain the unzipped functions
+appropriate to that directory.
+
+
+B.  Installing the examples:
+
+There are currently six sample analyses bundled with the data
+that are analyzed:
+-- the gait data,                      in file gait.zip
+-- the growth data,                    in file growth.zip
+-- the handwriting data,               in file handwrit.zip
+-- the lip movement data,              in file lip.zip
+-- the pinch force data,               in file pinch.zip
+-- the monthly and daily weather data, in file weather.zip
+
+You might consider setting up a separate subdirectory for each of these
+analyses, perhaps within a directory "examples" in the directory
+containing the functions set up above.
+
+For each of these analyses and data, move the .zip file with appropriate
+name into the appropriate subdirectory.  Then extract the files in this
+file using WinZip or some other utility.
+
+To run a sample analysis, start Matlab.  At the top of each sample
+analysis file, with the extension ".m", you will find two "addpath"
+commands that attach, respectively, the "functions" directory, and the
+directory containing the sample data.  The paths in these commands are
+what I use in my system, and you may have to change them to what is
+appropriate for your system.  For example, at the top of the "monthly.m"
+file, you will find the two commands
+
+      addpath('c:\\Matlab\\fdaM')
+      addpath('c:\\Matlab\\fdaM\\examples\\weather')
+
+that add the needed paths on my system.
+
+Last modified on 9 February 2004

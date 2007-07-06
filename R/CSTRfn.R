@@ -720,7 +720,7 @@ CSTRfn <- function(parvec, datstruct, fitstruct,
       Dres = rbind(Dres, phimat%*%DcDtheta[ind2,]/sqrt(Twt))
   }
 ##
-## 8.  Done
+## 9.  Done
 ##  
 #  list(res=res, Dres=Dres, fitstruct=fitstruct, df=df, lambda=lambda, gradwrd=gradwrd)
   list(res=res, Dres=Dres, fitstruct=fitstruct, df=df., gcv=gcv)

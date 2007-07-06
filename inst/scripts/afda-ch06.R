@@ -458,7 +458,7 @@ range(smB.wrpG.1)
 #smG.warpB. <- 1+17*smG.warpB / rep(smG.warpB[nPts,], each=nPts)
 #range(smG.warpB.)
 #  1 18
-str(smB.warpG.)
+str(smB.warpG.1)
 
 op <- par(mfrow=c(2,2))
 plot(agefine, smB.wrpG.1, type="l")

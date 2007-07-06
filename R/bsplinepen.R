@@ -4,8 +4,8 @@ bsplinepen <- function(basisobj, Lfdobj=2, rng=basisobj$rangeval)
 #  Computes the Bspline penalty matrix.
 #  Arguments:
 #  BASISOBJ    a basis.fd object of type "bspline"
-#  LFDOBJ      A linear differential operator object.
-#  RNG         A range over which the product is evaluate
+#  LFDOBJ      a linear differential operator object.
+#  RNG         a range over which the product is evaluate
 #  Returns the penalty matrix.
 
 #  Last modified 26 October 2005

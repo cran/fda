@@ -190,7 +190,7 @@ plot(bspl3.4)
 #     from (0,0 to (.5, .5) to match
 # (3 & 4) = complements to (2 & 1).  
 
-# Default b-spline basis
+# Default B-spline basis
 (bSpl4.23 <- create.bspline.basis())
 # Cubic bspline (norder=4) with nbasis=23,
 # so nbreaks = nbasis-norder+2 = 21, 

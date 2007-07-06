@@ -18,24 +18,26 @@ daily
   same data.  'CanadianWeather' may be preferred for most purposes;
   'daily' is included primarily for compatability with scripts written
   before the other format became available and for compatability with
-  the Matlab 'fda' code.    
+  the Matlab 'fda' code.  
 
   \item{CanadianWeather}{
     A list with the following components:
 
     \itemize{
       \item{dailyAv}{
-	a three dimensional array c(365, 35, 3) summarizing data collected
-	at 35 different weather stations in Canada on the following:
+	a three dimensional array c(365, 35, 3) summarizing data
+	collected at 35 different weather stations in Canada on the
+	following:
 	
-	[[1]] Temperature.C:  average daily temperature for each day of the year
+	[,,1] = [,, 'Temperature.C']:  average daily temperature for
+	each day of the year 
 	
-	[[2]] Precipitation.mm:  average daily rainfall for each day of
-	the year rounded to 0.1 mm.  
+	[,,2] = [,, 'Precipitation.mm']:  average daily rainfall for
+	each day of the year rounded to 0.1 mm.  
 
-	[[3]] log10precip:  base 10 logarithm of Precipitation.mm after
-	first replacing 27 zeros by 0.05 mm (Ramsay and Silverman 2006,
-	p. 248).   
+	[,,3] = [,, 'log10precip']:  base 10 logarithm of
+	Precipitation.mm after first replacing 27 zeros by 0.05 mm
+	(Ramsay and Silverman 2006, p. 248).   
       }    
       \item{place}{
 	Names of the 35 different weather stations in Canada whose data
@@ -43,6 +45,17 @@ daily
 	characters in length.  By contrast, daily[["place"]] which are
 	all 11 characters, with names having fewer characters being
 	extended with trailing blanks.  
+      }
+      \item{province}{
+	names of the Canadian province containing each place
+      }
+      \item{coordinates}{
+	a numeric matrix giving 'N.longitude' and 'W.latitude' for each
+	place.  
+      }
+      \item{region}{
+	Which of 4 climate zones contain each place:  Atlantic, Pacific,
+	Continental, Arctic.  
       }
       \item{monthlyTemp}{
 	A matrix of dimensions (12, 35) giving the average temperature
@@ -93,8 +106,10 @@ daily
     Functional Data Analysis}, Springer, New York
 
 }
-%\seealso{\code{\link{eval.penalty}}}
+\seealso{
+  \code{\link{monthAccessories}}}
 \examples{
+data(CanadianWeather) 
 # Expand the left margin to allow space for place names 
 op <- par(mar=c(5, 4, 4, 5)+.1)
 # Plot

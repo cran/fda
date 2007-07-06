@@ -1,4 +1,5 @@
-\name{monthAccessories}
+\name{dateAccessories}
+\alias{dateAccessories}
 \alias{monthAccessories}
 \alias{dayOfYear}
 \alias{day.5}
@@ -44,8 +45,8 @@
     monthEnd.5)/2  
   }
   \item{monthLetters}{
-    A character vector of c("j", "FALSE", "m", "A", "M", "J", "J", "A", "S",
-    "O", "N", "D"), with 'month.abb' as the names.  
+    A character vector of c("j", "F", "m", "A", "M", "J", "J", "A",
+    "S", "O", "N", "D"), with 'month.abb' as the names.  
   }
   \item{weeks}{
     a numeric vector of length 53 marking 52 periods of approximately 7
@@ -66,11 +67,7 @@
 \seealso{
   \code{\link{month.abb}} 
 }
-\examples{
-
-
-
-}
+%\examples{ }
 % docclass is function
 \keyword{datasets}
 

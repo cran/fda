@@ -1,53 +1,52 @@
-smooth.basis <- function (argvals, y, fdParobj, wtvec=rep(1,n), dffactor=1,
-                          fdnames=list(NULL, dimnames(y)[2], NULL)) 
+smooth.basis <- function (argvals, y, fdParobj,
+                          wtvec=rep(1,length(argvals)), fdnames=NULL) 
 {
+# ARGVALS ... A set of argument values, set by default to equally spaced 
+#             on the unit interval (0,1).
+# Y       ... an array containing values of curves
+#             If the array is a matrix, rows must correspond to argument
+#             values and columns to replications, and it will be assumed
+#             that there is only one variable per observation.
+#             If Y is a three-dimensional array, the first dimension
+#             corresponds to argument values, the second to replications,
+#             and the third to variables within replications.
+#             If Y is a vector, only one replicate and variable are assumed.
+# FDPAROBJ... A functional parameter or fdPar object.  This object
+#             contains the specifications for the functional data
+#             object to be estimated by smoothing the data.  See
+#             comment lines in function fdPar for details.
+#             This argument may also be either a FD object, or a
+#             BASIS object.  In this case, the smoothing parameter
+#             LAMBDA is set to 0.
+# WTVEC   ... A vector of N weights, set to one by default, that can
+#             be used to differentially weight observations.
+# DFFACTOR... A multiplier of df in GCV, set to one by default
+# FDNAMES ... A cell of length 3 with names for
+#             1. argument domain, such as 'Time'
+#             2. replications or cases
+#             3. the function.
+# Returns a list containing:
+#   FDOBJ ...  an object of class fd containing coefficients.
+#   DF    ...  a degrees of freedom measure.
+#   GCV   ...  a measure of lack of fit discounted for df.
+#              If the function is univariate, GCV is a vector
+#              containing the error  sum of squares for each
+#              function, and if the function is multivariate,
+#              GCV is a NVAR by NCURVES matrix.
+#   COEF  ...  the coefficient matrix for the basis function
+#                expansion of the smoothing function
+#   SSE   ...  the error sums of squares.
+#              SSE is a vector or matrix of the same size as
+#              GCV.
+#   PENMAT...  the penalty matrix.
+#   Y2CMAP...  the matrix mapping the data to the coefficients.
 
-#  ARGVALS  ... A set of argument values, set by default to equally spaced on
-#               the unit interval (0,1).
-#  Y        ... an array containing values of curves
-#               If the array is a matrix, rows must correspond to argument
-#               values and columns to replications, and it will be assumed
-#               that there is only one variable per observation.
-#               If Y is a three-dimensional array, the first dimension
-#               corresponds to argument values, the second to replications,
-#               and the third to variables within replications.
-#               If Y is a vector, only one replicate and variable are assumed.
-#  FDPAROBJ ... A functional parameter or fdPar object.  This object
-#               contains the specifications for the functional data
-#               object to be estimated by smoothing the data.  See
-#               comment lines in function fdPar for details.
-#               This argument may also be either a FD object, or a
-#               BASIS object.  In this case, the smoothing parameter
-#               LAMBDA is set to 0.
-#  WTVEC    ... A vector of N weights, set to one by default, that can
-#               be used to differentially weight observations.
-#  DFFACTOR ... A multiplier of df in GCV, set to one by default
-#  FDNAMES  ... A cell of length 3 with names for
-#               1. argument domain, such as 'Time'
-#               2. replications or cases
-#               3. the function.
-#  Returns a list containing:
-#    FDOBJ  ...  an object of class fd containing coefficients.
-#    DF     ...  a degrees of freedom measure.
-#    GCV    ...  a measure of lack of fit discounted for df.
-#                If the function is univariate, GCV is a vector
-#                containing the error  sum of squares for each
-#                function, and if the function is multivariate,
-#                GCV is a NVAR by NCURVES matrix.
-#    COEF   ...  the coefficient matrix for the basis function
-#                  expansion of the smoothing function
-#    SSE    ...  the error sums of squares.
-#                SSE is a vector or matrix of the same size as
-#                GCV.
-#    PENMAT ...  the penalty matrix.
-#    Y2CMAP ...  the matrix mapping the data to the coefficients.
+# last modified 2008.07.01 by Spencer Graves   
+#  previously modified:  2007.09.29 and 1 March 2007
 
-# last modified 2007.09.29 by Spencer Graves   
-#  previously modified:  1 March 2007
-
-  #  -----------------------------------------------------------------------
-  #                      Check argments
-  #  -----------------------------------------------------------------------
+#  ---------------------------------------------------------------------
+#                      Check argments
+#  ---------------------------------------------------------------------
 
   #  check ARGVALS
 
@@ -102,9 +101,9 @@ smooth.basis <- function (argvals, y, fdParobj, wtvec=rep(1,n), dffactor=1,
     lambda <- 0
   }
 
-  #  -----------------------------------------------------------------------
-  #                      Set up analysis
-  #  -----------------------------------------------------------------------
+#  ---------------------------------------------------------------------
+#                      Set up analysis
+#  ---------------------------------------------------------------------
 
   #  set number of curves and number of variables
 
@@ -131,11 +130,12 @@ smooth.basis <- function (argvals, y, fdParobj, wtvec=rep(1,n), dffactor=1,
 
   basismat <- eval.basis(argvals, basisobj)
 
-  #  ------------------------------------------------------------------
-  #                set up the linear equations for smoothing
-  #  ------------------------------------------------------------------
+#  ----------------------------------------------------------------
+#                set up the linear equations for smoothing
+#  ----------------------------------------------------------------
 
-  if (n >= nbasis || lambda > 0) {
+#  if (n >= nbasis || lambda > 0) {
+  if (n > nbasis || lambda > 0) {
 
     #  The following code is for the coefficients completely determined
 
@@ -144,25 +144,27 @@ smooth.basis <- function (argvals, y, fdParobj, wtvec=rep(1,n), dffactor=1,
 
     #  set up right side of equations
 
-    if (ndim < 3) {
+    {
+      if (ndim < 3) {
       	Dmat <- crossprod(basisw,y)
-    } else {
-	 Dmat <- array(0, c(nbasis, nrep, nvar))
+      } else {
+        Dmat <- array(0, c(nbasis, nrep, nvar))
       	for (ivar in 1:nvar)
-        	    Dmat[,,ivar] <- crossprod(basisw,y[,,ivar])
+          Dmat[,,ivar] <- crossprod(basisw,y[,,ivar])
+      }
     }
     if (lambda > 0) {
-        #  smoothing required, set up coefficient matrix for normal equations
-        penmat  <- eval.penalty(basisobj, Lfdobj)
-        Bnorm   <- sqrt(sum(c(Bmat0)^2))
-        pennorm <- sqrt(sum(c(penmat)^2))
-        condno  <- pennorm/Bnorm
-        if (lambda*condno > 1e12) {
-          lambda <- 1e12/condno
-          warning(paste("lambda reduced to",lambda,
-                        "to prevent overflow"))
-        }
-        Bmat <- Bmat0 + lambda*penmat
+#  smoothing required, set up coefficient matrix for normal equations
+      penmat  <- eval.penalty(basisobj, Lfdobj)
+      Bnorm   <- sqrt(sum(c(Bmat0)^2))
+      pennorm <- sqrt(sum(c(penmat)^2))
+      condno  <- pennorm/Bnorm
+      if (lambda*condno > 1e12) {
+        lambda <- 1e12/condno
+        warning(paste("lambda reduced to",lambda,
+                      "to prevent overflow"))
+      }
+      Bmat <- Bmat0 + lambda*penmat
     } else {
       penmat <- matrix(0,nbasis,nbasis)
       Bmat   <- Bmat0
@@ -190,10 +192,10 @@ smooth.basis <- function (argvals, y, fdParobj, wtvec=rep(1,n), dffactor=1,
       }
     }
 
-    #  ------------------------------------------------------------------
-    #       Compute the coefficients defining the smooth and 
-    #            summary properties of the smooth
-    #  ------------------------------------------------------------------
+#  ----------------------------------------------------------------
+#       Compute the coefficients defining the smooth and 
+#            summary properties of the smooth
+#  ----------------------------------------------------------------
 
     #  compute map from y to c
 
@@ -201,7 +203,9 @@ smooth.basis <- function (argvals, y, fdParobj, wtvec=rep(1,n), dffactor=1,
 
     #  compute degrees of freedom of smooth
 
-    df <- sum(diag(Bmatinv %*% Bmat0))
+    BiB0 <- (Bmatinv %*% Bmat0)
+
+    df. <- sum(diag(BiB0))
 
     #  solve normal equations for each observation
 
@@ -209,95 +213,139 @@ smooth.basis <- function (argvals, y, fdParobj, wtvec=rep(1,n), dffactor=1,
     else for (ivar in 1:nvar)
 			coef[,,ivar] <- Bmatinv %*% Dmat[,,ivar]
 
-  } else {
-
-    #  ------------------------------------------------------------------
-    #  The following code is for the underdetermined coefficients:
-    #  the number of basis functions exceeds the number of argument values.
-    #  ------------------------------------------------------------------
-
-    qrlist <- qr(t(basismat))
-    Qmat   <- qr.Q(qrlist, complete=TRUE)
-    Rmat   <- t(qr.R(qrlist))
-    Q1mat  <- Qmat[,1:n]
-    Q2mat  <- as.matrix(Qmat[,(n+1):nbasis])
-    Hmat   <- getbasispenalty(basisobj)
-    Q2tHmat   <- crossprod(Q2mat,Hmat)
-    Q2tHQ2mat <- Q2tHmat %*% Q2mat
-    Q2tHQ1mat <- Q2tHmat %*% Q1mat
-    if (ndim < 3) {
-      z1mat <- solve(Rmat,y)
-      z2mat <- solve(Q2tHQ2mat, Q2tHQ1mat %*% z1mat)
-      coef <- Q1mat %*% z1mat + Q2mat %*% z2mat
-    } else {
-      for (ivar in 1:nvar) {
-        z1mat <- solve(Rmat,y[,,ivar])
-        z2mat <- solve(Q2tHQ2mat, Q2tHQ1mat %*% z1mat)
-        coef[,,ivar] <- Q1mat %*% z1mat + Q2mat %*% z2mat
+  } else { 
+#  if((n <= nbasis) && (lambda<=0))
+    if(n == nbasis) {
+      y2cMap <- solve(basismat[, 1:n])
+      df. <- n
+      {
+        if(ndim==1)
+          coef[1:n] <- (y2cMap %*% y)
+        else if (ndim==2)
+          coef[1:n, ] <-(y2cMap %*% y) 
+        else
+          for(ivar in 1:var)
+            coef[1:n, , ivar] <- (y2cMap %*% y[,,ivar])
       }
+      penmat <- matrix(0,nbasis,nbasis)
+    }
+    else {
+      warning("The number of basis functions = ", nbasis, " exceeds ", 
+              n, " = the number of points to be smoothed.  ",
+              "With no smoothing (lambda = 0), this will produce ", 
+              "a perfect fit to data that typically has wild ",
+              "excursions between data points.") 
+#  ------------------------------------------------------------------
+#  The following code is for the underdetermined coefficients:
+#  the number of basis functions exceeds the number of argument values.
+#  ------------------------------------------------------------------
+#      qrlist <- qr(t(basismat))
+#      Qmat   <- qr.Q(qrlist, complete=TRUE)
+#      Rmat   <- t(qr.R(qrlist))
+#      Q1mat  <- Qmat[,1:n]
+#      Q2mat  <- as.matrix(Qmat[,(n+1):nbasis])
+#      Hmat   <- getbasispenalty(basisobj)
+#      Q2tHmat   <- crossprod(Q2mat,Hmat)
+#      Q2tHQ2mat <- Q2tHmat %*% Q2mat
+#      Q2tHQ1mat <- Q2tHmat %*% Q1mat
+      w.5 <- sqrt(wtvec)
+      b.5 <- (basismat * w.5)
+      svdB <- svd(b.5)
+      dGood <- with(svdB, d > sqrt(.Machine$double.eps)*d[1])
+#      vd <- with(svdB, v %*% diag(1/d))
+      v.d <- with(svdB, v / rep(d, each=nbasis))
+      vdu <- tcrossprod(v.d, svdB$u)
+      y2cMap <- (vdu * rep(w.5, each=nbasis))
+#      
+      if (ndim < 3) {
+#        z1mat <- solve(Rmat,y)
+#        z2mat <- solve(Q2tHQ2mat, Q2tHQ1mat %*% z1mat)
+#        coef <- Q1mat %*% z1mat + Q2mat %*% z2mat
+        coef <- y2cMap %*% y 
+      } else {
+        for (ivar in 1:nvar) {
+#          z1mat <- solve(Rmat,y[,,ivar])
+#          z2mat <- solve(Q2tHQ2mat, Q2tHQ1mat %*% z1mat)
+#          coef[,,ivar] <- Q1mat %*% z1mat + Q2mat %*% z2mat
+          coef[,,ivar] <- (y2cMap %*% y[, , ivar])
+        }
+      }
+      df. <- n
+      penmat <- matrix(0,nbasis,nbasis)
+#      basisinv <- solve(basismat)
+#      basisiw <- basisinv / rep(wt, each=n)
+#      Bmatinv <- tcrossprod(basisiw, basisinv)
+#      y2cMap = Bmatinv %*% t(basisw)    
     }
   }
-
-  #  ------------------------------------------------------------------
-  #            compute SSE, yhat, GCV and other fit summaries
-  #  ------------------------------------------------------------------
+#  ----------------------------------------------------------------
+#            compute SSE, yhat, GCV and other fit summaries
+#  ----------------------------------------------------------------
 
   #  compute error sum of squares
-
+    
   if (ndim < 3) {
-      	yhat <- basismat %*% coef
-      	SSE <- sum((y - yhat)^2)
+    yhat <- basismat %*% coef
+    SSE <- sum((y - yhat)^2)
   } else {
-      	SSE <- 0
-       yhat <- array(0,c(n, nrep, nvar))
-      	for (ivar in 1:nvar) {
-        	yhat[,,ivar] <- basismat %*% coef[,,ivar]
-        	SSE <- SSE + sum((y[,,ivar] - yhat[,,ivar])^2)
-      	}
+    SSE <- 0
+    yhat <- array(0,c(n, nrep, nvar))
+    for (ivar in 1:nvar) {
+      yhat[,,ivar] <- basismat %*% coef[,,ivar]
+      SSE <- SSE + sum((y[,,ivar] - yhat[,,ivar])^2)
+    }
   }
-
+    
   #  compute  GCV index
-
-  if (df < n) {
-	   if (ndim < 3) {
-	   		gcv <- rep(0,nrep)
-	   		for (i in 1:nrep) {
-		   		SSEi <- sum((y[,i] - yhat[,i])^2)
-    			gcv[i] <- (SSEi/n)/((n - df)/n)^2
-       	}
-		} else {
-			gcv <- matrix(0,nrep,nvar)
-			for (ivar in 1:nvar) {
-	   			for (i in 1:nrep) {
-		   			SSEi <- sum((y[,i,ivar] - yhat[,i,ivar])^2)
-    				gcv[i,ivar] <- (SSEi/n)/((n - df)/n)^2
-       		}
-			}
-		}
+  if (df. < n) {
+    if (ndim < 3) {
+      gcv <- rep(0,nrep)
+      for (i in 1:nrep) {
+        SSEi <- sum((y[,i] - yhat[,i])^2)
+        gcv[i] <- (SSEi/n)/((n - df.)/n)^2
+      }
+    } else {
+      gcv <- matrix(0,nrep,nvar)
+      for (ivar in 1:nvar) {
+        for (i in 1:nrep) {
+          SSEi <- sum((y[,i,ivar] - yhat[,i,ivar])^2)
+          gcv[i,ivar] <- (SSEi/n)/((n - df.)/n)^2
+        }
+      }
+    }
   } else {
-    	gcv <- NA
+#    gcv <- NA
+    gcv <- Inf 
   }
-
+    
   #  ------------------------------------------------------------------
   #          Set up the functional data objects for the smooths
   #  ------------------------------------------------------------------
 
   #  set up default fdnames
 
-  if (ndim == 1) defaultnames <- list("time", "reps", "values")
-  if (ndim == 2) defaultnames <- list("time",
-                                      paste("reps",as.character(1:nrep)),
-                                      "values")
-  if (ndim == 3) defaultnames <- list("time",
-                                      paste("reps",as.character(1:nrep)),
-                                      paste("values",as.character(1:nvar)) )
-
-  names(defaultnames) <- c("args", "reps", "funs")
-
-  fdobj <- fd(coef, basisobj, defaultnames)
-
-  smoothlist <- list( fdobj, df, gcv, coef, SSE, penmat, y2cMap )
-  names(smoothlist) <- c("fd", "df", "gcv", "coef", "SSE", "penmat", "y2cMap")
-
-  return( smoothlist )
+#  if (ndim == 1) defaultnames <- list("time", "reps", "values")
+#  if (ndim == 2) defaultnames <- list("time",
+#                                    paste("reps",as.character(1:nrep)),
+#                                    "values")
+#  if (ndim == 3) defaultnames <- list("time",
+#                                    paste("reps",as.character(1:nrep)),
+#                                    paste("values",as.character(1:nvar)) )
+  if(is.null(fdnames)){ 
+    if (ndim == 1) fdnames <- list("time", "reps", "values")
+    if (ndim == 2) fdnames <- list("time",
+          paste("reps",as.character(1:nrep)),
+          "values")
+    if (ndim == 3) fdnames <- list("time",
+          paste("reps",as.character(1:nrep)),
+          paste("values",as.character(1:nvar)) )
+    names(fdnames) <- c("args", "reps", "funs")
+  }
+  fdobj <- fd(coef, basisobj, fdnames)    
+#
+  smoothlist <- list(fd=fdobj, df=df., gcv=gcv, coef=coef,
+                     SSE=SSE, penmat=penmat, y2cMap=y2cMap )
+  
+  class(smoothlist) <- 'fdSmooth' 
+  return(smoothlist)
 }

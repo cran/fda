@@ -1,5 +1,7 @@
-\name{plotfit.fd}
+\name{plotfit}
+%\alias{plotfit}
 \alias{plotfit.fd}
+\alias{plotfit.fdSmooth}
 \title{
   Plot a Functional Data Object With Data
 }
@@ -17,12 +19,18 @@
   the next page unless ask==FALSE.  
 }
 \usage{
-plotfit.fd(y, argvals, fdobj, rng = rangeval,
-           index = 1:nrep, nfine = 101, residual = FALSE,
-           sortwrd = FALSE, titles=NULL, ylim=NULL,
-           ask=FALSE, type=c("p", "l")[1+residual],
-           xlab=argname, ylab, sub=Sub, col=1:9, lty=1:9,
-           lwd=1, cex.pch=1, ...)
+%\method{plotfit}{fd}(y, argvals, fdobj, rng = NULL, index = NULL,
+plotfit.fd(y, argvals, fdobj, rng = NULL, index = NULL,
+      nfine = 101, residual = FALSE, sortwrd = FALSE, titles=NULL,
+      ylim=NULL, ask=TRUE, type=c("p", "l")[1+residual],
+      xlab=NULL, ylab=NULL, sub=NULL, col=1:9, lty=1:9, lwd=1,
+      cex.pch=1, ...)
+%\method{plotfit}{fdSmooth}(y, argvals, fdSm, rng = NULL, index = NULL,
+plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
+      nfine = 101, residual = FALSE, sortwrd = FALSE, titles=NULL,
+      ylim=NULL, ask=TRUE, type=c("p", "l")[1+residual],
+      xlab=NULL, ylab=NULL, sub=NULL, col=1:9, lty=1:9, lwd=1,
+      cex.pch=1, ...)
 }
 \arguments{
   \item{y}{
@@ -36,11 +44,11 @@ plotfit.fd(y, argvals, fdobj, rng = rangeval,
   \item{fdobj}{
     a functional data object estimated from the data.
   }
+  \item{fdSm}{ an object of class \code{fdSmooth} }
   \item{rng}{
-    a vector of length 2 specifying a reduced range contained within the
-    range defined by the functional data object or the arguments.  This
-    is used to examine the fit over a limited segment of the whole range
-    of it.  
+    a vector of length 2 specifying the limits for the horizontal axis.
+    This must be a subset of fdobj[['basis']][['rangeval']], which is
+    the default.  
   }
   \item{index}{
     a set of indices of functions if only a subset of the observations
@@ -68,10 +76,11 @@ plotfit.fd(y, argvals, fdobj, rng = rangeval,
   \item{ask}{
     If TRUE and if 'y' has more levels than the max length of col, lty,
     lwd and cex.pch, the user must confirm page change before the next
-    plot will be created.  The number of lines / cases per plot is
-    controled by the maximum of the lengths of col, lty, lwd and cex.pch
-    (see below), except that if length(dim(x))>2, a separate plot is
-    created for each level of the third dimension of x.  
+    plot will be created.
+    %The number of lines / cases per plot is
+    %controled by the maximum of the lengths of col, lty, lwd and cex.pch
+    %(see below), except that if length(dim(x))>2, a separate plot is
+    %created for each level of the third dimension of x.  
   }
   \item{type}{
     type of plot desired, as described with \code{\link{plot}}.  If
@@ -80,14 +89,11 @@ plotfit.fd(y, argvals, fdobj, rng = rangeval,
     always plot as a line.  If residual == TRUE, the default type ==
     "l";  an alternative is "b" for both.  
   }
-  \item{xlab}{
-    x axis label.  
-  }
+  \item{xlab}{x axis label. }
   \item{ylab}{
-    Character vector of y axis labels.  
-    y axis label.  If(residual), ylab defaults to 'Residuals', else to
-    varnames derived from names(fdnames[[3]] or fdnames[[3]] or
-    dimnames(y)[[3]]. 
+    Character vector of y axis labels.  If(residual), ylab defaults to
+    'Residuals', else to varnames derived from names(fdnames[[3]] or
+    fdnames[[3]] or dimnames(y)[[3]]. 
   }
   \item{sub}{
     subtitle under the x axis label.  Defaults to the RMS residual from
@@ -116,6 +122,15 @@ plotfit.fd(y, argvals, fdobj, rng = rangeval,
     \code{plot} functions. 
   }
 }
+\details{
+  \code{plotfit} plots discrete data along with a functional data object
+  for fitting the data.  It is designed to be used after something like
+  \code{data2fd}, \code{smooth.fd}, \code{smooth.basis} or
+  \code{smoothe.basisPar} to check the fit of the data offered by the
+  \code{fd} object.
+
+  \code{plotfit.fdSmooth} calls \code{plotfit} for its 'fd' component.   
+}
 \value{
   A matrix of mean square deviations from predicted is returned
   invisibly.  If fdobj[["coefs"]] is a 3-dimensional array, this is a
@@ -135,21 +150,18 @@ plotfit.fd(y, argvals, fdobj, rng = rangeval,
   observed and predicted, depending on whether residual is FALSE or
   TRUE.  
 }
-\details{
-  'plotfit.fd' plots discrete data along with a functional data object for
-  fitting the data.  It is designed to be used after 'data2fd',
-  'smooth.fd', or 'smooth.basis' to check the fit of the data offered by
-  the 'fd' object. 
-}
 
 \seealso{
-  \code{\link{plot.fd}}, 
   \code{\link{plot}}, 
+  \code{\link{plot.fd}}, 
   \code{\link{lines.fd}}
+  \code{\link{plot.fdSmooth}}, 
+  \code{\link{lines.fdSmooth}}
   \code{\link{par}}
   \code{\link{data2fd}}
   \code{\link{smooth.fd}}
   \code{\link{smooth.basis}}
+  \code{\link{smooth.basisPar}}
 }
 \examples{
 daybasis65 <- create.fourier.basis(c(0, 365), 65)
@@ -159,7 +171,8 @@ daytempfd <- with(CanadianWeather, data2fd(
        daybasis65, argnames=list("Day", "Station", "Deg C")) )
  
 with(CanadianWeather, plotfit.fd(dailyAv[, , "Temperature.C"],
-          argvals= day.5, daytempfd, index=1, titles=place, axes=FALSE) )
+     argvals= day.5, daytempfd, index=1, titles=place, axes=FALSE) )
+
 # Label the horizontal axis with the month names
 axis(1, monthBegin.5, labels=FALSE)
 axis(1, monthEnd.5, labels=FALSE)

@@ -8,8 +8,8 @@ function [res, Dres, fitstruct, df, gcv] = ...
 if nargin < 6, gradwrd = 1;  end
 
 fit = fitstruct.fit;
-
-%  load parameters
+%%
+% 1.  load parameters
 
 [kref, EoverR, a, b] = par2vals(parvec, fitstruct);
 
@@ -21,8 +21,8 @@ fitstruct.a      = a;
 fitstruct.b      = b;
 
 estimate = fitstruct.estimate;
-
-%  Inner optimization:  optimize fit with respect to coef
+%%
+% 2.  Inner optimization:  optimize fit with respect to coef
 
 tolval  = 1e-10;
 itermax = 10;
@@ -37,7 +37,8 @@ iter = 0;
 fundif = 1;
 % gradnorm0 = mean(res0'*Dres);
 gradnorm1 = 1;
-%  Gauss-Newton optimization loop
+%%
+% 3.  Gauss-Newton optimization loop
 while ((gradnorm1 > tolval) || (fundif > tolval))
     iter = iter + 1;
     if iter > itermax, break; end
@@ -69,13 +70,13 @@ while ((gradnorm1 > tolval) || (fundif > tolval))
     F0        = F1;
 %    gradnorm0 = gradnorm1;
 end
-
-%  update coef
+%%
+% 4.  update coef
 
 coef = coef0;
 fitstruct.coef0 = coef;
-
-%  compute df and gcv
+%%
+% 5.  compute df and gcv
 
 Zmat = Dres(1:ncoef,:);
 Nval = length(res1);
@@ -84,8 +85,8 @@ Smat = Zmat*inv(Zmat'*Zmat + Rfac'*Rfac)*Zmat';
 df   = sum(diag(Smat));
 dfe  = ncoef - df;
 gcv  = (ncoef/dfe)*sum(res1(1:ncoef).^2)/dfe;
-
-%  compute fits and residuals
+%%
+% 6.  compute fits and residuals
 
 [N, nbasis] = size(datstruct.basismat);
 ind1  = 1:nbasis;
@@ -112,10 +113,12 @@ end
 if fit(2)
     res = [res; (yobs(:,2) - That)./sqrt(Twt)];
 end
+%%
+% 7.  Derivatives? 
 
 if gradwrd
     
-    %  set up basis and basis derivatve matrices
+    % 7.1.  set up basis and basis derivatve matrices
     
     quadmat  = datstruct.quadbasismat;
     Dquadmat = datstruct.Dquadbasismat;
@@ -124,7 +127,7 @@ if gradwrd
     onesb = ones(1,nbasis);
     onesq = ones(nquad, 1);
     
-    %  set up some constants that are required
+    % 7.2.  set up some constants that are required
     
     V      = fitstruct.V;
     rho    = fitstruct.rho;
@@ -134,7 +137,7 @@ if gradwrd
     Cpc    = fitstruct.Cpc;
     Tref   = fitstruct.Tref;
 
-    %  Set up input arrays
+    % 7.3.  Set up input arrays
     
     F   = datstruct.F;   
     CA0 = datstruct.CA0; 
@@ -142,20 +145,20 @@ if gradwrd
     Tc  = datstruct.Tcin;
     Fc  = datstruct.Fc;  
 
-    %  C and T values at fine grid
+    % 7.4.  C and T values at fine grid
     
     Chat  = quadmat*Ccoef;
     That  = quadmat*Tcoef;
     DChat = Dquadmat*Ccoef;
     DThat = Dquadmat*Tcoef;
 
-    %  betaCC and betaTC depend on kref and Eover R
+    % 7.5.  betaCC and betaTC depend on kref and Eover R
     Tdif   = 1./That - 1./Tref;
     temp   = exp(-1e4.*EoverR.*Tdif);
     betaCC = kref.*temp; 
     TCfac  = -delH./(rho.*Cp);
     betaTC = TCfac.*betaCC;
-    %  betaTT depends on a and b
+    % 7.6.  betaTT depends on a and b
     Fc2b    = Fc.^b;
     aFc2b   = a.*Fc2b;
     K1      = V.*rho.*Cp;
@@ -163,7 +166,7 @@ if gradwrd
     betaTT  = Fc.*aFc2b./(K1.*(Fc + K2.*aFc2b));    
     betaTT0 = F./V;
 
-    %  compute derivatives of residuals
+    % 7.7.  compute derivatives of residuals
     
     %  L values
     
@@ -198,13 +201,13 @@ if gradwrd
     lamC = lambda(1);
     lamT = lambda(2);
     
-    %  assemble the Jacobian matrix
+    % 7.8.  assemble the Jacobian matrix
     
     DLC = sqrt(lamC/Cwt).*[DcLC, DtLC];
     DLT = sqrt(lamT/Twt).*[DcLT, DtLT];
     Jacobian = [DLC; DLT];
     
-    %  compute derivatives with respect to parameters
+    % 7.9.  compute derivatives with respect to parameters
     
     %  set up right hand side of equation D2GDc
     
@@ -322,7 +325,10 @@ if gradwrd
         D2GDc = [D2GDc, D2GDcb];
         
     end
-
+%%
+% 8.  Construct D2GDc2 
+%
+% 8.1.  First part 
     Wmat = [quadwtsmat, quadwtsmat; quadwtsmat, quadwtsmat];
     
     D2GDc2  = (Jacobian.*Wmat)'*Jacobian;
@@ -334,7 +340,7 @@ if gradwrd
         D2GDc2(ind2,ind2) = D2GDc2(ind2,ind2) + ZtZmat./Twt;
     end
 
-    %  Add second derivative information
+% 8.2.  Add second derivative information
     
     DttbetaCC = (1e4.*kref.*EoverR./That.^2).* ...
                 (1e4.*EoverR./That.^2 - 2./That).*temp;
@@ -364,17 +370,17 @@ if gradwrd
     DctL = lamC.*DctLC./Cwt + lamT.*DctLT./Twt;
     DttL = lamC.*DttLC./Cwt + lamT.*DttLT./Twt;
           
-    %  modify D2GDc2
+% 8.3.  modify D2GDc2
    
     D2GDc2(ind1,ind2) = D2GDc2(ind1,ind2) + DctL;
     D2GDc2(ind2,ind1) = D2GDc2(ind2,ind1) + DctL';
     D2GDc2(ind2,ind2) = D2GDc2(ind2,ind2) + DttL;
     
-    %  compute (D2GDc2)^{-1} D2GDc
+% 8.4.  compute (D2GDc2)^{-1} D2GDc
     
     DcDtheta = D2GDc2\D2GDc;
     
-    %  set up Dres
+% 8.5.  set up Dres
     
     Dres = [];
     if fit(1)

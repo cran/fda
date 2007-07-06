@@ -47,6 +47,5 @@ basisobj <- create.bspline.basis(c(0,1),13)
 #  compute the 13 by 13 matrix of inner products of second derivatives
 penmat <- bsplinepen(basisobj)
 }
-\keyword{}
 % docclass is function
 \keyword{smooth}

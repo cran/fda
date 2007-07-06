@@ -13,23 +13,23 @@ derivatives are integers.  This function is called by function
 inprod.bspline(fdobj1, fdobj2=fdobj1, nderiv1=0, nderiv2=0)
 }
 \arguments{
-\item{fdobj1}{
-a functional data object having a B-spline basis function
-expansion.
-}
-\item{fdobj2}{
-a second functional data object with a B-spline basis
-function expansion.  By default, this is the same as
-the first argument.
-}
-\item{nderiv1}{
-a nonnegative integer specifying the derivative for the
-first argument.
-}
-\item{nderiv2}{
-a nonnegative integer specifying the derivative for the
-second argument.
-}
+  \item{fdobj1}{
+    a functional data object having a B-spline basis function
+    expansion.
+  }
+  \item{fdobj2}{
+    a second functional data object with a B-spline basis
+    function expansion.  By default, this is the same as
+    the first argument.
+  }
+  \item{nderiv1}{
+    a nonnegative integer specifying the derivative for the
+    first argument.
+  }
+  \item{nderiv2}{
+    a nonnegative integer specifying the derivative for the
+    second argument.
+  }
 }
 \value{
 a matrix of inner products with number of rows equal

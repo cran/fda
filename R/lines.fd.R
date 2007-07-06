@@ -1,3 +1,7 @@
+lines.fdSmooth <- function(x, Lfdobj=int2Lfd(0), ...){
+  lines(x$fd, Lfdobj=Lfdobj, ...)
+}
+
 lines.fd <- function(x, Lfdobj=int2Lfd(0), ...)
 {
   #  Plot a functional data object FD using lines in a pre-existing plot.

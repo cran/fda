@@ -1,5 +1,7 @@
 axisIntervals <- function(side, atTick1=monthBegin.5, atTick2=monthEnd.5,
-              atLabels=monthMid, labels=month.abb, cex.axis=0.9, ...){
+              atLabels=monthMid, labels=month.abb, cex.axis=0.9, ...)
+{
+#  Here's something trivial ...
 # 1.  Interval start 
   axis(side, at=atTick1, labels=FALSE, ...)
 # 2.  Interval end

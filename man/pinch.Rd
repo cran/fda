@@ -13,16 +13,17 @@ pinch
 pinchtime
 }
 \format{
-
-\describe{
-  \item{pinch}{
-    Matrix of dimension c(151, 20) = 20 measurements of pinch force
+  
+  \describe{
+    \item{pinch}{
+      Matrix of dimension c(151, 20) = 20 replications of measuring
+      pinch force every 2 milliseconds for 300 milliseconds.  
     }
-  \item{pinchtime}{
-    time in seconds from the start = seq(0, 0.3, 151) = every 2
-    milliseconds.
+    \item{pinchtime}{
+      time in seconds from the start = seq(0, 0.3, 151) = every 2
+      milliseconds.
+    }
   }
-}
 }
 \details{
   Measurements every 2 milliseconds.  

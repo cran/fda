@@ -758,6 +758,15 @@ save(file="CSTR-section12-nls-prep.Rdata",
      list=c("parvec0", "parvec1234", "datstruct", "fitStrCool", "fitStrHot", 
 		"fitStrH1234", "CSTRbasis", "lambda", "btru"))
 # load("CSTR-section12-nls-prep.Rdata")
+# or 
+# fdaPath <- system.file(package = 'fda')
+# fdaDir <- dir(fdaPath)
+# fdaScriptsPath <- dir(fdaPath, full.names=TRUE)[fdaDir == 'scripts']
+# fdaScriptsDir <- dir(fdaScriptsPath)
+# fdaCSTRpath <- dir(fdaScriptsPath, full.names=TRUE)[fdaScriptsDir=='CSTR']
+# fdaCSTRdir <- dir(fdaCSTRpath)
+# fdaCSTRdat <- dir(fdaCSTRpath, full.names=TRUE)[grep('\\.Rdata$', fdaCSTRdir)]
+# load(fdaCSTRdat)
 
 .datstruct <- datstruct
 .fitstruct <- fitStrH1234
@@ -771,11 +780,15 @@ nlsFit0.0 <- nls(formula=
      ~CSTRres0(kref=kref, EoverR=EoverR, a=a, b=b,gradwrd=FALSE),
     start=as.list(parvec1234),
     control=nls.control(printEval=TRUE, warnOnly=TRUE), trace=TRUE) )
+et.nls0.0 <- system.time(
+nlsFit0.0 <- NLS(formula=
+     ~CSTRres0(kref=kref, EoverR=EoverR, a=a, b=b,gradwrd=FALSE),
+    start=as.list(parvec1234),
+    control=nls.control(printEval=TRUE, warnOnly=TRUE), trace=TRUE) )
 # warnOnly=TRUE to force output:
 # CSTR computations are so intense that 'nls' overestimates
 #   the numerical precision feasible and often
-#   terminates with an error & returns nothing
-#   when it can't achieve that level of precision.
+#   terminates with an error & returns nothing#   when it can't achieve that level of precision.
 #......70.23466 :  0.4 0.8 1.7 0.5 7
 #  It.   1, fac=           1, eval (no.,total): ( 1,  1):..... new dev = 10.9019
 #10.90186 :  0.4672504 0.8296264 1.9357038 0.4600686 
@@ -1180,7 +1193,7 @@ log10(s1234[1]/s1234[4])
 # Try passing arguments via a list 'data'
 
 et.nlsFit <- system.time( 
-nlsFit1234o <- nls(formula=~CSTRres(kref=kref, EoverR=EoverR, a=a, b=b,
+nlsFit1234o <- NLS(formula=~CSTRres(kref=kref, EoverR=EoverR, a=a, b=b,
    datstruct=datstr, fitstruct=fitstr, CSTRbasis=Cb, lambda=lam),
               data=list(datstr=datstruct, fitstr=fitStrH1234,
                              Cb=CSTRbasis, lam=lambda), 
@@ -1427,7 +1440,7 @@ fitStrHTemp$b <- btru
 #toc
 
 et.nlsFitT <- system.time( 
-nlsFitHTemp <- nls(formula=~CSTRres(kref=kref, EoverR=EoverR, a=a, b=b,
+nlsFitHTemp <- NLS(formula=~CSTRres(kref=kref, EoverR=EoverR, a=a, b=b,
    datstruct=datstr, fitstruct=fitstr, CSTRbasis=Cb, lambda=lam),
               data=list(datstr=datstruct, fitstr=fitStrHTemp,
                              Cb=CSTRbasis, lam=lambda), 
@@ -1680,7 +1693,7 @@ fitStrHConc$b <- btru
 #toc
 
 et.Conc <- system.time( 
-nlsFitHConc <- nls(formula=~CSTRres(kref=kref, EoverR=EoverR, a=a, b=b,
+nlsFitHConc <- NLS(formula=~CSTRres(kref=kref, EoverR=EoverR, a=a, b=b,
    datstruct=datstr, fitstruct=fitstr, CSTRbasis=Cb, lambda=lam),
               data=list(datstr=datstruct, fitstr=fitStrHConc,
                              Cb=CSTRbasis, lam=lambda), 

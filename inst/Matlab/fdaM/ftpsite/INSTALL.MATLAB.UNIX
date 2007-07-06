@@ -1,0 +1,82 @@
+        Installation Notes for Matlab Functions on Unix/Linus Systems
+
+                     Jim Ramsay,  McGill University
+
+
+To install the Matlab functions and sample analyses in a Unix
+system, using Matlab Version 6, follow these instructions, which
+will install
+--  the Matlab functions
+--  the sample analyses and the data that are analyzed
+
+
+A.  Installing the Matlab functions:
+
+1. Create a directory to contain the Matlab functions.  For example, on
+my system the directory is
+
+    ~/fdaM
+
+2. Put the file "functions.tar.Z" into this directory, and uncompress it
+with the command
+
+    uncompress functions.tar.Z
+
+3. Extract the function files, each with extension ".m", from this
+.tar file using the command
+
+     tar -xvf functions.tar
+
+Each of these function files will contain a function with the same name
+as the file, and possibly some supporting functions only used by this
+function.  Documentation on the use of the functions is found in the
+leading lines of the file.
+
+4.  Within this directory, create a subdirectory with the name "@fd".
+That is, on my system, this would have the path
+
+    ~/fdaM/@fd
+
+This subdirectory will contain functions that are process objects of the
+"fd" class.  Move the file "@fd.tar.Z" into this directory, and extract
+the function files as you did in steps 2 and 3.
+
+5.  Repeat step 4 twice, with subdirectory names "@basis", "@bifd", and
+"@Lfd", and corresponding files "@basis.tar.Z", "@bifd.tar.Z" and
+"@Lfd.tar.Z", respectively.
+
+
+
+B.  Installing the examples:
+
+There are currently six sample analyses bundled with the data
+that are analyzed:
+-- the gait data,                      in file gait.tar.Z
+-- the growth data,                    in file growth.tar.Z
+-- the handwriting data,               in file handwrit.tar.Z
+-- the lip movement data,              in file lip.tar.Z
+-- the pinch force data,               in file pinch.tar.Z
+-- the monthly and daily weather data, in file weather.tar.Z
+
+You might consider setting up a separate subdirectory for each of these
+analyses, perhaps within a directory "examples" in the directory
+containing the functions set up above.
+
+For each of these analyses and data, move the .tar.Z file with appropriate
+name into the appropriate subdirectory.  Then extract the files in this
+file using uncompress and tar commands as above.
+
+To run a sample analysis, start Matlab.  At the top of each sample
+analysis file, with the extension ".m", you will find two "addpath"
+commands that attach, respectively, the "functions" directory, and the
+directory containing the sample data.  The paths in these commands are
+what I use in my system, and you may have to change them to what is
+appropriate for your system.  For example, at the top of the "monthly.m"
+file, you will find the two commands
+
+      addpath('~/fdaM')
+      addpath('~/fdaM/examples/weather')
+
+that add the needed paths on my system.
+
+Last modified on 10 March 2003

@@ -15,8 +15,7 @@
   are.  
 }
 \usage{
-fd(coef=matrix(0, 2, 1), basisobj=basisfd(),
-   fdnames=defaultnames)
+fd(coef=NULL, basisobj=NULL, fdnames=defaultnames)
 }
 \arguments{
   \item{coef}{
@@ -28,9 +27,18 @@ fd(coef=matrix(0, 2, 1), basisobj=basisfd(),
     functional data objects.  A functional data object is referred to as
     "univariate" if this argument is a vector or a matrix, and
     "multivariate" if it is a three-dimensional array.
+
+    if(is.null(coef)) coef <- rep(0, basisobj[['nbasis']]) 
   }
   \item{basisobj}{
     a functional basis object defining the basis
+
+    if(is.null(basisobj)){
+      rc <- range(coef)
+      if(diff(rc)==0) rc <- rc+0:1
+      nb <- max(4, nrow(coef)) 
+      basisobj <- create.bspline.basis(rc, nbasis = nb)
+    }
   }
   \item{fdnames}{
     A list of length 3, each member being a string vector containing
@@ -49,8 +57,7 @@ fd(coef=matrix(0, 2, 1), basisobj=basisfd(),
   \code{is.fd}.
 
   Normally only developers of new functional data analysis
-  functions will actually need to use this function, so no examples are
-  provided.  
+  functions will actually need to use this function.  
 }
 \source{
   Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
@@ -60,6 +67,24 @@ fd(coef=matrix(0, 2, 1), basisobj=basisfd(),
     Functional Data Analysis}, Springer, New York
 }
 \examples{
+bspl1.1 <- create.bspline.basis(norder=1, breaks=0:1)
+fd.bspl1.1 <- fd(0, basisobj=bspl1.1)
+
+fd.bspl1.1a <- fd(basisobj=bspl1.1)
+\dontshow{ stopifnot( }
+all.equal(fd.bspl1.1, fd.bspl1.1a)
+\dontshow{ ) }
+
+\dontrun{
+fd.bspl1.1b <- fd(0)
+Error in fd(0) : 
+  Number of coefficients does not match number of basis functions.
+
+... because fd by default wants to create a cubic spline 
+}
+
+fd.bspl4 <- fd(rep(0,4))
+
 }
 % docclass is function
 \keyword{smooth}

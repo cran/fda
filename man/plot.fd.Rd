@@ -1,5 +1,6 @@
 \name{plot.fd}
 \alias{plot.fd}
+\alias{plot.fdSmooth}
 \title{
   Plot a Functional Data Object
 }
@@ -8,12 +9,19 @@
   These may be either plotted simultaneously, as \code{matplot} does for
   multivariate data, or one by one with a mouse click to move from one
   plot to another.  The function also accepts the other plot
-  specification arguments that the regular \code{plot} does.
+  specification arguments that the regular \code{plot} does.  Calling
+  \code{plot} with an \code{fdSmooth} object is simply plots its
+  code{fd} component.   
 }
 \usage{
-plot.fd(x, y, Lfdobj=0, href=TRUE,
-        titles=NULL, xlim=rangex, ylim=rangey,
-        xlab=xlabel, ylab=ylabel, ask=FALSE, nx=201, ...)
+\method{plot}{fd}(x, y, Lfdobj=0, href=TRUE, titles=NULL,
+                    xlim=NULL, ylim=NULL, xlab=NULL,
+                    ylab=NULL, ask=FALSE, nx=201, ...)
+\method{plot}{fdSmooth}(x, y, Lfdobj=0, href=TRUE, titles=NULL,
+                    xlim=NULL, ylim=NULL, xlab=NULL,
+                    ylab=NULL, ask=FALSE, nx=201, ...)
+%plot.fd(x, y, Lfdobj=0, href=TRUE, titles=NULL, xlim=rangex, ylim=rangey,
+%        xlab=xlabel, ylab=ylabel, ask=FALSE, nx=201, ...)
 }
 \arguments{
   \item{x}{
@@ -62,22 +70,27 @@ plot.fd(x, y, Lfdobj=0, href=TRUE,
     \code{plot}
   }
 }
-\value{
-  invisible(NULL)
-}
-\section{Side Effects}{
-  a plot of the functional observations
-}
 \details{
   Note that for multivariate data, a
   suitable array must first be defined using the \code{par} function. 
 }
+\value{
+  'done'
+  % This used to return 'invisible(NULL)'.
+  % However, with R 2.7.0 under XEmacs with ESS,
+  % it sometimes failed to plot.  I changed the return value,
+  % and the problem disappeared.  
+}
+\section{Side Effects}{
+  a plot of the functional observations
+}
 \seealso{
-  \code{\link{lines.fd}}, 
-  \code{\link{plotfit.fd}}
+  \code{\link{lines.fd}}, \code{\link{plotfit.fd}}
 }
 \examples{
-
+##
+## plot.df
+##
 #daytime   <- (1:365)-0.5
 #dayrange  <- c(0,365)
 #dayperiod <- 365
@@ -99,11 +112,30 @@ plot(daytempfd, main="Temperature Functions")
 \dontrun{
 # To plot one at a time:  
 # The following pauses to request page changes.
+\dontshow{
 # (Without 'dontrun', the package build process
 # might encounter problems with the par(ask=TRUE)
 # feature.)
+}
 plot(daytempfd, main="Temperature Functions", ask=TRUE)
 }
+
+##
+## plot.fdSmooth
+##
+b3.4 <- create.bspline.basis(norder=3, breaks=c(0, .5, 1))
+# 4 bases, order 3 = degree 2 =
+# continuous, bounded, locally quadratic 
+fdPar3 <- fdPar(b3.4, lambda=1)
+# Penalize excessive slope Lfdobj=1;  
+# second derivative Lfdobj=2 is discontinuous.
+fd3.4s0 <- smooth.basis(0:1, 0:1, fdPar3)
+
+# using plot.fd directly 
+plot(fd3.4s0$fd)
+
+# same plot via plot.fdSmooth 
+plot(fd3.4s0)
 
 }
 % docclass is function

@@ -1,0 +1,54 @@
+       Updates on Functions for Functional Data Analysis in
+                          R, SPLUS and Matlab
+
+                     Jim Ramsay,  McGill University
+
+These changes affect functions only in Matlab:
+
+1.  The most important change is the introduction of a new object:  the
+Lfd object.  This object contains information defining a linear
+differential operator, and that may be nonhomogeneous.
+
+This change in the code comes about because of work on data arising from
+industrial processes where control theory can be applied.  These
+processes are usually represented as nonhomogeneous linear differential
+equation systems.  The new and much more powerful function for principal
+differential analysis, pdacell(), was designed to estimate such systems
+from data.  Once estimated, the linear differential operator can be used
+to smooth data and in other ways.  The coefficients defining the linear
+differential operator can each be defined separately, with their own
+bases, number of basis functions, and so on.  In addition, one or more
+forcing functions, each with its own weight function, may be involved.
+See the preamble to function Lfd(), found in the directory @Lfd, for
+more details, as well as the updated example files.
+
+Nearly all functions are potentially affected.  Moreover, it is now the
+case that few functions will work with just an integer instead of a
+properly defined Lfd object.  Instead, a new function, int2Lfd(m),
+converts a nonnegative integer m into a linear differential operator
+object of class Lfd.
+
+These new objects make full use of Matlab's cell objects.
+
+2.  A number of new functions are also added, including smoothing and
+evaluation functions for positive, monotone, density, and warping
+functions.  The registerfd() function has been reworked considerably.
+
+3.  In the case of a B-spline basis, the function bsplinepen() can now
+compute the penalty matrix exactly instead of using numerical
+integration.
+
+4.  The bases that are now permitted are:
+        -- constant
+        -- bspline
+        -- exponential
+        -- fourier
+        -- polygonal
+        -- power
+
+It is expected that these modifications will soon be introduced into the
+S-PLUS and R code as well.
+
+Last modified on:  15 January 2003
+
+

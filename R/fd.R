@@ -6,7 +6,7 @@
 
 #  Generator function of class fd
 
-fd <- function (coef=matrix(0,2,1), basisobj=basisfd(), fdnames=defaultnames)
+fd <- function (coef=NULL, basisobj=NULL, fdnames=defaultnames)
 {
   #  This function creates a functional data object.
   #    A functional data object consists of a basis for expanding a functional
@@ -37,18 +37,32 @@ fd <- function (coef=matrix(0,2,1), basisobj=basisfd(), fdnames=defaultnames)
 
   #  Returns:
   #  FD ... a functional data object
-# last modified 2007.11.28 by Spencer Graves 
-  #  Previously modified 26 October 2005 & 2007.09.18
+# last modified 2008.06.28 by Spencer Graves 
+# previously modified 2007.11.28, 2008.09.18 and 2005.10.26
 
     #  check basisobj
-
-  if (!(inherits(basisobj, "basisfd")))
-    stop("Argument basis must be of basis class")
-
+  {
+    if(is.null(basisobj)){
+      rc <- range(coef)
+      if(diff(rc)==0) rc <- rc+0:1 
+      dimC <- dim(coef)
+      nb <- {
+        if(is.null(dimC)) length(coef)
+        else dimC[1]
+      }
+      basisobj <- create.bspline.basis(rc, nbasis=max(4, nb)) 
+    }
+    else   
+      if (!(inherits(basisobj, "basisfd")))
+        stop("Argument basis must be of basis class")
+  }
+#  
   type <- basisobj$type
 
     #  check COEF and get its dimensions
-
+  if(is.null(coef))
+    coef <- rep(0, basisobj[['nbasis']]) 
+#
   if (!is.numeric(coef)) stop("coef must be numerical vector or matrix")
   else if (is.vector(coef)) {
     coef  <- as.matrix(coef)

@@ -37,6 +37,5 @@ lipbasis <- create.bspline.basis(c(0,1), 23)
 plot(lipbasis)
 
 }
-\keyword{}
 % docclass is function
 \keyword{smooth}

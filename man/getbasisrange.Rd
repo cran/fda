@@ -18,11 +18,7 @@ getbasisrange(basisobj)
 \value{
   a numeric vector of length 2 
 }
-\seealso{
-
-}
-\examples{
-
-}
+%\seealso{}
+%\examples{}
 % docclass is function
 \keyword{attribute}

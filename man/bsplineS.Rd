@@ -12,8 +12,8 @@ bsplineS(x, breaks, norder=4, nderiv=0)
 }
 \arguments{
   \item{x}{
-    A vector of argument values at which the B-spline basis functions are to
-    evaluated.
+    A vector of argument values at which the B-spline basis functions
+    are to be evaluated.
   }
   \item{breaks}{
     A strictly increasing set of break values defining the B-spline
@@ -21,19 +21,19 @@ bsplineS(x, breaks, norder=4, nderiv=0)
     spanned by the break values.
   }
   \item{norder}{
-    The order of the B-spline basis functions.  The order less one is the
-    degree of the piece-wise polynomials that make up any B-spline function.
-    The default is order 4, meaning piece-wise cubic.
+    The order of the B-spline basis functions.  The order less one is
+    the degree of the piece-wise polynomials that make up any B-spline
+    function. The default is order 4, meaning piece-wise cubic.
   }
   \item{nderiv}{
     A nonnegative integer specifying the order of derivative to be
-    evaluated.  The derivative must not exceed the order.  The default
+    evaluated.  The derivative must not exceed the order.  The default 
     derivative is 0, meaning that the basis functions themselves are
     evaluated. 
   }
 }
 \value{
-  a matrix of function values.  The number of rows equals the number of
+  a matrix of function values.  The number of rows equals the number of 
   arguments, and the number of columns equals the number of basis
   functions. 
 }
