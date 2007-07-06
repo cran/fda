@@ -108,7 +108,7 @@ smooth.basisPar(argvals, y, fdobj=fd(), Lfdobj=int2Lfd(0), lambda=0,
 \details{
   1.  dfPar
 
-  2.  smooth.data 
+  2.  smooth.basis 
 }
 \seealso{
   \code{\link{data2fd}}, 

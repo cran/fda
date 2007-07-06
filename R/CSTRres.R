@@ -1,3 +1,71 @@
+CSTRsse <- function(par, datstruct, fitstruct, CSTRbasis, lambda){
+#%  2007.07.06 by Spencer Graves
+#
+  estimate = fitstruct$estimate;
+  if(is.null(estimate))
+    stop("fitstruct has no 'estimate' component")  
+#  Compare estimate with par
+  if(sum(estimate) != length(par)){
+    cat("ERROR in CSTRfn:  sum(estimate) != length(par)\n")
+    cat("par = ", par, "; \n")
+    stop("fitstruct$estimate = ",
+         paste(estimate, collapse=" "))
+  }
+  m <- 0
+  {
+#  1.1.  Estimate kref starting from par or use fitstruct?      
+    if(estimate[1]){
+      m <- m+1
+      kref <- par[m]
+      fitstruct$kref <- kref
+    }
+    else
+      kref <- fitstruct$kref
+  }
+  {
+#  1.2.  Estimate EoverR starting from parvec or use fitstruct?      
+    if(estimate[2]){
+      m <- m+1
+      EoverR <- par[m]
+      fitstruct$EoverR <- EoverR
+    }
+    else
+      EoverR<- fitstruct$EoverR 
+  }
+  {
+#  1.3.  Estimate 'a' starting from parvec or use fitstruct?      
+    if(estimate[3]){
+      m <- m+1
+      a <- par[m]
+      fitstruct$a <- a
+    }
+    else
+      a <- fitstruct$a
+  }
+  {
+#  1.4.  Estimate b starting from parvec or use fitstruct?      
+    if(estimate[4]){
+      m <- m+1
+      b <- par[m]
+      fitstruct$b <- b
+    }
+    else
+      b<- fitstruct$b 
+  }  
+#  
+  res <- CSTRres(kref=kref, EoverR=EoverR, a=a, b=b,
+               datstruct=datstruct, fitstruct=fitstruct,
+               CSTRbasis=CSTRbasis, lambda=lambda,
+               gradwrd=FALSE)
+  sse <- sum(res^2)
+  if(is.na(sse)){
+    parch <- paste(par, collapse=", ")
+    warning('Missing values returned by CSTRres with par = ',
+        parch, '; ', sum(is.na(res)), ' NAs out of ', length(res))
+  }
+  sse
+}
+
 CSTRres <- function(kref=NULL, EoverR=NULL, a=NULL, b=NULL,
                datstruct, fitstruct, CSTRbasis, lambda,
                gradwrd=FALSE){
@@ -71,6 +139,18 @@ CSTRres0 <- function(kref=NULL, EoverR=NULL, a=NULL, b=NULL,
   }
   if(gradwrd)
     attr(Res, "gradient") <- cstr.$Dres
-#  
+##
+## 4.  Store trace in '.CSTRres0.trace' if it exists 
+##
+  if(exists(".CSTRres0.trace")){
+    CSTRr.tr <- get(".CSTRres0.trace")
+    CSTRr.tr2 <- rbind(CSTRr.tr,
+       c(kref, EoverR, a, b, sum(Res^2), Res) )
+    assign(".CSTRres0.trace", CSTRr.tr2, env=.GlobalEnv)
+    cat(".")
+  }  
+##
+## 5.  Done 
+##
   Res
 }

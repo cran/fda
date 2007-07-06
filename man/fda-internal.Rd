@@ -4,9 +4,6 @@
 \usage{
 center.fd(fdobj)
 }
-\alias{*.fd}
-\alias{+.fd}
-\alias{-.fd}
 \alias{/.fd}
 \alias{Varfnden}
 \alias{Varfninten}

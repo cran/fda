@@ -34,12 +34,12 @@ geigen <- function(Amat, Bmat, Cmat)
   Cfacinv <- solve(Cfac)
   Dmat <- t(Bfacinv) %*% Amat %*% Cfacinv
   if (p >= q) {
-    result <- svd(Dmat)
+    result <- svd2(Dmat)
     values <- result$d
     Lmat <- Bfacinv %*% result$u
     Mmat <- Cfacinv %*% result$v
   } else {
-    result <- svd(t(Dmat))
+    result <- svd2(t(Dmat))
     values <- result$d
     Lmat <- Bfacinv %*% result$v
     Mmat <- Cfacinv %*% result$u

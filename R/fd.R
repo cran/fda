@@ -134,7 +134,11 @@ summary.fd <- function(object,...)
 #  plus method for "fd"
 #  -----------------------------------------------------------------
 
-"+.fd" <- function(e1, e2, basisobj=basisobj1*basisobj2)
+"+.fd" <- function(e1, e2){
+  plus.fd(e1, e2)
+}
+
+plus.fd <- function(e1, e2, basisobj=basisobj1*basisobj2)
 {
 #  PLUS: Pointwise sum of two functional data objects,
 #    the sum of a scalar and a functional data object,
@@ -313,7 +317,11 @@ return(plusfd)
 #  minus method for "fd"
 #  --------------------------------------------------------------------------
 
-"-.fd" <- function(e1, e2, basisobj=basisobj1*basisobj2)
+"-.fd" <- function(e1, e2){
+  minus.fd(e1, e2)
+}
+
+minus.fd <- function(e1, e2, basisobj=basisobj1*basisobj2)
 {
 #  MINUS: Pointwise difference two functional data objects,
 #    the between a scalar and a functional data object,
@@ -492,7 +500,11 @@ return(minusfd)
 #  point-wise product method for "fd"
 #  --------------------------------------------------------------------------
 
-"*.fd" <- function(e1, e2, basisobj=basisobj1*basisobj2)
+"*.fd" <- function(e1, e2){
+  times.fd(e1, e2)
+}
+  
+times.fd <- function(e1, e2, basisobj=basisobj1*basisobj2)
 {
 #  TIMES: Pointwise product of two functional data objects,
 #    the product of a scalar and a functional data object,
@@ -885,3 +897,4 @@ sum.fd <- function(..., na.rm=FALSE)
   concatfd <- fd(coef, basisfd, fdnames)
   return(concatfd)
 }
+

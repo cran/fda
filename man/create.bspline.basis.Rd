@@ -200,8 +200,8 @@ plot(lipbasis)
 #(bSpl.growth <- create.bspline.basis(breaks=growth$age))
 #Error in create.bspline.basis(breaks = growth$age) : 
 #	Smallest value in BREAKS not equal to RANGEVAL[1].
-#**Modify create.bspline.basis so
-#  rangeval=range(breaks) breaks are provided and rangeval is not
+#**Modify create.bspline.basis so rangeval=range(breaks)
+#      when breaks are provided and rangeval is not
 
 #(bSpl.growth <- create.bspline.basis(growth$age))
 #Error in create.bspline.basis(growth$age) : 
@@ -213,6 +213,9 @@ plot(lipbasis)
 #(bSpl.growth6 <- create.bspline.basis(growth$age,norder=6))
 #Error in create.bspline.basis(growth$age, norder = 6) : 
 #	Argument RANGEVAL is not correct.
+#**Modify create.bspline.basis so
+# if(length(rangeval)>2 & missing(breaks),
+# breaks = rangeval;  rangeval = range(breaks).  
 
 }
 % docclass is function

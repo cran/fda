@@ -6,6 +6,7 @@
 \alias{CSTRfitLS}
 \alias{CSTRres}
 \alias{CSTRres0}
+\alias{CSTRsse}
 \title{
   Continuously Stirred Temperature Reactor
 }
@@ -17,7 +18,8 @@
   metrology error can not be ignored, use CSTRfn (which calls
   CSTRfitLS).  To estimate parameters in the CSTR differential equation
   system (kref, EoverR, a, and / or b), pass either CSTRres or CSTRres0
-  to nls.  
+  to nls.  If nls fails to converge, first use optim or nlminb with
+  CSTRsse, then pass the estimates to nls.
 }
 \usage{
 CSTR2in(Time, condition =
@@ -32,6 +34,7 @@ CSTRfn(parvec, datstruct, fitstruct, CSTRbasis, lambda, gradwrd=TRUE)
 CSTRres(kref=NULL, EoverR=NULL, a=NULL, b=NULL,
         datstruct, fitstruct, CSTRbasis, lambda, gradwrd=FALSE)
 CSTRres0(kref=NULL, EoverR=NULL, a=NULL, b=NULL, gradwrd=FALSE)
+CSTRsse(par, datstruct, fitstruct, CSTRbasis, lambda)
 
 }
 \arguments{
@@ -52,6 +55,7 @@ CSTRres0(kref=NULL, EoverR=NULL, a=NULL, b=NULL, gradwrd=FALSE)
     observation(s) on Concentration and Temperature for which
     computation(s) are desired  
   }
+  
   \item{parms}{
     a list of CSTR model parameters passed via the lsoda 'parms'
     argument.  This list consists of the following 3 components:  
@@ -125,7 +129,7 @@ CSTRres0(kref=NULL, EoverR=NULL, a=NULL, b=NULL, gradwrd=FALSE)
 	Quadrature weights created by 'quadset' and stored in
 	CSTRbasis[["quadvals"]][, "quadpts"].  
       }
-    }	
+    }
   }
   \item{fitstruct}{
     a list with 14 components:  
@@ -186,13 +190,12 @@ CSTRres0(kref=NULL, EoverR=NULL, a=NULL, b=NULL, gradwrd=FALSE)
   }
   \item{lambda}{
     a 2-vector of rate parameters 'lambdaC' and 'lambdaT'.  
-    
   }
   \item{gradwrd}{
     a logical scalar TRUE if the gradient is to be returned as well as
     the residuals matrix.      
   }
-  \item{parvec}{
+  \item{parvec, par}{
     initial values for the parameters specified by fitstruct[[
     "estimate"]] to be estimated. 
   }
@@ -212,7 +215,8 @@ CSTRres0(kref=NULL, EoverR=NULL, a=NULL, b=NULL, gradwrd=FALSE)
 
   dC/dt = (-betaCC(T, F.in)*C + F.in*C.in)
 
-  dT/dt = (-betaTT(Fcvec, F.in)*T + betaTC(T, F.in)*C + alpha(Fcvec)*T.co
+  dT/dt = (-betaTT(Fcvec, F.in)*T + betaTC(T, F.in)*C +
+  alpha(Fcvec)*T.co)
 
   where
 
@@ -277,7 +281,18 @@ CSTRres0(kref=NULL, EoverR=NULL, a=NULL, b=NULL, gradwrd=FALSE)
   nls(~CSTRres0(...), ...), the values of these arguments must be
   assigned to .datstruct, .fitstruct, .CSTRbasis and .lambda.  If 'nls'
   is called from the global environment, it will look for these objects
-  in the global environment.  
+  in the global environment.
+
+  CSTRres0 has one feature absent from CSTRres:  If a variable
+  .CSTRres0.trace is available, it is assumed to be a matrix with columns
+  kref, EoverR, a, b, SSE, plus all residuals.  These numbers are
+  rbinded as an additional row of this matrix.  This is provided to help
+  diagnose a problem were 'nls' was terminating with "step factor
+  ... reduced below 'minFactor'", facilitating the comparison between R
+  and Matlab for the precise sets of parameter values tested by 'nls'.    
+
+  CSTRsse computes sum of squares of residuals for use with optim or
+  nlminb.  
 }
 \value{
   \item{CSTR2in}{
@@ -363,7 +378,7 @@ CSTRres0(kref=NULL, EoverR=NULL, a=NULL, b=NULL, gradwrd=FALSE)
 	the Generalized cross validation estimate of the mean square
 	error, as discussed in Ramsay and Silverman (2006, sec. 5.4).  	
       }
-    }
+    } 
   }
   \item{CSTRres, CSTRres0}{
     the 'res' component of CSTRfd(...) as a column vector.  This allows
@@ -371,6 +386,14 @@ CSTRres0(kref=NULL, EoverR=NULL, a=NULL, b=NULL, gradwrd=FALSE)
     as 'nls' has several helper functions to facilitate evaluating
     goodness of fit and and uncertainty in parameter estimates.  
   }
+  \item{CSTRsse}{
+    sum(res*res) from CSTRfd(...).  This allows us to use 'optim' or
+    'nlminb' with the CSTR model.  This can also be used to obtain
+    starting values for 'nls' in cases where 'nls' fails to converge
+    from the initiall provided starting values.  Apart from 'par', the
+    other arguments 'datstruct', 'fitstruct', 'CSTRbasis', and 'lambda',
+    must be passed via '...' in 'optim' or 'nlminb'.  
+  }  
 }
 \references{
   Ramsay, J. O., Hooker, G., Cao, J. and Campbell, D. (2007) Parameter
@@ -451,7 +474,8 @@ coolStepSoln <- lsoda(y=yinit, times=tspan, func=CSTR2,
 ###
 ###
 
-# See the demo in '~R\library\fda\scripts\CSTR\CSTR_demo.R'.
+# See the script in '~R\library\fda\scripts\CSTR\CSTR_demo.R'
+#  for more examples.  
 
 }
 % docclass is function

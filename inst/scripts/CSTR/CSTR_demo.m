@@ -15,7 +15,8 @@
 %  Previously modified 26 October 2005
 
 %addpath('c:/matlab7/fdaM')
-addpath('d:/spencerg/statmtds/fda/Matlab/fdaM')
+addpath('d:/spencerg/statmtds/fda/Matlab/fdaM') ; 
+addpath('D:\spencerg\statmtds\fda\R\fda\inst\scripts\CSTR') ; 
 
 %%  2.  Set up the problem 
 
@@ -116,6 +117,8 @@ ylabel('\fontsize{13} F_c(t)')
 title('\fontsize{13} Coolant flow rate')
 axis([0,Tlim,8,22])
 
+save CSTR_fig1Matlab -v6; 
+
 %%  5.  Solve the equations for both the hot and cool conditions
 
 %  5.0.  set constants for ODE solver
@@ -128,7 +131,7 @@ odeoptions = odeset('RelTol',1e-7,'AbsTol',1e-7);
 
 Cinit_cool = 1.5965;    %  initial concentration in kmol/m^3
 Tinit_cool = 341.3754;  %  initial temperature in deg K
-yinit = [Cinit_cool, Tinit_cool];
+yinitCool = [Cinit_cool, Tinit_cool];
 
 %  load cool input into fitstruct
 
@@ -138,7 +141,7 @@ fitStrCool.Tcin = Tcin_cool;
 %  5.2.  solve  differential equation with true parameter values
 
 h = waitbar(0,'Simulating Cool Output...');
-[t, y_cool] = ode45(@CSTR2, tspan, yinit, odeoptions, ...
+[t, y_cool] = ode45(@CSTR2, tspan, yinitCool, odeoptions, ...
                             fitStrCool, 'all_cool_step', Tlim);
 close(h)
 
@@ -153,7 +156,7 @@ T_cool = y_cool(:,2);
 
 Cinit_hot  = 0.2651;    %  initial concentration in kmol/m^3
 Tinit_hot  = 394.0532;  %  initial temperature in deg K
-yinit = [Cinit_hot, Tinit_hot];
+yinitHot = [Cinit_hot, Tinit_hot];
 
 %  load hot input into fitstruct
 
@@ -163,7 +166,7 @@ fitStrHot.Tcin = Tcin_hot;
 %  solve  differential equation with true parameter values
 
 h = waitbar(0,'Simulating Hot Output...');
-[t, y_hot] = ode45(@CSTR2, tspan, yinit, odeoptions, ...
+[t, y_hot] = ode45(@CSTR2, tspan, yinitHot, odeoptions, ...
                             fitStrHot, 'all_hot_step', Tlim);
 close(h)
 
@@ -201,6 +204,7 @@ ylabel('\fontsize{16} T(t)')
 title('\fontsize{16} Output temperature')
 axis([0,Tlim,330,420])
 
+save CSTR_fig2Matlab -v6; 
 
 %%  6.  Set up the B-spline basis for representing solutions.
 
@@ -260,6 +264,8 @@ xlabel('')
 ylabel('\fontsize{16} T(t)')
 title('\fontsize{16} Temperature')
 axis([0, Tlim, 330, 360])
+
+save CSTR_fig3Matlab -v6; 
 
 %  7.3.  compute weights to correct for differences in
 %  scale for the two variables
@@ -329,6 +335,9 @@ ylabel('\fontsize{16} T(t)')
 title('\fontsize{16} Temperature')
 axis([0, Tlim, 330, 360])
 
+save CSTR_fig4Matlab -v6; 
+
+
 %  8.6.  plot the data and the smooths
 
 figure(5)
@@ -344,6 +353,8 @@ xlabel('')
 ylabel('\fontsize{16} T(t)')
 title('\fontsize{16} Temperature')
 axis([0, Tlim, 330, 360])
+
+save CSTR_fig5Matlab -v6; 
 
 %%  9.  Load data into struct variable datstruct
 
@@ -540,8 +551,9 @@ log10(s123(1)/s123(3))
 % 1.2357 on 2007.06.03 by Spencer Graves
 % previously 0.7495
 
-save CSTR5 -v6 ;
+save CSTR5 -v6; 
 % load CSTR5 ; 
+
 %%  12.  Estimate all four parameters
 
 %  set the optimization parameters for the outer optimization
@@ -584,32 +596,18 @@ lambda = 10.*[lambdaC, lambdaT];
 %  calculate the estimates
 % CSTRfn use 6 
 tic;
-[parvec1234, resnorm1234, residual1234, exitflag1234, output1234, ...
-    lambdaout1234, jacobian1234] = ...
+[parvec1234o, resnorm1234o, residual1234o, exitflag1234o, ... 
+        output1234o, lambdaout1234o, jacobian1234o] = ...
     lsqnonlin(@CSTRfn, parvec1234, [], [], optionsCSTRfn, ...
               datstruct, fitStrH1234, CSTRbasis, lambda);
-et = toc
+et = toc ;
 
-save cstr4nls  -v6 parvec1234 resnorm1234 residual1234 ... 
-    exitflag1234 output1234 lambdaout1234 jacobian1234 ; 
+save cstr4nls  -v6 parvec1234o resnorm1234o residual1234o ... 
+    exitflag1234o output1234o lambdaout1234o jacobian1234o ; 
+% load cstr4nls ; 
 %  get the singular values of the jacobian
 
-% test CSTRfn again 
-parvecTst = [.461, .83301, 1.678, .5]+0.001*pi.^(1./(1:4)) ; 
-
-[resTst jacobianTst] = CSTRfn(...
-    parvecTst, datstruct, fitStrH1234, CSTRbasis, lambda) ; 
-
-svd(full(jacobianTst)) 
-
-tic;
-[parvec1234o, resnorm1234o, residual1234o, exitflag1234o, output1234o, ...
-    lambdaout1234o, jacobian1234o] = ...
-    lsqnonlin(@CSTRfn, parvec1234, [], [], optionsCSTRfn, ...
-              datstruct, fitStrH1234, CSTRbasis, lambda);
-et = toc
-
-s1234 = svd(full(jacobian1234));
+s1234 = svd(full(jacobian1234o));
 
 %  log 10 of condition number
 
@@ -619,48 +617,85 @@ log10(s1234(1)/s1234(4))
 
 %  get final solution values
 
-[resAll, DresAll, fitstructAll] = CSTRfn(parvec1234, datstruct, ...
+[resAll, DresAll, fitstructAll] = CSTRfn(parvec1234o, datstruct, ...
         fitStrH1234, CSTRbasis, lambda, 0);
 
 %  display the parameter estimates
 
 disp(['Initial   values: ', num2str(parvec1234)])
-disp(['Estimated values: ', num2str(parvec)])
+disp(['Estimated values: ', num2str(parvec1234o)])
 disp(['True      values: ', num2str(parvectru)])
 
 %  get the final coefficient values for the solutions
 
-coef     = fitStrH1234.coef0;
-Ccoefest = coef(1:nbasis);
-Tcoefest = coef(nbasis+1:2*nbasis);
+coef     = fitstructAll.coef0;
+Ccoefest1234o = coef(1:nbasis);
+Tcoefest1234o = coef(nbasis+1:2*nbasis);
 
-Cfdest = fd(Ccoefest, CSTRbasis);
-Tfdest = fd(Tcoefest, CSTRbasis);
+Cfdest1234o = fd(Ccoefest1234o, CSTRbasis);
+Tfdest1234o = fd(Tcoefest1234o, CSTRbasis);
 
-Cvecest = eval_fd(tobs, Cfdest);
-Tvecest = eval_fd(tobs, Tfdest);
+Cvecest1234o = eval_fd(tobs, Cfdest1234o);
+Tvecest1234o = eval_fd(tobs, Tfdest1234o);
 
 Cvectru = eval_fd(tobs, Cfdtru);
 Tvectru = eval_fd(tobs, Tfdtru);
 
 %  display maximum absolute errors
 
-Cerrpct = 100.*median(abs(Cvecest - Cvectru)./Cvectru)
-Terrpct = 100.*median(abs(Tvecest - Tvectru)./Tvectru)
+Cerrpct1234o = 100.*median(abs(Cvecest1234o - Cvectru)./Cvectru) ;
+fprintf('Cerrpct1234o = %f\n',Cerrpct1234o)
+Terrpct1234o = 100.*median(abs(Tvecest1234o - Tvectru)./Tvectru) ;
+fprintf('Terrpct1234o = %f\n',Terrpct1234o)
 
 %  plot the estimated and true solutions
 
 figure(6)
 subplot(2,1,1)
-plot(tobs, Cvectru, 'r-', tobs, Cvecest, 'b-', tobs, Cobs, 'b.')
+plot(tobs, Cvectru, 'r-', tobs, Cvecest1234o, 'b-', tobs, Cobs, 'b.')
 ylabel('\fontsize{16} C(t)')
 title('\fontsize{16} Concentration (red = true, blue = estimated)')
 axis([0, Tlim, 1.2, 1.8])
 subplot(2,1,2)
-plot(tobs, Tvectru, 'r-', tobs, Tvecest, 'b-')
+plot(tobs, Tvectru, 'r-', tobs, Tvecest1234o, 'b-')
 ylabel('\fontsize{16} T(t)')
 title('\fontsize{16} Temperature')
 axis([0, Tlim, 330, 360])
+
+save CSTR_fig6Matlab -v6; 
+
+% (0) To compare computation with R, starting from here:  
+% load CSTR_fig6Matlab ; 
+% (1) Open 'CSTR_demo.R' in R 
+% (2) Create a connection in R for Matlab 
+% (matlab <- Matlab())
+% (3) In Matlab, addpath to 'MatlabServer'
+%     at system.file("externals", package="R.matlab")
+addpath('C:\Program Files\R\R-2.5.1\library\R.matlab\externals') ; 
+% (4) Lock up Matlab until realsed by close(matlab) in R 
+Matlab ; 
+% (5) In R, open the connection 
+% (isOpenMatlab <- open(matlab))
+% (6) In R, transfer '.CSTRres0.trace' to Matlab
+% setVariable(matlab, R_CSTRres0trace = .CSTRres0.trace)
+% (7) In R, close(matlab) to allow interactive work in Matlab 
+nRows = size(R_CSTRres0trace, 1) ; 
+% 106 
+% (8) In Matlab, add a column to R_CSTRres0trace:  
+RmatlabCSTRres0trace = [R_CSTRres0trace NaN*ones(nRows, 1)] ; 
+% (9) Fill the new column with CSTRfn(R_CSTRres0trace(i, 1:4), ...) 
+for i = 1:nRows 
+    parvec = R_CSTRres0trace(i, 1:4) ;      
+    resi = CSTRfn(parvec, datstruct, fitStrH1234, CSTRbasis, lambda) ; 
+    RmatlabCSTRres0trace(i, 6) = sum(resi(:).^2) ; 
+end % for i = 1:nRows 
+
+%(10) In Matlab 
+MatlabServer % to transfer control back to R.
+%(10) In R, reopen the connection 
+% (isOpenMatlab <- open(matlab))
+%(11) Get the results
+% CSTRres0.R.Matlab.trace <-  getVariable(matlab, 'R_CSTRres0trace')
 
 %%  13.  Fit the hot solution with the cool parameter estimates
 
@@ -672,31 +707,34 @@ axis([0, Tlim, 330, 360])
 %fitstruct.b      = parvec(4);   
 
 fitStrHC = fitStrHot; 
-fitStrHC.kref   = parvec1234(1);      
-fitStrHC.EoverR = parvec1234(2);   
-fitStrHC.a      = parvec1234(3);   
-fitStrHC.b      = parvec1234(4);   
+fitStrHC.kref   = parvec1234o(1);      
+fitStrHC.EoverR = parvec1234o(2);   
+fitStrHC.a      = parvec1234o(3);   
+fitStrHC.b      = parvec1234o(4);   
 
-yinit = [Cinit_hot, Tinit_hot];
+% from 5.4 above
+%yinitHot = [Cinit_hot, Tinit_hot];
 
 %  load hot input into fitstruct
-
+plot(Tcin_hot);
 fitStrHC.Tcin = Tcin_hot;
 
 %  solve  differential equation with true parameter values
 
 h = waitbar(0,'Simulating Actual Model Output...');
-[t, yest_hot] = ode45(@CSTR2, tspan, yinit, odeoptions, ...
+[t, yestHC] = ode45(@CSTR2, tspan, yinitHot, odeoptions, ...
                             fitStrHC, 'all_hot_step', Tlim);
 close(h)
 
 %  set up separate variables for concentration and temperature
 
-C_hotest = yest_hot(:,1);
-T_hotest = yest_hot(:,2);
+C_HC = yestHC(:,1);
+T_HC = yestHC(:,2);
 
-Cerrpct = 100.*median(abs(C_hotest - C_hot)./Cinit_hot)
-Terrpct = 100.*median(abs(T_hotest - T_hot)./Tinit_hot)
+CerrpctHC = 100.*median(abs(C_HC - C_hot)./Cinit_hot) ;
+fprintf('CerrpctHC = %f\n',CerrpctHC)
+TerrpctHC = 100.*median(abs(T_HC - T_hot)./Tinit_hot) ; 
+fprintf('TerrpctHC = %f\n',TerrpctHC)
 
 % plot the estimated and true hot solutions
 
@@ -704,7 +742,7 @@ figure(8)
 subplot(2,1,1)
 lhdl = plot(t, C_hot, 'r-'); 
 set(lhdl, 'LineWidth', 1);
-lhdl = line(t, C_hotest);
+lhdl = line(t, C_HC);
 set(lhdl, 'LineWidth', 1, 'color', 'b');
 ylabel('\fontsize{16} C(t)')
 title('\fontsize{16} Concentration (red = true, blue = estimated)')
@@ -712,18 +750,22 @@ axis([0, Tlim, 0.1, 0.48])
 subplot(2,1,2)
 lhdl = plot(t, T_hot, 'r-'); 
 set(lhdl, 'LineWidth', 1);
-lhdl = line(t, T_hotest);
+lhdl = line(t, T_HC);
 set(lhdl, 'LineWidth', 1, 'color', 'b');
 ylabel('\fontsize{16} T(t)')
 title('\fontsize{16} Temperature')
 axis([0, Tlim, 370, 420])
+
+save CSTR_fig8Matlab -v6; 
+% load CSTR_fig8Matlab ; 
+% save CSTR_fig8Mat -v6 t Tlim C_hot C_HC T_hot T_HC ; 
 
 %%  14.  Estimate kref, EoverR and a with only 
 %   one response variable observed.  
 
 % 14.1.  With only temperature observed 
 
-fitStrHTemp = fitStrHot
+fitStrHTemp = fitStrHot ; 
 fitStrHTemp.fit = [0,1];
 
 %  use coefficients from spline smoothing as initial
@@ -739,59 +781,80 @@ fitStrHTemp.b = btru;
 %  calculate the estimates
 
 tic;
-[parvecT, resnormT, residualT, exitflagT] = ...
+[parvecHTemp, resnormHTemp, residualHTemp, exitflagHTemp] = ...
     lsqnonlin(@CSTRfn, parvec1234, [], [], optionsCSTRfn, ...
               datstruct, fitStrHTemp, CSTRbasis, lambda);
-toc
+toc 
+
+optionsCSTRfn.MaxIter = 100 ; 
+tic;
+[parvecHTemp, resnormHTemp, residualHTemp, exitflagHTemp] = ...
+    lsqnonlin(@CSTRfn, parvec1234, [], [], optionsCSTRfn, ...
+              datstruct, fitStrHTemp, CSTRbasis, lambda);
+toc 
 
 %  get final solution values
 
-[resT, DresT, fitStrFinalT] = CSTRfn(parvec, datstruct, ... 
-                    fitStrHTemp, CSTRbasis, lambda, 0);
+[resHTemp, DresHTemp, fitStrFinalHTemp] = CSTRfn(parvecHTemp, ...
+        datstruct, fitStrHTemp, CSTRbasis, lambda, 0);
 
 %  display the parameter estimates
 
 disp(['Initial   values: ', num2str(parvec1234)])
-disp(['Estimated values: ', num2str(parvecT)])
+disp(['Estimated values: ', num2str(parvecHTemp)])
 disp(['True      values: ', num2str(parvectru)])
 
 %  get the final coefficient values for the solutions
 
-coefT     = fitStrFinalT.coef0;
-CcoefestT = coef(1:nbasis);
-TcoefestT = coef(nbasis+1:2*nbasis);
+coefHTemp     = fitStrFinalHTemp.coef0;
+CcoefestHTemp = coefHTemp(1:nbasis);
+TcoefestHTemp = coefHTemp(nbasis+1:2*nbasis);
 
-CfdestT = fd(CcoefestT, CSTRbasis);
-TfdestT = fd(TcoefestT, CSTRbasis);
+CfdestHTemp = fd(CcoefestHTemp, CSTRbasis);
+TfdestHTemp = fd(TcoefestHTemp, CSTRbasis);
 
-CvecestT = eval_fd(tobs, CfdestT);
-TvecestT = eval_fd(tobs, TfdestT);
+CvecestHTemp = eval_fd(tobs, CfdestHTemp);
+TvecestHTemp = eval_fd(tobs, TfdestHTemp);
 
-CvectruT = eval_fd(tobs, CfdtruT);
-TvectruT = eval_fd(tobs, TfdtruT);
+Cvectru = eval_fd(tobs, Cfdtru);
+Tvectru = eval_fd(tobs, Tfdtru);
 
 %  display maximum absolute errors
 
-CerrpctT = 100.*median(abs(Cvecest - Cvectru)./Cvectru)
-TerrpctT = 100.*median(abs(Tvecest - Tvectru)./Tvectru)
+CerrpctHTemp = 100.*median(abs(CvecestHTemp - Cvectru)./Cvectru) ;
+
+TerrpctHTemp = 100.*median(abs(TvecestHTemp - Tvectru)./Tvectru) ;
+fprintf('CerrpctHTemp = %f\n',CerrpctHTemp) ; 
+fprintf('TerrpctHTemp = %f\n',TerrpctHTemp) ; 
 
 %  plot the estimated and true solutions
 
-figure('9T')
+figure(9)
 subplot(2,1,1)
-plot(tobs, Cvectru, 'r-', tobs, CvecestT, 'b-')
+plot(tobs, Cvectru, 'r-', tobs, CvecestHTemp, 'b-')
 ylabel('\fontsize{16} C(t)')
 title('\fontsize{16} Concentration (red = true, blue = estimated)')
 axis([0, Tlim, 1.2, 1.8])
 subplot(2,1,2)
-plot(tobs, Tvectru, 'r-', tobs, TvecestT, 'b-')
+plot(tobs, Tvectru, 'r-', tobs, TvecestHTemp, 'b-')
 ylabel('\fontsize{16} T(t)')
 title('\fontsize{16} Temperature')
 axis([0, Tlim, 330, 360])
 
+save CSTR_fig9Matlab -v6; 
+% load CSTR_fig9Matlab -v6 ; 
+save CSTR_fig9Mat tobs Tlim Cvectru CvecestHTemp Tvectru TvecestHTemp ; 
+save CSTR_fig9Mat0 tobs Tlim ; 
+save CSTR_fig9Mat1 Cvectru Tvectru ; 
+save CSTR_fig9Mat2 CvecestHTemp TvecestHTemp ; 
+
+csvwrite('fit9Mat.csv', [Tobs Cvectru CvecestHTemp ... 
+    Tvectru TvecestHTemp]) ; 
+
+
 % 14.2.  With only concentration observed 
 
-fitStrHConc = fitStrHot
+fitStrHConc = fitStrHot ; 
 fitStrHConc.fit = [1, 0];
 
 %  use coefficients from spline smoothing as initial
@@ -807,55 +870,60 @@ fitStrHConc.b = btru;
 %  calculate the estimates
 
 tic;
-[parvecC, resnormC, residualC, exitflagC] = ...
+[parvecHConc, resnormHConc, residualHConc, exitflagHConc] = ...
     lsqnonlin(@CSTRfn, parvec1234, [], [], optionsCSTRfn, ...
               datstruct, fitStrHConc, CSTRbasis, lambda);
 toc
 
 %  get final solution values
 
-[resC, DresC, fitStrFinalC] = CSTRfn(parvec, datstruct, ... 
+[resHConc, DresHConc, fitStrFinalHConc] = CSTRfn(parvecHConc, datstruct, ... 
                 fitStrHConc, CSTRbasis, lambda, 0);
 
 %  display the parameter estimates
 
 disp(['Initial   values: ', num2str(parvec1234)])
-disp(['Estimated values: ', num2str(parvecC)])
+disp(['Estimated values: ', num2str(parvecHConc)])
 disp(['True      values: ', num2str(parvectru)])
 
 %  get the final coefficient values for the solutions
 
-coefC     = fitStrFinalC.coef0;
-CcoefestC = coefC(1:nbasis);
-TcoefestC = coefC(nbasis+1:2*nbasis);
+coefHConc     = fitStrFinalHConc.coef0;
+CcoefestHConc = coefHConc(1:nbasis);
+TcoefestHConc = coefHConc(nbasis+1:2*nbasis);
 
-CfdestC = fd(CcoefestC, CSTRbasis);
-TfdestC = fd(TcoefestC, CSTRbasis);
+CfdestHConc = fd(CcoefestHConc, CSTRbasis);
+TfdestHConc = fd(TcoefestHConc, CSTRbasis);
 
-CvecestC = eval_fd(tobs, CfdestC);
-TvecestC = eval_fd(tobs, TfdestC);
+CvecestHConc = eval_fd(tobs, CfdestHConc);
+TvecestHConc = eval_fd(tobs, TfdestHConc);
 
-CvectruC = eval_fd(tobs, CfdtruC);
-TvectruC = eval_fd(tobs, TfdtruC);
+Cvectru = eval_fd(tobs, Cfdtru);
+Tvectru = eval_fd(tobs, Tfdtru);
 
 %  display maximum absolute errors
 
-CerrpctC = 100.*median(abs(Cvecest - Cvectru)./Cvectru)
-TerrpctC = 100.*median(abs(Tvecest - Tvectru)./Tvectru)
+CerrpctHConc = 100.*median(abs(CvecestHConc - Cvectru)./Cvectru) ;
+TerrpctHConc = 100.*median(abs(TvecestHConc - Tvectru)./Tvectru) ;
+fprintf('CerrpctHConc = %f\n',CerrpctHConc) ; 
+fprintf('TerrpctHConc = %f\n',TerrpctHConc) ; 
 
 %  plot the estimated and true solutions
 
-figure('9C')
+figure(10) % was figure(9): second copy for obs. Conc only 
 subplot(2,1,1)
-plot(tobs, Cvectru, 'r-', tobs, CvecestC, 'b-')
+plot(tobs, Cvectru, 'r-', tobs, CvecestHConc, 'b-')
 ylabel('\fontsize{16} C(t)')
 title('\fontsize{16} Concentration (red = true, blue = estimated)')
 axis([0, Tlim, 1.2, 1.8])
 subplot(2,1,2)
-plot(tobs, Tvectru, 'r-', tobs, TvecestC, 'b-')
+plot(tobs, Tvectru, 'r-', tobs, TvecestHConc, 'b-')
 ylabel('\fontsize{16} T(t)')
 title('\fontsize{16} Temperature')
 axis([0, Tlim, 330, 360])
+
+save CSTR_fig10Matlab -v6; 
+% load CSTR_fig10Matlab ; 
 
 %%  15.  Fit the hot solution with the cool parameter estimates
 
@@ -867,12 +935,13 @@ axis([0, Tlim, 330, 360])
 %fitstruct.b      = parvec(4);   
 
 fitStrHTC = fitStrHTemp; 
-fitStrHTC.kref   = parvec(1);      
-fitStrHTC.EoverR = parvec(2);   
-fitStrHTC.a      = parvec(3);   
-fitStrHTC.b      = parvec(4);   
+fitStrHTC.kref   = parvecHConc(1);      
+fitStrHTC.EoverR = parvecHConc(2);   
+fitStrHTC.a      = parvecHConc(3);   
+fitStrHTC.b      = parvecHConc(4);   
 
-yinit = [Cinit_hot, Tinit_hot];
+% from 5.4 above
+%yinitHot = [Cinit_hot, Tinit_hot];
 
 %  load hot input into fitstruct
 
@@ -881,28 +950,28 @@ fitStrHTC.Tcin = Tcin_hot;
 %  solve  differential equation with true parameter values
 
 h = waitbar(0,'Simulating Actual Model Output...');
-[t, yest_hot] = ode45(@CSTR2, tspan, yinit, odeoptions, ...
+[t, yestHTC] = ode45(@CSTR2, tspan, yinitHot, odeoptions, ...
                             fitStrHTC, 'all_hot_step', Tlim);
 close(h)
 
 %  set up separate variables for concentration and temperature
 
-C_hotest = yest_hot(:,1);
-T_hotest = yest_hot(:,2);
+C.HTC= yestHTC(:,1);
+T.HTC = yestHTC(:,2);
 
 % plot the estimated and true hot solutions
 
-figure(10)
+figure(11) % was figure(10) 
 subplot(2,1,1)
-plot(t, C_hot, 'r-', t, C_hotest, 'b-')
+plot(t, C_hot, 'r-', t, C.HTC, 'b-')
 ylabel('\fontsize{16} C(t)')
 title('\fontsize{16} Concentration (red = true, blue = estimated)')
 axis([0, Tlim, 0, 0.5])
 subplot(2,1,2)
-plot(t, T_hot, 'r-', t, T_hotest, 'b-')
+plot(t, T_hot, 'r-', t, T.HTC, 'b-')
 ylabel('\fontsize{16} T(t)')
 title('\fontsize{16} Temperature')
 axis([0, Tlim, 370, 420])
 
-
+save CSTR_fig11Matlab -v6; 
 

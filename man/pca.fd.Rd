@@ -78,10 +78,10 @@ daytempfd <- data2fd(CanadianWeather$dailyAv[,,"Temperature.C"],
 
 
 # the following should work but doesn't;  2007
-#daytemppcaobj <- pca.fd(daytempfd, nharm=4, harmfdPar)
-#daytemppcaobj <- varmx.pca.fd(daytemppcaobj)
+daytemppcaobj <- pca.fd(daytempfd, nharm=4, harmfdPar)
+daytemppcaobj <- varmx.pca.fd(daytemppcaobj)
 #  plot harmonics
-#plot.pca.fd(daytemppcaobj, cex=1.2)
+plot.pca.fd(daytemppcaobj, cex=1.2)
 
 }
 % docclass is function

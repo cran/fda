@@ -111,11 +111,6 @@ goodsfdPar9.5 = fdPar(goodsbasis, LfdobjNonDur, lam9.5);
 #lognondursmth = smooth_basis(durtime, lognondur, goodsfdPar);
 lognondursm9.5 = smooth.basis(durtime, coredata(lognondur), goodsfdPar9.5);
 
-# p. 47, Figure 3.5.
-#Phase-plane plot of smoothed log nondurable goods index for 1964
-
-
-
 # p. 47, Figure 3.5.  Nondurable phase-plane plot, 1964
 ##*** Need to add xlim and ylim to the following
 ## to match the plots in the book.  

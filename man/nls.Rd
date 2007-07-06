@@ -22,8 +22,15 @@
 \details{
   This version of 'nls' was developed on 2007.06.02 to fix some apparent
   discrepancies between documentation and behaviour.  See the examples.
+  
   If the official version of 'nls' in 'stats' is modified to support the
-  'fda' uses, this version might then be deleted.  
+  'fda' uses, this version might then be deleted.
+
+  Of the options documented in the examples, the option using 'get'
+  might not be supported in the future.  It may still work, however, if
+  at least one argument is passed to the function via a data.frame.
+  This could always be done by passing a dummy argument that is never
+  used.  
 }
 \value{
   A list as documented in help(nls, package=stats).  

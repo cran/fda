@@ -130,8 +130,7 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
   harmfd   <- fd(harmcoef, basisobj, harmnames)
 
   pcafd        <- list(harmfd, eigvalc, harmscr, varprop, meanfd)
-  setOldClass("pca.fd")
-  oldClass(pcafd) <- "pca.fd"
+  class(pcafd) <- "pca.fd"
   names(pcafd) <- c("harmonics", "values", "scores", "varprop", "meanfd")
 
   return(pcafd)

@@ -9,6 +9,15 @@ CSTRfitLS <- function(coef, datstruct, fitstruct,
 ##
 ## 1.  Set up   
 ##
+  max.log.betaCC <- (log(.Machine$double.xmax)/3)
+# For certain values of 'coef',
+# naive computation of betaCC will return +/-Inf,
+# which generates NAs in Dres.
+# Avoid this by clipping betaCC
+#
+# log(.Machine$double.xmax)/2 is too big,
+# because a multiple of it is squared in CSTRfn ... 
+#  
   fit = fitstruct$fit;
 
   basismat = datstruct$basismat;
@@ -49,7 +58,8 @@ CSTRfitLS <- function(coef, datstruct, fitstruct,
   }
 
   if( fit[2]){
-    resT = yobs[,fit12] - basismat%*%Tcoef;
+#    resT = yobs[,fit12] - basismat%*%Tcoef;
+    resT = yobs[,2] - basismat%*%Tcoef;
     Sres[,fit12] <- resT/sqrt(Twt)
   }
 ##
@@ -106,7 +116,18 @@ CSTRfitLS <- function(coef, datstruct, fitstruct,
 #% 4.2.  compute multipliers of outputs
 
   Tdif    = 1./Thatquad - 1./Tref;
-  betaCC  = kref*exp(-1e4*EoverR*Tdif);
+#
+#  betaCC  = kref*exp(-1e4*EoverR*Tdif);
+  log.betaCC <- (log(abs(kref))-1e4*EoverR*Tdif)
+  oops <- (log.betaCC > max.log.betaCC)
+  if(any(oops)){
+    warning(sum(oops), " of ", length(log.betaCC),
+            " values of log(abs(betaCC)) exceed the max = ",
+            max.log.betaCC, ";  thresholding.")
+    log.betaCC[oops] <- max.log.betaCC 
+  }
+  betaCC <- sign(kref)*exp(log.betaCC)
+#                     
   TCfac   = -delH/(rho*Cp);
   betaTC  = TCfac*betaCC;
   aFc2b   = a*Fc^b;

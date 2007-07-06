@@ -5,8 +5,7 @@
   Nondurable goods index
 }
 \description{
-  US nondurable goods index time series, 
-  January 1919 to January 2000.  
+  US nondurable goods index time series, January 1919 to January 2000.  
 }
 \format{
     An object of class 'ts'.  

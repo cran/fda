@@ -33,6 +33,7 @@ library(fda)
 ##
 # pp.  4-6, Figure 1.3.  US nondurable goods index 1919-2000
 #durtime = (0:(ndur-1))./12 + 1919;
+ndur <- length(nondurables)
 durtime = (0:(ndur-1))/12 + 1919;
 lognondur = log10(nondurables);
 

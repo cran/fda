@@ -3,16 +3,27 @@ CSTRfn <- function(parvec, datstruct, fitstruct,
 #function [res, Dres, fitstruct, df, gcv] =
 #    CSTRfn(parvec, datstruct, fitstruct, CSTRbasis, lambda, gradwrd)
 
-# Last modified with R port 2007.05.25 by Spencer Graves  
+# Last modified with R port 2007.07.21 by Spencer Graves  
 #%  Previously modified 29 July 2005
+
+  max.log.betaCC <- (log(.Machine$double.xmax)/3)
+# For certain values of 'coef',
+# naive computation of betaCC will return +/-Inf,
+# which generates NAs in Dres.
+# Avoid this by clipping betaCC
+#
+# log(.Machine$double.xmax)/2 is too big,
+# because a multiple of it is squared in CSTRfn ... 
+#
 
 #if nargin < 6, gradwrd = 1;  end
 ##
 ## 1.  Modify fitstruct for use with CSTRfitLS 
 ##
 #  cat("CSTRfn: parvec =", parvec, "\n")
-
+#
   eps <- .Machine$double.eps
+  eps1 <- (1+2*eps)
   fit = fitstruct$fit;
   if(is.null(fit))
     stop("fitstruct has no 'fit' component")  
@@ -99,7 +110,7 @@ CSTRfn <- function(parvec, datstruct, fitstruct,
 
 #  2.3.  Reshape for easier manipulation   
   res0 <- with(CSTR0$res, c(Sres, Lres))
-
+#
   N <- dim(CSTR0$res$Sres)[1]
   k12 <- dim(CSTR0$res$Sres)[2]
   nquad <- dim(CSTR0$res$Lres)[1]
@@ -109,7 +120,6 @@ CSTRfn <- function(parvec, datstruct, fitstruct,
 #
   nbasis <- (dim(CSTR0$Dres$DSres)[2]/2)
   Dres0 <- with(CSTR0$Dres, rbind(DSres, DLres))
-# CSTR0mat <- readMat("CSTRfitLS1_0.mat") # Problem w Matlab sparse 
 # res0.mat <- readMat("CSTRfitLSres0.mat")# OK 
 # d.res0 <- (res0-res0.mat$res0)
 # quantile(d.res0)
@@ -117,7 +127,6 @@ CSTRfn <- function(parvec, datstruct, fitstruct,
 #-7.1e-06 -1.4e-07  1.3e-08  2.1e-07  6.0e-06 
 # res0 good.
   
-# Dres.mat <- readMat("CSTRfitLSDres.mat") # Problem w 'sparse' 
 # Dres.mat <- read.csv("CSTRfitLSDres.csv", header=FALSE)
 # d.Dres <- (Dres0-as.matrix(Dres.mat))
 # quantile(d.Dres)
@@ -137,8 +146,8 @@ CSTRfn <- function(parvec, datstruct, fitstruct,
   gradnorm0 = mean(r.D)
   if(is.na(gradnorm0))
     stop("Initial call to CSTRfitLS returned NAs with parvec = ",
-         parvec, ";  sum(is.na(res0)) = ", sum(is.na(res0)),
-        "; sum(is.na(Dres0)) = ", sum(is.na(Dres0)))
+         paste(parvec, collapse=", "), ";  sum(is.na(res0)) = ",
+         sum(is.na(res0)), "; sum(is.na(Dres0)) = ", sum(is.na(Dres0)))
 #  
   gradnorm1 = 1;
 ##  
@@ -151,8 +160,29 @@ CSTRfn <- function(parvec, datstruct, fitstruct,
     if( iter > itermax) break
 #    
 #    Dcoef = Dres\res0;
-    Dcoef <- (lm.fit(Dres0, res0)$coefficients)
-    
+    nNA.res0 <- sum(is.na(res0))
+    nNA.Dres0 <- sum(is.na(Dres0))
+    if(nNA.res0 | nNA.Dres0) {
+      dump("parvec", "parvecError.R")
+      cat("Error: ", nNA.res0, "and", nNA.Dres0,
+          "NAs found in res0 and Dres0 with parvec =",
+          parvec, "; parvec dumped to parvecError.R\n") 
+    }
+#
+#    Dcoef <- (lm.fit(Dres0, res0)$coefficients)
+#    
+    Dres.svd <- svd2(Dres0)
+    ikeep <- with(Dres.svd, which(d > eps*max(d)))
+    Dres.rank <- length(ikeep) 
+    if(Dres.rank < min(dim(Dres0)))
+      warning("Dres0 has rank ", Dres.rank, " < dim(Dres0) = ",
+              paste(dim(Dres0), collapse=", "),
+              " in iteration ", iter, 
+              ".  Ignoring singular subspace.  ", 
+              "First (rank+1) singular values = ",
+              paste(Dres.svd$d[1:(Dres.rank+1)], collapse=", "))
+    Dcoef <- with(Dres.svd, v %*% ((t(u) %*% res0) / d))
+#    
 #    %  initial step:  alpha = 1
     coef1 <- coef0 - Dcoef
 #    
@@ -166,8 +196,8 @@ CSTRfn <- function(parvec, datstruct, fitstruct,
     fundif = abs(F0-F1)/abs(F0)
     
 #%     %  smaller steps as required, halving alpha each time
-#%     while F1 >= F0
-    while(is.na(F1) || F1>= F0 || any(is.na(Dres1))){
+#%     while F1 >= F0*(1+2*eps)
+    while(is.na(F1) || F1>= (eps1*F0) || any(is.na(Dres1))){
       alpha = alpha/2;
       if(is.na(F1)){
         n.na <- sum(is.na(res1))
@@ -180,7 +210,8 @@ CSTRfn <- function(parvec, datstruct, fitstruct,
         pv <- paste(signif(parvec, 3), collapse=", ")
         ..CSTRfn.coef1.gen.5 <<- list(parvec=parvec, coef1=coef1)
         warning("Stepsize reduced below the minimum with parvec = ",
-             pv, " in trying to optimize ", length(coef0),
+             pv, " on iteration ", iter,
+             " in trying to optimize ", length(coef0),
              " coefficients;  using suboptimal coefficients;  ",
                 "saved in '..CSTRfn.coef1.gen.5'")
         break 
@@ -227,7 +258,7 @@ CSTRfn <- function(parvec, datstruct, fitstruct,
 #  Smat = Zmat*inv(Zmat'*Zmat + Rfac'*Rfac)*Zmat';
 # Use singular value decomposition so we never have to worry about
 # ill conditioning.
-  Zsvd <- svd(Zmat)
+  Zsvd <- svd2(Zmat)
 # Zmat = with(Zsvd, u %*% diag(d) %*% t(v))
 # so Z'Z+R'R = v d^2 v' + R'R
 #          = v %*% (d^2 + (R%*%v)'(R%*%v))
@@ -245,18 +276,24 @@ CSTRfn <- function(parvec, datstruct, fitstruct,
     else{
       if(ZR.rank<ncoef)
         warning("Z'Z+R'R is not positive definite.  rank = ",
-                ZR.rank, ";  dim = ", ncoef, "; using ginverse.")
+                ZR.rank, ";  dim = ", ncoef, "; increasing the ",
+                ncoef-ZR.rank, " smallest eigenvalues ",
+                "to improve numeric stability.") 
       d2.evMin <- eps*d2.ev[1]
       ZR.rank1 <- sum(d2.ev >= d2.evMin)
       if(ZR.rank1 < ZR.rank)
         warning("Z'Z+R'R is ill conditioned.  Increasing the ",
                 ncoef-ZR.rank1, " smallest eigenvalues ",
-                " to improve numeric stability.") 
+                "to improve numeric stability.") 
 #  Z'(inv(Z'Z+R'R)Z
 #     = (u%*%d%*%w) solve(LAM) (udw)'
       udw <- ((Zsvd$u * rep(Zsvd$d, each=ncoef)) %*% d2.eig$vectors)
+# or
+#udw1<-((Zsvd$u[,1:ZR.rank1, drop=FALSE]*rep(Zsvd$d[1:ZR.rank1],e=ncoef))%*%d2.eig$vectors[1:ZR.rank1,,drop=FALSE])
       d2.ev2 <- pmax(d2.ev, d2.evMin)
       Smat <- ((udw / rep(d2.ev2, each=ncoef)) %*% t(udw))
+# or
+#Smat1<-((udw1/rep(d2.ev2, each=ncoef)) %*% t(udw1))
     }
   }
   df.   = sum(diag(Smat))
@@ -292,7 +329,8 @@ CSTRfn <- function(parvec, datstruct, fitstruct,
   res <- array(NA, dim=c(N, fit12), dimnames=
                 list(basisNames[[1]], fitNames))
   if(fit[1])res[, 1] <- ((yobs[,1] - Chat0)/sqrt(Cwt))
-  if(fit[2])res[, fit12] <- ((yobs[,fit12] - That0)/sqrt(Twt))
+#  if(fit[2])res[, fit12] <- ((yobs[,fit12] - That0)/sqrt(Twt))
+  if(fit[2])res[, fit12] <- ((yobs[,2] - That0)/sqrt(Twt))
 #  res[1:5] matches Matlab 2007.05.29
 ##
 ## 7.  Derivatives?    
@@ -338,7 +376,17 @@ CSTRfn <- function(parvec, datstruct, fitstruct,
 #
 #  7.5.  betaCC and betaTC depend on kref and Eover R
     Tdif   = 1/That - 1/Tref
-    temp   = exp(-1e4*EoverR*Tdif)
+#    temp   = exp(-1e4*EoverR*Tdif)
+    log.temp <- (-1e4*EoverR*Tdif)
+    oops <- (log.temp > max.log.betaCC)
+    if(any(oops)){
+      warning(sum(oops), " of ", length(log.temp),
+              " values of (-1e4*EoverR*Tdif) exceed the max = ",
+              log.max.betaCC, ";  thresholding.")
+      log.temp[oops] <- max.log.betaCC
+    }
+    temp <- exp(log.temp)
+#    
     betaCC = kref*temp
     TCfac  = (-delH/(rho*Cp))
     betaTC = TCfac*betaCC

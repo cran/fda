@@ -190,8 +190,11 @@ text(gaitMean[ltrs,], LETTERS[c(2:5, 1)])
 
 str(CanadianWeather)
 CanadianWeather$place
-Pr.Rupert=29
+Pr.Rupert <- 29
 #attach(CanadianWeather)
+daybasis65 <- create.fourier.basis(rangeval=c(0, 365), nbasis=65)
+harmaccelLfd365 <- vec2Lfd(c(0,(2*pi/365)^2,0), c(0, 365))
+
 precipSm7.Pr.Rupert <- smooth.basisPar(argvals=day.5,
      y=CanadianWeather$dailyAv[,Pr.Rupert, "Precipitation.mm"],
      fdobj=daybasis65, Lfdobj=harmaccelLfd365, lambda=1e7)$fd
@@ -221,9 +224,9 @@ axis(2, las=1)
 
 # p. 14.  Figure 1.12.  Annual variation in mean temperature at Montreal
 
-op <- par(mfrow=c(1, 2))
-
-str(CanadianWeather)
+#op <- par(mfrow=c(1, 2), cex=2)
+op <- par(cex=2)
+#str(CanadianWeather)
 tempMontreal <- CanadianWeather$dailyAv[, "Montreal", "Temperature.C"]
 
 tempSm6.Montreal <- smooth.basisPar(argvals=day.5,
@@ -236,9 +239,14 @@ axisIntervals(1)
 axis(2)
 text(monthMid, CanadianWeather$monthlyTemp[, "Montreal"],
      monthLetters)
+title(paste(c("Montreal average daily temp\ndeviation from average",
+              " (C)"), collapse=""))
 
 phaseplanePlot(fdobj=tempSm6.Montreal, Lfdobj1=0,
                xlab="Temperature (C)")
+title(paste(c("Montreal average daily temp\ndeviation from average",
+              " (C)"), collapse=""))
+par(op)
 
 # NOTE:  This image seems more accurate than the right panel
 # of Figure 1.12, because the slope should be negative, since
