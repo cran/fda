@@ -4,12 +4,12 @@
   Mark Intervals on a Plot Axis
 }
 \description{
-  Adds an axis to the current plot, with tick marks delimiting intervals
-  described by labels 
+  Adds an axis to the current plot, with tick marks delimiting interval
+  described by labels  
 }
 \usage{
-axisIntervals(side, atTick1=monthBegin.5, atTick2=monthEnd.5, atLabels=monthMid,
-           labels=month.abb, cex.axis=0.9, ...)
+axisIntervals(side, atTick1=monthBegin.5, atTick2=monthEnd.5,
+      atLabels=monthMid, labels=month.abb, cex.axis=0.9, ...)
 }
 \arguments{
   \item{side}{

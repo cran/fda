@@ -146,7 +146,7 @@ smooth.basis <- function (argvals, y, fdParobj, wtvec=rep(1,n), dffactor=1,
     if (ndim < 3) {
       	Dmat <- crossprod(basisw,y)
     } else {
-	 	Dmat <- array(0, c(nbasis, nrep, nvar))
+	 Dmat <- array(0, c(nbasis, nrep, nvar))
       	for (ivar in 1:nvar)
         	    Dmat[,,ivar] <- crossprod(basisw,y[,,ivar])
     }

@@ -11,7 +11,7 @@
   forth that set up basis objects of a specific type.  Ordinarily, user
   of the functional data analysis software will not need to call this
   function directly, but these notes are valuable to understanding what
-  the "slots" or "members" of the \code{basisfd} class are.
+  the "slots" or "members" of the \code{basisfd} class are. 
 }
 \usage{
 basisfd(type, rangeval, nbasis, params,

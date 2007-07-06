@@ -25,7 +25,7 @@ inprod <- function(fdobj1, fdobj2, Lfdobj1=int2Lfd(0), Lfdobj2=int2Lfd(0),
 #  A matrix of NREP1 by NREP2 of inner products for each possible pair
 #  of functions.
 
-#  Last modified 3 January 2007
+#  Last modified 25 May 2007
 
 #  Check FDOBJ1 and get no. replications and basis object
 
@@ -153,10 +153,10 @@ for (irng  in  2:nrng) {
     for (iter in 2:JMAX) {
         tnm <- tnm*2
         if (j == 2) {
-            x <- mean(range1)
+            x <- mean(rngi)
         } else {
             del <- width/tnm
-            x   <- seq(range1[1]+del/2, range1[2]-del/2, del)
+            x   <- seq(rngi[1]+del/2, rngi[2]-del/2, del)
         }
         fx1 <- eval.fd(x, fdobj1, Lfdobj1)
         fx2 <- eval.fd(x, fdobj2, Lfdobj2)

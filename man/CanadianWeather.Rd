@@ -62,17 +62,17 @@ daily
       are summarized in 'dailyAv'.  These names are all 11 characters,
       with shorter names being extended with trailing blanks.  This is
       different from CanadianWeather[["place"]], where trailing blanks
-      have been dropped.   
+      have been dropped.    
     }
     \item{tempav}{
       a matrix of dimensions (365, 35) giving the average temperature in
       degrees celcius for each day of the year.  This is essentially the
-      same as CanadianWeather[["dailyAv"]][,,"Temperature.C"].  
+      same as CanadianWeather[["dailyAv"]][,, "Temperature.C"].  
     }
     \item{precipav}{
       a matrix of dimensions (365, 35) giving the average temperature in
       degrees celcius for each day of the year.  This is essentially the
-      same as CanadianWeather[["dailyAv"]][,,"Precipitation.mm"].  
+      same as CanadianWeather[["dailyAv"]][,, "Precipitation.mm"].  
     }
   }  
 }

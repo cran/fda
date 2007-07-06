@@ -40,7 +40,7 @@ create.bspline.basis(rangeval=c(0, 1), nbasis=NULL, norder=4, breaks=NULL,
     Default value NULL.
 
     This 'nbasis' argument is ignored if 'breaks' is supplied, in which
-    case nbasis = nbreaks+norder-2, where nbreaks = length(breaks).
+    case nbasis = nbreaks + norder - 2, where nbreaks = length(breaks).
   }
   \item{norder}{
     an integer specifying the order of b-splines, which is one higher

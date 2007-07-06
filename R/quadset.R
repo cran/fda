@@ -9,9 +9,12 @@ quadset <- function(nquad=5, basisobj=NULL, breaks){
   {
     if(nquad<5){
       warning("nquad must be at least 5;  increase to this minimum.")
+      nquad <- 5
+    }
+    else {
       if((nquad%%2)!=1){
         warning("nquad must be an odd integer;  increased to enforce this.")
-        nquad <- 1+2*ceil(nquad/2)
+        nquad <- 1+2*floor(nquad/2)
       }
     }
   }
@@ -49,15 +52,18 @@ quadset <- function(nquad=5, basisobj=NULL, breaks){
   db <- diff(breaks)
   nquad1 <- nquad-1
   nbreaks1 <- nbreaks-1
-  quadpts. <- array(NA, dim=c(nbreaks1, nquad))
+# 4.1.  First create quadpts as a matrix   
+  quadpts. <- array(NA, dim=c(nbreaks1, nquad) )
   quadpts.[, 1] <- breaks[-nbreaks]
   db. <- db/nquad1
   for(i in 2:nquad)
     quadpts.[, i] <- (quadpts.[, i-1]+db.)
+# 4.2.  Now convert quadpts matrix to the desired vector 
   quadpts <- as.vector(t(quadpts.))
-#
+# 4.3.  Similarly first create quadwts as a matrix 
   quadwts. <- outer(c(1, 4, rep(c(2, 4), (nquad1-2)/2), 1),
                    db/(nquad1*3) )
+# 4.4.  Now convert quadwts matrix to the desired vector   
   quadwts <- as.vector(quadwts.)
 #  quadpts1 = linspace(breaks(1),breaks(2),nquad)';
 # quadwts1 = ones(nquad,1);
