@@ -19,5 +19,12 @@ a functional data object.
 \value{
 a displayed summary of the bivariate functional data object.
 }
+\references{
+  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional 
+    Data Analysis, 2nd ed.}, Springer, New York. 
+
+  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
+    Functional Data Analysis}, Springer, New York.
+}
 % docclass is function
 \keyword{smooth}

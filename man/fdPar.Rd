@@ -18,15 +18,15 @@ fdPar(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE, penmat=NULL)
 }
 \arguments{
   \item{fdobj}{
-    a functional data object, functional basis object, a functional
-    parameter object or a matrix.  If class(fdobj) == 'basisfd', it is
+    a functional data object, functional basis object, a functional 
+    parameter object or a matrix.  If class(fdobj) == 'basisfd', it is 
     converted to functional data objects with the identity matrix as the
     coefficient matrix.  If it a matrix, it is replaced by fd(fdobj).      
   }
   \item{Lfdobj}{
     either a nonnegative integer or a linear differential operator
     object.  If NULL and fdobj[['type']] == 'bspline', Lfdobj =
-    int2obj(max(0, norder-2)), where norder = order of fdobj.   
+    int2Lfd(max(0, norder-2)), where norder = order of fdobj.   
   }
   \item{lambda}{
     a nonnegative real number specifying the amount of smoothing
@@ -39,11 +39,8 @@ fdPar(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE, penmat=NULL)
   \item{penmat}{
     a roughness penalty matrix.  Including this can eliminate the need
     to compute this matrix over and over again in some types of
-    calculations.
+    calculations.  
   }
-}
-\value{
-  a functional parameter object
 }
 \details{
   Functional parameters are often needed to specify initial
@@ -55,6 +52,30 @@ fdPar(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE, penmat=NULL)
   considered known and must remain fixed during the analysis.  This is
   the case for functions \code{fRegress} and  \code{pda.fd}, for
   example.  
+}
+\value{
+  a functional parameter object (i.e., an object of class \code{fdPar}),
+  which is a list with the following components:
+
+  \itemize{
+    \item{fd}{
+      a functional data object (i.e., with class \code{fd})
+    }
+    \item{Lfd}{
+      a linear differential operator object (i.e., with class
+      \code{Lfd})
+    }
+    \item{lambda}{
+      a nonnegative real number
+    }
+    \item{estimate}{
+      a logical:  if \code{TRUE}, the functional parameter is estimate.
+    }
+    \item{penmat}{
+      either NULL or a square, symmetric matrix with penmat[i, j] =
+      integral over fd[['basis']][['rangeval']] of basis[i]*basis[j] 
+    }
+  }
 }
 \source{
   Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
@@ -72,7 +93,8 @@ fdPar(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE, penmat=NULL)
   \code{\link{smooth.fdPar}}, 
   \code{\link{smooth.basis}}, 
   \code{\link{smooth.basisPar}}, 
-  \code{\link{smooth.monotone}}, 
+  \code{\link{smooth.monotone}},
+  \code{\line{int2Lfd}}
 }
 \examples{
 ##

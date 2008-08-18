@@ -115,7 +115,14 @@ $b0 = Z c$. In this case, the single
 intercept coefficient is replaced by the regression coefficients
 in vector $c$ multipying the design matrix.
 
+}\references{
+  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional 
+    Data Analysis, 2nd ed.}, Springer, New York. 
+
+  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
+    Functional Data Analysis}, Springer, New York.
 }
+
 \seealso{
 \code{\link{smooth.basis}}, 
 \code{\link{smooth.pos}}, 

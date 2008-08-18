@@ -98,8 +98,8 @@ smooth.basis(argvals, y, fdParobj, wtvec=rep(1, length(argvals)),
   using function \code{smooth.fd}.
 }
 \value{
-  an object of class \code{fdSmooth}, which is a list of length 7 with
-  the following components: 
+  an object of class \code{fdSmooth}, which is a names list of length 6
+  with the following components: 
 
   \item{fd}{
     a functional data object containing a smooth of the data. 
@@ -111,12 +111,14 @@ smooth.basis(argvals, y, fdParobj, wtvec=rep(1, length(argvals)),
     the value of the generalized cross-validation or GCV criterion.  If
     there are multiple curves, this is a vector of values, one per
     curve.  If the smooth is multivariate, the result is a matrix of gcv
-    values, with columns corresponding to variables.  
+    values, with columns corresponding to variables.
+
+    \deqn{gcv = n*SSE/((n-df)^2)}
   }
-  \item{coef}{
-    the coefficient matrix or array for the basis function expansion of
-    the smoothing function 
-  }
+%  \item{coef}{
+%    the coefficient matrix or array for the basis function expansion of
+%    the smoothing function 
+%  }
   \item{SSE}{
     the error sums of squares.  SSE is a vector or a matrix of the same
     size as GCV. 
@@ -223,8 +225,23 @@ with(result104.0, c(df, gcv, SSE))
 
 plotfit.fd(y, x, result104.0[['fd']], nfine=501)
 # perfect (over)fit
-# Need lambda > 0.  
+# Need lambda > 0.
 
+##
+## Example 5.  gait
+##
+gaittime  <- (1:20)/21
+gaitrange <- c(0,1)
+gaitbasis <- create.fourier.basis(gaitrange,21)
+lambda    <- 10^(-11.5)
+harmaccelLfd <- vec2Lfd(c(0, 0, (2*pi)^2, 0))
+
+gaitfdPar <- fdPar(gaitbasis, harmaccelLfd, lambda)
+gaitfd <- smooth.basis(gaittime, gait, gaitfdPar)$fd
+\dontrun{
+# by default creats multiple plots, asking for a click between plots 
+plotfit.fd(gait, gaittime, gaitfd)
+}
 }
 % docclass is function
 \keyword{smooth}

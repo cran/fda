@@ -9,7 +9,7 @@
 }
 \usage{
 smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
-      lambda=1/diff(range(argvals)), estimate=TRUE, penmat=NULL,
+      lambda=0, estimate=TRUE, penmat=NULL,
       wtvec=rep(1, length(argvals)), fdnames=NULL)
 }
 \arguments{
@@ -31,10 +31,13 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
     One of the following:
 
     \itemize{
-      \item{fd}{a functional data object (class \code{fd})}
+      \item{fd}{
+	a functional data object (class \code{fd})
+      }
       \item{basisfd}{
-	a functional basis object, which is converted to a functional
-	data object with the identity matrix as the coefficient matrix.
+	a functional basis object (class \code{basisfd}), which is
+	converted to a functional data object with the identity matrix
+	as the coefficient matrix. 
       }
       \item{fdPar}{
 	a functional parameter object (class \code{fdPar})
@@ -44,7 +47,7 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
 	further converted to a functional data object with the identity
 	matrix as the coefficient matrix.  
       }
-      \item{matrix or array}{replaced by fd(fdobj)} 	
+      \item{matrix or array}{replaced by fd(fdobj)}	
       \item{NULL}{
 	Defaults to fdobj = create.bspline.basis(argvals).
       }
@@ -53,7 +56,7 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
   \item{Lfdobj}{
     either a nonnegative integer or a linear differential operator
     object.  If NULL and fdobj[['type']] == 'bspline', Lfdobj =
-    int2obj(max(0, norder-2)), where norder = order of fdobj.   
+    int2Lfd(max(0, norder-2)), where norder = order of fdobj.   
   }
   \item{lambda}{
     a nonnegative real number specifying the amount of smoothing
@@ -98,11 +101,20 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
     }
   }
 }
-\value{
-  The output of a call to 'smooth.data', which is a named list of length
-  7:  
+\details{
+  1.  if(is.null(fdobj))fdobj <- create.bspline.basis(argvals).  Else
+  if(is.integer(fdobj)) fdobj <- create.bspline.basis(argvals, norder =
+  fdobj) 
+  
+  2.  fdPar
 
-  \item{fdobj}{
+  3.  smooth.basis 
+}
+\value{
+  The output of a call to 'smooth.basis', which is a named list of
+  length 6 and class \code{fdSmooth} with the following components:  
+
+  \item{fd}{
     a functional data object that smooths the data.
   }
   \item{df}{
@@ -114,10 +126,10 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
     curve.  If the smooth is multivariate, the result is a matrix of gcv
     values, with columns corresponding to variables.  
   }
-  \item{coef}{
-    the coefficient matrix or array for the basis function expansion of
-    the smoothing function 
-  }
+%  \item{coef}{
+%    the coefficient matrix or array for the basis function expansion of
+%    the smoothing function 
+%  }
   \item{SSE}{
     the error sums of squares.  SSE is a vector or a matrix of the same
     size as 'gcv'. 
@@ -129,17 +141,15 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
     the matrix mapping the data to the coefficients.
   }
 }
-\details{
-  1.  if(is.null(fdobj))fdobj <- create.bspline.basis(argvals).  Else
-  if(is.integer(fdobj)) fdobj <- create.bspline.basis(argvals, norder =
-  fdobj) 
-  
-  2.  fdPar
+\references{
+  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional 
+    Data Analysis, 2nd ed.}, Springer, New York. 
 
-  3.  smooth.basis 
+  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
+    Functional Data Analysis}, Springer, New York.
 }
 \seealso{
-  \code{\link{data2fd}}, 
+  \code{\link{Data2fd}}, 
   \code{\link{df2lambda}}, 
   \code{\link{fdPar}}, 
   \code{\link{lambda2df}}, 
@@ -229,6 +239,14 @@ with(result4.0, c(df, gcv)) #  display df and gcv measures
 # no smoothing, degrees of freedom = number of points 
 # but generalized cross validation = Inf
 # suggesting overfitting.  
+
+##
+## fdnames?
+##
+girlGrow12 <- with(growth, smooth.basisPar(argvals=age, y=hgtf[, 1:2],
+              fdnames=c('age', 'girl', 'height')) ) 
+girlGrow12. <- with(growth, smooth.basisPar(argvals=age, y=hgtf[, 1:2],
+    fdnames=list(age=age, girl=c('Carol', 'Sally'), value='height')) )
 
 }
 % docclass is function

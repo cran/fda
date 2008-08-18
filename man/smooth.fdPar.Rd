@@ -34,14 +34,20 @@ smooth.fdPar(fdobj, Lfdobj=int2Lfd(0), lambda=0,
     calculations.
   }
 }
-\value{
-  a functional data object.
-}
 \details{
   1.  fdPar
 
-  2.  smooth.fd
- 
+  2.  smooth.fd 
+}
+\value{
+  a functional data object.
+}
+\references{
+  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional 
+    Data Analysis, 2nd ed.}, Springer, New York. 
+
+  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
+    Functional Data Analysis}, Springer, New York.
 }
 \seealso{
 \code{\link{smooth.fd}}, 

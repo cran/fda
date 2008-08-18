@@ -16,10 +16,10 @@
 \usage{
 \method{plot}{fd}(x, y, Lfdobj=0, href=TRUE, titles=NULL,
                     xlim=NULL, ylim=NULL, xlab=NULL,
-                    ylab=NULL, ask=FALSE, nx=201, ...)
+                    ylab=NULL, ask=FALSE, nx=NULL, ...)
 \method{plot}{fdSmooth}(x, y, Lfdobj=0, href=TRUE, titles=NULL,
                     xlim=NULL, ylim=NULL, xlab=NULL,
-                    ylab=NULL, ask=FALSE, nx=201, ...)
+                    ylab=NULL, ask=FALSE, nx=NULL, ...)
 %plot.fd(x, y, Lfdobj=0, href=TRUE, titles=NULL, xlim=rangex, ylim=rangey,
 %        xlab=xlabel, ylab=ylabel, ask=FALSE, nx=201, ...)
 }
@@ -30,7 +30,10 @@
   \item{y}{
     sequence of points at which to evaluate the functions 'x' and plot
     on the horizontal axis.  Defaults to seq(rangex[1], rangex[2],
-    length = nx).  
+    length = nx).
+
+    NOTE:  This will be the values on the horizontal axis, NOT the
+    vertical axis.  
   }
   \item{Lfdobj}{
     either a nonnegative integer or a linear differential operator
@@ -102,9 +105,8 @@ harmaccelLfd <- vec2Lfd(c(0,(2*pi/365)^2,0), c(0, 365))
 
 harmfdPar     <- fdPar(daybasis65, harmaccelLfd, lambda=1e5)
 
-daytempfd <- with(CanadianWeather, data2fd(
-        dailyAv[,,"Temperature.C"], day.5, 
-        daybasis65,argnames=list("Day", "Station", "Deg C")) )
+daytempfd <- with(CanadianWeather, Data2fd(day.5, 
+        dailyAv[,,"Temperature.C"], daybasis65)) 
 
 #  plot all the temperature functions for the monthly weather data
 plot(daytempfd, main="Temperature Functions")
@@ -117,7 +119,7 @@ plot(daytempfd, main="Temperature Functions")
 # might encounter problems with the par(ask=TRUE)
 # feature.)
 }
-plot(daytempfd, main="Temperature Functions", ask=TRUE)
+plot(daytempfd, ask=TRUE)
 }
 
 ##
@@ -128,7 +130,7 @@ b3.4 <- create.bspline.basis(norder=3, breaks=c(0, .5, 1))
 # continuous, bounded, locally quadratic 
 fdPar3 <- fdPar(b3.4, lambda=1)
 # Penalize excessive slope Lfdobj=1;  
-# second derivative Lfdobj=2 is discontinuous.
+# (Can not smooth on second derivative Lfdobj=2 at it is discontinuous.)
 fd3.4s0 <- smooth.basis(0:1, 0:1, fdPar3)
 
 # using plot.fd directly 

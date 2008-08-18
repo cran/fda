@@ -45,8 +45,8 @@ if (!is.vector(evalarg))    stop("Argument EVALARG is not a vector.")
 	
 #  check basisobj
 	
-if (!(inherits(basisobj, "basisfd"))) stop(
-    "Second argument is not a basis object.")
+if (!(inherits(basisobj, "basisfd")))
+  stop("Second argument is not a basis object.")
 
 #  check LFDOBJ
 

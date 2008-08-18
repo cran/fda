@@ -1,4 +1,4 @@
-create.bspline.basis <- function (rangeval=c(0,1), nbasis=NULL, norder=4,
+create.bspline.basis <- function (rangeval=NULL, nbasis=NULL, norder=4,
                                   breaks=NULL, dropind=NULL, quadvals=NULL,
                                   values=NULL, names="bspl")
 {
@@ -45,39 +45,48 @@ create.bspline.basis <- function (rangeval=c(0,1), nbasis=NULL, norder=4,
 #  Returns
 #  BASISFD  ... a functional data basis object
 
-# Last modified 2007.09.07 by Spencer Graves
-# Previously modified 20 November 2005
+# Last modified 2008.08.15 by Spencer Graves
+# Previously modified 20 November 2005 and 2007.09.07 
 
   type <- "bspline"
 
 #  check RANGE
 
-  if (length(rangeval) == 1){
-    if(rangeval <= 0)
-      stop("'rangeval' a single value that is not positive.")
-    rangeval = c(0,rangeval)
-  }
-  
+  {
+    if(length(rangeval)<1) {
+      rangeval <- {
+        if(is.null(breaks))0:1
+        else range(breaks)
+      }
+    }
+    if(length(rangeval)<1) rangeval <- 0:1 
+    else
+      if (length(rangeval) == 1){
+        if(rangeval <= 0)
+          stop("'rangeval' a single value that is not positive.")
+        rangeval = c(0,rangeval)
+      }      
 #  if (!rangechk(rangeval)) stop("Argument 'rangeval' is not correct.")
-  if(!is.vector(rangeval))
-    stop('rangeval is not a vector;  class(rangeval) = ', class(rangeval))
+    if(!is.vector(rangeval))
+      stop('rangeval is not a vector;  class(rangeval) = ', class(rangeval))
 # rangeval too long ??? 
-  if(length(rangeval)>2){
-    if(!is.null(breaks))
-      stop('length(rangeval)>2 and breaks can not both be provided; ',
-           ' length(rangeval) = ', length(rangeval),
-           ' and length(breaks) = ', length(breaks))
-    if(!is.null(nbasis))
-      stop('length(rangeval)>2 and nbasis can not both be provided; ',
-           ' length(rangeval) = ', length(rangeval),
-           ' and nbasis = ', nbasis)
-    breaks <- rangeval
-    rangeval <- range(breaks)
+    if(length(rangeval)>2){
+      if(!is.null(breaks))
+        stop('length(rangeval)>2 and breaks can not both be provided; ',
+             ' length(rangeval) = ', length(rangeval),
+             ' and length(breaks) = ', length(breaks))
+      if(!is.null(nbasis))
+        stop('length(rangeval)>2 and nbasis can not both be provided; ',
+             ' length(rangeval) = ', length(rangeval),
+             ' and nbasis = ', nbasis)
+      breaks <- rangeval
+      rangeval <- range(breaks)
+    }
+    if(rangeval[1]>=rangeval[2])
+      stop('rangeval[1] must be less than rangeval[2];  instead ',
+           'rangeval[1] = ', rangeval[1], c('==', '>')[diff(rangeval)<0],
+           ' rangeval[2] = ', rangeval[2])
   }
-  if(rangeval[1]>=rangeval[2])
-    stop('rangeval[1] must be less than rangeval[2];  instead ',
-         'rangeval[1] = ', rangeval[1], c('==', '>')[diff(rangeval)<0],
-         ' rangeval[2] = ', rangeval[2]) 
 #  check NORDER
 
   if(!is.numeric(norder) || (norder<=0) || ((norder%%1) > 0) ) 
@@ -171,8 +180,16 @@ create.bspline.basis <- function (rangeval=c(0,1), nbasis=NULL, norder=4,
                     dropind=dropind, quadvals=quadvals, values=values)
   basisobj$names <- {
     if(length(names) == nbasis) names
-    else paste(names, norder, ".", 1:nbasis, sep="")
+    else {
+      if(length(names)<1)
+        paste("bspl", norder, '.', 1:nbasis, sep='')
+      else {
+        if(length(names)>1)
+          stop('length(names) = ', length(names), ';  must be either ',
+               '1 or nbasis = ', nbasis)
+        paste(names, norder, ".", 1:nbasis, sep="")
+      }
+    }
   }
   basisobj
-
 }

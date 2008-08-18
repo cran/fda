@@ -52,7 +52,7 @@
   \item{quantileType}{
     an integer between 1 and 9 selecting one of the nine quantile
     algorithms to be used with 'trim' to determine limits not provided
-    with 'lower' and 'upper'.  
+    with 'lower' and 'upper';  see   \code{\link{quantile}}.  
   }
   \item{ subset }{
     an optional vector specifying a subset of observations to be used in
@@ -209,6 +209,8 @@
 }
 \author{ Spencer Graves }
 \seealso{
+  \code{\link{predict.lmWinsor}}
+  \code{\link{lmeWinsor}}
   \code{\link{lm}}
   \code{\link{quantile}}
   \code{\link[quadprog]{solve.QP}}

@@ -32,9 +32,8 @@ monomial <- function(evalarg, exponents=1:nbasis, nderiv=0)
 
 	# check if there are duplicate exponents
 
-	if (min(diff(sort(exponents))) <= 0) {
-    	stop("There are duplicate exponents.")
-	}
+        if((length(exponents)>1) && (min(diff(sort(exponents))) <= 0)) 
+          stop("There are duplicate exponents.")
 
 	monommat <- matrix(0,n,nbasis)
 

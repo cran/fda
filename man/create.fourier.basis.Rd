@@ -31,10 +31,7 @@ create.fourier.basis(rangeval=c(0, 1), nbasis=3,
   }
   \item{dropind}{
     a vector of integers specifiying the basis functions to
-    be dropped, if any.  For example, if it is required that
-    a function be zero at the left boundary, this is achieved
-    by dropping the first basis function, the only one that
-    is nonzero at that point. Default value NULL.
+    be dropped, if any. Default value NULL.
   }
   \item{quadvals}{
     a matrix with two columns and a number of rows equal to the number

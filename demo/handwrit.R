@@ -32,7 +32,8 @@
 # movements, such as speech, juggling and so on.
 #  -----------------------------------------------------------------------
 
-#  Last modified 2 March 2007 by spencer Graves
+#  Last modified 18 August, 2007 by Giles Hooker
+#  Previously modified 2 March 2007 by spencer Graves
 #  Previously  modified 20 March 2006
 
 
@@ -62,6 +63,8 @@
 #  unit to the inter-knot interval not too
 #  far from one.  Otherwise, smoothing parameter values
 #  may be extremely small or extremely large.
+
+fdaarray = handwrit
 
 fdatime  <- seq(0, 2300, len=1401)
 fdarange <- c(0, 2300)

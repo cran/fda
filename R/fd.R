@@ -316,7 +316,7 @@ if (inherits(e1, "fd") && inherits(e2, "fd")) {
     rangeval <- basisobj$rangeval
     neval    <- max(10*nbasis + 1,201)
     neval    <- min(neval,201)
-    evalarg  <- seq(rangeval(1),rangeval[2], len=neval)
+    evalarg  <- seq(rangeval[1],rangeval[2], len=neval)
     fdmat    <- eval.fd(evalarg, fd)
     #  If one of the objects has length 1 and the other
     #  is longer, expand the scalar object into a vector
@@ -501,7 +501,7 @@ if (inherits(e1, "fd") && inherits(e2, "fd")) {
     rangeval <- basisobj$rangeval
     neval    <- max(10*nbasis + 1,201)
     neval    <- min(neval,201)
-    evalarg  <- seq(rangeval(1),rangeval[2], len=neval)
+    evalarg  <- seq(rangeval[1],rangeval[2], len=neval)
     fdmat    <- eval.fd(evalarg, fd)
     #  If one of the objects has length 1 and the other
     #  is longer, expand the scalar object into a vector

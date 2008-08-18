@@ -1,9 +1,9 @@
-plot.basisfd <- function(x, ...) {
+plot.basisfd <- function(x, knots=TRUE, ...) {
   basisobj <- x
 #  plot a basis object
 
-# last modified 2007.09.09 Spencer Graves 
-#  Previously modified 26 October 2005
+# last modified 2008.07.21 by Spencer Graves 
+#  Previously modified 26 October 2005 and 2007.09.09
 
 #  check BASISOBJ
 
@@ -11,38 +11,54 @@ plot.basisfd <- function(x, ...) {
     stop("argument x is not a basis object.")
 		
   dot.args <- list(...)
-  
-  xlabel <- dot.args$xlab
-  if (is.null(xlabel)) xlabel <- ""
-  
-  ylabel <- dot.args$ylab
-  if (is.null(ylabel)) ylabel <- ""
-  
-  cexval <- dot.args$cex
-  if (is.null(cexval)) cexval <- 1
-  
+
+  if(is.null(dot.args$xlab))dot.args$xlab <- ''
+  if(is.null(dot.args$ylab))dot.args$ylab <- ''
+    
   nbasis   <- basisobj$nbasis
-  ltype <- dot.args$lty
-  if (is.null(ltype)) ltype=rep(c(1,2,3),max(1, nbasis/3))
+
+  if(is.null(dot.args$type))dot.args$type <- 'l' 
+
+  if(is.null(dot.args$lty))
+    dot.args$lty <- rep(1:3, max(1, nbasis/3))
   
   nx       <- max(101,10*nbasis)
-  rangex   <- basisobj$rangeval
-  argvals  <- seq(rangex[1],rangex[2],len=nx)
-  basismat <- eval.basis(argvals, basisobj)
-  minval   <- min(basismat)
-  maxval   <- max(basismat)
-  if (minval == maxval) {
-    if (abs(minval) < 1e-1) {
-      minval <- minval - 0.05
-      maxval <- maxval + 0.05
-    } else {
-      minval <- minval - 0.05*minval
-      maxval <- maxval + 0.05*minval
+
+  {
+    if(is.null(dot.args$xlim))rangex <- basisobj$rangeval
+    else {
+      rangex <- dot.args$xlim 
+      rangex[1] <- max(basisobj$rangeval[1], dot.args$xlim[1])
+      rangex[2] <- min(rangex[2], dot.args$xlim[2])
     }
   }
   
-  matplot (argvals, basismat, type="l", lty=ltype,
-           xlab=xlabel, ylab=ylabel, cex=cexval,
-           xlim=c(argvals[1],argvals[nx]),
-           ylim=c(minval, maxval))
+  argvals  <- seq(rangex[1],rangex[2],len=nx)
+  basismat <- eval.basis(argvals, basisobj)
+
+#  minval   <- min(basismat)
+#  maxval   <- max(basismat)
+#  if (minval == maxval) {
+#    if (abs(minval) < 1e-1) {
+#      minval <- minval - 0.05
+#      maxval <- maxval + 0.05
+#    } else {
+#      minval <- minval - 0.05*minval
+#      maxval <- maxval + 0.05*minval
+#    }
+#  }
+  
+#  matplot (argvals, basismat, type="l", lty=ltype,
+#           xlab=xlabel, ylab=ylabel, cex=cexval,
+#           xlim=c(argvals[1],argvals[nx]),
+#           ylim=, ...)
+
+  dot.args$x <- argvals
+  dot.args$y <- basismat
+  
+  do.call('matplot', dot.args) 
+  
+# knots?
+  if(knots && (x$type=='bspline'))
+    abline(v=knots(x), lty='dotted', col='red') 
 }

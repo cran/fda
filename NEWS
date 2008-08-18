@@ -1,45 +1,59 @@
 Software and datasets to support 'Functional Data Analysis',
-second edition (2006) and 'Applied Functional Data Analysis' 
-(2002), both by James O. Ramsay and Bernard W. Silverman 
-(Springer).  
+second edition (2006) and 'Applied Functional Data Analysis'
+(2002), both by James O. Ramsay and Bernard W. Silverman
+(Springer).
 
-Release 1.2.3 adds to previous versions a script to create most 
-of the figures of chapter 6 of "Applied Functional Data Analysis" 
-by Ramsay and Silverman.  Other changes offer simpler calls to 
-time warping / registration and functional principal component 
-functions. 
+Release 2.0.0 added 'coef' generic functions to extract the
+coefficients from objects of class 'fd', 'fdPar', and 'fdSmooth'.
+Also, the 'coef' component in objects of class 'fdSmooth' was
+removed as it was redundant with 'fd$coefs'.  In addition, a bug
+was fixed in the addition of functional data objects.
+
+Release 1.2.4 fixes a few bugs and adds defaults to
+'smooth.basis' and 'smooth.basisPar' to make them easier to use.
+The output of 'smooth.basis' and 'smooth.basisPar' now have class
+'fdSmooth', with methods for 'plot', 'lines', and 'plotfit'.
+There have also been improvements to the 'plotfit' function and
+the 'CanadianWeather' data.  Also, a function 'norder' has been
+added, which returns the order of a B-spline.
+
+Release 1.2.3 adds to previous versions a script to create most
+of the figures of chapter 6 of "Applied Functional Data Analysis"
+by Ramsay and Silverman.  Other changes offer simpler calls to
+time warping / registration and functional principal component
+functions.
 
 ############################
-Release 1.1.7 provides improved documentation and modifications 
-to some data sets.  Major modifications from previous releases: 
+Release 1.1.7 provides improved documentation and modifications
+to some data sets.  Major modifications from previous releases:
 
-MINOR INCOMPATIBILITIES WITH PREVIOUS VERSIONS:   
+MINOR INCOMPATIBILITIES WITH PREVIOUS VERSIONS:
 
-	  1.  The 'daily' data set now has a more descriptive name, 
-'CanadianWeather', and some enhancements;  see the help page.  
+	  1.  The 'daily' data set now has a more descriptive name,
+'CanadianWeather', and some enhancements;  see the help page.
 
-	  2.  The 'melanoma' data set has been modified to match 
-the object of the same name in the 'lattice' package.  Accordingly, 
-the 'index' column has been deleted and the column name 'melanoma' 
-has been changed to 'incidence'.  
+	  2.  The 'melanoma' data set has been modified to match
+the object of the same name in the 'lattice' package.  Accordingly,
+the 'index' column has been deleted and the column name 'melanoma'
+has been changed to 'incidence'.
 
 
-ENHANCEMENTS 
+ENHANCEMENTS
 
-	  1.  New functions 'smooth.basisPar' and 'smooth.fdPar' 
-simplify common analysis flows that follow an isolated call to 
-'dfPar' with a call to either 'smooth.basis' or 'smooth.fd';  these 
-tasks can now be performed in one step rather than two.  
+	  1.  New functions 'smooth.basisPar' and 'smooth.fdPar'
+simplify common analysis flows that follow an isolated call to
+'dfPar' with a call to either 'smooth.basis' or 'smooth.fd';  these
+tasks can now be performed in one step rather than two.
 
-	  2.  A new function 'phaseplanePlot' simplifies the 
-process of plotting "Acceleration" vs. "Velocity".  
+	  2.  A new function 'phaseplanePlot' simplifies the
+process of plotting "Acceleration" vs. "Velocity".
 
-	  3.  A new function 'axisIntervals' facilitates labeling 
-months and quarters on plots.  
+	  3.  A new function 'axisIntervals' facilitates labeling
+months and quarters on plots.
 
-	  4.  A 'scripts' subdirectory now includes partial scripts 
-to replicate some of the analyses in the books.  
+	  4.  A 'scripts' subdirectory now includes partial scripts
+to replicate some of the analyses in the books.
 
-	  5.  There have been numerous enhancements to help pages.  
+	  5.  There have been numerous enhancements to help pages.
 
 

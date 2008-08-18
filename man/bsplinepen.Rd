@@ -41,8 +41,15 @@ is necessary. This function just calls the roughness penalty evaluation
 function specific to the basis involved.
 }
 \examples{
-#  set up a B-spline basis of order 4 with 13 basis functions
-#  and knots at 0.0, 0.1,..., 0.9, 1.0.
+##
+## bsplinepen with only one basis function
+##
+bspl1.1 <- create.bspline.basis(nbasis=1, norder=1)
+pen1.1 <- bsplinepen(bspl1.1, 0) 
+
+##
+## bspline pen for a cubic spline with knots at seq(0, 1, .1)
+##
 basisobj <- create.bspline.basis(c(0,1),13)
 #  compute the 13 by 13 matrix of inner products of second derivatives
 penmat <- bsplinepen(basisobj)

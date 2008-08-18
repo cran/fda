@@ -7,7 +7,7 @@
 }
 \description{
   Plot either functional data observations 'x' with a fit 'fdobj' or
-  residuals from the fit.
+  residuals from the fit. 
 
   This function is useful for assessing how well a functional data
   object fits the actual discrete data.
@@ -16,26 +16,26 @@
   if residual is FALSE and superimposed lines if residual==TRUE.  
 
   With multiple plots, the system waits to confirm a desire to move to
-  the next page unless ask==FALSE.  
+  the next page unless ask==FALSE. 
 }
 \usage{
-%\method{plotfit}{fd}(y, argvals, fdobj, rng = NULL, index = NULL,
+%\method{plotfit}{fd}(y, argvals, fdobj, rng = NULL, index = NULL,)
 plotfit.fd(y, argvals, fdobj, rng = NULL, index = NULL,
       nfine = 101, residual = FALSE, sortwrd = FALSE, titles=NULL,
       ylim=NULL, ask=TRUE, type=c("p", "l")[1+residual],
       xlab=NULL, ylab=NULL, sub=NULL, col=1:9, lty=1:9, lwd=1,
       cex.pch=1, ...)
-%\method{plotfit}{fdSmooth}(y, argvals, fdSm, rng = NULL, index = NULL,
+%\method{plotfit}{fdSmooth}(y, argvals, fdSm, rng = NULL, index = NULL,)
 plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
       nfine = 101, residual = FALSE, sortwrd = FALSE, titles=NULL,
       ylim=NULL, ask=TRUE, type=c("p", "l")[1+residual],
       xlab=NULL, ylab=NULL, sub=NULL, col=1:9, lty=1:9, lwd=1,
-      cex.pch=1, ...)
+      cex.pch=1, ...) 
 }
 \arguments{
   \item{y}{
     a vector, matrix or array containing the discrete observations used
-    to estimate the functional data object.
+    to estimate the functional data object. 
   }
   \item{argvals}{
     a vector containing the argument values corresponding to the first
@@ -48,11 +48,12 @@ plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
   \item{rng}{
     a vector of length 2 specifying the limits for the horizontal axis.
     This must be a subset of fdobj[['basis']][['rangeval']], which is
-    the default.  
+    the default. 
   }
   \item{index}{
     a set of indices of functions if only a subset of the observations
-    are to be plotted. 
+    are to be plotted.  Subsetting can also be achieved by subsetting
+    \code{y};  see \code{details}, below.  
   }
   \item{nfine}{
     the number of argument values used to define the plot of the
@@ -64,8 +65,9 @@ plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
     rather than the data and functional data object.
   }
   \item{sortwrd}{
-    a logical variable:  if \code{TRUE}, the observations are sorted for
-    plotting by the size of the sum of squared residuals.  
+    a logical variable:  if \code{TRUE}, the observations (i.e., second
+    dimension of \code{y}) are sorted for plotting by the size of the
+    sum of squared residuals. 
   }
   \item{titles}{
     a vector containing strings that are titles for each observation.
@@ -129,7 +131,20 @@ plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
   \code{smoothe.basisPar} to check the fit of the data offered by the
   \code{fd} object.
 
-  \code{plotfit.fdSmooth} calls \code{plotfit} for its 'fd' component.   
+  \code{plotfit.fdSmooth} calls \code{plotfit} for its 'fd' component.
+
+  The plot can be restricted to a subset of observations (i.e., second
+  dimension of \code{y}) or variables (i.e., third dimension of
+  \code{y}) by providing \code{y} with the dimnames for its second and
+  third dimensions matching a subset of the dimnames of fdobj[['coef']]
+  (for \code{plotfit.fd} or fdSm[['fdobj']][['coef']] for
+  \code{plotfit.fdSmooth}).  If only one observation or variable is to
+  be plotted, \code{y} must include 'drop = TRUE', as, e.g., y[, 2, 3,
+  drop=TRUE].  If \code{y} or fdobj[['coef']] does not have dimnames on
+  its second or third dimension, subsetting is acheived by taking the
+  first few colums so the second or third dimensions match.  This is
+  acheived using checkDims3(y, fdobj[['coef']], defaultNames =
+  fdobj[['fdnames']]]).    
 }
 \value{
   A matrix of mean square deviations from predicted is returned
@@ -162,6 +177,7 @@ plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
   \code{\link{smooth.fd}}
   \code{\link{smooth.basis}}
   \code{\link{smooth.basisPar}}
+  \code{\link{checkDims3}} 
 }
 \examples{
 daybasis65 <- create.fourier.basis(c(0, 365), 65)
@@ -172,6 +188,11 @@ daytempfd <- with(CanadianWeather, data2fd(
  
 with(CanadianWeather, plotfit.fd(dailyAv[, , "Temperature.C"],
      argvals= day.5, daytempfd, index=1, titles=place, axes=FALSE) )
+# Default ylab = daytempfd[['fdnames']] 
+
+with(CanadianWeather, plotfit.fd(dailyAv[, , "Temperature.C", drop=FALSE],
+     argvals= day.5, daytempfd, index=1, titles=place, axes=FALSE) )
+# Better:  ylab = dimnames(y)[[3]]
 
 # Label the horizontal axis with the month names
 axis(1, monthBegin.5, labels=FALSE)

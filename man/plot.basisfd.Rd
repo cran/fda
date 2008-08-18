@@ -7,15 +7,18 @@
   Plots all the basis functions.
 }
 \usage{
-plot.basisfd(x, ...)
+plot.basisfd(x, knots=TRUE, ...)
 }
 \arguments{
   \item{x}{
     a basis object
   }
+  \item{knots}{
+    logical:  If TRUE and x[['type']] == 'bslpine', the knot locations
+    are plotted using vertical dotted, red lines.  Ignored otherwise.  
+  }
   \item{\dots }{
-    additional plotting parameters that can be used
-    in \code{plot}
+    additional plotting parameters passed to \code{matplot}.  
   }
 }
 \value{

@@ -8,7 +8,8 @@ bsplinepen <- function(basisobj, Lfdobj=2, rng=basisobj$rangeval)
 #  RNG         a range over which the product is evaluate
 #  Returns the penalty matrix.
 
-#  Last modified 26 October 2005
+#  Last modified 2008.08.23 by Spencer Graves
+#  Previously modified 26 October 2005
 
 #  check BASISOBJ
 
@@ -32,7 +33,7 @@ params <- basisobj$params
 #  if there are no internal knots, use the monomial penalty
 
 if (length(params) == 0) {
-    basisobj      <- create.monomial.basis(range, nbasis, 0:(nbasis-1))
+    basisobj      <- create.monomial.basis(rng, nbasis, 0:(nbasis-1))
     penaltymatrix <- monomialpen(basisobj, Lfdobj, rng)
     return(penaltymatrix)
 }

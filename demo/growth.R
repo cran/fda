@@ -82,15 +82,14 @@ agefine <- seq(ageRng[1],ageRng[2],length=101)
 # we need a quintic spline (degree 5, order 6) 
 
 # .... 
-hgtmfd <- smooth.basisPar(age, hgtm, growfdPar)$fd
 
 
+hgtm = growth$hgtm
+hgtf = growth$hgtf
+age = growth$age
 
 
-
-
-
-knots  <- age
+knots  <- growth$age
 norder <- 6
 nbasis <- length(knots) + norder - 2
 hgtbasis <- create.bspline.basis(rng, nbasis, norder, knots)

@@ -1,16 +1,16 @@
-lines.fdSmooth <- function(x, Lfdobj=int2Lfd(0), ...){
-  lines(x$fd, Lfdobj=Lfdobj, ...)
+lines.fdSmooth <- function(x, Lfdobj=int2Lfd(0), nx=201, ...){
+  lines(x$fd, Lfdobj=Lfdobj, nx=nx, ...)
 }
 
-lines.fd <- function(x, Lfdobj=int2Lfd(0), ...)
+lines.fd <- function(x, Lfdobj=int2Lfd(0), nx=201, ...)
 {
   #  Plot a functional data object FD using lines in a pre-existing plot.
   #  If there are multiple variables, each curve will appear in the same plot.
   #  The remaining optional arguments are the same as those available
   #     in the regular "lines" function.
   
-# Last modified 2007 May 3 by Spencer Graves
-  #  previously modified 1 October 2005
+# Last modified 2008.07.05 by Spencer Graves
+  #  previously modified 2007.05.03 and 1 October 2005
   fdobj <- x
   
   if (!inherits(fdobj,  "fd"))  stop(
@@ -28,19 +28,25 @@ lines.fd <- function(x, Lfdobj=int2Lfd(0), ...)
   varnames <- fdobj$fdnames[[3]]
 
   basisobj <- fdobj$basis
-  rangex   <- basisobj$rangeval
-  x        <- seq(rangex[1],rangex[2],length=101)
-  fdmat    <- eval.fd(x,fdobj,Lfdobj)
+#
+  xlim <- par('usr')[1:2]
+  if(par('xlog')) xlim <- 10^xlim
+# 
+  rngx <- basisobj$rangeval 
+  xmin <- max(rngx[1], xlim[1])
+  xmax <- min(rngx[2], xlim[2])
+  x.        <- seq(xmin, xmax, length=nx)
+  fdmat    <- eval.fd(x.,fdobj,Lfdobj)
 
   if (length(dim(coef)) < 2) {
-    lines (x,fdmat,...)
+    lines (x.,fdmat,...)
   }
   if (length(dim(coef)) ==2 ) {
-    matlines (x,fdmat,...)
+    matlines (x.,fdmat,...)
   }
   if (length(dim(coef)) == 3) {
     for (ivar in 1:nvar) {
-      matlines (x,fdmat[,,ivar],type="l",lty=1,
+      matlines (x.,fdmat[,,ivar],type="l",lty=1,
                 main=varnames[ivar],...)
     }
   }

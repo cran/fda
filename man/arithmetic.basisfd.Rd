@@ -19,7 +19,13 @@
 \value{
   basisobj1 == basisobj2 returns a logical scalar.
 }
+\references{
+  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional 
+    Data Analysis, 2nd ed.}, Springer, New York. 
 
+  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
+    Functional Data Analysis}, Springer, New York.
+}
 \seealso{
 \code{\link{basisfd}}, 
 \code{\link{basisfd.product}}

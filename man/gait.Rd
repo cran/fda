@@ -12,7 +12,7 @@
    for 39 repetitions of a 20 point gait cycle.   
 }
 \details{
-  The componenents of dimnames(gait) are as follows:
+  The components of dimnames(gait) are as follows:
   
   [[1]] standardized gait time = seq(from=0.025, to=0.975, by=0.05) 
 

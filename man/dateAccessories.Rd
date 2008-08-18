@@ -65,9 +65,19 @@
 
 }
 \seealso{
+  \code{\link{axisIntervals}} 
   \code{\link{month.abb}} 
 }
-%\examples{ }
+\examples{
+daybasis65 <- create.fourier.basis(c(0, 365), 65)
+daytempfd <- with(CanadianWeather, smooth.basisPar(day.5, 
+    dailyAv[,,"Temperature.C"]) )
+plot(daytempfd, axes=FALSE)
+axisIntervals(1) 
+# axisIntervals by default uses
+# monthBegin.5, monthEnd.5, monthMid, and month.abb
+axis(2)  
+}
 % docclass is function
 \keyword{datasets}
 

@@ -12,7 +12,7 @@ if nargin < 2, nx = max([10*nbasisx+1, 201]);  end
 %  evaluate basis at a fine mesh of values
 
 rangex   = getbasisrange(basisobj);
-x        = linspace(rangex(1),rangex(2),nx)';
+x        = linspace(rangex(1),rangex(2),nx);
 basismat = full(eval_basis(x, basisobj));
 
 %  plot the basis values

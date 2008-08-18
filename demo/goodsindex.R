@@ -17,28 +17,26 @@
 #  attach FDA functions
 
 #  Windows ... R
-#  Last modified 21 March 2006
+
+#  Last modified 18 August 2007 by Giles Hooker
+#  Previously modified 21 March 2006
 
 #  ------------------------------------------------------------------------
 #                    Set up the data for analysis
 #  ------------------------------------------------------------------------
 
 ndur <- 12
-durtime <- (0:(ndur-1))/12 + 1919
+durtime <- rep((0:(ndur-1))/12,81) + rep(1919:1999,1,each=ndur)
 goodsrange <- c(1919,2000)
-monthlabs <- c("j","FALSE","m","A","M","J","J","A","S","O","N","D")
+monthlabs <- c("j","f","m","A","M","J","J","A","S","O","N","D")
 
 #  compute log nondurables
-lognondur <- log10(nondurables)
+
+lognondur <- log10(nondurables[1:972])
 
 #  compute linear trend
 
 lognondurhat <- lognondur - lsfit(durtime, lognondur)$residuals
-
-xmat <- matrix(1,ndur,2)
-xmat[,2] <- durtime
-lsfitlist <- lsfit(durtime, lognondur)
-lognondurhat <- lognondur - lsfitlist$residuals
 
 #  set up plotting arrangements for one and two panel displays allowing
 #  for larger fonts
@@ -46,7 +44,7 @@ lognondurhat <- lognondur - lsfitlist$residuals
 #  plot the index
 
 par(mfrow=c(1,1), mar=c(5,5,4,2), pty="m")
-plot(durtime, nondurables, type="l", cex=1,
+plot(durtime, nondurables[1:972], type="l", cex=1,
      xlim=goodsrange, ylim=c(0,120),
      xlab="Year", ylab="Nondurable Goods Index")
 
@@ -61,7 +59,7 @@ lines(durtime, lognondurhat, lty=3)
 
 lambda     <- 10^(-11)
 wtvec      <- rep(1,ndur)
-goodsbasis <- create.bspline.basis(goodsrange,ndur+4,6)
+goodsbasis <- create.bspline.basis(goodsrange,81*ndur+4,6)
 goodsfdPar <- fdPar(goodsbasis, 4, lambda)
 
 #  smooth the data with smooth.basis.  This takes a fair length of time
@@ -70,7 +68,7 @@ lognondursmthfd <- smooth.basis(durtime, lognondur, goodsfdPar)$fd
 
 #  evaluate smooth over a fine mesh of values
 
-durfine <- seq(1919,2000,0.05)
+durfine <- seq(1919,2000,0.025)
 lognondursmthvec <- eval.fd(durfine, lognondursmthfd)
  
 #  smooth the data with smooth.Pspline.  This is fast, but
@@ -87,7 +85,7 @@ lognondursmthvec <- eval.fd(durfine, lognondursmthfd)
 index <- durtime >= 1964 & durtime <= 1967
 plot(durtime[index], lognondur[index], type="p", cex=1, lwd=2, 
      xlim=c(1964,1967), ylim=c(1.61,1.73),
-     xlab="Year", ylab="Log10 Nondurable Goods Index" )
+     xlab="Year", ylab="Log10 NGI",cex.axis=1.5,cex.lab=2)
 index <- durfine >= 1964 & durfine <= 1967
 lines(durfine[index], lognondursmthvec[index], lwd=2)
 lines(c(1965,1965),c(1.61,1.73),lty=2)

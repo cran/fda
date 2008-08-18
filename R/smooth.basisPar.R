@@ -1,5 +1,5 @@
 smooth.basisPar <- function(argvals, y, fdobj=NULL, Lfdobj=NULL,
-      lambda=1/diff(range(argvals)), estimate=TRUE, penmat=NULL, 
+      lambda=0, estimate=TRUE, penmat=NULL, 
       wtvec=rep(1, length(argvals)), fdnames=NULL ){
 ##
 ## 1.  fdobj
@@ -27,10 +27,9 @@ smooth.basisPar <- function(argvals, y, fdobj=NULL, Lfdobj=NULL,
 ##
 ## 3.  smooth.fd
 ##
-  n <- length(argvals)
+#  n <- length(argvals)
   w <- wtvec
 #  smoothB <- smooth.basis(argvals, y, fdP, wtvec=w,
 #        dffactor=dffactor, fdnames=fdnames)
-  smooth.basis(argvals, y, fdP, wtvec=w,
-        fdnames=fdnames)
+  smooth.basis(argvals, y, fdP, wtvec=w, fdnames=fdnames)
 }

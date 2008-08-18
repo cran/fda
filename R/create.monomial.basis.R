@@ -1,5 +1,5 @@
-create.monomial.basis <- function(rangeval=c(0,1), nbasis=2, exponents=NULL,
-                                  dropind=NULL, quadvals=NULL, values=NULL)
+create.monomial.basis <- function(rangeval=c(0,1), nbasis=2,
+           exponents=NULL, dropind=NULL, quadvals=NULL, values=NULL)
 {
 #  CREATE_MONOMIAL_BASIS  Creates a monomial basis:, x^i_1, x^i_2, ...
 #  The exponents in this version must be nonnegative integers
@@ -27,55 +27,56 @@ create.monomial.basis <- function(rangeval=c(0,1), nbasis=2, exponents=NULL,
 #               column of QUADVALS.  
 #  Return:
 #  BASISOBJ  ... a functional data basis object of type "monom"
-#
-#  last modified 20 November 2005
+#  
+#  last modified 2008.08.23 by Spencer Graves 
+# previously modified  20 November 2005
 
 #  check RANGEVAL
 
-if (length(rangeval) == 1) {
+  if (length(rangeval) == 1) {
     if( rangeval <= 0) stop("RANGEVAL a single value that is not positive.")
     rangeval <- c(0,rangeval)
-}
-if (!rangechk(rangeval)) stop("RANGEVAL is not a legitimate range.")
-
-if (missing(exponents) || is.null(exponents)) exponents = c(0:(nbasis-1))
+  }
+  if (!rangechk(rangeval)) stop("RANGEVAL is not a legitimate range.")
+  
+  if (missing(exponents) || is.null(exponents)) exponents = c(0:(nbasis-1))
 
 #  check whether exponents are nonnegative integers
 
-for(ibasis in 1:nbasis) {
-	if (exponents[ibasis] - round(exponents[ibasis]) != 0)
-		stop("An exponent is not an integer.")
-	if (exponents[ibasis] < 0)  stop("An exponent is negative.")
-}
+  for(ibasis in 1:nbasis) {
+    if (exponents[ibasis] - round(exponents[ibasis]) != 0)
+      stop("An exponent is not an integer.")
+    if (exponents[ibasis] < 0)  stop("An exponent is negative.")
+  }
 
 # check if there are duplicate exponents
 
-if (min(diff(sort(exponents))) <= 0) stop("There are duplicate exponents.")
+  if((length(exponents)>1) && (min(diff(sort(exponents))) <= 0))
+    stop("There are duplicate exponents.")
 
-type   = "monom"
-params = exponents
+  type <- "monom"
+  params <- exponents
 
 #  check DROPIND
 
-if (missing(dropind)) dropind <- NULL
+  if (missing(dropind)) dropind <- NULL
 
-if (length(dropind) > 0){
+  if (length(dropind) > 0){
     if(length(dropind) >= nbasis)  stop("Too many index values in DROPIND.")
     dropind = sort(dropind)
     if(length(dropind) > 1) {
-        if(min(diff(dropind)) == 0) stop("Multiple index values in DROPIND.")
+      if(min(diff(dropind)) == 0) stop("Multiple index values in DROPIND.")
     }
     for(i in 1:length(dropind)) {
-   	    if(dropind[i] < 1 || dropind[i] > nbasis)
-            stop("An index value is out of range.")
+      if(dropind[i] < 1 || dropind[i] > nbasis)
+        stop("An index value is out of range.")
     }
-}
+  }
 
 #  set up the basis object
 
-basisobj <- basisfd(type=type, rangeval=rangeval, nbasis=nbasis, params=params,
-                    dropind=dropind, quadvals=quadvals, values=values)
+  basisobj <- basisfd(type=type, rangeval=rangeval, nbasis=nbasis,
+        params=params, dropind=dropind, quadvals=quadvals, values=values)
 
-basisobj
-
+  basisobj
 }

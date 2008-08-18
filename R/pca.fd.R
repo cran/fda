@@ -3,7 +3,7 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
 {
 #  Carry out a functional PCA with regularization
 #  Arguments:
-#  FDOBJ	    ... Functional data object
+#  FDOBJ        ... Functional data object
 #  NHARM     ... Number of principal components or harmonics to be kept
 #  HARMFDPAR ... Functional parameter object for the harmonics
 #  CENTERFNS ... If TRUE, the mean function is first subtracted from each function
@@ -23,7 +23,7 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
   #  Check arguments
 
   if (!(inherits(fdobj, "fd"))) stop(
-		"Argument FD  not a functional data object.")
+        "Argument FD  not a functional data object.")
 
   #  compute mean function and center if required
 
@@ -124,7 +124,7 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
   for(i in 1:nharm)
     harmnames[i] <- paste("PC", i, sep = "")
   if(length(coefd) == 2)
-    harmnames <- list(coefnames[[1]], harmnames)
+    harmnames <- list(coefnames[[1]], harmnames,NULL)
   if(length(coefd) == 3)
     harmnames <- list(coefnames[[1]], harmnames, coefnames[[3]])
   harmfd   <- fd(harmcoef, basisobj, harmnames)
