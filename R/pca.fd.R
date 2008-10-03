@@ -124,7 +124,7 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
   for(i in 1:nharm)
     harmnames[i] <- paste("PC", i, sep = "")
   if(length(coefd) == 2)
-    harmnames <- list(coefnames[[1]], harmnames,NULL)
+    harmnames <- list(coefnames[[1]], harmnames,'values')
   if(length(coefd) == 3)
     harmnames <- list(coefnames[[1]], harmnames, coefnames[[3]])
   harmfd   <- fd(harmcoef, basisobj, harmnames)

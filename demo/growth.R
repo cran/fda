@@ -87,6 +87,7 @@ agefine <- seq(ageRng[1],ageRng[2],length=101)
 hgtm = growth$hgtm
 hgtf = growth$hgtf
 age = growth$age
+rng = range(age)
 
 
 knots  <- growth$age

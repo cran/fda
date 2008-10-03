@@ -254,13 +254,13 @@ gaitvararray = eval.bifd(gaittime, gaittime, gaitvarbifd)
 
 #  plot variance and covariance functions as contours
 
-contour(gaittime, gaittime, gaitvararray[,,1,1], cex=1.2)
+filled.contour(gaittime, gaittime, gaitvararray[,,1,1], cex=1.2,las='none')
 title("Knee - Knee")
 
-contour(gaittime, gaittime, gaitvararray[,,1,2], cex=1.2)
+filled.contour(gaittime, gaittime, gaitvararray[,,1,2], cex=1.2)
 title("Knee - Hip")
 
-contour(gaittime, gaittime, gaitvararray[,,1,3], cex=1.2)
+filled.contour(gaittime, gaittime, gaitvararray[,,1,3], cex=1.2)
 title("Hip - Hip")
 
 #  plot variance and covariance functions as surfaces

@@ -1,7 +1,7 @@
 stepchk <- function(oldstep, cvec, deltac, limwrd, ind,
                     climit=50*c(-rep(1,ncvec), rep(1,ncvec)),
-                    active=1:ncvec, dbgwrd)
-{
+                    active=1:ncvec, dbgwrd){
+# last changed 2007 or 2008 by Spencer Graves
 #  check the step size to keep parameters within boundaries
         ncvec   <- length(deltac)
         bot     <- climit[1:ncvec]

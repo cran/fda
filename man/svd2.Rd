@@ -1,12 +1,12 @@
 \name{svd2}
 \alias{svd2}
 \title{
-  singular value decomposition with automatic error handling 
+  singular value decomposition with automatic error handling
 }
 \description{
   The 'svd' function in R 2.5.1 occasionally throws an error
   with a cryptic message.  In some such cases, changing the
-  LINPACK argument works.  
+  LINPACK argument has worked.
 }
 \usage{
   svd2(x, nu = min(n, p), nv = min(n, p), LINPACK = FALSE)
@@ -19,7 +19,7 @@
 
 \value{
   a list with components d, u, and v, as described in the help file for
-  'svd' in the 'base' package.    
+  'svd' in the 'base' package.
 }
 \details{
   In R 2.5.1, the 'svd' function sometimes stops with a cryptic error
@@ -29,10 +29,10 @@
   in 'env = .GlobalEnv'.
 
   Except for these rare pathologies, 'svd2' should work the same as
-  'svd'.   
+  'svd'.
 }
 \keyword{array}
 \seealso{
-\code{\link{svd}}, 
+\code{\link{svd}},
 }
 

@@ -1,4 +1,4 @@
-tperm.fd <- function(x1fd,x2fd,nperm=200,q=0.95,argvals=NULL,plotres=TRUE) # first and second 
+tperm.fd <- function(x1fd,x2fd,nperm=200,q=0.05,argvals=NULL,plotres=TRUE,...) # first and second 
 {                                                                          # groups of data,
     if( !is.fd(x1fd) | !is.fd(x2fd) ){                                     # number permuts
         stop("x1fd and x2fd must both be functional data objects")         # quantile
@@ -7,6 +7,7 @@ tperm.fd <- function(x1fd,x2fd,nperm=200,q=0.95,argvals=NULL,plotres=TRUE) # fir
     rangeobs = x1fd$basis$range
     rangehat = x2fd$basis$range
 
+
     if( !prod(rangeobs == rangehat) ){
         stop("x1fd and x2fd do not have the same range.")
     }
@@ -14,6 +15,8 @@ tperm.fd <- function(x1fd,x2fd,nperm=200,q=0.95,argvals=NULL,plotres=TRUE) # fir
     if(is.null(argvals)){
         argvals = seq(rangeobs[1],rangeobs[2],length.out=101)
     }
+
+    q = 1-q
 
     x1mat = eval.fd(argvals,x1fd)
     x2mat = eval.fd(argvals,x2fd)
@@ -56,13 +59,28 @@ tperm.fd <- function(x1fd,x2fd,nperm=200,q=0.95,argvals=NULL,plotres=TRUE) # fir
     qvals.pts = apply(Tnullvals,1,quantile,q)
 
     if(plotres){
-        ylims = c( min(Tobs,-qval),max(Tobs,qval))
 
-        plot(argvals,Tvals,type='l',col=2,ylim=ylims)
-        lines(argvals,qvals.pts,lty=2,col=4)
-        abline(h=qval,lty=2,col=4)
-        abline(h=-qval,lty=2,col=4)
-        abline(h=Tobs,lty=2,col=2)
+	  if( is.null(names(x1fd$fdnames)) | is.null(names(x2fd$fdnames)) ){
+		xlab='argvals'
+	  }	
+	  else if( prod(names(x1fd$fdnames)[1] == names(x2fd$fdnames)[1]) ){
+		xlab = names(x1fd$fdnames)[1]
+	  }
+	  else{ xlab = 'argvals' }
+
+        ylims = c( min(Tvals,qvals.pts),max(Tobs,qval))
+
+        plot(argvals,Tvals,type='l',col=2,ylim=ylims,lwd=2,
+		xlab=xlab,ylab='t-statistic',main='Permutation t-Test',...)
+        lines(argvals,qvals.pts,lty=3,col=4,lwd=2)
+        abline(h=qval,lty=2,col=4,lwd=2)
+	
+        legendstr = c('Observed Statistic',
+			    paste('pointwise',1-q,'critical value'),
+			    paste('maximum',1-q,'critical value'))
+
+	  legend(argvals[1],ylims[2],legend=legendstr,col=c(2,4,4),
+		lty=c(1,3,2),lwd=c(2,2,2))
     }
 
 

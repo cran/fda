@@ -13,7 +13,7 @@ geigen <- function(Amat, Bmat, Cmat)
   #  LMAT   ... p by s matrix L
   #  MMAT   ... q by s matrix M
 
-  #  last modified 18 May 2001
+  #  last modified 2007 to use svd2;  previous mod 18 May 2001
 
   Bdim <- dim(Bmat)
   Cdim <- dim(Cmat)

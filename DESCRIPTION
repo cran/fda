@@ -1,6 +1,6 @@
 Package: fda
-Version: 2.0.0
-Date: 2008-08-18
+Version: 2.0.2
+Date: 2008-10-03
 Title: Functional Data Analysis
 Author: J. O. Ramsay <ramsay@psych.mcgill.ca>,
 	Hadley Wickham <h.wickham@gmail.com>,
@@ -21,4 +21,4 @@ Description: These functions were developed to support
 License: GPL (>= 2)
 URL: http://www.functionaldata.org
 LazyData: true
-Packaged: Wed Oct  1 19:04:20 2008; spencerg
+Packaged: Tue Oct  7 08:13:23 2008; gilesh

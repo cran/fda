@@ -885,14 +885,17 @@ y2cMap <- solve(crossprod(smallbasismat), t(smallbasismat))
 #  names for climate zones
 
 zonenames <- c("Canada  ",
-               "Atlantic", "Pacific ", "Contintl", "Arctic  ")
+               "Atlantic", "Pacific ", "Contintal", "Arctic  ")
 
 #  indices for (weather stations in each of four climate zones
 
-atlindex <- c(1,2,4,8,9,13,14,15,19,22,23,24,25,28,34)
-pacindex <- c(12,17,18,30,31)
-conindex <- c(3,5,6,7,16,20,26,27,29,32,33,35)
-artindex <- c(10,11,21)
+index = 1:35
+
+
+atlindex <- index[CanadianWeather$region == "Atlantic"]
+pacindex <- index[CanadianWeather$region == "Pacific"]
+conindex <- index[CanadianWeather$region == "Continental"]
+artindex <- index[CanadianWeather$region == "Arctic"]
 
 #  Set up a design matrix having a column for (the grand mean, and
 #    a column for (each climate zone effect. Add a dummy contraint
@@ -959,7 +962,7 @@ for (j in 1:p) {
 #  plot predicted functions
 
 yhatfdobj <- fRegressList$yhatfdobj
-plot(yhatfdobj)
+plot(yhatfdobj,main='Predicted Temperature',)
 
 #  compute residual matrix and get covariance of residuals
 
@@ -1001,7 +1004,7 @@ par(op)
 
 #  plot regression functions with confidence limits
 
-op <- par(mfrow=c(2,3))
+op <- par(mfrow=c(3,2))
 for (j in 1:p) {
 	betafdParj  <- betaestlist[[j]]
 	betafdj     <- betafdParj$fd
@@ -1024,7 +1027,7 @@ t.res = tperm.fd(tempfd[atlindex],tempfd[pacindex])
 
 # instead, we'll try a permutation F-test for the regression
 
-F.res = Fperm.fd(tempfd, xfdlist, betalist)
+F.res = Fperm.fd(tempfd, xfdlist, betalist,cex.axis=1.5,cex.lab=1.5)
 
 
 
@@ -1274,8 +1277,9 @@ for (ilam in 1:nlam) {
 }
 
 plot(loglam, SSE.CV, type="b",
-	  xlab="log_{10} smoothing parameter lambda",
-	  ylab="Cross-validation score")
+	  xlab="log smoothing parameter lambda",
+	  ylab="Cross-validation score",cex.lab=1.5,cex.axis=1.5,
+	  lwd=2)
 
 #  analysis with minimum CV smoothing
 
@@ -1309,7 +1313,7 @@ title("Regression coefficient for temperature")
 #  plot the fit
 
 par(mfrow=c(1,1), pty="m")
-plot (annualprechat, annualprec, type="p")
+plot (annualprechat, annualprec, type="p",cex.lab=1.5,cex.axis=1.5)
 lines(annualprechat, annualprechat, lty=2)
 
 #  compute squared multiple correlation
@@ -1321,7 +1325,7 @@ Rsqrd <- covmat[1,2]^2/(covmat[1,1]*covmat[2,2])
 #  compute SigmaE
 
 resid  <- annualprec - annualprechat
-SigmaE <- mean(resid^2)
+SigmaE <- sum(resid^2)/(35-fRegressList$df)
 SigmaE <- SigmaE*diag(rep(1,35))
 
 #  recompute the analysis to get confidence limits
@@ -1347,7 +1351,8 @@ betaplotmat <- cbind(betavec, betavec+2*betastderrvec,
                               betavec-2*betastderrvec)
 
 matplot(day.5, betaplotmat, type="l", lty=c(1,4,4),
-        xlab="Day", ylab="Temperature Reg. Coeff.")
+        xlab="Day", ylab="Temperature Reg. Coeff.",lwd=2,
+	 cex.lab=1.5,cex.axis=1.5)
 lines(c(0, 365),c(0,0),lty=2)
 
 

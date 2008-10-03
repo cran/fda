@@ -4,9 +4,9 @@ stddev.fd <- function(fdobj)
   #  Argument:
   #  fdobj    ... a functional data object
   #  Return:
-  #  STDFD ... a functional data for the standard deviation functions
+  #  STDFD ... a functional data object for the standard deviation functions
 
-  #  Last modified 26 February 2007
+  #  Last modified 20081004;  previously modified 26 February 2007
 
   if (!(inherits(fdobj, "fd"))) stop(
 		"Argument  fdobj not a functional data object.")

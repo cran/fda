@@ -1,9 +1,11 @@
 Fperm.fd <- function(yfdPar, xfdlist, betalist,wt=NULL, # Standard inputs to fRegress
-            nperm=200,argvals=NULL,q=0.95,plotres=TRUE) # number of permutations,
+            nperm=200,argvals=NULL,q=0.05,plotres=TRUE,...) # number of permutations,
 {                                                       # where to evaluate functional
     Fnull = rep(0,nperm)                                # responses, quantile to compare
                                                         # and do we plot the results?
     Fnullvals = c()
+
+    q = 1-q
 
     begin <- proc.time()
     fRegressList <- fRegress(yfdPar, xfdlist, betalist)
@@ -50,18 +52,35 @@ Fperm.fd <- function(yfdPar, xfdlist, betalist,wt=NULL, # Standard inputs to fRe
 
     if(plotres){
         if(is.fd(yfdPar)){
-            ylims = c(min(c(Fvals,qval)),max(c(Fobs,qval)))
+            ylims = c(min(c(Fvals,qval,qvals.pts)),max(c(Fobs,qval)))
     
-            plot(argvals,Fvals,type="l",ylim=ylims,col=2)
-            lines(argvals,qvals.pts,lty=2,col=4)
-            abline(h=qval,lty=2,col=4)
-            abline(h=Fobs,col=2)
+		if( is.null(names(yhat$fdnames)) ){ xlab = 'argvals' }
+		else{ xlab = names(yhat$fdnames)[1] }
+
+            plot(argvals,Fvals,type="l",ylim=ylims,col=2,lwd=2,
+			xlab=xlab,ylab='F-statistic',main='Permutation F-Test',...)
+            lines(argvals,qvals.pts,lty=3,col=4,lwd=2)
+            abline(h=qval,lty=2,col=4,lwd=2)
+
+	      legendstr = c('Observed Statistic',
+		    paste('pointwise',1-q,'critical value'),
+		    paste('maximum',1-q,'critical value'))
+
+		legend(argvals[1],ylims[2],legend=legendstr,col=c(2,4,4),
+			lty=c(1,3,2),lwd=c(2,2,2))
         }
         else{
             xlims = c(min(c(Fnull,Fobs)),max(c(Fnull,Fobs)))
-            hist(Fnull,xlim=xlims)
-            abline(v = Fobs,col=2)
-            abline(v = qval,col=4)
+            hstat = hist(Fnull,xlim=xlims,lwd=2,xlab='F-value',
+			main = 'Permutation F-Test',...)
+            abline(v = Fobs,col=2,lwd=2)
+            abline(v = qval,col=4,lty=2,lwd=2)
+
+	      legendstr = c('Observed Statistic',
+		    paste('Permutation',1-q,'critical value'))
+
+		legend(xlims[1],max(hstat$counts),legend=legendstr,col=c(2,4),
+			lty=c(1,2),lwd=c(2,2))
         }
     }
     

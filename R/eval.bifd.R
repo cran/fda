@@ -4,8 +4,8 @@ eval.bifd <- function(sevalarg, tevalarg, bifd, sLfdobj = 0, tLfdobj = 0) {
   #  SEVALARG and TEVALARG.  Differential operators SLFD and TLFD are
   #     applied to BIFD if present.
 
-  #  Last modified 26 October 2005
-
+  #  Last modified 2007 by Spencer(?); previous mod 26 October 2005
+#  fixed references to nonexistent sLfd, tLfd
   if (!is.vector(sevalarg)) stop(
      "First argument is not a vector.")
   if (!is.vector(tevalarg)) stop(

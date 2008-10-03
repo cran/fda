@@ -1,38 +1,38 @@
 #  --------------------------------------------------------------------------
 
-mongrad <- function(x, Wfd, basislist=vector("list",JMAX)) {
-#  Evaluates the gradient with respect to the coefficients in Wfd
+mongrad <- function(x, Wfdobj, basislist=vector("list",JMAX)) {
+#  Evaluates the gradient with respect to the coefficients in Wfdobj
 #     of a monotone function of the form
-#            h(x) = [D^{-1} exp Wfd](x)
+#            h(x) = [D^{-1} exp Wfdobj](x)
 #  where  D^{-1} means taking the indefinite integral.
 #  The interval over which the integration takes places is defined in
-#  the basisfd object in Wfd.
+#  the basisfd object in Wfdobj.
 #  Arguments:
 #  X      ... argument values at which function and derivatives are evaluated
-#  Wfd    ... a functional data object
+#  WFDOBJ ... a functional data object
 #  BASISLIST ... a list containing values of basis functions
 #  Returns:
 #  GVAL   ... value of gradient at input values in X.
 
-#  Last modified 15 December 2005
+#  Last modified 19 December 2007
 
   JMAX <- 15
   JMIN <- 11
   EPS  <- 1E-5
 
-  coef  <- Wfd$coefs
+  coef  <- Wfdobj$coefs
   coefd <- dim(coef)
   ndim  <- length(coefd)
-  if (ndim > 1 && coefd[2] != 1) stop("Wfd is not a single function")
+  if (ndim > 1 && coefd[2] != 1) stop("Wfdobj is not a single function")
 
-  basisfd  <- Wfd$basis
+  basisfd  <- Wfdobj$basis
   rangeval <- basisfd$rangeval
   nbasis   <- basisfd$nbasis
   onebas   <- rep(1,nbasis)
+  width    <- rangeval[2] - rangeval[1]
 
   #  set up first iteration
 
-  width <- rangeval[2] - rangeval[1]
   JMAXP <- JMAX + 1
   h <- rep(1,JMAXP)
   h[2] <- 0.25

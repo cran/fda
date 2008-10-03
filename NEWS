@@ -3,10 +3,14 @@ second edition (2006) and 'Applied Functional Data Analysis'
 (2002), both by James O. Ramsay and Bernard W. Silverman
 (Springer).
 
+Release 2.0.1 added a map to CanadianWeather.Rd showing the
+location of each weather station by region.
+
 Release 2.0.0 added 'coef' generic functions to extract the
 coefficients from objects of class 'fd', 'fdPar', and 'fdSmooth'.
 Also, the 'coef' component in objects of class 'fdSmooth' was
-removed as it was redundant with 'fd$coefs'.  In addition, a bug
+removed as it was redundant with 'fd$coefs'.  In addition,
+functions 'Fperm.fd' and and 'tperm.fd' were added, and a bug
 was fixed in the addition of functional data objects.
 
 Release 1.2.4 fixes a few bugs and adds defaults to

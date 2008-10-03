@@ -9,7 +9,7 @@ smooth.fd <- function(fdobj, fdParobj){
 #  Returns a functional data object containing a smoothed version
 #    of the input functional data object
 #
-#  Last modified:  26 October 2005
+#  Last modified: 20081003;  previously modified 26 October 2005
 #
 
 #  check fdParobj

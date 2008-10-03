@@ -7,10 +7,10 @@ evaldiag.bifd <- function(evalarg, bifdobj,
 #  or linear differential operators to be applied before evaluation.
 #  Their defaults are 0, meaning that the function itself is evaluated.
 
-#  last modified 26 October 2005
+#  last modified 2008(?) replacing Matlab subscripts with R style
+# in lines 70, 77, 78;  previously modified 26 October 2005
 
 #  exchange order if BIFD is the first argument
-
 if (inherits(evalarg, "bifd")) {
     temp    <- bifdobj
     bifdobj <- evalarg
