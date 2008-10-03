@@ -10,9 +10,10 @@
 \usage{
   lmWinsor(formula, data, lower=NULL, upper=NULL, trim=0,
         quantileType=7, subset, weights=NULL, na.action,
-        method = "qr", model = TRUE, x = FALSE, y = FALSE, qr = TRUE,
+        model = TRUE, x = FALSE, y = FALSE, qr = TRUE,
         singular.ok = TRUE, contrasts = NULL, offset=NULL,
-        eps=sqrt(.Machine$double.eps), ...)
+        method=c('QP', 'clip'), eps=sqrt(.Machine$double.eps),
+        trace=ceiling(sqrt(nrow(data))), ...)
 }
 \arguments{
   \item{formula}{
@@ -28,26 +29,37 @@
     'environment(formula)';  see \link{lm}.
   }
   \item{lower, upper}{
-    optional numeric vectors with names matching columns of 'data'
+    Either NULL or a numeric vector or a list.
+
+    If a numeric vector, it must have names matching columns of 'data'
     giving limits on the ranges of predictors and predictions:  If
     present, values below 'lower' will be increased to 'lower', and
     values above 'upper' will be decreased to 'upper'.  If absent, these
     limit(s) will be inferred from quantile(..., prob=c(trim, 1-trim),
     na.rm=TRUE, type=quantileType).
+
+    If a list, its components must be numeric vectors with names, as
+    just described.
+
+    If length(trim) > 1 or either 'lower' or 'upper' is a list,
+    'lmWinsor' will return a list giving alternative fits;  see 'value'
+    below.
   }
   \item{trim}{
-    the fraction (0 to 0.5) of observations to be considered outside the
-    range of the data in determining limits not specified in 'lower' and
-    'upper'.
+    Either a constant or a numeric vector giving the fraction (0 to 0.5)
+    of observations to be considered outside the range of the data in
+    determining limits not specified in 'lower' and 'upper'.  If
+    length(trim) > 1 or either 'lower' or 'upper' is a list, 'lmWinsor'
+    will return a list giving alternative fits;  see 'value' below.
 
     NOTES:
 
-    (1) trim = 0.5 should NOT be used except to check  the algorithm,
+    (1) trim>0 with a singular fit may give an error.  In such cases,
+    fix the singularity and retry.
+
+    (2) trim = 0.5 should NOT be used except to check the algorithm,
     because it trims everything to the median, thereby providing zero
     leverage for estimating a regression.
-
-    (2) trim>0 will give an error with a singular fit.  In such cases,
-    fix the singularity and retry.
   }
   \item{quantileType}{
     an integer between 1 and 9 selecting one of the nine quantile
@@ -71,11 +83,6 @@
     'na.omit'.  Another possible value is 'NULL', no action.  Value
     'na.exclude' can be useful.
   }
-  \item{method}{
-    the method to be used; for fitting, currently only 'method = "qr"'
-    is supported; 'method = "model.frame"' returns the model frame (the
-    same as with 'model = TRUE', see below).
-  }
   \item{model, x, y, qr}{
     logicals.  If 'TRUE' the corresponding components of the fit (the
     model frame, the model matrix, the response, the QR decomposition)
@@ -96,6 +103,15 @@
     number of cases. One or more 'offset' terms can be included in the
     formula instead or as well, and if both are specified their sum is
     used.  See 'model.offset'.
+  }
+  \item{method}{
+    Either 'QP' or 'clip';  partial matching is allowed.  If 'clip',
+    force all 'fitted.values' from an 'lm' fit to be at least
+    lower[yName] and at most'upper[yName].  If 'QP', iteratively find
+    the prediction farthest outside (lower, upper)[yName] and transfer
+    it from the sum of squared residuals objective function to a
+    constraint that keeps high 'fitted.values' from going below
+    upper[yName] and low 'fitted.values' from going above lower[yName].
   }
   \item{eps}{
     small positive number used in two ways:
@@ -119,6 +135,10 @@
       }
     }
   }
+  \item{trace}{
+    Print the iteration count every 'trace' iteration during 'QP'
+    iterations;  see details.  'trace' = 0 means no trace.
+  }
   \item{\dots}{
     additional arguments to be passed to the low level regression
     fitting functions;  see \link{lm}.
@@ -139,45 +159,61 @@
   na.action = na.action, method = method, x=x, y=y, qr=qr,
   singular.ok=singular.ok, contrasts=contrasts, offset=offset, ...)
 
-  5.  Add components lower and upper to fit0 and convert it to class
+  5.  out = a logical matrix with two columns, indicating any of
+  predict(fit0) outside (lower, upper)[yName].
+
+  6.  Add components lower and upper to fit0 and convert it to class
   c('lmWinsor', 'lm').
 
-  6.  If all fit0[['fitted.values']] are inside (lower, upper)[yNames],
-  return(fit0).
+  7.  If((method == 'clip') || !any(out)), return(fit0).
 
-  7.  Else, use quadratic programming (QP) to minimize the 'Winsorized
-  sum of squares of residuals' as follows:
+  8.  Else, use quadratic programming (\link[quadprog]{solve.QP}) to
+  minimize the 'Winsorized sum of squares of residuals' as follows:
 
-  7.1.  First find the prediction farthest outside (lower,
+  8.1.  First find the prediction farthest outside (lower,
   upper)[yNames].  Set temporary limits at the next closest point inside
   that point (or at the limit if that's closer).
 
-  7.2.  Use QP to minimize the sum of squares of residuals among all
+  8.2.  Use QP to minimize the sum of squares of residuals among all
   points not outside the temporary limits while keeping the prediction
   for the exceptional point away from the interior of (lower,
   upper)[yNames].
 
-  7.3.  Are the predictions for all points unconstrained in QP inside
+  8.3.  Are the predictions for all points unconstrained in QP inside
   (lower, upper)[yNames]?  If yes, quit.
 
-  7.4.  Otherwise, among the points still unconstrained, find the
+  8.4.  Otherwise, among the points still unconstrained, find the
   prediction farthest outside (lower, upper)[yNames].  Adjust the
   temporary limits to the next closest point inside that point (or at
   the limit if that's closer).
 
-  7.5.  Use QP as in 7.2 but with multiple exceptional points, then
-  return to step 7.3.
+  8.5.  Use QP as in 8.2 but with multiple exceptional points, then
+  return to step 8.3.
 
-  8.  Modify the components of fit0 as appropriate and return the
+  9.  Modify the components of fit0 as appropriate and return the
   result.
 }
 \value{
-  an object of class c('lmWinsor', 'lm') with 'lower', 'upper', and
-  'message' components in addition to the standard 'lm' components.  In
-  addition, if the initial fit produces predictions outside the limits,
-  this object returned will also include components 'coefIter' and
-  'tempLimits' containing the model coefficients and temporary limits
-  obtained during the iteration.
+  an object of class 'lmWinsor', which is either an object of class
+  c('lmWinsor', 'lm') or a list of such objects.  A list is returned
+  when length(trim) > 0 or is.list(lower) or is.list(upper).  The length
+  of the ouput list is the max of length(trim) and the lengths of any
+  lists provided for 'lower' and 'upper'.  If these lengths are not the
+  same, shorter ones are replicated to match the longest one.
+
+  An object of class c('lmWinsor', 'lm') has 'lower', 'upper', 'out',
+  'message', and 'elapsed.time' components in addition to the standard
+  'lm' components. The 'out' component is a logical matrix identifying
+  which predictions from the initial 'lm' fit were below lower[yName]
+  and above upper[yName].  If method = 'QP' and the initial fit produces
+  predictions outside the limits, this object returned will also include
+  a component 'coefIter' containing the model coefficients, the index
+  number of the observation in 'data' transferred from the objective
+  function to the constraints on that iteration, plus the sum of squared
+  residuals before and after clipping the predictions and the number of
+  predictions in 5 categories:  below and at the lower limit, between
+  the limits, and at and above the upper limit.  The 'elapsed.time'
+  component gives the run time in seconds.
 
   The options for 'message' are as follows:
 
@@ -222,6 +258,9 @@ lm.1.5 <- lmWinsor(y1~x1, data=anscombe, trim=0.5)
 
 # test nonlinear optimization
 lm.1.25 <- lmWinsor(y1~x1, data=anscombe, trim=0.25)
+
+# list example
+lm.1. <- lmWinsor(y1~x1, data=anscombe, trim=c(0, 0.25, .4, .5))
 
 }
 \keyword{ models }

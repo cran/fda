@@ -21,8 +21,7 @@ density.fd(x, WfdParobj, conv=0.0001, iterlim=20,
 }
 \arguments{
 \item{x}{
-a strictly increasing set variable values.
-These observations may be one of two forms:
+a set observations, which may be one of two forms:
 \enumerate{
 	\item a vector of observatons $x_i$
 	\item a two-column matrix, with the observations $x_i$ in the

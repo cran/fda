@@ -286,7 +286,8 @@ for (ilam in 1:nlam) {
     betafdPar2   <- betalisti[[2]]
     betafdPar2$lambda <- lambda
     betalisti[[2]] <- betafdPar2
-    SSE.CV[ilam]   <- fRegress.CV(annualprec, xfdlist, betalisti)$SSE.CV
+#    SSE.CV[ilam]   <- fRegress.CV(annualprec, xfdlist, betalisti)$SSE.CV
+    SSE.CV[ilam] <- fRegress(annualprec, xfdlist, betalisti)$OCV
     print(c(ilam, loglam[ilam], SSE.CV[ilam]))
 }
 

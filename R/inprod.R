@@ -2,20 +2,20 @@ inprod <- function(fdobj1, fdobj2, Lfdobj1=int2Lfd(0), Lfdobj2=int2Lfd(0),
                    rng = range1, wtfd = 0)
 {
 
-#  computes matrix of inner products of functions by numerical integration
-#    using Romberg integration
+#  computes matrix of inner products of functions by numerical
+#    integration using Romberg integration
 
 #  Arguments:
-#  FDOBJ1 and FDOBJ2    these may be either functional data or basis function
-#                    objects.  In the latter case, a functional data object
-#                    is created from a basis function object by using the
-#                    identity matrix as the coefficient matrix.
-#                    Both functional data objects must be univariate.
-#                    If inner products for multivariate objects are needed,
-#                    use a loop and call inprod(FDOBJ1[i],FDOBJ2[i]).
+#  FDOBJ1 and FDOBJ2    these may be either functional data or basis
+#               function objects.  In the latter case, a functional
+#               data object is created from a basis function object
+#               by using the identity matrix as the coefficient matrix.
+#               Both functional data objects must be univariate.
+#               If inner products for multivariate objects are needed,
+#               use a loop and call inprod(FDOBJ1[i],FDOBJ2[i]).
 #  LFDOBJ1 and LFDOBJ2  order of derivatives for inner product for
-#                    FDOBJ1 and FDOBJ2, respectively, or functional data objects
-#                    defining linear differential operators
+#               FDOBJ1 and FDOBJ2, respectively, or functional data
+#               objects defining linear differential operators
 #  RNG    Limits of integration
 #  WTFD   A functional data object defining a weight
 #  JMAX   maximum number of allowable iterations
@@ -65,7 +65,7 @@ if (inherits(fdobj1,"fd")       && inherits(fdobj2,"fd")   &&
     is.eqbasis(basisobj1, basisobj2)                       &&
     is.integer(Lfdobj1)         && is.integer(Lfdobj2)      &&
     wtfd == 0                   && all(rng == range1)) {
-	
+
     inprodmat <- inprod.bspline(fdobj1, fdobj2,
                      Lfdobj1$nderiv, Lfdobj2$nderiv)
     return(inprodmat)
@@ -199,7 +199,7 @@ for (irng  in  2:nrng) {
             ssqval <- max(abs(ss))
             if (all(ssqval > 0)) {
                 crit <- errval/ssqval
-            } else {                
+            } else {
                 crit <- errval
             }
             if (crit < EPS && iter >= JMIN) break
@@ -220,7 +220,7 @@ return(inprodmat)
 #  -------------------------------------------------------------------------------
 
 fdchk <- function(fdobj) {
-	
+
     #  check the class of FDOBJ and extract coefficient matrix
 
     if (inherits(fdobj, "fd")) coef  <- fdobj$coefs
@@ -237,7 +237,7 @@ fdchk <- function(fdobj) {
     if (length(coefd) > 2) stop("Functional data object must be univariate")
     nrep     <- coefd[2]
     basisobj <- fdobj$basis
-	
+
     return(list(nrep, fdobj))
 
 }

@@ -29,16 +29,20 @@ eigen.pda(pdaList,plotresult=TRUE,npts=501,...)
   Conducts an eigen decomposition of the linear differential equation implied
   by the result of \code{pda.fd}. Imaginary eigenvalues indicate instantaneous
   oscillatory behavior. Positive real eigenvalues indicate exponential increase,
-  negative real eigenvalues correspond to exponential decay.
+  negative real eigenvalues correspond to exponential decay. If the principle
+  differential analysis also included the estimation of a forcing function, the
+  limitting stable points are also tracked.
 }
 \value{
   Returns a list with elements
   \item{argvals}{The evaluation points of the coefficient functions.}
-  \item{eigvals}{The corresponding eigenvalues.}
+  \item{eigvals}{The corresponding eigenvalues at each time.}
+  \item{limvals}{The stable points of the system at each time.}
 }
 \seealso{
   \code{\link{pda.fd}}
   \code{\link{plot.pda.fd}}
+  \code{\link{pda.overlay}}
 }
 \examples{
 

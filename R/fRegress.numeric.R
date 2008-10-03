@@ -485,7 +485,10 @@ fRegress.numeric <- function(y, xfdlist, betalist, wt=NULL,
 
     #  compute and print degrees of freedom measure
 
-    df <- sum(diag(Zmat %*% Cmatinv %*% t(Zmat)))
+#    df <- sum(diag(Zmat %*% Cmatinv %*% t(Zmat)))
+
+    hatvals = diag(Zmat %*% Cmatinv %*% t(Zmat))
+    df <- sum(hatvals)
 
     #  set up fdPar object for BETAESTFDPAR
 
@@ -532,8 +535,8 @@ fRegress.numeric <- function(y, xfdlist, betalist, wt=NULL,
             betafdj    <- betafdParj$fd
             betamat    <- eval.fd(tfine, betafdj)
             fitj       <- deltat*(crossprod(xmat,betamat) -
-						                 0.5*(outer(xmat[1,    ],betamat[1,    ]) +
-				                          outer(xmat[nfine,],betamat[nfine,])))
+                                  0.5*(outer(xmat[1,    ],betamat[1,    ]) +
+                                       outer(xmat[nfine,],betamat[nfine,])))
             yhatmat    <- yhatmat + fitj
         } else{
 	          betaestfdParj <- betaestlist[[j]]
@@ -542,6 +545,13 @@ fRegress.numeric <- function(y, xfdlist, betalist, wt=NULL,
         }
     }
     yhatfdobj <- yhatmat
+
+    # Calculate OCV and GCV scores
+
+    OCV = sum( (ymat-yhatmat)^2/(1-hatvals)^2 )
+    GCV = sum( (ymat-yhatmat)^2 )/( (sum(1-hatvals))^2 )
+
+
 
     #  -----------------------------------------------------------------------
     #        Compute pointwise standard errors of regression coefficients
@@ -603,7 +613,9 @@ fRegress.numeric <- function(y, xfdlist, betalist, wt=NULL,
              yhatfdobj   = yhatfdobj,
              Cmatinv     = Cmatinv,
              wt          = wt,
-             df          = df)
+             df          = df,
+             OCV         = OCV,
+             gcv         = GCV)
  }
 
  class(fRegressList) <- 'fRegress'

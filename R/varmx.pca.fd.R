@@ -58,6 +58,8 @@ varmx.pca.fd <- function(pcafd, nharm = scoresd[2], nx=501)
   harmfd$coefs    <- harmcoef
   pcafd$harmonics <- harmfd
   pcafd$varprop   <- propvar
+  pcafd$scores    <- harmscrs
+  
   return(pcafd)
 }
 

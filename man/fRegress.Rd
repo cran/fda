@@ -12,27 +12,34 @@
   This function carries out a functional regression analysis, where
   either the dependent variable or one or more independent variables are
   functional.  Non-functional variables may be used on either side
-  of the equation.  In a simple problem where there is a single scalar independent
-  covariate with values \eqn{z_i, i=1,\ldots,N} and a single functional covariate
-  with values \eqn{x_i(t)}, the two versions of the model fit by \code{fRegress} are
-  the \emph{scalar} dependent variable model
-    \deqn{y_i = \beta_1 z_i + \int x_i(t) \beta_2(t) \, dt + e_i}
+  of the equation.  In a simple problem where there is a single scalar
+  independent covariate with values \eqn{z_i, i=1,\ldots,N} and a single
+  functional covariate with values \eqn{x_i(t)}, the two versions of the
+  model fit by \code{fRegress} are the \emph{scalar} dependent variable
+  model
+
+  \deqn{y_i = \beta_1 z_i + \int x_i(t) \beta_2(t) \, dt + e_i}
+
   and the \emph{concurrent} functional dependent variable model
-    \deqn{y_i(t) = \beta_1(t) z_i + \beta_2(t) x_i(t) + e_i(t)}.
-  In these models, the final term \eqn{e_i} or \eqn{e_i(t)} is a residual, lack
-  of fit or error term.
 
-  In the concurrent functional linear model for a functional dependent variable, all functional
-  variables are all evaluated at a common time or argument value $t$.
-  That is, the fit is defined in terms of the behavior of all variables
-  at a fixed time, or in terms of "now" behavior.
+  \deqn{y_i(t) = \beta_1(t) z_i + \beta_2(t) x_i(t) + e_i(t).}
 
-  All regression coefficient functions \eqn{\beta_j(t)} are considered to be functional.
-  In the case of a scalar dependent variable, the regression coefficient for
-  a scalar covariate is converted to a functional variable with a constant basis.   All
-  regression coefficient functions can be forced to be \emph{smooth} through the use
-  of roughness penalties, and consequently are specified in the argument list as
-  functional parameter objects.
+  In these models, the final term \eqn{e_i} or \eqn{e_i(t)} is a
+  residual, lack of fit or error term.
+
+  In the concurrent functional linear model for a functional dependent
+  variable, all functional   variables are all evaluated at a common
+  time or argument value $t$.  That is, the fit is defined in terms of
+  the behavior of all variables at a fixed time, or in terms of "now"
+  behavior.
+
+  All regression coefficient functions \eqn{\beta_j(t)} are considered
+  to be functional.  In the case of a scalar dependent variable, the
+  regression coefficient for a scalar covariate is converted to a
+  functional variable with a constant basis.   All regression
+  coefficient functions can be forced to be \emph{smooth} through the
+  use of roughness penalties, and consequently are specified in the
+  argument list as functional parameter objects.
 }
 \usage{
 fRegress(y, ...)
@@ -51,7 +58,7 @@ fRegress(y, ...)
 }
 \arguments{
   \item{y}{
-    the dependent variable object.  It may be an object of four
+    the dependent variable object.  It may be an object of five
     possible classes:
 
     \itemize{
@@ -69,11 +76,11 @@ fRegress(y, ...)
 	\code{numeric} or \code{fd} (functional data) or \code{fdPar}.
 	The number of replications of \code{fd} or \code{fdPar}
 	object(s) must match each other and the number of observations
-	of \code{numeric} objects named, as well as the number of replications
-of the dependent variable object.  The right hand side of this
-	\code{formula} is translated into \code{xfdlist}, then passed to
-	another method for fitting (unless \code{method} = 'model').
-	Multivariate independent variables are allowed in a
+	of \code{numeric} objects named, as well as the number of
+	replications of the dependent variable object.  The right hand
+	side of this \code{formula} is translated into \code{xfdlist},
+	then passed to another method for fitting (unless \code{method}
+	= 'model'). Multivariate independent variables are allowed in a
 	\code{formula} and are split into univariate independent
 	variables in the resulting \code{xfdlist}.  Similarly,
 	categorical independent variables with \code{k} levels are
@@ -88,13 +95,13 @@ of the dependent variable object.  The right hand side of this
       }
       \item{fd}{
 	a functional data object if the dependent variable is
-	functional.  A \code{y} of this class is replaced by fdPar(y,
-	...) and passed to \code{fRegress.fdPar}.
+	functional.  A \code{y} of this class is replaced by
+	\code{fdPar(y, ...)} and passed to \code{fRegress.fdPar}.
 
       }
       \item{fdPar}{
 	a functional parameter object if the dependent variable is
-	functional, and if it is necessary to smooth the prediction
+	functional, and if it is desired to smooth the prediction
 	of the dependent variable.
 
       }
@@ -191,8 +198,10 @@ of the dependent variable object.  The right hand side of this
     response \tab | \tab scalar \tab | \tab function \cr
     \tab | \tab \tab | \tab \cr
     scalar \tab | \tab lm \tab | \tab fRegress.numeric \cr
-    function \tab | \tab fRegress.fd or .fdPar \tab | \tab fRegress.fd
-    or .fdPar or linmod \cr
+    \tab | \tab \tab | \tab \cr
+    function \tab | \tab fRegress.fd or \tab | \tab fRegress.fd
+    or \cr
+    \tab | \tab fRegress.fdPar \tab | \tab fRegress.fdPar or linmod \cr
   }
 
   For \code{fRegress.numeric}, the numeric response is assumed to be the
@@ -264,10 +273,20 @@ of the dependent variable object.  The right hand side of this
 	the vector of weights input or inferred
 
       }
+
+
+   If \code{class(y)} is numeric, the \code{fRegress} object also includes:
+
       \item{df}{
-	equivalent degrees of freedom for the fit;  only present if
-	\code{class(y)} is \code{numeric}.
+	equivalent degrees of freedom for the fit.
       }
+      \item{OCV}{
+      the leave-one-out cross validation score for the model.
+      }
+      \item{gcv}{
+      the generalized cross validation score.
+      }
+
 
       If \code{class(y)} is either \code{fd} or \code{fdPar}, the
       \code{fRegress} object returned also includes 5 other components:
@@ -289,8 +308,7 @@ of the dependent variable object.  The right hand side of this
 	a covariance matrix
 
       }
-      \item{c2bMap}{
-	a map
+      \item{c2bMap}{	a map
       }
     }
   }
@@ -303,7 +321,6 @@ of the dependent variable object.  The right hand side of this
     this list is then used to call the appropriate other
     \code{fRegress} function.
 
-
     Alternatively, to see how the \code{formula} is translated, use
     the alternative 'model' value for the argument \code{method}.  In
     that case, the function returns a list with the arguments
@@ -313,7 +330,7 @@ of the dependent variable object.  The right hand side of this
     \itemize{
       \item{xfdlist0}{
 	a list of the objects named on the right hand side of
-	\code{formula}.  The will differ from from \code{xfdlist} for
+	\code{formula}.  This will differ from \code{xfdlist} for
 	any categorical or multivariate right hand side object.
 
       }
@@ -343,7 +360,7 @@ of the dependent variable object.  The right hand side of this
   J. O. Ramsay, Giles Hooker, and Spencer Graves
 }
 \references{
-  Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
+  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional
     Data Analysis, 2nd ed.}, Springer, New York.
 }
 \seealso{
@@ -508,7 +525,8 @@ all.equal(TempRgn, TempRgn.f)
 
 ###
 ###
-### functional response with (concurrent) functional explanatory variable
+### functional response with
+###            (concurrent) functional explanatory variable
 ###
 ###
 

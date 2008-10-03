@@ -20,10 +20,10 @@ fdPar(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
 \arguments{
   \item{fdobj}{
     a functional data object, functional basis object, a functional
-    parameter object or a matrix.  If class(fdobj) == 'basisfd', it is
-    converted to an object of class \code{fd} with the identity matrix
-    as the coefficient matrix.  If it a matrix, it is replaced by
-    fd(fdobj).
+    parameter object or a matrix.  If it a matrix, it is replaced by
+    fd(fdobj).  If class(fdobj) == 'basisfd', it is converted to an
+    object of class \code{fd} with a coefficient matrix consisting of a
+    single column of zeros.
   }
   \item{Lfdobj}{
     either a nonnegative integer or a linear differential operator

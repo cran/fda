@@ -2,6 +2,7 @@
 \alias{dateAccessories}
 \alias{monthAccessories}
 \alias{dayOfYear}
+\alias{dayOfYearShifted}
 \alias{day.5}
 \alias{daysPerMonth}
 \alias{monthEnd}
@@ -21,7 +22,11 @@
 
   \itemize{
     \item{dayOfYear}{
-      a numeric vector = 1:365
+      a numeric vector = 1:365 with names 'jan01' to 'dec31'.
+    }
+    \item{dayOfYearShifted}{
+      a numeric vector = c(182:365, 1:181) with names 'jul01' to
+      'jun30'.
     }
     \item{day.5 }{
       a numeric vector = dayOfYear-0.5 = 0.5, 1.5, ..., 364.5

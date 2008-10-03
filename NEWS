@@ -1,7 +1,18 @@
-Software and datasets to support 'Functional Data Analysis',
-second edition (2006) and 'Applied Functional Data Analysis'
-(2002), both by James O. Ramsay and Bernard W. Silverman
-(Springer).
+Software and datasets to support three books:
+
+James O. Ramsay and Bernard W. Silverman (2006),
+      'Functional Data Analysis', 2nd ed. (Springer)
+_______ (2002) 'Applied Functional Data Analysis' (Springer)
+James O. Ramsay, Giles Hooker, and Spencer Graves (2009)
+      'Functional Data Analysis with R and Matlab' (Springer)
+
+Release 2.1.1 added partial script files for
+      Ramsay, Hooker and Graves, and fixed some bugs.
+
+Release 2.1.0 made 'fRegress' much easier to use by adding
+a formula interface to handle the laborious setup.  To do
+this and maintain backward compatibility, 'fRegress' is now
+a generic function with a 'formula' and other methods.
 
 Release 2.0.5 introduced 'predict', 'fitted', and 'residual'
 methods as wrappers for various 'eval.*' functions where

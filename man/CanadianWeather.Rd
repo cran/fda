@@ -120,7 +120,9 @@ daily
 
 }
 \seealso{
-  \code{\link{monthAccessories}}}
+  \code{\link{monthAccessories}}
+  \code{\link{MontrealTemp}}
+}
 \examples{
 ##
 ## 1.  Plot (latitude & longitude) of stations by region
