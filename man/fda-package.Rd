@@ -5,7 +5,7 @@
 \title{Functional Data Analysis in R}
 \description{
   Functions and data sets companion to Ramsay, J. O., and Silverman,
-  B. W. (2005) Functional Data Analysis, 2nd ed. and (2002) Applied
+  B. W. (2006) Functional Data Analysis, 2nd ed. and (2002) Applied
   Functional Data Analysis (Springer).  This includes finite bases
   approximations (such as splines and Fourier series) to functions fit
   to data smoothing on the integral of the squared deviations from an
@@ -15,8 +15,8 @@
   \tabular{ll}{
     Package: \tab fda\cr
     Type: \tab Package\cr
-    Version: \tab 2.0.5\cr
-    Date: \tab 2008-05-05\cr
+    Version: \tab 2.1.0\cr
+    Date: \tab 2008-11-28\cr
     License: \tab GPL-2\cr
     LazyLoad: \tab yes\cr
   }
@@ -27,7 +27,7 @@
   Maintainer:  J. O. Ramsay <ramsay@psych.mcgill.ca>
 }
 \references{
-  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional
+  Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
     Data Analysis, 2nd ed.}, Springer, New York.
 
   Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied

@@ -71,7 +71,7 @@ tperm.fd <- function(x1fd,x2fd,nperm=200,q=0.05,argvals=NULL,plotres=TRUE,...) #
         ylims = c( min(Tvals,qvals.pts),max(Tobs,qval))
 
         plot(argvals,Tvals,type='l',col=2,ylim=ylims,lwd=2,
-		xlab=xlab,ylab='t-statistic',main='Permutation t-Test',...)
+		xlab=xlab,ylab='t-statistic',...)
         lines(argvals,qvals.pts,lty=3,col=4,lwd=2)
         abline(h=qval,lty=2,col=4,lwd=2)
 	

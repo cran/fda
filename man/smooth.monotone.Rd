@@ -155,7 +155,7 @@ smooth.monotone(argvals, y, WfdParobj, wtvec=rep(1,n),
   }
 }
 \references{
-  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional
+  Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
     Data Analysis, 2nd ed.}, Springer, New York.
 
   Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied

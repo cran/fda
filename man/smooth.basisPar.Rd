@@ -55,8 +55,24 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
   }
   \item{Lfdobj}{
     either a nonnegative integer or a linear differential operator
-    object.  If NULL and fdobj[['type']] == 'bspline', Lfdobj =
-    int2Lfd(max(0, norder-2)), where norder = order of fdobj.
+    object.
+
+    If \code{NULL}, Lfdobj depends on fdobj[['basis']][['type']]:
+
+    \itemize{
+      \item{bspline}{
+	Lfdobj <- int2Lfd(max(0, norder-2)), where norder =
+	norder(fdobj).
+      }
+      \item{fourier}{
+	Lfdobj = a harmonic acceleration operator:
+
+	\code{Lfdobj <- vec2Lfd(c(0,(2*pi/diff(rng))^2,0), rng)}
+
+	where rng = fdobj[['basis']][['rangeval']].
+      }
+      \item{anything else}{Lfdobj <- int2Lfd(0)}
+    }
   }
   \item{lambda}{
     a nonnegative real number specifying the amount of smoothing
@@ -144,7 +160,7 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
   \item{argvals, y}{input arguments}
 }
 \references{
-  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional
+  Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
     Data Analysis, 2nd ed.}, Springer, New York.
 
   Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
@@ -175,16 +191,14 @@ plot(deriv(girlGrowthSm$fd), xlab="age", ylab="growth rate (cm / year)",
 plot(deriv(girlGrowthSm$fd, 2), xlab="age",
         ylab="growth acceleration (cm / year^2)",
         main="Girls in Berkeley Growth Study" )
-#  Shows the effects of smoothing
-#  where the size of the third derivative is penalized.
-#  The null space contains quadratic functions.
+#  Undersmoothed with lambda = 0
 
 ##
 ## Another simple call
 ##
 lipSm <- smooth.basisPar(liptime, lip)
 plot(lipSm)
-# oversmoothing
+#  Undersmoothed with lambda = 0
 plot(smooth.basisPar(liptime, lip, lambda=1e-9))
 # more sensible
 
@@ -249,6 +263,15 @@ girlGrow12 <- with(growth, smooth.basisPar(argvals=age, y=hgtf[, 1:2],
               fdnames=c('age', 'girl', 'height')) )
 girlGrow12. <- with(growth, smooth.basisPar(argvals=age, y=hgtf[, 1:2],
     fdnames=list(age=age, girl=c('Carol', 'Sally'), value='height')) )
+
+##
+## Fourier basis with harmonic acceleration operator
+##
+daybasis65 <- create.fourier.basis(rangeval=c(0, 365), nbasis=65)
+daytemp.fdSmooth <- with(CanadianWeather, smooth.basisPar(day.5,
+       dailyAv[,,"Temperature.C"],
+       daybasis65, fdnames=list("Day", "Station", "Deg C")) )
+
 
 }
 % docclass is function

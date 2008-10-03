@@ -20,79 +20,92 @@ daily
   before the other format became available and for compatability with
   the Matlab 'fda' code.
 
-  \item{CanadianWeather}{
-    A list with the following components:
+  \itemize{
+    \item{CanadianWeather}{
+      A list with the following components:
 
-    \itemize{
-      \item{dailyAv}{
-	a three dimensional array c(365, 35, 3) summarizing data
-	collected at 35 different weather stations in Canada on the
-	following:
+      \itemize{
+	\item{dailyAv}{
+	  a three dimensional array c(365, 35, 3) summarizing data
+	  collected at 35 different weather stations in Canada on the
+	  following:
 
-	[,,1] = [,, 'Temperature.C']:  average daily temperature for
-	each day of the year
+	  [,,1] = [,, 'Temperature.C']:  average daily temperature for
+	  each day of the year
 
-	[,,2] = [,, 'Precipitation.mm']:  average daily rainfall for
-	each day of the year rounded to 0.1 mm.
+	  [,,2] = [,, 'Precipitation.mm']:  average daily rainfall for
+	  each day of the year rounded to 0.1 mm.
 
-	[,,3] = [,, 'log10precip']:  base 10 logarithm of
-	Precipitation.mm after first replacing 27 zeros by 0.05 mm
-	(Ramsay and Silverman 2006, p. 248).
-      }
-      \item{place}{
-	Names of the 35 different weather stations in Canada whose data
-	are summarized in 'dailyAv'.  These names vary between 6 and 11
-	characters in length.  By contrast, daily[["place"]] which are
-	all 11 characters, with names having fewer characters being
-	extended with trailing blanks.
-      }
-      \item{province}{
-	names of the Canadian province containing each place
-      }
-      \item{coordinates}{
-	a numeric matrix giving 'N.latitude' and 'W.longitude' for each
-	place.
-      }
-      \item{region}{
-	Which of 4 climate zones contain each place:  Atlantic, Pacific,
-	Continental, Arctic.
-      }
-      \item{monthlyTemp}{
-	A matrix of dimensions (12, 35) giving the average temperature
-	in degrees celcius for each month of the year.
-      }
-      \item{monthlyPrecip}{
-	A matrix of dimensions (12, 35) giving the average daily
-	precipitation in milimeters for each month of the year.
-      }
-      \item{geogindex}{
-	Order the weather stations from East to West to North
+	  [,,3] = [,, 'log10precip']:  base 10 logarithm of
+	  Precipitation.mm after first replacing 27 zeros by 0.05 mm
+	  (Ramsay and Silverman 2006, p. 248).
+
+	}
+	\item{place}{
+	  Names of the 35 different weather stations in Canada whose data
+	  are summarized in 'dailyAv'.  These names vary between 6 and 11
+	  characters in length.  By contrast, daily[["place"]] which are
+	  all 11 characters, with names having fewer characters being
+	  extended with trailing blanks.
+
+	}
+	\item{province}{
+	  names of the Canadian province containing each place
+
+	}
+	\item{coordinates}{
+	  a numeric matrix giving 'N.latitude' and 'W.longitude' for each
+	  place.
+
+	}
+	\item{region}{
+	  Which of 4 climate zones contain each place:  Atlantic, Pacific,
+	  Continental, Arctic.
+
+	}
+	\item{monthlyTemp}{
+	  A matrix of dimensions (12, 35) giving the average temperature
+	  in degrees celcius for each month of the year.
+
+	}
+	\item{monthlyPrecip}{
+	  A matrix of dimensions (12, 35) giving the average daily
+	  precipitation in milimeters for each month of the year.
+
+	}
+	\item{geogindex}{
+	  Order the weather stations from East to West to North
+
+	}
       }
     }
-  }
 
-  \item{daily}{
-    A list with the following components:
+    \item{daily}{
+      A list with the following components:
 
-    \itemize{
-      \item{place}{
-	Names of the 35 different weather stations in Canada whose data
-	are summarized in 'dailyAv'.  These names are all 11 characters,
-	with shorter names being extended with trailing blanks.  This is
-	different from CanadianWeather[["place"]], where trailing blanks
-	have been dropped.
-      }
-      \item{tempav}{
-	a matrix of dimensions (365, 35) giving the average temperature
-	in degrees celcius for each day of the year.  This is
-	essentially the same as CanadianWeather[["dailyAv"]][,,
-	"Temperature.C"].
-      }
-      \item{precipav}{
-	a matrix of dimensions (365, 35) giving the average temperature
-	in degrees celcius for each day of the year.  This is
-	essentially the same as CanadianWeather[["dailyAv"]][,,
-	"Precipitation.mm"].
+      \itemize{
+	\item{place}{
+	  Names of the 35 different weather stations in Canada whose
+	  data are summarized in 'dailyAv'.  These names are all 11
+	  characters, with shorter names being extended with trailing
+	  blanks.  This is different from CanadianWeather[["place"]],
+	  where trailing blanks have been dropped.
+
+	}
+	\item{tempav}{
+	  a matrix of dimensions (365, 35) giving the average
+	  temperature in degrees celcius for each day of the year.  This
+	  is essentially the same as CanadianWeather[["dailyAv"]][,,
+	  "Temperature.C"].
+
+	}
+	\item{precipav}{
+	  a matrix of dimensions (365, 35) giving the average
+	  temperature in degrees celcius for each day of the year.  This
+	  is essentially the same as CanadianWeather[["dailyAv"]][,,
+	  "Precipitation.mm"].
+
+	}
       }
     }
   }
@@ -113,23 +126,18 @@ daily
 ## 1.  Plot (latitude & longitude) of stations by region
 ##
 with(CanadianWeather, plot(-coordinates[, 2], coordinates[, 1], type='n',
-                           xlab="West Latitude", ylab="North Longitude",
+                           xlab="West Longitude", ylab="North Latitude",
                            axes=FALSE) )
-Wlat <- pretty(CanadianWeather$coordinates[, 2])
-axis(1, -Wlat, Wlat)
+Wlon <- pretty(CanadianWeather$coordinates[, 2])
+axis(1, -Wlon, Wlon)
 axis(2)
 
-arctic <- with(CanadianWeather, coordinates[region=='Arctic', ])
-atl <- with(CanadianWeather, coordinates[region=='Atlantic', ])
-contl <- with(CanadianWeather, coordinates[region=='Continental', ])
-pac <- with(CanadianWeather, coordinates[region=='Pacific', ])
-points(-arctic[, 2], arctic[, 1], col=1, pch=1)
-points(-atl[, 2], atl[, 1], col=2, pch=2)
-points(-contl[, 2], contl[, 1], col=3, pch=3)
-points(-pac[, 2], pac[, 1], col=4, pch=4)
-
-legend('topright', legend=c('Arctic', 'Atlantic', 'Pacific', 'Continental'),
-       col=1:4, pch=1:4)
+rgns <- 1:4
+names(rgns) <- c('Arctic', 'Atlantic', 'Continental', 'Pacific')
+Rgns <- rgns[CanadianWeather$region]
+with(CanadianWeather, points(-coordinates[, 2], coordinates[, 1],
+                             col=Rgns, pch=Rgns) )
+legend('topright', legend=names(rgns), col=rgns, pch=rgns)
 
 ##
 ## 2.  Plot dailyAv[, 'Temperature.C'] for 4 stations

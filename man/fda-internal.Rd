@@ -37,7 +37,6 @@
 \alias{monhess}
 \alias{normalize.phi}
 \alias{pendiagfn}
-\alias{plot.Lfd}
 \alias{plot.cca.fd}
 \alias{polintarray}
 \alias{polintmat}
@@ -68,7 +67,6 @@
 \alias{PENSSEhess}
 \alias{argcheck}
 \alias{fdParcheck}
-\alias{wtcheck}
 \alias{ycheck}
 
 % docclass is function

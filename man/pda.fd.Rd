@@ -4,140 +4,152 @@
   Principal Differential Analysis
 }
 \description{
-Principal differential analysis (PDA) estimates a
-system of \eqn{n} linear differential equations that define functions
-that fit the data and their derivatives.  There is an equation in the
-system for each variable.  
+  Principal differential analysis (PDA) estimates a system of \eqn{n}
+  linear differential equations that define functions that fit the data
+  and their derivatives.  There is an equation in the system for each
+  variable.
 
-Each equation has on its right side the highest order derivative that is used, 
-and the order of this derivative, \eqn{m_j, j=1,...,n} can vary over equations.    
+  Each equation has on its right side the highest order derivative that
+  is used, and the order of this derivative, \eqn{m_j, j=1,...,n} can
+  vary over equations.
 
-On the left side of equation equation is a linear combination of all the 
-variables and all the derivatives of these variables up to order one less than 
-the order \eqn{m_j} of the highest derivative.
+  On the left side of equation equation is a linear combination of all
+  the  variables and all the derivatives of these variables up to order
+  one less than the order \eqn{m_j} of the highest derivative.
 
-In addition, the right side may contain linear combinations of forcing
-functions as well, with the number of forcing functions varying over 
-equations.
+  In addition, the right side may contain linear combinations of forcing
+  functions as well, with the number of forcing functions varying over
+  equations.
 
-The linear combinations are defined by weighting functions multiplying each
-variable, derivative, and forcing function in the equation.  These weighting
-functions may be constant or vary over time.  They are each represented by a
-functional parameter object, specifying a basis for an expansion of a
-coefficient, a linear differential operator for smoothing purposes, a 
-smoothing parameter value, and a logical variable indicating whether the
-function is to be estimated, or kept fixed.
+  The linear combinations are defined by weighting functions multiplying
+  each variable, derivative, and forcing function in the equation.
+  These weighting functions may be constant or vary over time.  They are
+  each represented by a functional parameter object, specifying a basis
+  for an expansion of a coefficient, a linear differential operator for
+  smoothing purposes, a smoothing parameter value, and a logical
+  variable indicating whether the function is to be estimated, or kept
+  fixed.
 }
 \usage{
 pda.fd(xfdlist, bwtlist=NULL,
        awtlist=NULL, ufdlist=NULL, nfine=501)
 }
 \arguments{
-\item{xfdlist}{
-a list whose members are functional data objects representing each
-variable in the system of differential equations.  Each of these objects
-contain one or more curves to be represented by the corresponding differential 
-equation.  The length of the list is equal to the number of 
-differential equations. The number \eqn{N} of replications must be
-the same for each member functional data object.
-}
-\item{bwtlist}{
-this argument contains the weight coefficients that multiply, in the right
-side of each equation, all the variables in the system, and all their 
-derivatives, where the derivatives are used up to one less than the order
-of the variable.   This argument has, in general, a three-level structure,
-defined by a three-level hierarchy of list objects.  
+  \item{xfdlist}{
+    a list whose members are functional data objects representing each
+    variable in the system of differential equations.  Each of these
+    objects contain one or more curves to be represented by the
+    corresponding differential equation.  The length of the list is
+    equal to the number of differential equations. The number \eqn{N} of
+    replications must be the same for each member functional data
+    object.
+  }
+  \item{bwtlist}{
+    this argument contains the weight coefficients that multiply, in the
+    right side of each equation, all the variables in the system, and
+    all their derivatives, where the derivatives are used up to one less
+    than the order of the variable.   This argument has, in general, a
+    three-level structure, defined by a three-level hierarchy of list
+    objects.
 
-At the top level, the argument is a single list of length equal to the number of 
-variables. Each component of this list is itself a list 
+    At the top level, the argument is a single list of length equal to
+    the number of variables. Each component of this list is itself a
+    list
 
-At the second level, each component of the top level list is itself a list, also 
-of length equal to the number of variables.  
+    At the second level, each component of the top level list is itself
+    a list, also of length equal to the number of variables.
 
-At the third and bottom level, each component of a second level list is a list 
-of length equal to the number of orders of derivatives appearing on the right       
-side of the equation, including  the variable itself, a derivative of order 0. 
-If m indicates the order of the equation, that is the order of the derivative
-on the left side, then this list is length m.  
+    At the third and bottom level, each component of a second level list
+    is a list of length equal to the number of orders of derivatives
+    appearing on the right side of the equation, including  the variable
+    itself, a derivative of order 0.  If m indicates the order of the
+    equation, that is the order of the derivative on the left side, then
+    this list is length m.
 
-The components in the third level lists are functional parameter objects
-defining estimates for weight functions.  For a first order equation,
-for example, \eqn{m = 1} and the single component in each list contains a weight 
-function for the variable.  Since each equation has a term involving each
-variable in the system, a system of first order equations will have \eqn{n^2}
-at the third level of this structure.
+    The components in the third level lists are functional parameter
+    objects defining estimates for weight functions.  For a first order
+    equation, for example, \eqn{m = 1} and the single component in each
+    list contains a weight function for the variable.  Since each
+    equation has a term involving each variable in the system, a system
+    of first order equations will have \eqn{n^2} at the third level of
+    this structure.
 
-There MUST be a component for each weight function, even if the corresponding  
-term does not appear in the equation.  In the case of a missing term, the 
-corresponding component can be \code{NULL}, and it will be treated as a 
-coefficient fixed at 0.  
+    There MUST be a component for each weight function, even if the
+    corresponding term does not appear in the equation.  In the case of
+    a missing term, the corresponding component can be \code{NULL}, and
+    it will be treated as a coefficient fixed at 0.
 
-However, in the case of a single differential equation, \code{bwtlist} can be
-given a simpler structure, since in this case only \eqn{m} coefficients are
-required.  Therefore, for a single equation, \code{bwtlist} can be a list
-of length \eqn{m} with each component containing a functional parameter 
-object for the corresponding derivative. 
-}
-                                                      
-\item{awtlist}{
-a two-level list containing weight functions for forcing functions.
+    However, in the case of a single differential equation,
+    \code{bwtlist} can be given a simpler structure, since in this case
+    only \eqn{m} coefficients are required.  Therefore, for a single
+    equation, \code{bwtlist} can be a list of length \eqn{m} with each
+    component containing a functional parameter object for the
+    corresponding derivative.
+  }
 
-In addition to terms in each of the equations involving terms corresponding
-to each derivative of each variable in the system, each equation can
-also have a contribution from one or more exogenous variables, often
-called \emph{forcing functions.}
+  \item{awtlist}{
+    a two-level list containing weight functions for forcing functions.
 
-This argument defines the weights multiplying these
-forcing functions, and is a list of length \eqn{n}, the number of variables.
-Each component of this is is in turn a list, each component of which contains
-a functional parameter object defining a weight function for a forcing function.
-If there are no forcing functions for an equation, this list can be \code{NULL}.
-If none of the equations involve forcing functions, \code{awtlist} can be
-\code{NULL}, which is its default value if it is not in the argument list.
-}
+    In addition to terms in each of the equations involving terms
+    corresponding to each derivative of each variable in the system,
+    each equation can also have a contribution from one or more
+    exogenous variables, often called \emph{forcing functions.}
 
-\item{ufdlist}{
-a two-level list containing forcing functions.  This list structure is 
-identical to that for \code{awtlist}, the only difference being that the
-components in the second level contain functional data objects for the 
-forcing functions, rather than functional parameter objects.
-}
+    This argument defines the weights multiplying these forcing
+    functions, and is a list of length \eqn{n}, the number of
+    variables.  Each component of this is is in turn a list, each
+    component of which contains a functional parameter object defining a
+    weight function for a forcing function.  If there are no forcing
+    functions for an equation, this list can be \code{NULL}.  If none of
+    the equations involve forcing functions, \code{awtlist} can be
+    \code{NULL}, which is its default value if it is not in the argument
+    list.
+  }
 
-\item{nfine}{
-a number of values for a fine mesh.
-The estimation of the differential equation involves discrete
-numerical quadrature estimates of integrals, and these require
-that functions be evaluated at a fine mesh of values of the
-argument.  This argument defines the number to use.  The default value of 501
-is reset to five times the largest number of basis functions used to represent 
-any variable in the system, if this number is larger.
-}
+  \item{ufdlist}{
+    a two-level list containing forcing functions.  This list structure
+    is identical to that for \code{awtlist}, the only difference being
+    that the components in the second level contain functional data
+    objects for the forcing functions, rather than functional parameter
+    objects.
+  }
+
+  \item{nfine}{
+    a number of values for a fine mesh.  The estimation of the
+    differential equation involves discrete numerical quadrature
+    estimates of integrals, and these require that functions be
+    evaluated at a fine mesh of values of the argument.  This argument
+    defines the number to use.  The default value of 501 is reset to
+    five times the largest number of basis functions used to represent
+    any variable in the system, if this number is larger.
+  }
 }
 
 \value{
-a named list of length 3 with components:
+  an object of class \code{pda.fd}, being a list with the following
+  components:
 
-\item{bwtlist}{
-a list array of the same dimensions as the
-corresponding argument, containing the estimated or fixed weight
-functions defining the system of linear differential equations.
-}
-\item{resfdlist}{
-a list of length equal to the number of variables
-or equations.  Each members is a functional data object giving the
-residual functions or forcing functions defined as the left side
-of the equation (the derivative of order m of a variable) minus
-the linear fit on the right side.  The number of replicates for each
-residual functional data object is the same as that for the variables.
-}
-\item{awtlist}{
-a list of the same dimensions as the corresponding
-argument.  Each member is an estimated or fixed weighting function for
-a forcing function.
-}
+  \item{bwtlist}{
+    a list array of the same dimensions as the corresponding argument,
+    containing the estimated or fixed weight functions defining the
+    system of linear differential equations.
+  }
+  \item{resfdlist}{
+    a list of length equal to the number of variables or equations.
+    Each members is a functional data object giving the residual
+    functions or forcing functions defined as the left side of the
+    equation (the derivative of order m of a variable) minus the linear
+    fit on the right side.  The number of replicates for each residual
+    functional data object is the same as that for the variables.
+  }
+  \item{awtlist}{
+    a list of the same dimensions as the corresponding argument.  Each
+    member is an estimated or fixed weighting function for a forcing
+    function.
+  }
 }
 \seealso{
-\code{\link{pca.fd}}, 
+\code{\link{pca.fd}},
 \code{\link{cca.fd}}
 }
 \examples{
@@ -227,7 +239,7 @@ plot(reslist[[1]])
 title("Residual function")
 ##
 ##  Example 4:  two first order constant coefficient unforced equations
-##     Dx1(t) = x2(t) and Dx2(t) = -x1(t)  
+##     Dx1(t) = x2(t) and Dx2(t) = -x1(t)
 ##   equivalent to  x1(t) = sin(2*pi*t)
 ##
 xvec1     = sin(2*pi*tvec)

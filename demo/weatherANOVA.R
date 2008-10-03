@@ -97,6 +97,11 @@ for (j in 1:p) betalist[[j]] <- betafdPar
 
 fRegressList <- fRegress(daytempfd, xfdlist, betalist)
 
+# try to get a cross-validated score
+
+res.cv = fRegress.CV(daytempfd,xfdlist,betalist,whichobs=1:35)
+
+
 #  plot regression functions
 
 betaestlist <- fRegressList$betaestlist
@@ -171,7 +176,7 @@ smoothList <- smooth.basis(daytime, tempresmat, fdParobj)
 
 tempresfdobj <- smoothList$fd
 
-%  plot temperature residuals
+#  plot temperature residuals
 
 par(mfrow=c(1,1))
 plot(tempresfdobj, ask=F)

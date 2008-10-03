@@ -10,19 +10,19 @@
   multivariate data, or one by one with a mouse click to move from one
   plot to another.  The function also accepts the other plot
   specification arguments that the regular \code{plot} does.  Calling
-  \code{plot} with an \code{fdSmooth} object is simply plots its
-  code{fd} component.
+  \code{plot} with an \code{fdSmooth} object plots its \code{fd}
+  component.
 }
 \usage{
 \method{plot}{fd}(x, y, Lfdobj=0, href=TRUE, titles=NULL,
                     xlim=NULL, ylim=NULL, xlab=NULL,
-                    ylab=NULL, ask=FALSE, nx=NULL, ...)
+                    ylab=NULL, ask=FALSE, nx=NULL, axes=NULL, ...)
 %\method{plot}{fdPar}(x, y, Lfdobj=0, href=TRUE, titles=NULL,
 %                    xlim=NULL, ylim=NULL, xlab=NULL,
 %                    ylab=NULL, ask=FALSE, nx=NULL, ...)
 \method{plot}{fdSmooth}(x, y, Lfdobj=0, href=TRUE, titles=NULL,
                     xlim=NULL, ylim=NULL, xlab=NULL,
-                    ylab=NULL, ask=FALSE, nx=NULL, ...)
+                    ylab=NULL, ask=FALSE, nx=NULL, axes=NULL, ...)
 %plot.fd(x, y, Lfdobj=0, href=TRUE, titles=NULL, xlim=rangex, ylim=rangey,
 %        xlab=xlabel, ylab=ylabel, ask=FALSE, nx=201, ...)
 }
@@ -71,6 +71,21 @@
     usually enough, but for a highly variable function more may be
     required.
   }
+  \item{axes}{
+    Either a logical or a list or \code{NULL}.
+
+    \itemize{
+      \item{logical}{
+	whether axes should be drawn on the plot
+      }
+      \item{list}{
+	a list used to create custom \code{axes} used to create axes via
+	\code{do.call(x$axes[[1]], x$axes[-1])}.  The primary example of
+	this uses \code{list("axesIntervals", ...)}, e.g., with
+	\code{Fourier} bases to create \code{CanadianWeather} plots
+      }
+    }
+  }
   \item{\dots }{
     additional plotting arguments that can be used with function
     \code{plot}
@@ -97,13 +112,14 @@
 ##
 ## plot.fd
 ##
-#daytime   <- (1:365)-0.5
-#dayrange  <- c(0,365)
-#dayperiod <- 365
-#nbasis     <- 65
-#dayrange  <- c(0,365)
+%#daytime   <- (1:365)-0.5
+%#dayrange  <- c(0,365)
+%#dayperiod <- 365
+%#nbasis     <- 65
+%#dayrange  <- c(0,365)
 
-daybasis65 <- create.fourier.basis(c(0, 365), 65)
+daybasis65 <- create.fourier.basis(c(0, 365), 65,
+                    axes=list("axesIntervals"))
 harmaccelLfd <- vec2Lfd(c(0,(2*pi/365)^2,0), c(0, 365))
 
 harmfdPar     <- fdPar(daybasis65, harmaccelLfd, lambda=1e5)

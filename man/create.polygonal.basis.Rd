@@ -9,7 +9,8 @@
 }
 \usage{
 create.polygonal.basis(rangeval=NULL, argvals=NULL, dropind=NULL,
-        quadvals=NULL, values=NULL, basisvalues=NULL, names='polygon')
+        quadvals=NULL, values=NULL, basisvalues=NULL, names='polygon',
+        axes=NULL)
 }
 \arguments{
   \item{rangeval}{
@@ -84,6 +85,16 @@ create.polygonal.basis(rangeval=NULL, argvals=NULL, dropind=NULL,
     appended as \code{paste(names, 1:nbasis, sep=''}.  For example, if
     \code{nbasis = 4}, this defaults to \code{c('polygon1', 'polygon2',
       'polygon3', 'polygon4')}.
+  }
+  \item{axes}{
+    an optional list used by selected \code{plot} functions to create
+    custom \code{axes}.  If this \code{axes} argument is not
+    \code{NULL}, functions \code{plot.basisfd}, \code{plot.fd},
+    \code{plot.fdSmooth} \code{plotfit.fd}, \code{plotfit.fdSmooth}, and
+    \code{plot.Lfd} will create axes via \code{do.call(x$axes[[1]],
+      x$axes[-1])}.  The primary example of this uses
+    \code{list("axesIntervals", ...)}, e.g., with \code{Fourier} bases
+    to create \code{CanadianWeather} plots
   }
 }
 \value{

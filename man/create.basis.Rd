@@ -31,7 +31,7 @@
   \code{create.basis} functions:
 
   \itemize{
-    \item{rangevals}{
+    \item{rangeval}{
       a vector of length 2 giving the lower and upper limits of the
       range of permissible values for the function argument.
 
@@ -70,7 +70,7 @@
       For \code{polynomial} bases, \code{nbasis} defaults to 2.
     }
 
-    In addition to \code{rangevals} and \code{nbasis}, all but
+    In addition to \code{rangeval} and \code{nbasis}, all but
     \code{constant} bases have one or two parameters unique to that
     basis type or shared with one other:
 
@@ -82,15 +82,15 @@
 
 	Argument \code{breaks} = the locations of the break or join
 	points;  also called \code{knots}.  This defaults to
-	seq(rangevals[1], rangevals[2], nbasis-norder+2).
+	seq(rangeval[1], rangeval[2], nbasis-norder+2).
       }
       \item{polygonal}{
 	Argument \code{argvals} = the locations of the break or join
 	points;  also called \code{knots}.  This defaults to
-	seq(rangevals[1], rangevals[2], nbasis).
+	seq(rangeval[1], rangeval[2], nbasis).
       }
       \item{fourier}{
-	Argument \code{period} defaults to diff(rangevals).
+	Argument \code{period} defaults to diff(rangeval).
       }
       \item{exponential}{
 	Argument \code{ratevec}.  In \code{fda_2.0.2}, this defaulted to
@@ -109,7 +109,7 @@
       }
     }
 
-    Beginning with \code{fda_2.0.3}, the last 5 arguments for all the
+    Beginning with \code{fda_2.1.0}, the last 6 arguments for all the
     \code{create.basis} functions will be as follows;  some but not all
     are available in the previous versions of \code{fda}:
 
@@ -176,10 +176,30 @@
 
 	For other bases, there are crudely similar defaults.
       }
+      \item{axes}{
+	an optional list used by selected \code{plot} functions to
+	create custom \code{axes}.  If this \code{axes} argument is not
+	NULL, functions \code{plot.basisfd}, \code{plot.fd},
+	\code{plot.fdSmooth} \code{plotfit.fd}, \code{plotfit.fdSmooth},
+	and \code{plot.Lfd} will create axes via
+	\code{do.call(x$axes[[1]], x$axes[-1])}.  The primary example of
+	this is to create \code{CanadianWeather} plots using
+	\code{list("axesIntervals")}
+      }
     }
   }
 }
 
+\author{
+  J. O. Ramsay and Spencer Graves
+}
+\references{
+  Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
+    Data Analysis, 2nd ed.}, Springer, New York.
+
+  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
+    Functional Data Analysis}, Springer, New York.
+}
 \seealso{
   \code{\link{create.bspline.basis}}
   \code{\link{create.constant.basis}}
@@ -189,16 +209,6 @@
   \code{\link{create.polygonal.basis}}
   \code{\link{create.polynomial.basis}}
   \code{\link{create.power.basis}}
-}
-\author{
-  J. O. Ramsay and Spencer Graves
-}
-\references{
-  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional
-    Data Analysis, 2nd ed.}, Springer, New York.
-
-  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
-    Functional Data Analysis}, Springer, New York.
 }
 %\examples{}
 \keyword{smooth}

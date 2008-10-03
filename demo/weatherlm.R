@@ -19,7 +19,7 @@ tempfdPar <- weatherfd$tempfdPar
 precfdPar <- weatherfd$precfdPar
 
 daytempfd <- tempfdPar$fd
-dayprecfd <- dayprecfdPar$fd
+dayprecfd <- precfdPar$fd
 
 harmaccelLfd <- tempfdPar$Lfd
 
@@ -286,7 +286,7 @@ for (ilam in 1:nlam) {
     betafdPar2   <- betalisti[[2]]
     betafdPar2$lambda <- lambda
     betalisti[[2]] <- betafdPar2
-    SSE.CV[ilam]   <- fRegress.CV(annualprec, xfdlist, betalisti)
+    SSE.CV[ilam]   <- fRegress.CV(annualprec, xfdlist, betalisti)$SSE.CV
     print(c(ilam, loglam[ilam], SSE.CV[ilam]))
 }
 

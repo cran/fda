@@ -1,6 +1,6 @@
 create.fourier.basis <- function (rangeval=c(0,1), nbasis=3,
          period=diff(rangeval), dropind=NULL, quadvals=NULL,
-         values=NULL, basisvalues=NULL, names=NULL)
+         values=NULL, basisvalues=NULL, names=NULL, axes=NULL)
 {
 
 #  This function creates a fourier functional data basis.
@@ -188,6 +188,6 @@ create.fourier.basis <- function (rangeval=c(0,1), nbasis=3,
 ##
 ## 7.  done
 ##
+  if(!is.null(axes))basisobj$axes <- axes
   basisobj
-
 }

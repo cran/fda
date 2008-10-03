@@ -7,16 +7,16 @@
 }
 \description{
   Plot either functional data observations 'x' with a fit 'fdobj' or
-  residuals from the fit. 
+  residuals from the fit.
 
   This function is useful for assessing how well a functional data
   object fits the actual discrete data.
 
   The default is to make one plot per functional observation with fit
-  if residual is FALSE and superimposed lines if residual==TRUE.  
+  if residual is FALSE and superimposed lines if residual==TRUE.
 
   With multiple plots, the system waits to confirm a desire to move to
-  the next page unless ask==FALSE. 
+  the next page unless ask==FALSE.
 }
 \usage{
 %\method{plotfit}{fd}(y, argvals, fdobj, rng = NULL, index = NULL,)
@@ -24,22 +24,22 @@ plotfit.fd(y, argvals, fdobj, rng = NULL, index = NULL,
       nfine = 101, residual = FALSE, sortwrd = FALSE, titles=NULL,
       ylim=NULL, ask=TRUE, type=c("p", "l")[1+residual],
       xlab=NULL, ylab=NULL, sub=NULL, col=1:9, lty=1:9, lwd=1,
-      cex.pch=1, ...)
+      cex.pch=1, axes=NULL, ...)
 %\method{plotfit}{fdSmooth}(y, argvals, fdSm, rng = NULL, index = NULL,)
 plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
       nfine = 101, residual = FALSE, sortwrd = FALSE, titles=NULL,
       ylim=NULL, ask=TRUE, type=c("p", "l")[1+residual],
       xlab=NULL, ylab=NULL, sub=NULL, col=1:9, lty=1:9, lwd=1,
-      cex.pch=1, ...) 
+      cex.pch=1, axes=NULL, ...)
 }
 \arguments{
   \item{y}{
     a vector, matrix or array containing the discrete observations used
-    to estimate the functional data object. 
+    to estimate the functional data object.
   }
   \item{argvals}{
     a vector containing the argument values corresponding to the first
-    dimension of \code{y}. 
+    dimension of \code{y}.
   }
   \item{fdobj}{
     a functional data object estimated from the data.
@@ -48,17 +48,17 @@ plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
   \item{rng}{
     a vector of length 2 specifying the limits for the horizontal axis.
     This must be a subset of fdobj[['basis']][['rangeval']], which is
-    the default. 
+    the default.
   }
   \item{index}{
     a set of indices of functions if only a subset of the observations
     are to be plotted.  Subsetting can also be achieved by subsetting
-    \code{y};  see \code{details}, below.  
+    \code{y};  see \code{details}, below.
   }
   \item{nfine}{
     the number of argument values used to define the plot of the
     functional data object.  This may need to be increased if the
-    functions have a great deal of fine detail. 
+    functions have a great deal of fine detail.
   }
   \item{residual}{
     a logical variable:  if \code{TRUE}, the residuals are plotted
@@ -67,13 +67,13 @@ plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
   \item{sortwrd}{
     a logical variable:  if \code{TRUE}, the observations (i.e., second
     dimension of \code{y}) are sorted for plotting by the size of the
-    sum of squared residuals. 
+    sum of squared residuals.
   }
   \item{titles}{
     a vector containing strings that are titles for each observation.
   }
   \item{ylim}{
-    a numeric vector of length 2 giving the y axis limits;  see 'par'.  
+    a numeric vector of length 2 giving the y axis limits;  see 'par'.
   }
   \item{ask}{
     If TRUE and if 'y' has more levels than the max length of col, lty,
@@ -82,46 +82,61 @@ plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
     %The number of lines / cases per plot is
     %controled by the maximum of the lengths of col, lty, lwd and cex.pch
     %(see below), except that if length(dim(x))>2, a separate plot is
-    %created for each level of the third dimension of x.  
+    %created for each level of the third dimension of x.
   }
   \item{type}{
     type of plot desired, as described with \code{\link{plot}}.  If
     residual == FALSE, 'type' controls the representation for 'x', which
     will typically be 'p' to plot points but not lines;  'fdobj' will
     always plot as a line.  If residual == TRUE, the default type ==
-    "l";  an alternative is "b" for both.  
+    "l";  an alternative is "b" for both.
   }
   \item{xlab}{x axis label. }
   \item{ylab}{
     Character vector of y axis labels.  If(residual), ylab defaults to
     'Residuals', else to varnames derived from names(fdnames[[3]] or
-    fdnames[[3]] or dimnames(y)[[3]]. 
+    fdnames[[3]] or dimnames(y)[[3]].
   }
   \item{sub}{
     subtitle under the x axis label.  Defaults to the RMS residual from
-    the smooth.  
+    the smooth.
   }
   \item{col, lty, lwd, cex.pch}{
     Numeric or character vectors specifying the color (col), line type
     (lty), line width (lwd) and size of plotted character symbols
-    (cex.pch) of the data representation on the plot. 
-    
+    (cex.pch) of the data representation on the plot.
+
     If ask==TRUE, the length of the longest of these determines the
     number of levels of the array 'x' in each plot before asking the
     user to acknowledge a desire to change to the next page.  Each of
     these is replicated to that length, so col[i] is used for x[,i] (if
     x is 2 dimensional), with line type and width controlled by lty[i]
-    and lwd[i], respectively.  
-    
+    and lwd[i], respectively.
+
     If ask==FALSE, these are all replicated to length = the number of
     plots to be superimposed.
-    
+
     For more information on alternative values for these paramters, see
-    'col', 'lty', 'lwd', or 'cex' with \code{\link{par}}.    
+    'col', 'lty', 'lwd', or 'cex' with \code{\link{par}}.
+  }
+  \item{axes}{
+    Either a logical or a list or \code{NULL}.
+
+    \itemize{
+      \item{logical}{
+	whether axes should be drawn on the plot
+      }
+      \item{list}{
+	a list used to create custom \code{axes} used to create axes via
+	\code{do.call(x$axes[[1]], x$axes[-1])}.  The primary example of
+	this uses \code{list("axesIntervals", ...)}, e.g., with
+	\code{Fourier} bases to create \code{CanadianWeather} plots
+      }
+    }
   }
   \item{\dots }{
     additional arguments such as axis labels that may be used with other
-    \code{plot} functions. 
+    \code{plot} functions.
   }
 }
 \details{
@@ -144,7 +159,7 @@ plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
   its second or third dimension, subsetting is acheived by taking the
   first few colums so the second or third dimensions match.  This is
   acheived using checkDims3(y, fdobj[['coef']], defaultNames =
-  fdobj[['fdnames']]]).    
+  fdobj[['fdnames']]]).
 }
 \value{
   A matrix of mean square deviations from predicted is returned
@@ -158,47 +173,42 @@ plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
   If x and fobj[["coefs"]] are vectors or 2-dimensional arrays, they are
   padded to three dimensions, and then MSE is computed as a matrix with
   the second dimension = 1;  if x and fobj[["coefs"]] are vectors, the
-  first dimension of the returned matrix will also be 1.  
+  first dimension of the returned matrix will also be 1.
 }
 \section{Side Effects}{
   a plot of the the data 'x' with the function or the deviations between
   observed and predicted, depending on whether residual is FALSE or
-  TRUE.  
+  TRUE.
 }
 
 \seealso{
-  \code{\link{plot}}, 
-  \code{\link{plot.fd}}, 
+  \code{\link{plot}},
+  \code{\link{plot.fd}},
   \code{\link{lines.fd}}
-  \code{\link{plot.fdSmooth}}, 
+  \code{\link{plot.fdSmooth}},
   \code{\link{lines.fdSmooth}}
   \code{\link{par}}
   \code{\link{data2fd}}
   \code{\link{smooth.fd}}
   \code{\link{smooth.basis}}
   \code{\link{smooth.basisPar}}
-  \code{\link{checkDims3}} 
+  \code{\link{checkDims3}}
 }
 \examples{
-daybasis65 <- create.fourier.basis(c(0, 365), 65)
+daybasis65 <- create.fourier.basis(c(0, 365), 65,
+                    axes=list("axesIntervals"))
 
 daytempfd <- with(CanadianWeather, data2fd(
-       dailyAv[,,"Temperature.C"], day.5, 
+       dailyAv[,,"Temperature.C"], day.5,
        daybasis65, argnames=list("Day", "Station", "Deg C")) )
- 
+
 with(CanadianWeather, plotfit.fd(dailyAv[, , "Temperature.C"],
-     argvals= day.5, daytempfd, index=1, titles=place, axes=FALSE) )
-# Default ylab = daytempfd[['fdnames']] 
+     argvals= day.5, daytempfd, index=1, titles=place) )
+# Default ylab = daytempfd[['fdnames']]
 
-with(CanadianWeather, plotfit.fd(dailyAv[, , "Temperature.C", drop=FALSE],
-     argvals= day.5, daytempfd, index=1, titles=place, axes=FALSE) )
+with(CanadianWeather, plotfit.fd(dailyAv[, , "Temperature.C",
+     drop=FALSE], argvals= day.5, daytempfd, index=1, titles=place) )
 # Better:  ylab = dimnames(y)[[3]]
-
-# Label the horizontal axis with the month names
-axis(1, monthBegin.5, labels=FALSE)
-axis(1, monthEnd.5, labels=FALSE)
-axis(1, monthMid, monthLetters, tick=FALSE)
-axis(2)
 
 \dontrun{
 # The following pauses to request page changes.
@@ -213,37 +223,29 @@ with(CanadianWeather, plotfit.fd(
 # If you want only the fitted functions, use plot(daytempfd)
 
 # To plot only a single fit vs. observations, use index
-# to request which one you want.  
+# to request which one you want.
 
 op <- par(mfrow=c(2,1), xpd=NA, bty="n")
 # xpd=NA:  clip lines to the device region,
 #       not the plot or figure region
-# bty="n":  Do not draw boxes around the plots.  
+# bty="n":  Do not draw boxes around the plots.
 ylim <- range(CanadianWeather$dailyAv[,,"Temperature.C"])
-# Force the two plots to have the same scale 
-with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5, 
-          daytempfd, index=2, titles=place, ylim=ylim, axes=FALSE) )
-axis(1, monthBegin.5, labels=FALSE)
-axis(1, monthEnd.5, labels=FALSE)
-axis(1, monthMid, monthLetters, tick=FALSE)
-axis(2)
+# Force the two plots to have the same scale
+with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5,
+          daytempfd, index=2, titles=place, ylim=ylim) )
 
-with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5, 
+with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5,
           daytempfd, index=35, titles=place, ylim=ylim) )
-axis(1, monthBegin.5, labels=FALSE)
-axis(1, monthEnd.5, labels=FALSE)
-axis(1, monthMid, monthLetters, tick=FALSE)
-axis(2)
 par(op)
 
 # plot residuals
-with(CanadianWeather, plotfit.fd(dailyAv[, , "Temperature.C"], 
+with(CanadianWeather, plotfit.fd(dailyAv[, , "Temperature.C"],
           day.5, daytempfd, residual=TRUE) )
-# Can't read this, so try with 2 lines per page with ask=TRUE, 
+# Can't read this, so try with 2 lines per page with ask=TRUE,
 # and limiting length(col), length(lty), etc. <=2
 \dontrun{
 with(CanadianWeather, plotfit.fd(
-          dailyAv[,,"Temperature.C"], day.5, 
+          dailyAv[,,"Temperature.C"], day.5,
           daytempfd, residual=TRUE, col=1:2, lty=1, ask=TRUE) )
 }
 

@@ -1,6 +1,6 @@
 create.polygonal.basis <- function(rangeval=NULL, argvals=NULL,
                       dropind=NULL, quadvals=NULL, values=NULL,
-                      basisvalues=NULL, names='polygon')
+                      basisvalues=NULL, names='polygon', axes=NULL)
 {
 #  This function creates a polygonal functional data basis.
 #  Arguments
@@ -132,9 +132,13 @@ create.polygonal.basis <- function(rangeval=NULL, argvals=NULL,
       if(length(names)>1)
         stop('length(names) = ', length(names), ';  must be either ',
              '1 or nbasis = ', nbasis)
-      basisobj$names <- paste(names, 1:nbasis, sep="")
+      basisobj$names <- basisobj$names <- paste(names, 1:nbasis, sep="")
     }
   }
+##
+## 5.  Done
+##
+  if(!is.null(axes))basisobj$axes <- axes
 
   basisobj
 }

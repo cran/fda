@@ -10,8 +10,7 @@
 \usage{
 create.exponential.basis(rangeval=c(0,1), nbasis=NULL, ratevec=NULL,
                          dropind=NULL, quadvals=NULL, values=NULL,
-                         basisvalues=NULL, names='exp')
-
+                         basisvalues=NULL, names='exp', axes=NULL)
 }
 \arguments{
   \item{rangeval}{
@@ -22,7 +21,6 @@ create.exponential.basis(rangeval=c(0,1), nbasis=NULL, ratevec=NULL,
     the number of basis functions.  Default = \code{if(is.null(ratevec))
       2 else length(ratevec)}.
   }
-
   \item{ratevec}{
     a vector of length \code{nbasis} of rate constants defining basis
     functions of the form \code{exp(rate*x)}.  Default = 0:(nbasis-1).
@@ -83,10 +81,19 @@ create.exponential.basis(rangeval=c(0,1), nbasis=NULL, ratevec=NULL,
     either a character vector of the same length as the number of basis
     functions or a simple stem used to construct such a vector.
 
-    For \code{monomial} bases, this defaults to paste('monomial',
-    1:nbreaks, sep='').
+    For \code{exponential} bases, this defaults to paste('exp',
+    0:(nbasis-1), sep='').
   }
-}
+  \item{axes}{
+    an optional list used by selected \code{plot} functions to create
+    custom \code{axes}.  If this \code{axes} argument is not
+    \code{NULL}, functions \code{plot.basisfd}, \code{plot.fd},
+    \code{plot.fdSmooth} \code{plotfit.fd}, \code{plotfit.fdSmooth}, and
+    \code{plot.Lfd} will create axes via \code{do.call(x$axes[[1]],
+      x$axes[-1])}.  The primary example of this uses
+    \code{list("axesIntervals", ...)}, e.g., with \code{Fourier} bases
+    to create \code{CanadianWeather} plots
+  }}
 \value{
   a basis object with the type \code{expon}.
 }

@@ -1,4 +1,5 @@
-create.constant.basis <- function(rangeval = c(0,1))
+create.constant.basis <- function(rangeval = c(0,1),
+                                  names="const", axes=NULL)
 {
 #  This function creates a constant basis
 #  Argument:
@@ -7,7 +8,8 @@ create.constant.basis <- function(rangeval = c(0,1))
 #  BASISOBJ  ... a functional data basis object of type "constant"
 #
 
-#  Last modified 6 January 2008
+#  last modified 2008.12.06 by Spencer Graves
+#  previously modified 6 January 2008
 
 #  check RANGEVAL
 
@@ -29,6 +31,8 @@ basisvalues <- vector("list",0)
 basisobj <- basisfd(type=type, rangeval=rangeval, nbasis=nbasis, params=params,
                     dropind=dropind, quadvals=quadvals, values=values,
                     basisvalues=basisvalues)
+basisobj$names <- names
+  if(!is.null(axes))basisobj$axes <- axes
 
 basisobj
 

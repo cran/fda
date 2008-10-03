@@ -16,9 +16,9 @@
 "+.fd"(e1, e2)
 "-.fd"(e1, e2)
 "*.fd"(e1, e2)
-plus.fd(e1, e2, basisobj=basisobj1*basisobj2)
-minus.fd(e1, e2, basisobj=basisobj1*basisobj2)
-times.fd(e1, e2, basisobj=basisobj1*basisobj2)
+plus.fd(e1, e2, basisobj=NULL)
+minus.fd(e1, e2, basisobj=NULL)
+times.fd(e1, e2, basisobj=NULL)
 }
 \arguments{
   \item{e1, e2}{
@@ -28,7 +28,8 @@ times.fd(e1, e2, basisobj=basisobj1*basisobj2)
     e2), respetively, only if e1 is of class 'fd'.
   }
   \item{basisobj}{
-    reference basis
+    reference basis;  defaults to e1[['basis']] * e2[['basis']];
+    ignored for \code{plus.fd} and \code{minus.fd}.
   }
 }
 
@@ -71,11 +72,11 @@ times.fd(e1, e2, basisobj=basisobj1*basisobj2)
 ##
 bspl4 <- create.bspline.basis(nbasis=4)
 parab4.5 <- fd(c(3, -1, -1, 3)/3, bspl4)
+
+coef2 <- matrix(c(6, -2, -2, 6)/3, 4)
+dimnames(coef2) <- list(NULL, 'reps 1')
 \dontshow{stopifnot(}
-all.equal(coef(parab4.5+parab4.5), matrix(c(6, -2, -2, 6)/3, 4))
-\dontshow{)}
-\dontshow{stopifnot(}
-all.equal(coef(parab4.5-parab4.5), matrix(rep(0, 4), 4))
+all.equal(coef(parab4.5+parab4.5), coef2)
 \dontshow{)}
 
 ##
@@ -92,12 +93,15 @@ plot(bspl5.2)
 para4.5.2 <- smooth.basis(x., 4*(x.-0.5)^2, fdParobj=bspl5.2)[['fd']]
 plot(para4.5.2)
 
-str(para4.5.3+para4.5.2)
+#str(para4.5.3+para4.5.2)
+
+coef2. <- matrix(0, 9, 1)
+dimnames(coef2.) <- list(NULL, 'rep1')
 \dontshow{stopifnot(}
-all.equal(coef(para4.5.3-para4.5.2), matrix(0, 9, 1))
+all.equal(coef(para4.5.3-para4.5.2), coef2.)
 \dontshow{)}
 
-str(para4.5.3*para4.5.2)
+#str(para4.5.3*para4.5.2)
 # interior knots of the sum
 # = union(interior knots of the summands);
 # ditto for difference and product.
@@ -106,8 +110,10 @@ plot(para4.5.3*para4.5.2)
 ##
 ## fd+numeric
 ##
+coef1 <- matrix(c(6, 2, 2, 6)/3, 4)
+dimnames(coef1) <- list(NULL, 'reps 1')
 \dontshow{stopifnot(}
-all.equal(coef(parab4.5+1), matrix(c(6, 2, 2, 6)/3, 4))
+all.equal(coef(parab4.5+1), coef1)
 \dontshow{)}
 
 \dontshow{stopifnot(}
@@ -117,10 +123,11 @@ all.equal(1+parab4.5, parab4.5+1)
 ##
 ## fd-numeric
 ##
+coefneg <- matrix(c(-3, 1, 1, -3)/3, 4)
+dimnames(coefneg) <- list(NULL, 'reps 1')
 \dontshow{stopifnot(}
-all.equal(coef(-parab4.5), matrix(c(-3, 1, 1, -3)/3, 4))
+all.equal(coef(-parab4.5), coefneg)
 \dontshow{)}
-
 
 plot(parab4.5-1)
 

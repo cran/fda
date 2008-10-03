@@ -13,7 +13,7 @@
 
 #  load the data
 
-load("weatherdata")
+#load("weatherdata")
 
 #  ------------------------  set up the data  -----------------------
 

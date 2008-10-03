@@ -40,22 +40,21 @@ TaylorSpline(object, ...)
 \value{
   a list with the following components:
 
-  \itemize{
-    \item{knots}{
-      a numeric vector of knots(object, interior=FALSE)
-    }
-    \item{midpoints}{
-      midpoints of intervals defined by unique(knots)
-    }
-    \item{coef}{
-      A matrix of dim = c(nKnots-1, norder) containing the coeffients of
-      a polynomial in (x-midpoints[i]) for interval i, where nKnots =
-      length(unique(knots)).
-    }
-    \item{deriv}{
-      A matrix of dim = c(nKnots-1, norder) containing the derivatives
-      of the spline evaluated at \code{midpoints}.
-    }
+  \item{knots}{
+    a numeric vector of knots(object, interior=FALSE)
+  }
+  \item{midpoints}{
+    midpoints of intervals defined by unique(knots)
+  }
+  \item{coef}{
+    A matrix of dim = c(nKnots-1, norder) containing the coeffients of
+    a polynomial in (x-midpoints[i]) for interval i, where nKnots =
+    length(unique(knots)).
+  }
+  \item{deriv}{
+    A matrix of dim = c(nKnots-1, norder) containing the derivatives
+    of the spline evaluated at \code{midpoints}.
+  }
 %    \item{Min, Max}{
 %      matrices with one row for each segment giving \code{x} at which
 %      local extreme are found, with the corresponding function values.
@@ -67,7 +66,6 @@ TaylorSpline(object, ...)
 %      maximum is achieved at multiple locations, the largest such
 %      \code{x} is returned.
 %    }
-  }
 }
 \author{ Spencer Graves }
 \seealso{
@@ -86,9 +84,9 @@ fd.bspl1.1pi <- fd(pi, basisobj=bspl1.1)
 bspl1.1pi <- TaylorSpline(fd.bspl1.1pi)
 \dontshow{
 bsp1.1ref <- list(knots=0:1, midpoints=0.5,
-      coef=array(pi, dim=rep(1, 3), dimnames=list(NULL, 'b0', NULL)), 
-      deriv=array(pi, dim=rep(1, 3), dimnames=list(NULL, 'D0', NULL)) )
-class(bsp1.1ref) <- "Taylor" 
+  coef=array(pi, dim=rep(1, 3), dimnames=list(NULL, 'b0', 'reps 1')),
+  deriv=array(pi, dim=rep(1, 3), dimnames=list(NULL, 'D0', 'reps 1')) )
+class(bsp1.1ref) <- "Taylor"
 stopifnot(all.equal(bspl1.1pi, bsp1.1ref))
 }
 

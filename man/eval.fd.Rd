@@ -104,13 +104,19 @@ bspl3 <- create.bspline.basis(c(0, .5, 1))
 plot(bspl3) # 5 bases
 fd.bspl3 <- fd(c(0, 0, 1, 0, 0), bspl3)
 pred3 <- predict(fd.bspl3)
+
+pred3. <- matrix(c(0, .5, 0), 3)
+dimnames(pred3.) <- list(NULL, 'reps 1')
 \dontshow{stopifnot(}
-all.equal(pred3, matrix(c(0, .5, 0), 3))
+all.equal(pred3, pred3.)
 \dontshow{)}
 
 pred.2 <- predict(fd.bspl3, c(.2, .8))
+
+pred.2. <- matrix(.176, 2, 1)
+dimnames(pred.2.) <- list(NULL, 'reps 1')
 \dontshow{stopifnot(}
-all.equal(pred.2, matrix(.176, 2, 1))
+all.equal(pred.2, pred.2.)
 \dontshow{)}
 
 ##

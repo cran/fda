@@ -13,7 +13,8 @@
   arguments to functions that estimate functional parameters.
 }
 \usage{
-fdPar(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE, penmat=NULL)
+fdPar(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
+      penmat=NULL)
 %fdPar(fdobj=fd(), Lfdobj=NULL, lambda=0, estimate=TRUE, penmat=NULL)
 }
 \arguments{
@@ -26,8 +27,24 @@ fdPar(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE, penmat=NULL)
   }
   \item{Lfdobj}{
     either a nonnegative integer or a linear differential operator
-    object.  If NULL and fdobj[['type']] == 'bspline', Lfdobj =
-    int2Lfd(max(0, norder-2)), where norder = order of fdobj.
+    object.
+
+    If \code{NULL}, Lfdobj depends on fdobj[['basis']][['type']]:
+
+    \itemize{
+      \item{bspline}{
+	Lfdobj <- int2Lfd(max(0, norder-2)), where norder =
+	norder(fdobj).
+      }
+      \item{fourier}{
+	Lfdobj = a harmonic acceleration operator:
+
+	\code{Lfdobj <- vec2Lfd(c(0,(2*pi/diff(rng))^2,0), rng)}
+
+	where rng = fdobj[['basis']][['rangeval']].
+      }
+      \item{anything else}{Lfdobj <- int2Lfd(0)}
+    }
   }
   \item{lambda}{
     a nonnegative real number specifying the amount of smoothing
@@ -55,22 +72,20 @@ fdPar(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE, penmat=NULL)
   a functional parameter object (i.e., an object of class \code{fdPar}),
   which is a list with the following components:
 
-  \itemize{
-    \item{fd}{
-      a functional data object (i.e., with class \code{fd})
-    }
-    \item{Lfd}{
-      a linear differential operator object (i.e., with class
-      \code{Lfd})
-    }
-    \item{lambda}{
-      a nonnegative real number
-    }
-    \item{estimate}{not currently used}
-    \item{penmat}{
-      either NULL or a square, symmetric matrix with penmat[i, j] =
-      integral over fd[['basis']][['rangeval']] of basis[i]*basis[j]
-    }
+  \item{fd}{
+    a functional data object (i.e., with class \code{fd})
+  }
+  \item{Lfd}{
+    a linear differential operator object (i.e., with class
+    \code{Lfd})
+  }
+  \item{lambda}{
+    a nonnegative real number
+  }
+  \item{estimate}{not currently used}
+  \item{penmat}{
+    either NULL or a square, symmetric matrix with penmat[i, j] =
+    integral over fd[['basis']][['rangeval']] of basis[i]*basis[j]
   }
 }
 \source{
@@ -128,7 +143,8 @@ daytime  <- (1:365)-0.5
 #  Convert the data to a functional data object
 daybasis65 <- create.fourier.basis(dayrange, nbasis, dayperiod)
 templambda <- 1e1
-tempfdPar  <- fdPar(fdobj=daybasis65, Lfdobj=harmaccelLfd, lambda=templambda)
+tempfdPar  <- fdPar(fdobj=daybasis65, Lfdobj=harmaccelLfd,
+                    lambda=templambda)
 
 #FIXME
 #tempfd <- smooth.basis(CanadianWeather$tempav, daytime, tempfdPar)

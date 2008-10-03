@@ -10,42 +10,45 @@ Fperm.fd <- function(yfdPar, xfdlist, betalist,wt=NULL,
   Fnull = rep(0,nperm)
   Fnullvals = c()
 
-    q = 1-q
+  q = 1-q
 
-    begin <- proc.time()
-    fRegressList <- fRegress(yfdPar, xfdlist, betalist)
-    elapsed.time <- max(proc.time()-begin,na.rm=TRUE)
+  begin <- proc.time()
+  fRegressList <- fRegress(yfdPar, xfdlist, betalist)
+  elapsed.time <- max(proc.time()-begin,na.rm=TRUE)
 
-    if( elapsed.time > 30/nperm ){
-        print(paste('Estimated Computing time =',round(nperm*elapsed.time),'seconds.'))
-    }
+  if( elapsed.time > 30/nperm ){
+    print(paste('Estimated Computing time =',
+                round(nperm*elapsed.time),'seconds.'))
+  }
+
+  yhat <- fRegressList$yhatfdobj
+  if(is.list(yhat) && ('fd' %in% names(yhat))) yhat <- yhat$fd
+
+  tFstat <- Fstat.fd(yfdPar,yhat,argvals)
+
+  Fvals <- tFstat$F
+  Fobs = max(Fvals)
+
+  argvals = tFstat$argvals
+
+  if(is.vector(yfdPar)){ n = length(yfdPar) }
+  else{ n = ncol(yfdPar$coefs) }
+
+  for(i in 1:nperm){
+
+    tyfdPar = yfdPar[sample(n)]
+
+    fRegressList <- fRegress(tyfdPar, xfdlist, betalist)
 
     yhat <- fRegressList$yhatfdobj
+    if(is.list(yhat) && ('fd' %in% names(yhat))) yhat <- yhat$fd
 
-    tFstat <- Fstat.fd(yfdPar,yhat,argvals)
+    tFstat = Fstat.fd(yfdPar,yhat,argvals)
 
-    Fvals <- tFstat$F
-    Fobs = max(Fvals)
+    Fnullvals <- cbind(Fnullvals,tFstat$F)
 
-    argvals = tFstat$argvals
-
-    if(is.vector(yfdPar)){ n = length(yfdPar) }
-    else{ n = ncol(yfdPar$coefs) }
-
-    for(i in 1:nperm){
-
-        tyfdPar = yfdPar[sample(n)]
-
-        fRegressList <- fRegress(tyfdPar, xfdlist, betalist)
-
-        yhat <- fRegressList$yhatfdobj
-
-        tFstat = Fstat.fd(yfdPar,yhat,argvals)
-
-        Fnullvals <- cbind(Fnullvals,tFstat$F)
-
-        Fnull[i] = max(Fnullvals[,i])
-    }
+    Fnull[i] = max(Fnullvals[,i])
+  }
 
 
     pval = mean( Fobs < Fnull )
@@ -53,7 +56,6 @@ Fperm.fd <- function(yfdPar, xfdlist, betalist,wt=NULL,
 
     pvals.pts = apply(Fvals<Fnullvals,1,mean)
     qvals.pts = apply(Fnullvals,1,quantile,q)
-
 
     if(plotres){
         if(is.fd(yfdPar)){

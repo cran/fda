@@ -2,7 +2,7 @@
 #  Generator function of class basisfd
 
 basisfd <- function(type, rangeval, nbasis, params, dropind=vector("list",0),
-                    quadvals=vector("list",0), values=vector("list",0), 
+                    quadvals=vector("list",0), values=vector("list",0),
                     basisvalues=vector("list",0))
 {
 #  BASISFD  generator function of "basisfd" class.
@@ -29,16 +29,16 @@ basisfd <- function(type, rangeval, nbasis, params, dropind=vector("list",0),
 #                 interior knots, that is the length of PARAMS.
 #               This means that NBASIS must be at least 1 larger than the
 #                 length of PARAMS.
-#  DROPIND ... A set of indices in 1:NBASIS of basis functions to drop when 
-#                basis objects are arguments.  Default is vector("list",0) 
-#                Note that argument NBASIS is reduced by the number of 
+#  DROPIND ... A set of indices in 1:NBASIS of basis functions to drop when
+#                basis objects are arguments.  Default is vector("list",0)
+#                Note that argument NBASIS is reduced by the number of
 #                indices, and the derivative matrices in VALUES are also clipped.
 #  QUADVALS .. A NQUAD by 2 matrix.  The firs t column contains quadrature
 #                points to be used in a fixed point quadrature.  The second
 #                contains quadrature weights.  For example, for (Simpson"s
 #                rule for (NQUAD = 7, the points are equally spaced and the
 #                weights are delta.*[1, 4, 2, 4, 2, 4, 1]/3.  DELTA is the
-#                spacing between quadrature points.  The default is 
+#                spacing between quadrature points.  The default is
 #                matrix("numeric",0,0).
 #  VALUES  ... A list, with entries containing the values of
 #                the basis function derivatives starting with 0 and
@@ -56,20 +56,20 @@ basisfd <- function(type, rangeval, nbasis, params, dropind=vector("list",0),
 #                quadrature points weighted by square root of quadrature weights.
 #                These values are only generated as required, and only if slot
 #                QUADVALS is not matrix("numeric",0,0).
-#  BASISVALUES ... A vector of lists, allocated by code such as 
+#  BASISVALUES ... A vector of lists, allocated by code such as
 #                vector("list",1).
 #                This field is designed to avoid evaluation of a
 #                basis system repeatedly at a set of argument values.
-#                Each list within the vector corresponds to a specific set 
-#                of argument values, and must have at least two components, 
-#                which may be tagged as you wish.  
-#                The first component in an element of the list vector contains the 
+#                Each list within the vector corresponds to a specific set
+#                of argument values, and must have at least two components,
+#                which may be tagged as you wish.
+#                The first component in an element of the list vector contains the
 #                argument values.
-#                The second component in an element of the list vector 
+#                The second component in an element of the list vector
 #                contains a matrix of values of the basis functions evaluated
-#                at the arguments in the first component. 
-#                The third and subsequent components, if present, contain 
-#                matrices of values their derivatives up to a maximum 
+#                at the arguments in the first component.
+#                The third and subsequent components, if present, contain
+#                matrices of values their derivatives up to a maximum
 #                derivative order.
 #                Whenever function getbasismatrix is called, it checks
 #                the first list in each row to see, first, if the number of
@@ -86,7 +86,7 @@ basisfd <- function(type, rangeval, nbasis, params, dropind=vector("list",0),
 #                respectively for these.  You would then assign them
 #                to BASISVALUES with code such as
 #                  basisobj$basisvalues <- vector("list",1)
-#                  basisobj$basisvalues[[1]] <- 
+#                  basisobj$basisvalues[[1]] <-
 #                               list(args=evalargs, values=basismat)
 #
 #  Returns
@@ -458,50 +458,51 @@ return(basisequal)
 
 #  Of course the ranges must also match.
 
-#  Last modified 22 March 2007
+#  Last modified 2008.12.26 by Spencer Graves
+#  previously modified 22 March 2007
 
 #  check the ranges
 
-range1 <- basisobj1$rangeval
-range2 <- basisobj2$rangeval
-if (range1[1] != range2[1] || range1[2] != range2[2])
+  range1 <- basisobj1$rangeval
+  range2 <- basisobj2$rangeval
+  if (range1[1] != range2[1] || range1[2] != range2[2])
     stop("Ranges are not equal.")
 
 #  get the types
 
-type1 <- basisobj1$type
-type2 <- basisobj2$type
+  type1 <- basisobj1$type
+  type2 <- basisobj2$type
 
 #  deal with constant bases
 
-if (type1 == "const" && type2 == "const") {
+  if (type1 == "const" && type2 == "const") {
     prodbasisobj <- create.constant.basis(range1)
     return(prodbasisobj)
-}
+  }
 
-if (type1 == "const") {
+  if (type1 == "const") {
     prodbasisobj <- basisobj2
     return(prodbasisobj)
-}
+  }
 
-if (type2 == "const") {
+  if (type2 == "const") {
     prodbasisobj <- basisobj1
     return(prodbasisobj)
-}
+  }
 
 #  get the numbers of basis functions
 
-nbasis1 <- basisobj1$nbasis
-nbasis2 <- basisobj2$nbasis
+  nbasis1 <- basisobj1$nbasis
+  nbasis2 <- basisobj2$nbasis
 
 #  work through the cases
 
-if (type1 == "bspline" && type2 == "bspline") {
+  if (type1 == "bspline" && type2 == "bspline") {
     #  both are bases B-splines
     #  get orders
     interiorknots1 <- basisobj1$params
     interiorknots2 <- basisobj2$params
-    uniqueknots    <- union(interiorknots1, interiorknots2)
+    uniqueknots    <- sort(union(interiorknots1, interiorknots2))
     nunique <- length(uniqueknots)
     multunique <- rep(0,nunique)
     for (i in seq(length=nunique)) {
@@ -521,9 +522,9 @@ if (type1 == "bspline" && type2 == "bspline") {
     allknots <- rep(0,sum(multunique))
     m2 <- 0
     for (i in seq(length=nunique)) {
-        m1 <- m2 + 1
-        m2 <- m2 + multunique[i]
-        allknots[m1:m2] <- uniqueknots[i]
+      m1 <- m2 + 1
+      m2 <- m2 + multunique[i]
+      allknots[m1:m2] <- uniqueknots[i]
     }
     norder1 <- nbasis1 - length(interiorknots1)
     norder2 <- nbasis2 - length(interiorknots2)
@@ -531,12 +532,12 @@ if (type1 == "bspline" && type2 == "bspline") {
     allbreaks  <- c(range1[1], allknots, range1[2])
     nbasis <- length(allbreaks) + norder - 2
     prodbasisobj <-
-        create.bspline.basis(range1, nbasis, norder, allbreaks)
+      create.bspline.basis(range1, nbasis, norder, allbreaks)
     return(prodbasisobj)
-}
+  }
 #  end if(type1 & type2 == 'bspline')
 
-if (type1 == "fourier" && type2 == "fourier") {
+  if (type1 == "fourier" && type2 == "fourier") {
     #  both bases Fourier
     #  check whether periods match
     #  if they do not, default to the basis below.
@@ -544,10 +545,10 @@ if (type1 == "fourier" && type2 == "fourier") {
     period2 <- basisobj2$params
     nbasis  <- nbasis1 + nbasis2
     if (period1 == period2) {
-        prodbasisobj <- create.fourier.basis(range1, nbasis, period1)
-        return(prodbasisobj)
+      prodbasisobj <- create.fourier.basis(range1, nbasis, period1)
+      return(prodbasisobj)
     }
-}
+  }
 
 #  default case when all else fails: the product basis is B-spline
 #  When neither basis is a B-spline basis, the order
@@ -556,26 +557,26 @@ if (type1 == "fourier" && type2 == "fourier") {
 #  the order is the smaller of 8 or the order of the spline
 #  plus 2.
 
-if (type1 == "bspline" || type2 == "bspline") {
+  if (type1 == "bspline" || type2 == "bspline") {
     norder <- 8
     if (type1 == "bspline") {
-        interiorknots1 <- basisobj1$params
-        norder1        <- nbasis1 - length(interiorknots1)
-        norder         <- min(c(norder1+2, norder))
+      interiorknots1 <- basisobj1$params
+      norder1        <- nbasis1 - length(interiorknots1)
+      norder         <- min(c(norder1+2, norder))
     }
     if (type2 == "bspline") {
-        interiorknots2 <- basisobj2$params
-        norder2        <- nbasis2 - length(interiorknots2)
-        norder         <- min(c(norder2+2, norder))
+      interiorknots2 <- basisobj2$params
+      norder2        <- nbasis2 - length(interiorknots2)
+      norder         <- min(c(norder2+2, norder))
     }
-} else {
-    #  neither basis is B-spline
+  } else {
+#  neither basis is B-spline
     norder <- min(c(8, nbasis1+nbasis2))
-}
+  }
 #  set up the default B-spline product basis
-nbasis <- max(c(nbasis1+nbasis2, norder+1))
-prodbasisobj <- create.bspline.basis(range1, nbasis, norder)
-return(prodbasisobj)
+  nbasis <- max(c(nbasis1+nbasis2, norder+1))
+  prodbasisobj <- create.bspline.basis(range1, nbasis, norder)
+  return(prodbasisobj)
 }
 
 #  ---------------------------------------------------------

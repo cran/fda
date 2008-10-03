@@ -202,7 +202,9 @@ nlandm <- dim(ximarks)[2]
   names(warpfdnames)[3] <- paste("Warped",names(regnames)[1])
   warpfdobj$fdnames     <- warpfdnames      
   
-  Wfd <- fd(wcoef, wbasis)
-
+#  Wfd <- fd(wcoef, wbasis)
+if(monwrd)
   return( list("regfd" = regfdobj, "warpfd" = warpfdobj, "Wfd" = Wfd) )
+else
+  return( list("regfd" = regfdobj, "warpfd" = warpfdobj) )
 }

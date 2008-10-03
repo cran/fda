@@ -1,6 +1,6 @@
 create.polynomial.basis <- function (rangeval=c(0,1), nbasis=2, ctr=0,
                    dropind=NULL, quadvals=NULL, values=NULL,
-                   basisvalues=NULL, names='polynom')
+                   basisvalues=NULL, names='polynom', axes=NULL)
 {
 
 #  This function creates a polynomial functional data basis, for
@@ -111,10 +111,13 @@ create.polynomial.basis <- function (rangeval=c(0,1), nbasis=2, ctr=0,
       if(length(names)>1)
         stop('length(names) = ', length(names), ';  must be either ',
              '1 or nbasis = ', nbasis)
-      paste(names, 0:(nbasis-1), sep="")
+      basisobj$names <- paste(names, 0:(nbasis-1), sep="")
     }
   }
-
+##
+## 8.  Done
+##
+  if(!is.null(axes))basisobj$axes <- axes
   basisobj
 
 }

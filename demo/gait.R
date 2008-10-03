@@ -41,7 +41,7 @@ library(fda)
 #  function fRegress.  In general, it is better use a time interval
 #  that assigns roughly one time unit to each inter-knot interval.
 
-(gaittime <- as.numeric(dimnames(gait)[[1]]))*20
+(gaittime <- as.numeric(dimnames(gait)[[1]])*20)
 gaitrange <- c(0,20)
 
 #  set up a three-dimensional array of function values
@@ -50,7 +50,7 @@ apply(gait, 3, range)
 
 # -----------  set up the harmonic acceleration operator  ----------
 
-harmaccelLfd <- vec2Lfd(c(0, 0, (2*pi/20)^2, 0), rangeval=gaitrange)
+harmaccelLfd <- vec2Lfd(c(0, (2*pi/20)^2, 0), rangeval=gaitrange)
 
 #  Set up basis for representing gait data.  The basis is saturated
 #  since there are 20 data points per curve, and this set up defines
@@ -171,8 +171,7 @@ gaitvararray <- eval.bifd(gaittime, gaittime, gaitvarbifd)
 
 #  plot variance and covariance functions as contours
 
-filled.contour(gaittime, gaittime, gaitvararray[,,1,1],
-               cex=1.2,las='none')
+filled.contour(gaittime, gaittime, gaitvararray[,,1,1], cex=1.2)
 title("Knee - Knee")
 
 filled.contour(gaittime, gaittime, gaitvararray[,,1,2], cex=1.2)
@@ -286,9 +285,10 @@ hist(shift)
 
 #  plot warping functions
 
-par(mfrow=c(1,1), mar=c(4,4,2,1), pty="m")
+op <- par(mfrow=c(1,1), mar=c(4,4,2,1), pty="m")
 matplot(xfine, warpmat, type="l", xlab="t", ylab="h(t)",
         main="Time warping functions", cex=1.2)
+par(op)
 
 #  plot the deformation functions, def(t) = warp(t) - t
 
@@ -296,15 +296,17 @@ defmat <- warpmat
 for (i in 1:39)
 	defmat[,i] <- warpmat[,i] - xfine - shift[i]
 
-par(mfrow=c(1,1), mar=c(4,4,2,1), pty="m")
+op <- par(mfrow=c(1,1), mar=c(4,4,2,1), pty="m")
 matplot(xfine, defmat, type="l", xlab="t", ylab="h(t) - t",
         main="Deformation functions", cex=1.2)
+par(op)
 
 #  plot both the unregistered and registered versions of the curves
 
-par(mfrow=c(2,2))
+op <- par(mfrow=c(2,2))
 plot(D2gaitfd,    ask=FALSE)
 plot(D2gaitregfd, ask=FALSE)
+par(op)
 
 #  --------------------------------------------------------------
 #              Predict knee angle from hip angle
@@ -345,34 +347,37 @@ betaestlist <- fRegressout$betaestlist
 alphafd   <- betaestlist[[1]]$fd
 hipbetafd <- betaestlist[[2]]$fd
 
-par(mfrow=c(2,1), ask=F)
+op <- par(mfrow=c(2,1), ask=FALSE)
 plot(alphafd,   ylab="Intercept")
 plot(hipbetafd, ylab="Hip coefficient")
+par(op)
 
 #  compute and plot squared multiple correlation function
 
 gaitfine    <- seq(0,20,len=101)
 kneemat     <- eval.fd(gaitfine, kneefd)
-kneehatmat  <- eval.fd(gaitfine, kneehatfd)
+#kneehatmat  <- eval.fd(gaitfine, kneehatfd)
+kneehatmat  <- predict(kneehatfd, gaitfine)
 kneemeanvec <- as.vector(eval.fd(gaitfine, kneemeanfd))
 
 SSE0 <- apply((kneemat - outer(kneemeanvec, rep(1,ncurve)))^2, 1, sum)
 SSE1 <- apply((kneemat - kneehatmat)^2, 1, sum)
 Rsqr <- (SSE0-SSE1)/SSE0
 
-par(mfrow=c(1,1),ask=F)
+op <- par(mfrow=c(1,1),ask=FALSE)
 plot(gaitfine, Rsqr, type="l", ylim=c(0,0.4))
 
 #  for each case plot the function being fit, the fit,
 #                     and the mean function
 
-par(mfrow=c(1,1),ask=TRUE)
+op <- par(mfrow=c(1,1),ask=TRUE)
 for (i in 1:ncurve) {
   plot( gaitfine, kneemat[,i], type="l", lty=1, col=4, ylim=c(0,80))
   lines(gaitfine, kneemeanvec,           lty=2, col=2)
   lines(gaitfine, kneehatmat[,i],        lty=3, col=4)
   title(paste("Case",i))
 }
+par(op)
 
 #  ----------  predict knee acceleration from hip acceleration --------
 
@@ -396,26 +401,28 @@ D2betaestlist <- D2fRegressout$betaestlist
 D2alphafd   <- D2betaestlist[[1]]$fd
 D2hipbetafd <- D2betaestlist[[2]]$fd
 
-par(mfrow=c(2,1), ask=F)
+op <- par(mfrow=c(2,1), ask=FALSE)
 plot(D2alphafd,   ylab="D2Intercept")
 plot(D2hipbetafd, ylab="D2Hip coefficient")
+par(op)
 
 #  compute and plot squared multiple correlation function
 
 D2kneemat     <- eval.fd(gaitfine, D2kneefd)
-D2kneehatmat  <- eval.fd(gaitfine, D2kneehatfd)
+#D2kneehatmat  <- eval.fd(gaitfine, D2kneehatfd)
+D2kneehatmat  <- predict(D2kneehatfd, gaitfine)
 D2kneemeanvec <- as.vector(eval.fd(gaitfine, D2kneemeanfd))
 
 D2SSE0 <- apply((D2kneemat - outer(D2kneemeanvec, rep(1,ncurve)))^2, 1, sum)
 D2SSE1 <- apply((D2kneemat - D2kneehatmat)^2, 1, sum)
 D2Rsqr <- (D2SSE0-D2SSE1)/D2SSE0
 
-par(mfrow=c(1,1),ask=F)
+par(mfrow=c(1,1),ask=FALSE)
 plot(gaitfine, D2Rsqr, type="l", ylim=c(0,0.5))
 
 #  for each case plot the function being fit, the fit, and the mean function
 
-par(mfrow=c(1,1),ask=TRUE)
+op <- par(mfrow=c(1,1),ask=TRUE)
 for (i in 1:ncurve) {
   plot( gaitfine, D2kneemat[,i], type="l", lty=1, col=4, ylim=c(-20,20))
   lines(gaitfine, D2kneemeanvec,           lty=2, col=2)
@@ -423,11 +430,7 @@ for (i in 1:ncurve) {
   lines(c(0,20), c(0,0), lty=2, col=2)
   title(paste("Case",i))
 }
-
-
-
-
-
+par(op)
 
 
 

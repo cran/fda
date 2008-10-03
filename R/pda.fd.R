@@ -5,9 +5,9 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
 #  estimates of the coefficient functions a_k(t) and b_j(t)
 #  in the possibly nonhomogeneous linear differential operator
 #
-#    Lx(t) = 
+#    Lx(t) =
 #       b_0(t)x(t) + b_1(t)Dx(t) + ... + b_{M-1}D^{M-1}x(t) + D^M x(t)
-#       - a_1(t)u_1(t) - ... - a_k(t)u_K(t) 
+#       - a_1(t)u_1(t) - ... - a_k(t)u_K(t)
 #
 #  of order M = DIFEORDER that minimizes in a least squares sense the residual
 #  functions f(t) = Lx(t).
@@ -28,49 +28,49 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
 #
 #
 #  Arguments:
-#  XFDLIST     list vector of length J of functional data objects for the 
+#  XFDLIST     list vector of length J of functional data objects for the
 #                 J functions whose derivatives define the DIFE.
 #  UFDLIST     list of length J whose components are themselves lists.
-#                  The jth component of this list contains a list vector of 
+#                  The jth component of this list contains a list vector of
 #                  length K_j of functional data objects for the
 #                 independent variables or u-variables forcing the equation
 #                  for the jth variable.
 #              In the special univariate case where there is only a single
-#                  DIFE, UFDLIST can have components which are the 
+#                  DIFE, UFDLIST can have components which are the
 #                  functional data objects for the forcing functions, rather
 #                  than being a list with a single component list containing
 #                  these functions.
-#  BWTLIST     list vector of length J, the jth component of which is a list 
+#  BWTLIST     list vector of length J, the jth component of which is a list
 #                   vector of length J, each component which is itself a list
-#                   vector of length M_k equal to the order of the kth 
-#                   differential equation in the containing list.   
+#                   vector of length M_k equal to the order of the kth
+#                   differential equation in the containing list.
 #                   Each component of these lists within lists within a list
 #                   is a functional parameter object defining a weighting
 #                   coefficient function.
 #              that is, BWTLIST is three levels or layers of lists, the top
 #                   level a single list of length J, the second level a
-#                   set of J lists, each corresponding to an equation, and the 
-#                   third level containing lists of length M_k containing 
-#                   coefficient functions defining the contribution of the 
-#                   m_kth derivative of variable k to the equation for 
-#                   variable j.  
+#                   set of J lists, each corresponding to an equation, and the
+#                   third level containing lists of length M_k containing
+#                   coefficient functions defining the contribution of the
+#                   m_kth derivative of variable k to the equation for
+#                   variable j.
 #              that is, if the orders of all the equations were the same
 #                   and R supported list arrays, their dimensions would be
-#                   J, J and M. 
-#              However, in the special case of J = 1, where only M 
+#                   J, J and M.
+#              However, in the special case of J = 1, where only M
 #                   coefficients are required, BWTLIST may be a simple
-#                   list vector of length M. 
+#                   list vector of length M.
 #  AWTLIST     list of length J whose components are themselves lists.
-#                 The jth component of this list contains a list vector of 
+#                 The jth component of this list contains a list vector of
 #                  length K_j of functional parameter objects for the
-#                  coefficient functions a_{jk}(t) multipling the 
+#                  coefficient functions a_{jk}(t) multipling the
 #                  corresponding forcing function in UFDLIST.
 #              In the special univariate case where there is only a single
-#                  DIFE, AWTLIST can have components which are the 
-#                  functional parameter objects for the forcing functions, 
-#                  rather than being a list with a single component list 
+#                  DIFE, AWTLIST can have components which are the
+#                  functional parameter objects for the forcing functions,
+#                  rather than being a list with a single component list
 #                  containing these functional parameter objects.
-#  NFINE       number of sampling points for numerical integration, set by 
+#  NFINE       number of sampling points for numerical integration, set by
 #                  default to 501, but adjusted as required to define a mesh
 #                  that is sufficient fine as to give a satisfactory
 #                  approximation to an integral.
@@ -85,8 +85,8 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
 #  RESFDLIST   FD object for residual functions.
 #  AWTLIST     list structure identical to that of the argument AWTLIST
 
-#  last modified 5 November 2008 by Jim Ramsay
-#  previously modified 2007.11.28 by Spencer Graves
+#  last modified 2008.11.28 by Spencer Graves
+#  previously modified 5 November 2008 by Jim Ramsay
 
 #  check dimensions of the lists
 
@@ -155,7 +155,7 @@ if (difeorder == 0 && nforce == 0)
 
 ncurve     <- dim(xcoef)[2]
 
-nbasmax <- xbasis$nbasis  
+nbasmax <- xbasis$nbasis
 
 #  check UFDLIST and AWTLIST
 
@@ -200,7 +200,7 @@ if (inherits(bwtlist[[1]],"list")) {
   temp <- vector("list",difeorder)
   for (j in 1:nvar) {
     if (inherits(bwtlist[[1]][[j]], "list")) {
-      bwtlist[[1]][[j]] <- bwtlist[[1]][[j]][[1]]  
+      bwtlist[[1]][[j]] <- bwtlist[[1]][[j]][[1]]
     }
     temp[[j]] <- bwtlist[[1]][[j]]
   }
@@ -214,14 +214,14 @@ for (j in 1:difeorder) {
     if (!inherits(bfdParj,"fdPar")) {
       print(paste(
             "BWTLIST[[",j,"]] is not a functional parameter object.",sep=""))
-      errorwrd <- TRUE      
+      errorwrd <- TRUE
     }  else {
       bfdj <- bfdParj$fd
       if (!inherits(bfdj, "fd")) {
         print(paste(
               "BFDJ in BWTLIST[[",j,"]] is not a functional data object.",
               sep=""))
-        errorwrd <- TRUE      
+        errorwrd <- TRUE
       } else {
         basisj <- bfdj$basis
         if (any(basisj$rangeval != xrange)) print(paste(
@@ -335,7 +335,7 @@ for (j1 in 1:difeorder) {
 
 if (neqns < 1) stop(
 		"Number of equations to solve is not positive.")
-		
+
 #  set up coefficient array and right side array for linear equation
 
 cmat   <- matrix(0,neqns, neqns)
@@ -622,7 +622,7 @@ if (is.null(ufdlist) || is.null(awtlist)) {
       }
     }
   }
-  if (errorwrd) stop("")   
+  if (errorwrd) stop("")
 }
 
 #  check the dimensions of BWTLIST
@@ -633,10 +633,10 @@ for (ivar in 1:nvar) {
   if (length(bwtlist[[ivar]]) != nvar) {
     print(paste("The length of BWTLIST[[",ivar,"]] is incorrect.",sep=""))
     errorwrd = TRUE
-  } 
+  }
 }
 if (errorwrd) stop("")
-    
+
 #  check XFDLIST and extract NCURVE and XRANGE
 
 xfd1       <- xfdlist[[1]]
@@ -675,9 +675,9 @@ nbasmax <- xbasis1$nbasis  #  This will be the maximum number of basis functions
 
 if (!(is.null(ufdlist) || is.null(awtlist))) {
   urange <- ufdlist[[1]]$basis$rangeval
-  errorwrd <- FALSE      
+  errorwrd <- FALSE
   for (ivar in 1:nvar) {
-    if (!is.null(ufdlist[[ivar]])) {    
+    if (!is.null(ufdlist[[ivar]])) {
       for (iu in 1:length(ufdlist[[ivar]])) {
 			  ufdiviu <- ufdlist[[ivar]][[iu]]
         if (!inherits(ufdiviu, "fd")) {
@@ -714,7 +714,7 @@ if (!(is.null(ufdlist) || is.null(awtlist))) {
 
 errorwrd <- FALSE
 for (ivar1 in 1:nvar) {
-  for (ivar2 in 1:nvar) {    
+  for (ivar2 in 1:nvar) {
     difeorder <- length(bwtlist[[ivar1]][[ivar2]])
     for (j in 1:difeorder) {
       if (!is.null(bwtlist[[ivar1]][[ivar2]][[j]])) {
@@ -768,7 +768,7 @@ if (!is.null(ufdlist)) {
     } else {
       nforce <- length(ufdlist[[ivar]])
       uarray[[ivar]] <- vector("list", nforce)
-      for (iu in 1:nforce) 
+      for (iu in 1:nforce)
           uarray[[ivar]][[iu]] <- matrix(0,nfine,ncurve)
     }
   }
@@ -878,8 +878,8 @@ for (ivar in 1:nvar) {
 
     #  get number of coefficients to be estimated for this equation
 
-    neqns  <- 0 
-    
+    neqns  <- 0
+
     # loop through u-variables  if required
 
     if (is.null(ufdlist) || is.null(ufdlist[[ivar]])) nforce <- 0
@@ -891,9 +891,9 @@ for (ivar in 1:nvar) {
             neqns <- neqns + afdPari$fd$basis$nbasis
       }
     }
-    
+
     # loop through x functions and their derivatives
-    
+
     for (i2 in 1:nvar) {
       difeorder <- length(bwtlist[[ivar]][[i2]])
       for (j2 in 1:difeorder) {
@@ -911,7 +911,7 @@ for (ivar in 1:nvar) {
     dmat   <- matrix(0,neqns, 1)
 
     #  evaluate default weight functions for this variable
-    
+
     if (nforce > 0) {
       aarray <- matrix(0,nfine,nforce)
       for (iu in 1:nforce) {
@@ -976,7 +976,7 @@ for (ivar in 1:nvar) {
                   abasisi2    <- afdPari2$fd$basis
                   abasismati2 <- getbasismatrix(tx, abasisi2)
                   weighti2    <- uprod[[ivar]][,iu1,iu2]
-                  Cprod       <- trapzmat(abasismati1, abasismati2, 
+                  Cprod       <- trapzmat(abasismati1, abasismati2,
                                         deltax, weighti2)
                   mi21 <- mi22 + 1
                   mi22 <- mi22 + abasisi2$nbasis
@@ -1158,10 +1158,10 @@ for (ivar in 1:nvar) {
   #  initialize with highest order derivative for this variable
   resmat    <- eval.fd(tx, xfdi, difeorder)
   #  add contributions from weighted u-functions
+  onesncurve <- rep(1,ncurve)
   if (!is.null(ufdlist)) {
     nforce <- length(ufdlist[[ivar]])
     if (nforce > 0) {
-	    onesncurve <- rep(1,ncurve)
     	for (iu in 1:nforce) {
     	  if (!is.null(awtlist[[ivar]][[iu]])) {
 	        afdPari  <- awtlist[[ivar]][[iu]]
@@ -1184,7 +1184,7 @@ for (ivar in 1:nvar) {
         bvecij   <- as.vector(eval.fd(tx, bfdij))
         if (ncurve == 1) {
           bmatij <- bvecij
-        }  else  {             
+        }  else  {
           bmatij <- outer(bvecij,onesncurve)
         }
         xmatij <- eval.fd(tx, xfdlist[[i1]], j1-1)
@@ -1197,7 +1197,7 @@ for (ivar in 1:nvar) {
   resfdnames        <- xfdi$fdnames
   resfdnames[[2]]   <- "Residual function"
   resfdnames[[3]]   <- "Residual function value"
-  resfdlist[[ivar]] <- resfdi	
+  resfdlist[[ivar]] <- resfdi
 }
 
 #  ----------------------------------------------------------------
@@ -1206,6 +1206,7 @@ for (ivar in 1:nvar) {
 
 }
 
-return(list(bwtlist=bwtlist, resfdlist=resfdlist, awtlist=awtlist))
-
+  pdaList <- list(bwtlist=bwtlist, resfdlist=resfdlist, awtlist=awtlist)
+  class(pdaList) <- 'pda.fd'
+  pdaList
 }

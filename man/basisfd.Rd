@@ -119,25 +119,6 @@ basisfd(type, rangeval, nbasis, params,
     values=basismat).
   }
 }
-\value{
-  an object of class \code{basisfd}, being a list with the following
-  components:
-
-  \itemize{
-    \item{type}{type of basis}
-    \item{rangeval}{acceptable range for the argument}
-    \item{nbasis}{number of bases}
-    \item{params}{
-      a vector of parameter values defining the basis.
-    }
-    \item{dropind}{input argument dropind}
-    \item{quadvals}{quadrature values ...}
-    \item{values}{
-      a list of basis functions and derivatives
-    }
-    \item{basisvalues}{input argument basisvalues}
-  }
-}
 \details{
 
   Previous versions of the 'fda' software used the name \code{basis}
@@ -166,6 +147,23 @@ basisfd(type, rangeval, nbasis, params,
 
   Normally only developers of new basis types will actually need
   to use this function, so no examples are provided.
+}
+\value{
+  an object of class \code{basisfd}, being a list with the following
+  components:
+
+  \item{type}{type of basis}
+  \item{rangeval}{acceptable range for the argument}
+  \item{nbasis}{number of bases}
+  \item{params}{
+    a vector of parameter values defining the basis.
+  }
+  \item{dropind}{input argument dropind}
+  \item{quadvals}{quadrature values ...}
+  \item{values}{
+    a list of basis functions and derivatives
+  }
+  \item{basisvalues}{input argument basisvalues}
 }
 \source{
   Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional

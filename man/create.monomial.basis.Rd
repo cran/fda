@@ -10,7 +10,8 @@
 \usage{
 create.monomial.basis(rangeval=c(0, 1), nbasis=NULL,
          exponents=NULL, dropind=NULL, quadvals=NULL,
-         values=NULL, basisvalues=NULL, names='monomial')
+         values=NULL, basisvalues=NULL, names='monomial',
+         axes=NULL)
 }
 \arguments{
   \item{rangeval}{
@@ -85,6 +86,16 @@ create.monomial.basis(rangeval=c(0, 1), nbasis=NULL,
 
     For \code{monomial} bases, this defaults to paste('monomial',
     1:nbreaks, sep='').
+  }
+  \item{axes}{
+    an optional list used by selected \code{plot} functions to create
+    custom \code{axes}.  If this \code{axes} argument is not
+    \code{NULL}, functions \code{plot.basisfd}, \code{plot.fd},
+    \code{plot.fdSmooth} \code{plotfit.fd}, \code{plotfit.fdSmooth}, and
+    \code{plot.Lfd} will create axes via \code{do.call(x$axes[[1]],
+      x$axes[-1])}.  The primary example of this uses
+    \code{list("axesIntervals", ...)}, e.g., with \code{Fourier} bases
+    to create \code{CanadianWeather} plots
   }
 }
 \value{

@@ -1,4 +1,4 @@
-fRegress.stderr <- function(fRegressList, y2cMap, SigmaE) {
+fRegress.stderr <- function(y, y2cMap, SigmaE, ...) {
 
 #  FREGRESS.STDERR  computes standard error estimates for regression
 #       coefficient functions estimated by function FREGRESS.
@@ -21,32 +21,33 @@ fRegress.stderr <- function(fRegressList, y2cMap, SigmaE) {
 #  BVAR           ... the symmetric matrix of sampling variances and
 #                     covariances for the matrix of regression coefficients
 #                     for the regression functions.  These are stored
-#                     column-wise in defining BVARIANCE.  
+#                     column-wise in defining BVARIANCE.
 #  C2BMAP         ... the matrix mapping from response variable coefficients
 #                     to coefficients for regression coefficients
 
 #  Last modified 21 October 2008 by Jim Ramsay
 
+  fRegressList <- y
 #  get number of independent variables
 
-xfdlist  <- fRegressList$xfdlist
-yfdPar   <- fRegressList$yfdPar
-betalist <- fRegressList$betalist
-Cmatinv  <- fRegressList$Cmatinv
+  xfdlist  <- fRegressList$xfdlist
+  yfdPar   <- fRegressList$yfdPar
+  betalist <- fRegressList$betalist
+  Cmatinv  <- fRegressList$Cmatinv
 
-p <- length(xfdlist)
+  p <- length(xfdlist)
 
 #  compute number of coefficients
 
-ncoef <- 0
-for (j in 1:p) {
-	betaParfdj <- betalist[[j]]
-	ncoefj     <- betaParfdj$fd$basis$nbasis
-	ncoef      <- ncoef + ncoefj
-}
+  ncoef <- 0
+  for (j in 1:p) {
+    betaParfdj <- betalist[[j]]
+    ncoefj     <- betaParfdj$fd$basis$nbasis
+    ncoef      <- ncoef + ncoefj
+  }
 
-if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
-	
+  if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
+
     #  ----------------------------------------------------------------
     #           YFDPAR is functional for a functional parameter
     #  ----------------------------------------------------------------
@@ -72,27 +73,27 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
 
     mj2 <- 0
     for (j in 1:p) {
-        betafdParj <- betalist[[j]]
-        betabasisj <- betafdParj$fd$basis
-        ncoefj     <- betabasisj$nbasis
-        bbasismatj <- eval.basis(tfine, betabasisj)
-        xfdj       <- xfdlist[[j]]
-        tempj      <- eval.fd(tfine, xfdj)
+      betafdParj <- betalist[[j]]
+      betabasisj <- betafdParj$fd$basis
+      ncoefj     <- betabasisj$nbasis
+      bbasismatj <- eval.basis(tfine, betabasisj)
+      xfdj       <- xfdlist[[j]]
+      tempj      <- eval.fd(tfine, xfdj)
         #  row indices of BASISPRODMAT to fill
-        mj1    <- mj2 + 1
-        mj2    <- mj2 + ncoefj
-        indexj <- mj1:mj2
+      mj1    <- mj2 + 1
+      mj2    <- mj2 + ncoefj
+      indexj <- mj1:mj2
         #  inner products of beta basis and response basis
         #    weighted by covariate basis functions
-        mk2 <- 0
-        for (k in 1:ynbasis) {
+      mk2 <- 0
+      for (k in 1:ynbasis) {
             #  row indices of BASISPRODMAT to fill
-            mk1    <- mk2 + 1
-            mk2    <- mk2 + N
-            indexk <- mk1:mk2
-            tempk  <- bbasismatj*ybasismat[,k]
-            basisprodmat[indexj,indexk] <-
-                     deltat*crossprod(tempk,tempj)
+        mk1    <- mk2 + 1
+        mk2    <- mk2 + N
+        indexk <- mk1:mk2
+        tempk  <- bbasismatj*ybasismat[,k]
+        basisprodmat[indexj,indexk] <-
+          deltat*crossprod(tempk,tempj)
         }
     }
 
@@ -100,11 +101,11 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
 
     y2cdim <- dim(y2cMap)
     if (y2cdim[1] != ynbasis ||
-        y2cdim[2] != dim(SigmaE)[1])  stop(
-					"Dimensions of Y2CMAP not correct.")
-					
+        y2cdim[2] != dim(SigmaE)[1])
+      stop("Dimensions of Y2CMAP not correct.")
+
     #  compute variances of regression coefficient function values
-		
+
     c2bMap    <- Cmatinv %*% basisprodmat
     VarCoef   <- y2cMap %*% SigmaE %*% t(y2cMap)
     CVariance <- kronecker(VarCoef,diag(rep(1,N)))
@@ -112,21 +113,21 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
     betastderrlist <- vector("list",p)
     mj2 <- 0
     for (j in 1:p) {
-        betafdParj <- betalist[[j]]
-        betabasisj <- betafdParj$fd$basis
-        ncoefj     <- betabasisj$nbasis
-        mj1 	     <- mj2 + 1
-        mj2 	     <- mj2 + ncoefj
-        indexj 	   <- mj1:mj2
-        bbasismat  <- eval.basis(tfine, betabasisj)
-        bvarj      <- bvar[indexj,indexj]
-        bstderrj   <- sqrt(diag(bbasismat %*% bvarj %*% t(bbasismat)))
-        bstderrfdj <- smooth.basis(tfine, bstderrj, betabasisj)$fd
-        betastderrlist[[j]] <- bstderrfdj
+      betafdParj <- betalist[[j]]
+      betabasisj <- betafdParj$fd$basis
+      ncoefj     <- betabasisj$nbasis
+      mj1 	     <- mj2 + 1
+      mj2 	     <- mj2 + ncoefj
+      indexj 	   <- mj1:mj2
+      bbasismat  <- eval.basis(tfine, betabasisj)
+      bvarj      <- bvar[indexj,indexj]
+      bstderrj   <- sqrt(diag(bbasismat %*% bvarj %*% t(bbasismat)))
+      bstderrfdj <- smooth.basis(tfine, bstderrj, betabasisj)$fd
+      betastderrlist[[j]] <- bstderrfdj
     }
 
-} else {
-	
+  } else {
+
     #  ----------------------------------------------------------------
     #                   YFDPAR is scalar or multivariate
     #  ----------------------------------------------------------------
@@ -136,19 +137,19 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
 
     Zmat  <- NULL
     for (j in 1:p) {
-        xfdj <- xfdlist[[j]]
-        if (inherits(xfdj, "fd")) {
-            xcoef      <- xfdj$coefs
-            xbasis     <- xfdj$basis
-            betafdParj <- betalist[[j]]
-            bbasis     <- betafdParj$fd$basis
-            Jpsithetaj <- inprod(xbasis,bbasis)
-            Zmat       <- cbind(Zmat,t(xcoef) %*% Jpsithetaj)
-        }
-        else if (inherits(xfdj, "numeric")) {
-            Zmatj <- xfdj
-            Zmat  <- cbind(Zmat,Zmatj)
-        }
+      xfdj <- xfdlist[[j]]
+      if (inherits(xfdj, "fd")) {
+        xcoef      <- xfdj$coefs
+        xbasis     <- xfdj$basis
+        betafdParj <- betalist[[j]]
+        bbasis     <- betafdParj$fd$basis
+        Jpsithetaj <- inprod(xbasis,bbasis)
+        Zmat       <- cbind(Zmat,t(xcoef) %*% Jpsithetaj)
+      }
+      else if (inherits(xfdj, "numeric")) {
+        Zmatj <- xfdj
+        Zmat  <- cbind(Zmat,Zmatj)
+      }
     }
 
     #  compute linear mapping c2bMap takinging coefficients for
@@ -160,36 +161,36 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
     betastderrlist <- vector("list",p)
     mj2 <- 0
     for (j in 1:p) {
-	      betafdParj <- betalist[[j]]
-        betabasisj <- betafdParj$fd$basis
-	      ncoefj <- betabasisj$nbasis
-        mj1    <- mj2 + 1
-        mj2    <- mj2 + ncoefj
-        indexj <- mj1:mj2
-        bvarj  <- bvar[indexj,indexj]
-        xfdj   <- xfdlist[[j]]
-        if (inherits(xfdj,"fd")) {
-            betarng    <- betabasisj$rangeval
-            nfine      <- max(c(501,10*ncoefj+1))
-            tfine      <- seq(betarng[1], betarng[2], len=nfine)
-            bbasismat  <- eval.basis(tfine, betabasisj)
-            bstderrj   <- sqrt(diag(bbasismat %*% bvarj %*% t(bbasismat)))
-            bstderrfdj <- smooth.basis(tfine, bstderrj, betabasisj)$fd
-        } else {
-	          bsterrj    <- sqrt(diag(bvarj))
-	          onebasis   <- create.constant.basis(betabasisj$rangeval)
-	          bstderrfdj <- fd(t(bstderrj), onebasis)
-        }
-        betastderrlist[[j]] <- bstderrfdj
+      betafdParj <- betalist[[j]]
+      betabasisj <- betafdParj$fd$basis
+      ncoefj <- betabasisj$nbasis
+      mj1    <- mj2 + 1
+      mj2    <- mj2 + ncoefj
+      indexj <- mj1:mj2
+      bvarj  <- bvar[indexj,indexj]
+      xfdj   <- xfdlist[[j]]
+      if (inherits(xfdj,"fd")) {
+        betarng    <- betabasisj$rangeval
+        nfine      <- max(c(501,10*ncoefj+1))
+        tfine      <- seq(betarng[1], betarng[2], len=nfine)
+        bbasismat  <- eval.basis(tfine, betabasisj)
+        bstderrj   <- sqrt(diag(bbasismat %*% bvarj %*% t(bbasismat)))
+        bstderrfdj <- smooth.basis(tfine, bstderrj, betabasisj)$fd
+      } else {
+        bsterrj    <- sqrt(diag(bvarj))
+        onebasis   <- create.constant.basis(betabasisj$rangeval)
+        bstderrfdj <- fd(t(bstderrj), onebasis)
+      }
+      betastderrlist[[j]] <- bstderrfdj
     }
-}
+  }
 
-stderrList <-
-       list(betastderrlist = betastderrlist,
-            bvar           = bvar,
-            c2bMap         = c2bMap)
+  stderrList <-
+    list(betastderrlist = betastderrlist,
+         bvar           = bvar,
+         c2bMap         = c2bMap)
 
-return(stderrList)
+  return(stderrList)
 
 }
 

@@ -3,6 +3,11 @@ second edition (2006) and 'Applied Functional Data Analysis'
 (2002), both by James O. Ramsay and Bernard W. Silverman
 (Springer).
 
+Release 2.0.5 introduced 'predict', 'fitted', and 'residual'
+methods as wrappers for various 'eval.*' functions where
+that seemed appropriate.  This was suggested by Soren
+Hosgaard.
+
 Release 2.0.4 introduced changes to make the syntax for all
 the 'create.*.basis' function calls more consistent.  This
 included added names for all the basis functions to make it

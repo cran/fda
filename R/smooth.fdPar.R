@@ -1,4 +1,4 @@
-smooth.fdPar <- function(fdobj, Lfdobj=int2Lfd(0),
+smooth.fdPar <- function(fdobj, Lfdobj=NULL,
          lambda=0, estimate=TRUE, penmat=NULL){
 ##
 ## 1.  fdPar

@@ -76,8 +76,8 @@ if (nderiv < 0)
 
 if (!inherits(bwtlist, "list") && !inherits(bwtlist, "fd") &&
     !is.null(bwtlist) && !missing(bwtlist))
-	stop("BWTLIST is neither a LIST or a FD object")	
-	
+	stop("BWTLIST is neither a LIST or a FD object")
+
 #  if bwtlist is missing or NULL, convert it to a constant basis FD object
 
 if (is.null(bwtlist)) {
@@ -91,7 +91,7 @@ if (is.null(bwtlist)) {
 #  if BWTLIST is a fd object, convert to a list object.
 
 if (inherits(bwtlist, "fd")) bwtlist <- fd2list(bwtlist)
-		
+
 #  check size of bwtlist
 
 nbwt <- length(bwtlist)
@@ -107,7 +107,7 @@ if (nderiv > 0) {
     for (j in 1:nbwt) {
         bfdj <- bwtlist[[j]]
         if (inherits(bfdj, "fdPar")) {
-			  bfdj <- bfdj$fd	
+			  bfdj <- bfdj$fd
 			  bwtlist[[j]] <- bfdj
 		 }
         if (!inherits(bfdj, "fd") && !inherits(bfdj, "integer"))
@@ -157,7 +157,7 @@ oldClass(Lfdobj) <- "Lfd"
 
 Lfdobj
 
-}	
+}
 
 #  "print" method for "Lfd"
 
@@ -166,11 +166,11 @@ print.Lfd <- function(x, ...)
   object <- x
 	nderiv  <- object$nderiv
 	bwtlist <- object$bwtlist
-	
+
 	cat("Lfd:\n")
-	
+
 	cat(paste("nderiv =",nderiv,"\n"))
-	
+
 	if (nderiv > 0) {
 		cat("\nbwtlist:\n")
 		for (ideriv in 1:nderiv) {
@@ -189,17 +189,17 @@ summary.Lfd <- function(object, ...)
 
 #  "plot" method for "Lfd"
 
-plot.Lfd <- function(x, ...)
+plot.Lfd <- function(x, axes=NULL, ...)
 {
 	nderiv <- x$nderiv
 	oldPar <- par(mfrow=c(nderiv,1))
 	on.exit(par(oldPar))
 	for (ideriv in 1:nderiv) {
-		plot(x$bwtlist[[ideriv]], ylab=...)
+		plot(x$bwtlist[[ideriv]], axes=axes, ...)
 	}
 	invisible(NULL)
 }
-	
 
 
-	
+
+

@@ -43,8 +43,8 @@ fdPar <- function(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
 #  Return:
 #  FDPAROBJ ... A functional parameter object
 
-#  Last modified 6 January 2008 by Jim Ramsay
-#  Previously modified 2007.09.18 by Spencer Graves
+#  Last modified 2008.12.14 by Spencer Graves
+#  Previosly modified 6 January 2008 by Jim Ramsay
 
 #  ----------------------------------------------------------------------
 #                            Default fdPar objects
@@ -60,8 +60,19 @@ fdPar <- function(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
        #  a default FD object with an empty coefficient matrix.
         nbasis  <- fdobj$nbasis
         dropind <- fdobj$dropind
-        coef    <- matrix(0,nbasis-length(dropind),1)
-        fdobj   <- fd(coef, fdobj)
+        coefs   <- matrix(0,nbasis-length(dropind),1)
+        fdnames <- list('time', 'reps 1', 'values')
+        if(!is.null(fdobj$names)){
+          nms <- {
+            if(length(dropind)>1)
+              fdobj$names[-dropind]
+            else
+              fdobj$names
+          }
+          dimnames(coefs) <- list(nms, NULL)
+          fdnames[[1]] <- nms
+        }
+        fdobj   <- fd(coefs, fdobj)
       }
 #    else if (inherits(fdobj,"fd")) {
 #      #  if the first object is a FD object, do nothing
@@ -80,11 +91,21 @@ fdPar <- function(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
 
   {
     if(is.null(Lfdobj)){
-      norder <- {
-        if(fdobj$basis$type=='bspline')norder.bspline(fdobj$basis)
-        else 2
+      if(fdobj$basis$type=='fourier'){
+        rng <- fdobj$basis$rangeval
+        Lfdobj <- vec2Lfd(c(0,(2*pi/diff(rng))^2,0), rng)
+        warning("Provding default Lfdobj = harmonic acceleration ",
+                "operator on c(", rng[1], ', ', rng[2],
+                ') = vec2Lfd(c(0,(2*pi/diff(rng))^2,0), rng);',
+                '  [default prior to fda 2.1.0:  int2Lfd(0)].')
       }
-      Lfdobj <- int2Lfd(max(0, norder-2))
+      else{
+        norder <- {
+          if(fdobj$basis$type=='bspline')norder.bspline(fdobj$basis)
+          else 2
+        }
+        Lfdobj <- int2Lfd(max(0, norder-2))
+      }
     }
     else
       Lfdobj <- int2Lfd(Lfdobj)

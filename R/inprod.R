@@ -141,7 +141,7 @@ for (irng  in  2:nrng) {
     fx2 <- eval.fd(rngi, fdobj2, Lfdobj2)
     #  multiply by values of weight function if necessary
     if (!is.numeric(wtfd)) {
-        wtd <- eval.fd(wtfd, rngi)
+        wtd <- eval.fd(rngi,wtfd)
         fx2 <- matrix(wtd,dim(wtd)[1],dim(fx2)[2]) * fx2
     }
     s[1,,] <- width*crossprod(fx1,fx2)/2

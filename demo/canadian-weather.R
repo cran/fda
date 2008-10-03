@@ -78,7 +78,7 @@
 #  per week.
 
 #  The use of only 65 basis functions instead of 365
-#  automatically generates some smoothing.  
+#  automatically generates some smoothing.
 
 #  However, see below for smoothing with a saturated
 #  basis (365 basis functions) where smoothing is defined by the
@@ -95,13 +95,13 @@ harmaccelLfd365 <- vec2Lfd(c(0,(2*pi/365)^2,0), c(0, 365))
 # First check the distribution
 qqnorm(CanadianWeather$dailyAv[,,"Temperature.C"], datax=TRUE)
 # Consistent with a strong annual cycle
-# plus weaker normal noise 
+# plus weaker normal noise
 
-daytempfd <- with(CanadianWeather, smooth.basis(day.5, 
+daytempfd <- with(CanadianWeather, smooth.basis(day.5,
        dailyAv[,,"Temperature.C"],
        daybasis65, fdnames=list("Day", "Station", "Deg C"))$fd )
 plot(daytempfd, axes=FALSE)
-axisIntervals(1) 
+axisIntervals(1)
 axis(2)
 
 # Check precipitation distribution
@@ -115,13 +115,13 @@ sum(CanadianWeather$precav==0)
 # Per help("CanadianWeather"),
 sort(unique(diff(sort(unique(CanadianWeather$
                              dailyAv[,,"Precipitation.mm"])))))
-# Some repeated numbers, indicating round off problems 
+# Some repeated numbers, indicating round off problems
 sort(unique(diff(sort(round(unique(
      CanadianWeather$dailyAv[,,"Precipitation.mm"]), 7)))))
 sort(unique(round(diff(sort(round(unique(
      CanadianWeather$dailyAv[,,"Precipitation.mm"]), 5) )),5)) )
 # Obviously, the 0's are problems ... but ignore them
-# The real point is that these numbers are all 
+# The real point is that these numbers are all
 # to the nearest tenth of a milimeter,
 # & the 0 differences are created by anomolies in 'unique'
 table(CanadianWeather$dailyAv[,,"Precipitation.mm"])
@@ -130,21 +130,21 @@ table(CanadianWeather$dailyAv[,,"Precipitation.mm"])
 # before computing logarithms
 qqnorm(CanadianWeather$dailyAv[,,"log10precip"], datax=TRUE)
 # Plausibly a weak annual cycle
-# relative to substantial normal noise 
-# on a log scale 
+# relative to substantial normal noise
+# on a log scale
 
 # Conclusion:  Prefer analysis on the log scale
 # Back transform to get answers in 'mm' or approx. percent
-# (recalling log(1+x) = x if x is small) 
-dayprecfd <- with(CanadianWeather, smooth.basis(day.5, 
-     dailyAv[,,"log10precip"], daybasis65, 
+# (recalling log(1+x) = x if x is small)
+dayprecfd <- with(CanadianWeather, smooth.basis(day.5,
+     dailyAv[,,"log10precip"], daybasis65,
      fdnames=list("Day", "Station", "log10(mm)"))$fd )
 plot(dayprecfd, axes=FALSE)
 axisIntervals(1)
 axis(2)
 
 # Or create a functional data object with Temp and log10precip together:
-CanadianTempPrecip.fd <- with(CanadianWeather, smooth.basis(day.5, 
+CanadianTempPrecip.fd <- with(CanadianWeather, smooth.basis(day.5,
          dailyAv[,,-2], daybasis65)$fd )
 str(CanadianTempPrecip.fd)
 
@@ -160,16 +160,16 @@ str(CanadianTempPrecip.fd)
 # Another alternative would be the 'ask' argument
 
 # Returns invisibly the mean square deviations
-# between observed and fdobj=daytempfd 
+# between observed and fdobj=daytempfd
 (CanadianWea.MSE <- with(CanadianWeather, plotfit.fd(
-   y=dailyAv[,,"Temperature.C"], argvals=day.5, 
+   y=dailyAv[,,"Temperature.C"], argvals=day.5,
    fdobj=CanadianTempPrecip.fd[,1], index=1:7, axes=FALSE) ))
 axisIntervals(1)
 axis(2)
 
-# Same as from a univariate functional data object 
+# Same as from a univariate functional data object
 (CanadianWea.MSE <- with(CanadianWeather, plotfit.fd(
-   y=dailyAv[,,"Temperature.C"], argvals=day.5, 
+   y=dailyAv[,,"Temperature.C"], argvals=day.5,
    fdobj=daytempfd, index=1:7, axes=FALSE) ))
 axisIntervals(1)
 axis(2)
@@ -195,7 +195,7 @@ axisIntervals(1)
 axis(2)
 
 # The smoothing is probably not quite adequate,
-# but it's not bad either.  
+# but it's not bad either.
 
 #  Plot residuals for three best fits and three worst fits
 
@@ -207,19 +207,19 @@ axis(2)
 #sortwrd   <- TRUE
 
 with(CanadianWeather, plotfit.fd(y=dailyAv[,,"Temperature.C"],
-       argvals=day.5, fdobj=daytempfd, index=c(1:3, 33:35), 
+       argvals=day.5, fdobj=daytempfd, index=c(1:3, 33:35),
            nfine=366, residual=TRUE, sortwrd=TRUE, axes=FALSE) )
 axisIntervals(1)
 axis(2)
-# To see the lines individually, plot them 1, 2 or 3 at a time:  
+# To see the lines individually, plot them 1, 2 or 3 at a time:
 #with(CanadianWeather, plotfit.fd(y=dailyAv[,,"Temperature.C",
 #   argvals=day.5, fdobj=daytempfd, index=c(1:3, 33:35),
 #   nfine=366, residual=TRUE, sortwrd=TRUE, ask=TRUE, col=1, lty=1) )
 #with(CanadianWeather, plotfit.fd(y=dailyAV[,,"Temperature.C",
 #   argvals=day.5, fdobj=daytempfd, index=c(1:3, 33:35),
 #   nfine=366, residual=TRUE, sortwrd=TRUE, ask=TRUE, col=1:3, lty=1) )
-# NOTE:  "col=1, lty=1" allows a singly plot per page.  
-     
+# NOTE:  "col=1, lty=1" allows a singly plot per page.
+
 #  Plot precipitation curves and values
 
 CanadianWeather$place
@@ -250,11 +250,6 @@ str(daytempfdSm)
 str(daytempSm)
 # fdnames lost in bivariate ...
 str(daytempfd)
-str(CanadianWea.fd)
-str(CanadianWea.fd[,1])
-# fdnames lost ... but I don't know if that's important,
-# since dimnames(coefs) are retained appropriately.  
-
 
 #  Use function 'plotfit.fd' to plot the temperature data, fit and residuals
 #    sorted by size of root mean square error
@@ -284,16 +279,16 @@ with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"],
 par(mfrow=c(2,1))
 for (i in 1:length(CanadianWeather$place) ) {
   with(CanadianWeather, plot(day.5, dailyAv[,i,"Temperature.C"],
-       type="p", xlim=c(0, 365), col=1, xlab="Day", ylab="", 
+       type="p", xlim=c(0, 365), col=1, xlab="Day", ylab="",
          main=paste(place[i],"temperature")) )
   lines.fd(daytempSm[i])
   with(CanadianWeather, plot(day.5, dailyAv[,i,"log10precip"],
        type="p", xlim=c(0, 365), col=1, xlab="Day", ylab="",
          main=paste(place[i],"precipitation")) )
   lines.fd(dayprecfdSm[i])
-# Uncomment the following line 'par(ask=TRUE)' 
+# Uncomment the following line 'par(ask=TRUE)'
 #  to plot the cuves one at a time
-# Otherwise, they fly by faster than the eye can see.  
+# Otherwise, they fly by faster than the eye can see.
    par(ask=TRUE)
 }
 par(mfrow=c(1,1), pty="m", ask=FALSE)
@@ -356,7 +351,7 @@ with(Temp.smoothStats, {
 par(op)
 
 #  Do final smooth with minimum GCV value
-# but try other levels also 
+# but try other levels also
 
 #lambda   <- 0.01  #  minimum GCV estimate, corresponding to 255 df
 #fdParobj <- fdPar(daybasis365, harmaccelLfd, lambda)
@@ -412,7 +407,7 @@ axis(2)
 
 op <- par(xpd=NA, bty="n")
 # trim lines at 'device region' not 'plot region'
-with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5, 
+with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5,
           TempSmooth.01$fd, index=c(1,35), titles=place, axes=FALSE) )
 axisIntervals(1)
 axis(2)
@@ -425,7 +420,7 @@ with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5,
 axisIntervals(1)
 axis(2)
 
-with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5, 
+with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5,
           TempSmooth1$fd, index=c(1,35), titles=place, axes=FALSE) )
 axisIntervals(1)
 axis(2)
@@ -439,35 +434,35 @@ axis(2)
 lines(TempSmooth10$fd, lty=1, lwd=2)
 title("Canadian Annual Temperature Cycle;  lambda = 10")
 
-with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5, 
+with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5,
       TempSmooth100$fd, index=c(1,35), titles=place, axes=FALSE) )
 axisIntervals(1)
 axis(2)
 lines(TempSmooth100$fd, lty=1, lwd=2)
 title("Canadian Annual Temperature Cycle;  lambda = 100")
 
-with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5, 
+with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5,
        TempSmooth1000$fd, index=c(1,35), titles=place, axes=FALSE) )
 axisIntervals(1)
 axis(2)
 lines(TempSmooth1000$fd, lty=1, lwd=2)
 title("Canadian Annual Temperature Cycle;  lambda = 1000")
 
-with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5, 
+with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5,
       TempSmooth4$fd, index=c(1,35), titles=place, axes=FALSE) )
 axisIntervals(1)
 axis(2)
 lines(TempSmooth4$fd, lty=1, lwd=2)
 title("Canadian Annual Temperature Cycle;  lambda = 1e4")
 
-with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5, 
+with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5,
           TempSmooth5$fd, index=c(1,35), titles=place, axes=FALSE) )
 axisIntervals(1)
 axis(2)
 lines(TempSmooth5$fd, lty=1, lwd=2)
 title("Canadian Annual Temperature Cycle;  lambda = 1e5")
 
-with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5, 
+with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5,
       TempSmooth6$fd, index=c(1,35), titles=place, axes=FALSE) )
 axisIntervals(1)
 axis(2)
@@ -475,11 +470,11 @@ lines(TempSmooth6$fd, lty=1, lwd=2)
 title("Canadian Annual Temperature Cycle;  lambda = 1e6")
 # Smoothing with lambda = 1e6 follows the main pattern
 # but NOT the fine detail.
-# Q:  Is that fine detail real or serial dependence 
+# Q:  Is that fine detail real or serial dependence
 # IGNORED by gcv?  If the latter, we should use
-# lambda = 1e6 over the 'gcv' min of 0.01.  
+# lambda = 1e6 over the 'gcv' min of 0.01.
 
-with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5, 
+with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5,
       TempSmooth7$fd, index=c(1,35), titles=place, axes=FALSE) )
 axisIntervals(1)
 axis(2)
@@ -487,47 +482,47 @@ lines(TempSmooth7$fd, lty=1, lwd=2)
 title("Canadian Annual Temperature Cycle;  lambda = 1e7")
 # possibly acceptable
 
-with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5, 
+with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5,
       TempSmooth8$fd, index=c(1,35), titles=place, axes=FALSE) )
 axisIntervals(1)
 axis(2)
 lines(TempSmooth8$fd, lty=1, lwd=2)
 title("Canadian Annual Temperature Cycle;  lambda = 1e8")
-# subtle but clear oversmoothing 
+# subtle but clear oversmoothing
 
-with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5, 
+with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5,
        TempSmooth9$fd, index=c(1,35), titles=place, axes=FALSE) )
 axisIntervals(1)
 axis(2)
 lines(TempSmooth9$fd, lty=1, lwd=2)
 title("Canadian Annual Temperature Cycle;  lambda = 1e9")
-# lambda=1e9 is oversmoothing, blatently obvious 
+# lambda=1e9 is oversmoothing, blatently obvious
 
 lvl.1 <- (-10:10)/10
 contour(cor.fd(weeks, TempSmooth1000$fd), levels=lvl.1)
 # NOT as smooth as Fig. 2.4, FDA
 op <- par(mfrow=c(2,2))
 contour(weeks, weeks, cor.fd(weeks, TempSmooth4$fd), levels=lvl.1,
-        xlab="Average daily Temperature (C)", 
-        ylab="Average daily Temperature (C)", 
+        xlab="Average daily Temperature (C)",
+        ylab="Average daily Temperature (C)",
         axes=FALSE, main="Temperature correlations, smoothing = 1e4")
 axisIntervals(1, labels=monthLetters)
 axisIntervals(2, labels=monthLetters)
 contour(weeks, weeks, cor.fd(weeks, TempSmooth5$fd), levels=lvl.1,
-        xlab="Average daily Temperature (C)", 
-        ylab="Average daily Temperature (C)", 
+        xlab="Average daily Temperature (C)",
+        ylab="Average daily Temperature (C)",
         axes=FALSE, main="Temperature correlations, smoothing = 1e5")
 axisIntervals(1, labels=monthLetters)
 axisIntervals(2, labels=monthLetters)
 contour(weeks, weeks, cor.fd(weeks, TempSmooth6$fd), levels=lvl.1,
-        xlab="Average daily Temperature (C)", 
-        ylab="Average daily Temperature (C)", 
+        xlab="Average daily Temperature (C)",
+        ylab="Average daily Temperature (C)",
         axes=FALSE, main="Temperature correlations, smoothing = 1e6")
 axisIntervals(1, labels=monthLetters)
 axisIntervals(2, labels=monthLetters)
 contour(weeks, weeks, cor.fd(weeks, TempSmooth7$fd), levels=lvl.1,
-        xlab="Average daily Temperature (C)", 
-        ylab="Average daily Temperature (C)", 
+        xlab="Average daily Temperature (C)",
+        ylab="Average daily Temperature (C)",
         axes=FALSE, main="Temperature correlations, smoothing = 1e7")
 axisIntervals(1, labels=monthLetters)
 axisIntervals(2, labels=monthLetters)
@@ -551,7 +546,7 @@ Prec.smoothSt <- sapply(Prec.loglam, function(x){
 
 op <- par(mfrow=c(2,1))
 with(Prec.smoothStats[8:16,], {
-  plot(loglam, gcv, type="b", cex=1, log="y", 
+  plot(loglam, gcv, type="b", cex=1, log="y",
      xlab="Log_10 lambda", ylab="GCV Criterion",
      main="Precipitation Smoothing")
   plot(loglam, df, type="b",  cex=1,
@@ -559,71 +554,71 @@ with(Prec.smoothStats[8:16,], {
      main="Precipitation Smoothing", log="y") } )
 par(op)
 
-# lambda = 1e6 minimizes gcv, df = 12.3  
+# lambda = 1e6 minimizes gcv, df = 12.3
 
 #  Do final smooth with minimum GCV value
 
-# Previous note:  
+# Previous note:
 #lambda   <- 1e7  #  minimum GCV estimate, corresponding to 255 df
-# The df can NOT be correct with this lambda 
+# The df can NOT be correct with this lambda
 
 PrecSmooth6 <- with(CanadianWeather, smooth.basisPar(
     argvals=day.5, y=dailyAv[,,"log10precip"],
-    fdobj=daybasis365, Lfdobj=harmaccelLfd365, lambda=1e6) ) 
+    fdobj=daybasis365, Lfdobj=harmaccelLfd365, lambda=1e6) )
 
 (stderr <- with(PrecSmooth6, sqrt(SSE/(35*(365-df)))))
 # 0.198 vs. previous annotation of 0.94 ???
 
 class(PrecSmooth6)
 sapply(PrecSmooth6, class)
-# Looks oversmoothed relative to Figure 2.4, FDA 
+# Looks oversmoothed relative to Figure 2.4, FDA
 
 PrecSmooth0 <- with(CanadianWeather, smooth.basisPar(
     argvals=day.5, y=dailyAv[,,"log10precip"],
-    fdobj=daybasis365, Lfdobj=harmaccelLfd365, lambda=1) ) 
+    fdobj=daybasis365, Lfdobj=harmaccelLfd365, lambda=1) )
 contour(cor.fd(weeks, PrecSmooth0$fd), levels=lvl.1)
-# Way undersmoothed 
+# Way undersmoothed
 
 PrecSmooth3 <- with(CanadianWeather, smooth.basisPar(
     argvals=day.5, y=dailyAv[,,"log10precip"],
-    fdobj=daybasis365, Lfdobj=harmaccelLfd365, lambda=1e3) ) 
+    fdobj=daybasis365, Lfdobj=harmaccelLfd365, lambda=1e3) )
 # Still undersmoothed but not as bad as lambda=1
 
 PrecSmooth4 <- with(CanadianWeather, smooth.basisPar(
     argvals=day.5, y=dailyAv[,,"log10precip"],
-    fdobj=daybasis365, Lfdobj=harmaccelLfd365, lambda=1e4) ) 
+    fdobj=daybasis365, Lfdobj=harmaccelLfd365, lambda=1e4) )
 
 PrecSmooth5 <- with(CanadianWeather, smooth.basisPar(
     argvals=day.5, y=dailyAv[,,"log10precip"],
-    fdobj=daybasis365, Lfdobj=harmaccelLfd365, lambda=1e5) ) 
+    fdobj=daybasis365, Lfdobj=harmaccelLfd365, lambda=1e5) )
 
 
 
 op <- par(mfrow=c(2,2))
-contour(weeks, weeks, cor.fd(weeks, PrecSmooth3$fd), levels=lvl.1, 
-        xlab="Average daily precipitation (mm)", 
-        ylab="Average daily precipitation (mm)", 
+contour(weeks, weeks, cor.fd(weeks, PrecSmooth3$fd), levels=lvl.1,
+        xlab="Average daily precipitation (mm)",
+        ylab="Average daily precipitation (mm)",
         axes=FALSE, main="Precipitation correlations, smoothing 1e3")
 axisIntervals(1, labels=monthLetters)
 axisIntervals(2, labels=monthLetters)
 
-contour(weeks, weeks, cor.fd(weeks, PrecSmooth4$fd), levels=lvl.1, 
-        xlab="Average daily precipitation (mm)", 
-        ylab="Average daily precipitation (mm)", 
+contour(weeks, weeks, cor.fd(weeks, PrecSmooth4$fd), levels=lvl.1,
+        xlab="Average daily precipitation (mm)",
+        ylab="Average daily precipitation (mm)",
         axes=FALSE, main="Precipitation correlations, smoothing 1e4")
 axisIntervals(1, labels=monthLetters)
 axisIntervals(2, labels=monthLetters)
 
-contour(weeks, weeks, cor.fd(weeks, PrecSmooth5$fd), levels=lvl.1, 
-        xlab="Average daily precipitation (mm)", 
-        ylab="Average daily precipitation (mm)", 
+contour(weeks, weeks, cor.fd(weeks, PrecSmooth5$fd), levels=lvl.1,
+        xlab="Average daily precipitation (mm)",
+        ylab="Average daily precipitation (mm)",
         axes=FALSE, main="Precipitation correlations, smoothing 1e5")
 axisIntervals(1, labels=monthLetters)
 axisIntervals(2, labels=monthLetters)
 
-contour(weeks, weeks, cor.fd(weeks, PrecSmooth6$fd), levels=lvl.1, 
-        xlab="Average daily precipitation (mm)", 
-        ylab="Average daily precipitation (mm)", 
+contour(weeks, weeks, cor.fd(weeks, PrecSmooth6$fd), levels=lvl.1,
+        xlab="Average daily precipitation (mm)",
+        ylab="Average daily precipitation (mm)",
         axes=FALSE, main="Precipitation correlations, smoothing 1e6")
 axisIntervals(1, labels=monthLetters)
 axisIntervals(2, labels=monthLetters)
@@ -634,13 +629,13 @@ par(op)
 # cross correlations
 contour(weeks, weeks,
    cor.fd(weeks, TempSmooth6$fd, weeks, PrecSmooth6$fd), levels=lvl.1,
-        xlab="Average daily Temperature (C)", 
-        ylab="Average daily precipitation (mm)", 
+        xlab="Average daily Temperature (C)",
+        ylab="Average daily precipitation (mm)",
         axes=FALSE, main="Canadian Weather Correlations")
 axisIntervals(1)
 axisIntervals(2)
 
-# CONCLUSIONS FROM CROSS CORRELATIONS:  
+# CONCLUSIONS FROM CROSS CORRELATIONS:
 # Places where January is warmer are quite likely to have more rain (r=.8).
 # Places where June is warmer are only moderately to have more rain (r=.4).
 
@@ -654,10 +649,10 @@ with(CanadianWeather, plotfit.fd(dailyAv[,,"log10precip"],
           day.5, PrecSmooth6$fd, titles=place) )
 with(CanadianWeather, plotfit.fd(dailyAv[,,"log10precip"],
           day.5, PrecSmooth6$fd, titles=place, index=1:2) )
-with(CanadianWeather, plotfit.fd(dailyAv[,,"log10precip"], 
+with(CanadianWeather, plotfit.fd(dailyAv[,,"log10precip"],
           day.5, PrecSmooth6$fd, titles=place, index=c(2, 35)) )
 
-#with(CanadianWeather, plotfit.fd(dailyAv[,,"log10precip"], day.5, 
+#with(CanadianWeather, plotfit.fd(dailyAv[,,"log10precip"], day.5,
 #          PrecSmooth6$fd, titles=place, lty=1, col=1, ask=TRUE) )
 
 #  Assessment: the temperature curves are still pretty rough,
@@ -674,11 +669,12 @@ with(CanadianWeather, plotfit.fd(dailyAv[,,"log10precip"],
 PRprecfd <- smooth.basisPar(day.5, CanadianWeather$dailyAv[,29,"log10precip"],
                             PrecSmooth6$fd, harmaccelLfd365, lambda=1e6)
 
-PRprecvec <- eval.fd(day.5, PRprecfd)
+#PRprecvec <- eval.fd(day.5, PRprecfd)
+PRprecvec <- predict(PRprecfd, day.5)
 
-plot(day.5, CanadianWeather$dailyAv[,29,"log10precip"], type="p", 
+plot(day.5, CanadianWeather$dailyAv[,29,"log10precip"], type="p",
      xlab="Day", ylab="Precipitation (mm)", main="Prince Rupert")
-lines(day.5, PRprecvec, lwd=2) 
+lines(day.5, PRprecvec, lwd=2)
 
 #  ----------------------------------------------------------------------
 #                Descriptive Statistics Functions
@@ -686,18 +682,18 @@ lines(day.5, PRprecvec, lwd=2)
 
 #  ---------  create fd objects for temp. and prec. ---------------
 
-# First check the distribution 
+# First check the distribution
 qqnorm(CanadianWeather$dailyAv[,,"Temperature.C"], datax=TRUE)
 # Short tailed distribution = strong annual cycle +
 # plausibly modest normal error
 
 # Recreate daytempfd, dayprecfd created above
-daytempfd <- smooth.basis(day.5, CanadianWeather$dailyAv[,,"Temperature.C"], 
-         daybasis65, argnames=list("Day", "Station", "Deg C"))$fd 
+daytempfd <- smooth.basis(day.5, CanadianWeather$dailyAv[,,"Temperature.C"],
+         daybasis65, fdnames=list("Day", "Station", "Deg C"))$fd
 
-dayprecfd <- smooth.basis(day.5, CanadianWeather$dailyAv[,,"log10precip"], 
-         daybasis65, argnames=list("Day", "Station", "log10(mm)"))$fd 
-                 
+dayprecfd <- smooth.basis(day.5, CanadianWeather$dailyAv[,,"log10precip"],
+         daybasis65, fdnames=list("Day", "Station", "log10(mm)"))$fd
+
 #  --  compute and plot mean and standard deviation of temperature -------
 
 (tempmeanfd  <- mean.fd(daytempfd))
@@ -714,23 +710,23 @@ plot(tempstdvfd, main="Standard Deviation", log="y")
 par(op)
 
 #  --  plot the temperature variance-covariance bivariate function  ----
-                  
+
 str(tempvarbifd <- var.fd(daytempfd))
 str(tempvarmat  <- eval.bifd(weeks,weeks,tempvarbifd))
 # dim(tempvarmat)= c(53, 53)
 
 op <- par(mfrow=c(1,2), pty="s")
 #contour(tempvarmat, xlab="Days", ylab="Days")
-contour(weeks, weeks, tempvarmat, 
+contour(weeks, weeks, tempvarmat,
         xlab="Temperature by day",
         ylab="Temperature by day",
         main=paste("Variance function across locations\n",
           "for Canadian Anual Temperature Cycle"),
         cex.main=0.8, axes=FALSE)
-axisIntervals(1, atTick1=seq(0, 365, length=5), atTick2=NA, 
+axisIntervals(1, atTick1=seq(0, 365, length=5), atTick2=NA,
             atLabels=seq(1/8, 1, 1/4)*365,
             labels=paste("Q", 1:4) )
-axisIntervals(2, atTick1=seq(0, 365, length=5), atTick2=NA, 
+axisIntervals(2, atTick1=seq(0, 365, length=5), atTick2=NA,
             atLabels=seq(1/8, 1, 1/4)*365,
             labels=paste("Q", 1:4) )
 #persp(tempvarmat,xlab="Days", ylab="Days", zlab="Covariance")
@@ -747,10 +743,10 @@ tempcormat <- tempvarmat/(tempstddev %o% tempstddev)
 
 op <- par(mfrow=c(1,2), pty="s")
 contour(weeks, weeks, tempcormat, xlab="Days", ylab="Days", axes=FALSE)
-axisIntervals(1, atTick1=seq(0, 365, length=5), atTick2=NA, 
+axisIntervals(1, atTick1=seq(0, 365, length=5), atTick2=NA,
             atLabels=seq(1/8, 1, 1/4)*365,
             labels=paste("Q", 1:4) )
-axisIntervals(2, atTick1=seq(0, 365, length=5), atTick2=NA, 
+axisIntervals(2, atTick1=seq(0, 365, length=5), atTick2=NA,
             atLabels=seq(1/8, 1, 1/4)*365,
             labels=paste("Q", 1:4) )
 persp(weeks, weeks, tempcormat,
@@ -765,10 +761,10 @@ precvarmat  <- eval.bifd(weeks,weeks,precvarbifd)
 
 op <- par(mfrow=c(2,2), pty="s")
 contour(weeks, weeks, precvarmat, xlab="Days", ylab="Days", axes=FALSE)
-axisIntervals(1, atTick1=seq(0, 365, length=5), atTick2=NA, 
+axisIntervals(1, atTick1=seq(0, 365, length=5), atTick2=NA,
             atLabels=seq(1/8, 1, 1/4)*365,
             labels=paste("Q", 1:4) )
-axisIntervals(2, atTick1=seq(0, 365, length=5), atTick2=NA, 
+axisIntervals(2, atTick1=seq(0, 365, length=5), atTick2=NA,
             atLabels=seq(1/8, 1, 1/4)*365,
             labels=paste("Q", 1:4) )
 
@@ -782,10 +778,10 @@ precstddev <- sqrt(diag(precvarmat))
 preccormat <- precvarmat/(precstddev %o% precstddev)
 
 contour(preccormat, xlab="Days", ylab="Days", axes=FALSE)
-axisIntervals(1, atTick1=seq(0, 365, length=5), atTick2=NA, 
+axisIntervals(1, atTick1=seq(0, 365, length=5), atTick2=NA,
             atLabels=seq(1/8, 1, 1/4)*365,
             labels=paste("Q", 1:4) )
-axisIntervals(2, atTick1=seq(0, 365, length=5), atTick2=NA, 
+axisIntervals(2, atTick1=seq(0, 365, length=5), atTick2=NA,
             atLabels=seq(1/8, 1, 1/4)*365,
             labels=paste("Q", 1:4) )
 mtext("Precipitation Correlation")
@@ -828,7 +824,7 @@ daytemppcaobj <- pca.fd(daytempfd, nharm=4, harmfdPar)
 
 daytemppcaobjVM <- varmx.pca.fd(daytemppcaobj)
 str(daytemppcaobjVM)
-dimnames(daytemppcaobjVM$scores)[[2]] <- paste("PCA", 1:4, sep=".") 
+dimnames(daytemppcaobjVM$scores)[[2]] <- paste("PCA", 1:4, sep=".")
 round(daytemppcaobjVM$scores)
 
 #  plot harmonics
@@ -839,7 +835,7 @@ plot.pca.fd(daytemppcaobjVM)
 op <- par(mfrow=c(2,2), pty="m")
 plot.pca.fd(daytemppcaobjVM)
 par(op)
-                  
+
 #  plot log eigenvalues
 
 daytempeigvals <- daytemppcaobjVM[[2]]
@@ -923,7 +919,7 @@ zmat   <- rbind(zmat, z36)
 
 coef   <- tempfd$coefs
 str(coef)
-# add a 0 column # 36 to coef 
+# add a 0 column # 36 to coef
 coef36 <- cbind(coef,matrix(0,65,1))
 tempfd$coefs <- coef36
 
@@ -969,7 +965,8 @@ plot(yhatfdobj,main='Predicted Temperature',)
 
 #  compute residual matrix and get covariance of residuals
 
-yhatmat  <- eval.fd(day.5, yhatfdobj)
+#yhatmat  <- eval.fd(day.5, yhatfdobj)
+yhatmat  <- predict(yhatfdobj, day.5)
 ymat     <- eval.fd(day.5, tempfd)
 temprmat <- ymat[,1:35] - yhatmat[,1:35]
 SigmaE   <- var(t(temprmat))
@@ -1023,7 +1020,7 @@ par(op)
 
 # Now a couple of permutation tests
 
-# permutation t-test between atlantic and pacific 
+# permutation t-test between atlantic and pacific
 
 t.res = tperm.fd(tempfd[atlindex],tempfd[pacindex])
 
@@ -1141,7 +1138,8 @@ plot(yhatfdobj)
 
 #  compute residual matrix and get covariance of residuals
 
-yhatmat    <- eval.fd(day.5, yhatfdobj)
+#yhatmat    <- eval.fd(day.5, yhatfdobj)
+yhatmat    <- predict(yhatfdobj, day.5)
 ymat       <- eval.fd(day.5, lnprecfd)
 lnprecrmat <- ymat[,1:35] - yhatmat[,1:35]
 SigmaE     <- var(t(lnprecrmat))
@@ -1468,7 +1466,7 @@ par(ask=FALSE)
 
 #  select Vancouver's precipitation
 
-index <- (1:35)[CanadianWeather$place == "Vancouver"] 
+index <- (1:35)[CanadianWeather$place == "Vancouver"]
 VanPrec  <- CanadianWeather$dailyAv[,index, "Precipitation.mm"]
 
 #  smooth the data using 65 basis functions
@@ -1498,7 +1496,7 @@ par(ask=FALSE)
 plot(day.5,  VanPrec, type="p")
 lines(day.5, VanPrecposvec, lwd=2, col=4)
 lines(day.5, VanPrecvec, lwd=2, col=3)
-legend(100, 8, c("Positive smooth", "Unrestricted smooth"), 
+legend(100, 8, c("Positive smooth", "Unrestricted smooth"),
        lty=c(1,1), col=c(4,3))
 
 #  plot the residuals
@@ -1538,20 +1536,39 @@ VanPrecposvec2 <- eval.posfd(day.5, Wfd2)
 plot(day.5,  VanPrec, type="p")
 lines(day.5, VanPrecposvec2, lwd=2, col=4)
 lines(day.5, VanPrecposvec, lwd=2, col=3)
-legend(100, 8, c("Weighted", "Unweighted"), 
+legend(100, 8, c("Weighted", "Unweighted"),
        lty=c(1,1), col=c(4,3))
 ##################################
 
      daybasis65 <- create.fourier.basis(c(0, 365), 65)
 
-     daytempfd <- smooth.basis(day.5, 
+     daytempfd <- smooth.basis(day.5,
          CanadianWeather$dailyAv[,,"Temperature.C"],
-         daybasis65, argnames=list("Day", "Station", "Deg C"))$fd
-      
+         daybasis65, fdnames=list("Day", "Station", "Deg C"))$fd
+
      with(CanadianWeather, plotfit.fd(y=dailyAv[,,"Temperature.C"],
             argvals=day.5, daytempfd, index=1, titles=place) )
      with(CanadianWeather, plotfit.fd(y=dailyAv[,,"Temperature.C"],
             argvals=day.5, daytempfd, index=c(2, 35), titles=place) )
      with(CanadianWeather, plotfit.fd(y=dailyAv[,,"Temperature.C"],
-            argvals=day.5, daytempfd, index=c(2, 35), titles=place, 
+            argvals=day.5, daytempfd, index=c(2, 35), titles=place,
                col=c("black", "blue") ) )
+###################################
+
+
+
+
+smallbasis  <- create.fourier.basis(c(0, 365), 65)
+
+VanPrec <- with(CanadianWeather,
+                dailyAv[, place='Vancouver', 'Precipitation.mm'])
+harmaccelLfd365 <- vec2Lfd(c(0,(2*pi/365)^2,0), c(0, 365))
+dayfdPar <- fdPar(smallbasis, harmaccelLfd365, 1000)
+Wfd1 <- smooth.pos(day.5, VanPrec, dayfdPar)$Wfdobj
+VanPrecposvec <- eval.posfd(day.5, Wfd1)
+VanPrecres <- VanPrec - VanPrecposvec
+
+Wfd <- smooth.pos(day.5, VanPrecres^2, dayfdPar)$Wfdobj
+VanPrecvarhat <- eval.posfd(day.5, Wfd)
+wtvec <- wtcheck(length(VanPrecvarhat), 1/VanPrecvarhat)
+Wfd2 <- smooth.pos(day.5, VanPrec, dayfdPar, wtvec)$Wfdobj
