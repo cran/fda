@@ -93,7 +93,7 @@ rng = range(age)
 knots  <- growth$age
 norder <- 6
 nbasis <- length(knots) + norder - 2
-hgtbasis <- create.bspline.basis(rng, nbasis, norder, knots)
+hgtbasis <- create.bspline.basis(range(knots), nbasis, norder, knots)
 
 #  --- Smooth these objects, penalizing the 4th derivative  --
 #  This gives a smoother estimate of the acceleration functions
@@ -103,8 +103,8 @@ lambda <- 1e-2
 growfdPar <- fdPar(hgtbasis, Lfdobj, lambda)
 
 # Need 'hgtm', 'hgtf', e.g., from attach(growth)
-hgtmfd <- smooth.basis(age, hgtm, growfdPar)$fd
-hgtffd <- smooth.basis(age, hgtf, growfdPar)$fd
+hgtmfd <- smooth.basis(growth$age, growth$hgtm, growfdPar)$fd
+hgtffd <- smooth.basis(growth$age, growth$hgtf, growfdPar)$fd
 
 #  plot data and smooth, residuals, velocity, and acceleration
 

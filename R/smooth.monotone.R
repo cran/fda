@@ -1,10 +1,11 @@
-smooth.monotone <- function(x, y, WfdParobj, wt=rep(1,nobs),
-       zmat=matrix(1,nobs,1), conv=.0001, iterlim=20,
-       active=c(FALSE,rep(TRUE,ncvec-1)), dbglev=1) {
-#  Smooths the relationship of Y to X using weights in WT by fitting a
+smooth.monotone <- function(argvals, y, WfdParobj, wtvec=rep(1,n),
+                            zmat=NULL, conv=.0001, iterlim=50,
+                            active=rep(TRUE,nbasis), dbglev=1)
+{
+#  Smooths the relationship of Y to ARGVALS using weights in WTVEC by fitting a
 #     monotone function of the form
 #                   f(x) = b_0 + b_1 D^{-1} exp W(x)
-#     where  W  is a function defined over the same range as X,
+#     where  W  is a function defined over the same range as ARGVALS,
 #                 W + ln b_1 = log Df and w = D W = D^2f/Df.
 #  The constant term b_0 in turn can be a linear combinations of covariates:
 #                         b_0 = zmat * c.
@@ -18,125 +19,238 @@ smooth.monotone <- function(x, y, WfdParobj, wt=rep(1,nobs),
 #    in the comments, while the b's are called "regression coefficients"
 
 #  Arguments:
-#  X       ...  vector of argument values
-#  Y       ...  vector of function values to be fit
-#  WT      ...  a vector of weights
-#  WFDPAROBJ  ...  functional parameter object for W(x).  The coefficient array
-#               for WFDPAROBJ$FD has a single column, and these are the
-#               starting values for the iterative minimization of mean squared error.
-#  ZMAT    ...  a matrix of covariate values for the constant term.
-#               It defaults to a column of one's
-#  CONV    ...  convergence criterion, 0.0001 by default
-#  ITERLIM ...  maximum number of iterations, 20 by default
-#  ACTIVE  ...  vector of 1's and 0's indicating which coefficients
-#               are to be optimized (1) or remain fixed (0).  All values
-#               are 1 by default, except that if a B-spline basis is used,
-#               the first value is set to 0.
+#  ARGVALS ...  Argument value array of length N, where N is the number of
+#               observed curve values for each curve.  It is assumed that
+#               that these argument values are common to all observed
+#               curves.  If this is not the case, you will need to
+#               run this function inside one or more loops, smoothing
+#               each curve separately.
+#  Y       ...  Function value array (the values to be fit).
+#               If the functional data are univariate, this array will be
+#               an N by NCURVE matrix, where N is the number of observed
+#               curve values for each curve and NCURVE is the number of
+#               curves observed.
+#               If the functional data are muliivariate, this array will be
+#               an N by NCURVE by NVAR matrix, where NVAR the number of
+#               functions observed per case.  For example, for the gait
+#               data, NVAR = 2, since we observe knee and hip angles.
+#  WFDPAROBJ... A functional parameter or fdPar object.  This object
+#               contains the specifications for the functional data
+#               object to be estimated by smoothing the data.  See
+#               comment lines in function fdPar for details.
+#               The functional data object WFD in WFDPAROBJ is used
+#               to initialize the optimization process.
+#               Its coefficient array contains the starting values for
+#               the iterative minimization of mean squared error.
+#  ZMAT    ...  An N by NCOV matrix of covariate values for the constant term.
+#               It defaults to NULL, in this case the constant term is the
+#               value of BETA[1] for all values of a given curve.
+#  WTVEC   ...  A vector of weights, a vector of N one's by default.
+#  CONV    ...  Convergence criterion, 0.0001 by default
+#  ITERLIM ...  maximum number of iterations, 50 by default.
+#  ACTIVE  ...  indices among 1:NBASIS of parameters to optimize.
+#               Defaults to 1:NBASIS.
 #  DBGLEV  ...  Controls the level of output on each iteration.  If 0,
-#               no output, if 1, output at each iteration, if higher, output
-#               at each line search iteration. 1 by default.
+#               no output, if 1, output at each iteration, if higher,
+#               output at each line search iteration. 1 by default.
 
-#  Returns a list containing:
-#  WFDOBJ    ...  functional data object for W(x).  Its coefficients are
-#                   those that optimize fit.
-#  BETA      ...  final regression coefficient values
-#  FLIST     ...  A list containing the final function value, gradient and
-#                 gradient norm.
-#  ITERNUM   ...  number of iterations
-#  ITERHIST  ...  ITERNUM+1 by 5 array containing iteration history
+#  Returns are:
+#  WFD     ...  Functional data object for W.
+#               Its coefficient matrix an N by NCURVE (by NVAR) matrix
+#               (or array), depending on whether the functional
+#               observations are univariate or multivariate.
+#  BETA    ...  The regression coefficients b_0 and b_1 for each
+#               smoothed curve.
+#               If the curves are univariate and
+#                  ... ZMAT is NULL,       BETA is 2   by NCURVE.
+#                  ... ZMAT has P columns, BETA is P+1 by NCURVE.
+#               If the curves are multivariate and
+#                  ... ZMAT is NULL,       BETA is 2   by NCURVE by NVAR.
+#                  ... ZMAT has P columns, BETA is P+1 by NCURVE by NVAR.
+#  YHATFD ...   A functional data object for the monotone curves that
+#               smooth the data
+#  FLIST  ...   A list object or a vector of list objects, one for
+#               each curve (and each variable if functions are multivariate).
+#               Each list object has slots:
+#                 f    ... The sum of squared errors
+#                 grad ... The gradient
+#                 norm ... The norm of the gradient
+#  Y2CMAP ...   For each estimated curve (and variable if functions are
+#               multivariate, this is an N by NBASIS matrix containing
+#               a linear mappping from data to coefficients that can be used
+#               for computing point-wise confidence intervals.
+#               If NCURVE = NVAR = 1, a matrix is returned.  Otherwise
+#               an NCURVE by NVAR list is returned, with each
+#               slot containing this mapping.
+#  When multiple curves and variables are analyzed, the lists containing
+#  FLIST and Y2CMAP objects are indexed linear with curves varying inside
+#  variables.
 
-# Last modified 30 April 2007 by Spencer Graves  
-#  Last modified 26 October 2005
+# last modified       26 September 2008 by Jim Ramsay
+# previously modified  3 January   2008 by Jim Ramsay
 
-#  initialize some arrays
+#  check ARGVALS
 
-  x      <- as.vector(x)
-  nobs   <- length(x)         #  number of observations
+argvals <- argcheck(argvals)
+n       <- length(argvals)
+onesobs <- matrix(1,n,1)
+
+#  at least three points are necessary for monotone smoothing
+
+if (n < 3) stop('ARGVALS does not contain at least three values.')
+
+#  check Y
+
+ychk   <- ycheck(y, n)
+y      <- ychk$y
+ncurve <- ychk$ncurve
+nvar   <- ychk$nvar
+ndim   <- ychk$ndim
+
+#  check WfdParobj and get LAMBDA
+
+WfdParobj <- fdParcheck(WfdParobj)
+lambda    <- WfdParobj$lambda
 
 #  the starting values for the coefficients are in FD object WFDOBJ
 
-  if (!(inherits(WfdParobj, "fdPar"))) stop(
-		"Argument 'WfdParobj' is not a functional data object.")
+Wfdobj   <- WfdParobj$fd
+Lfdobj   <- WfdParobj$Lfd
+basisobj <- Wfdobj$basis     #  basis for W(argvals)
+nbasis   <- basisobj$nbasis  #  number of basis functions
 
-  Wfdobj   <- WfdParobj$fd
-  Lfdobj   <- WfdParobj$Lfd
-  basisobj <- Wfdobj$basis     #  basis for W(x)
-  nbasis   <- basisobj$nbasis  #  number of basis functions
-  type     <- basisobj$type
-  cvec     <- Wfdobj$coefs
-  ncvec    <- length(cvec)
+#  set up initial coefficient array
 
-#  check some arguments
+coef0    <- Wfdobj$coefs
 
-  if (any(wt < 0))  stop("One or more weights are negative.")
-  if (all(wt == 0)) stop("All weights are zero.")
+#  check WTVEC
+
+wtvec <- wtcheck(n, wtvec)
+
+#  check ZMAT
+
+if (!is.null(zmat)) {
   zdim <- dim(zmat)
-  if (zdim[1] != nobs) stop(
-    "First dimension of ZMAT not correct.")
+  if (zdim[1] != n) stop("First dimension of ZMAT not correct.")
+  ncov   <- zdim[2]   #  number of covariates
+}
+else
+  ncov <- 1
 
 #  set up some variables
 
-  ncov   <- zdim[2]   #  number of covariates
-  ncovp1 <- ncov + 1  #  index for regression coef. for monotone fn.
-  wtroot <- sqrt(wt)
-  wtrtmt <- wtroot %*% matrix(1,1,ncovp1)
-  yroot  <- y*wtroot
-  climit <- c(-100*rep(1,nbasis), 100*rep(1,nbasis))
-  inact  <- !active   #  indices of inactive coefficients
+ncovp1 <- ncov + 1  #  index for regression coef. for monotone fn.
+wtroot <- sqrt(wtvec)
+wtrtmt <- wtroot %*% matrix(1,1,ncovp1)
+yroot  <- y*wtroot
+climit <- c(-100*rep(1,nbasis), 100*rep(1,nbasis))
+inact  <- !active   #  indices of inactive coefficients
 
-#  set up cell for storing basis function values
+#  set up list for storing basis function values
 
-  JMAX <- 15
-  basislist <- vector("list", JMAX)
+JMAX <- 15
+basislist <- vector("list", JMAX)
 
 #  initialize matrix Kmat defining penalty term
 
-  lambda = WfdParobj$lambda
-  if (lambda > 0) Kmat <- lambda*getbasispenalty(basisobj, Lfdobj)
-  else            Kmat <- NULL
+if (lambda > 0) {
+  Kmat <- lambda*eval.penalty(basisobj, Lfdobj)
+} else {
+  Kmat <- matrix(0,nbasis,nbasis)
+}
 
-#  Compute initial function and gradient values
+#  --------------------------------------------------------------------
+#              loop through variables and curves
+#  --------------------------------------------------------------------
 
-  result <- fngrad.smooth.monotone(y, x, zmat, wt, Wfdobj, lambda,
-                                   Kmat, inact, basislist)
-  Flist  <- result[[1]]
-  beta   <- result[[2]]
+#  set up arrays and lists to contain returned information
+
+if (ndim == 2) {
+    coef <- matrix(0,nbasis,ncurve)
+    beta <- matrix(0,ncovp1,ncurve)
+} else {
+    coef <- array(0,c(nbasis,ncurve,nvar))
+    beta <- array(0,c(ncovp1,ncurve,nvar))
+}
+
+if (ncurve > 1 || nvar > 1 ) {
+    Flist <- vector("list",ncurve*nvar)
+} else {
+    Flist <- NULL
+}
+
+if (ncurve > 1 || nvar > 1)  {
+    y2cMap <- vector("list",ncurve*nvar)
+} else {
+    y2cMap <- NULL
+}
+
+if (dbglev == 0) cat("Progress:  Each dot is a curve\n")
+
+for (ivar in 1:nvar) {
+  for (icurve in 1:ncurve) {
+    if (ndim == 2) {
+        yi    <- y[,icurve]
+        cveci <- coef0[,icurve]
+    } else {
+        yi    <- y[,icurve,ivar]
+        cveci <- coef0[,icurve,ivar]
+    }
+
+  #  Compute initial function and gradient values
+
+  result <- fngrad.smooth.monotone(yi, argvals, zmat, wtvec, cveci, lambda,
+                                   basisobj, Kmat, inact, basislist)
+  Flisti <- result[[1]]
+  betai  <- result[[2]]
   Dyhat  <- result[[3]]
 
-#  compute the initial expected Hessian
+  #  compute the initial expected Hessian
 
-  hessmat <- hesscal.smooth.monotone(beta, Dyhat, wtroot,
+  hessmat <- hesscal.smooth.monotone(betai, Dyhat, wtroot,
                                      lambda, Kmat, inact)
 
-#  evaluate the initial update vector for correcting the initial cvec
+  #  evaluate the initial update vector for correcting the initial cveci
 
-  result   <- linesearch.smooth.monotone(Flist, hessmat, dbglev)
+  result   <- linesearch.smooth.monotone(Flisti, hessmat, dbglev)
   deltac   <- result[[1]]
   cosangle <- result[[2]]
 
-#  initialize iteration status arrays
+  #  initialize iteration status arrays
 
   iternum <- 0
-  status  <- c(iternum, Flist$f, Flist$norm, beta)
+  status  <- c(iternum, Flisti$f, Flisti$norm, betai)
   if (dbglev >= 1) {
-    cat("\nIter.   PENSSE   Grad Length Intercept   Slope")
-    cat("\n")
+    if (ncurve > 1 || nvar > 1) {
+          if (ncurve > 1 && nvar > 1) {
+            cat("\n")
+            curvetitle <- paste('Results for curve',icurve,'and variable',ivar)
+          }
+          if (ncurve > 1 && nvar == 1) {
+            cat("\n")
+            curvetitle <- paste('Results for curve',icurve)
+          }
+          if (ncurve == 1 && nvar > 1) {
+            cat("\n")
+            curvetitle <- paste('Results for variable',ivar)
+          }
+    }
+    else curvetitle <- 'Results'
+
+    cat("\n",curvetitle,"\n")
+    cat("\nIter.   PENSSE   Grad Length Intercept   Slope\n")
     cat(iternum)
     cat("        ")
     cat(round(status[2],4))
     cat("      ")
     cat(round(status[3],4))
     cat("      ")
-    cat(round(beta[1],4))
+    cat(round(betai[1],4))
     cat("      ")
-    cat(round(beta[ncovp1],4))
+    cat(round(betai[ncovp1],4))
+  } else {
+    cat(".")
   }
-
-  iterhist <- matrix(0,iterlim+1,length(status))
-  iterhist[1,]  <- status
-  if (iterlim == 0)
-    return ( list( "Wfdobj" = Wfdobj, "beta" = beta, "Flist" = Flist,
-                 "iternum" = iternum, "iterhist" = iterhist ) )
 
 #  -------  Begin iterations  -----------
 
@@ -145,36 +259,36 @@ smooth.monotone <- function(x, y, WfdParobj, wt=rep(1,nobs),
   trial       <- 1
   reset       <- FALSE
   linemat     <- matrix(0,3,5)
-  betaold     <- beta
-  cvecold     <- cvec
-  Foldlist    <- Flist
+  betaold     <- betai
+  cvecold     <- cveci
+  Foldlist    <- Flisti
   dbgwrd      <- dbglev >= 2
 
-  for (iter in 1:iterlim)
-  {
-     iternum <- iternum + 1
-     #  initialize logical variables controlling line search
-     dblwrd <- c(FALSE,FALSE)
-     limwrd <- FALSE
-     stpwrd <- FALSE
-     ind    <- 0
-     ips    <- 0
-     #  compute slope at 0 for line search
-     linemat[2,1] <- sum(deltac*Flist$grad)
-     #  normalize search direction vector
+  if (iterlim > 0) {
+  for (iter in 1:iterlim) {
+      iternum <- iternum + 1
+      #  initialize logical variables controlling line search
+      dblwrd <- c(FALSE,FALSE)
+      limwrd <- FALSE
+      stpwrd <- FALSE
+      ind    <- 0
+      ips    <- 0
+      #  compute slope at 0 for line search
+      linemat[2,1] <- sum(deltac*Flisti$grad)
+      #  normalize search direction vector
       sdg     <- sqrt(sum(deltac^2))
       deltac  <- deltac/sdg
       dgsum   <- sum(deltac)
       linemat[2,1] <- linemat[2,1]/sdg
       # initialize line search vectors
-      linemat[,1:4] <- outer(c(0, linemat[2,1], Flist$f),rep(1,4))
+      linemat[,1:4] <- outer(c(0, linemat[2,1], Flisti$f),rep(1,4))
       stepiter <- 0
       if (dbglev >= 2) {
           cat("\n")
           cat(paste("                 ", stepiter, "  "))
           cat(format(round(t(linemat[,1]),6)))
       }
-      #  return with error condition if initial slope is nonnegative
+      #  break with error condition if initial slope is nonnegative
       if (linemat[2,1] >= 0) {
         if (dbgwrd >= 2) print("Initial slope nonnegative.")
         ind <- 3
@@ -189,15 +303,12 @@ smooth.monotone <- function(x, y, WfdParobj, wt=rep(1,nobs),
       #  first step set to trial
       linemat[1,5]  <- trial
       #  Main iteration loop for linesearch
-      cvecnew <- cvec
-      Wfdnew  <- Wfdobj
-      for (stepiter in 1:MAXSTEPITER)
-      {
-      #  ensure that step does not go beyond limits on parameters
+      for (stepiter in 1:MAXSTEPITER) {
+        #  ensure that step does not go beyond limits on parameters
         limflg  <- FALSE
         #  check the step size
         result <-
-              stepchk(linemat[1,5], cvec, deltac, limwrd, ind,
+              stepchk(linemat[1,5], cveci, deltac, limwrd, ind,
                       climit, active, dbgwrd)
         linemat[1,5] <- result[[1]]
         ind          <- result[[2]]
@@ -205,31 +316,33 @@ smooth.monotone <- function(x, y, WfdParobj, wt=rep(1,nobs),
         if (linemat[1,5] <= 1e-7)
         {
           #  Current step size too small ... terminate
+          Flisti  <- Foldlist
+          cvecnew <- cveci
+          gvecnew <- Flisti$grad
           if (dbglev >= 2) {
             print("Stepsize too small")
-            # print(avec[5])
+            print(linemat[1,5])
           }
           if (limflg) ind <- 1 else ind <- 4
           break
         }
         #  compute new function value and gradient
-        cvecnew <- cvec + linemat[1,5]*deltac
-        Wfdnew$coefs <- as.matrix(cvecnew)
-        result  <- fngrad.smooth.monotone(y, x, zmat, wt, Wfdnew, lambda,
-                                          Kmat, inact, basislist)
-        Flist   <- result[[1]]
-        beta    <- result[[2]]
+        cvecnew <- cveci + linemat[1,5]*deltac
+        result  <- fngrad.smooth.monotone(yi, argvals, zmat, wtvec, cvecnew, lambda,
+                                          basisobj, Kmat, inact, basislist)
+        Flisti  <- result[[1]]
+        betai   <- result[[2]]
         Dyhat   <- result[[3]]
-        linemat[3,5] <- Flist$f
+        linemat[3,5] <- Flisti$f
         #  compute new directional derivative
-        linemat[2,5] <- sum(deltac*Flist$grad)
+        linemat[2,5] <- sum(deltac*Flisti$grad)
         if (dbglev >= 2) {
           cat("\n")
           cat(paste("                 ", stepiter, "  "))
           cat(format(round(t(linemat[,5]),6)))
         }
         #  compute next line search step, also test for convergence
-        result  <- stepit(linemat, ips, ind, dblwrd, MAXSTEP, dbglev)
+        result  <- stepit(linemat, ips, dblwrd, MAXSTEP)
         linemat <- result[[1]]
         ips     <- result[[2]]
         ind     <- result[[3]]
@@ -237,52 +350,49 @@ smooth.monotone <- function(x, y, WfdParobj, wt=rep(1,nobs),
         trial   <- linemat[1,5]
         #  ind == 0  mean convergence
         if (ind == 0 | ind == 5) break
+        #  end of line search loop
      }
-     #  end iteration loop
-     cvec    <- cvecnew
-     Wfdobj  <- Wfdnew
+     cveci  <- cvecnew
      #  check that function value has not increased
-     if (Flist$f > Foldlist$f) {
+     if (Flisti$f > Foldlist$f) {
         # if it has, terminate iterations with a message
         if (dbglev >= 2) {
           cat("Criterion increased: ")
-          cat(format(round(c(Foldlist$f, Flist$f),4)))
+          cat(format(round(c(Foldlist$f, Flisti$f),4)))
           cat("\n")
         }
         #  reset parameters and fit
-        beta         <- betaold
-        cvec         <- cvecold
-        Wfdobj$coefs <- cvec
-        Flist        <- Foldlist
-        deltac       <- -Flist$grad
+        betai        <- betaold
+        cveci        <- cvecold
+        Wfdobj$coefs <- cveci
+        Flisti       <- Foldlist
+        deltac       <- -Flisti$grad
         if (reset) {
           # This is the second time in a row that
           #  this has happened ... quit
           if (dbglev >= 2) cat("Reset twice, terminating.\n")
-          return ( list( "Wfdobj" = Wfdobj, "beta" = beta, "Flist" = Flist,
-                         "iternum" = iternum, "iterhist" = iterhist ) )
+          break
         } else {
           reset <- TRUE
         }
      } else {
-       if (abs(Foldlist$f - Flist$f) < conv) {
-	       cat("\n")
+       if (abs(Foldlist$f - Flisti$f) < conv) {
+	       if (dbglev >= 1) cat("\n")
 	       break
        }
-       cvecold  <- cvec
-       betaold  <- beta
-       Foldlist <- Flist
-       hessmat  <- hesscal.smooth.monotone(beta, Dyhat, wtroot,
+       cvecold  <- cveci
+       betaold  <- betai
+       Foldlist <- Flisti
+       hessmat  <- hesscal.smooth.monotone(betai, Dyhat, wtroot,
                                            lambda, Kmat, inact)
-       #  udate the line search direction
-       result   <- linesearch.smooth.monotone(Flist, hessmat, dbglev)
+       #  update the line search direction
+       result   <- linesearch.smooth.monotone(Flisti, hessmat, dbglev)
        deltac   <- result[[1]]
        cosangle <- result[[2]]
        reset    <- FALSE
      }
-     #  store iteration status
-     status <- c(iternum, Flist$f, Flist$norm, beta)
-     iterhist[iter+1,] <- status
+     #  display iteration status
+     status <- c(iternum, Flisti$f, Flisti$norm, betai)
      if (dbglev >= 1) {
         cat("\n")
         cat(iternum)
@@ -291,26 +401,101 @@ smooth.monotone <- function(x, y, WfdParobj, wt=rep(1,nobs),
         cat("      ")
         cat(round(status[3],4))
         cat("      ")
-        cat(round(beta[1],4))
+        cat(round(betai[1],4))
         cat("      ")
-        cat(round(beta[ncovp1],4))
+        cat(round(betai[ncovp1],4))
      }
+    }
+    }
+
+    #  save coefficients in arrays COEF and BETA
+
+    if (ndim == 2) {
+        coef[,icurve] <- cveci
+#        beta[,icurve] <- matrix(betai,2,1)
+        beta[,icurve] <- betai
+    } else {
+        coef[,icurve,ivar] <- cveci
+#        beta[,icurve,ivar] <- matrix(betai,2,1)
+        beta[,icurve,ivar] <- betai
+    }
+
+    #  save Flisti if required in a list,
+    #      indexed with curves varying inside variables.
+
+    if (ncurve == 1 && nvar == 1) {
+        Flist <- Flisti
+    } else {
+        Flist[[(ivar-1)*ncurve+icurve]] <- Flisti
+    }
+
+    #  save y2cMap if required in a list,
+    #      indexed with curves varying inside variables.
+
+    y2cMapij <- solve(crossprod(Dyhat) + lambda*Kmat) %*%
+                    t(Dyhat)/sqrt(n)
+    if (ncurve == 1 && nvar == 1) {
+        y2cMap <- y2cMapij
+    } else {
+        y2cMap[[(ivar-1)*ncurve+icurve]] <- y2cMapij
+    }
   }
-  return ( list( "Wfdobj" = Wfdobj, "beta" = beta, "Flist" = Flist,
-                 "iternum" = iternum, "iterhist" = iterhist ) )
+}
+
+Wfdobj <- fd(coef, basisobj)
+
+#  Set up yhatfd, a functional data object for the monotone curves
+#  fitting the data.
+#  This can only be done if the covariate matrix ZMAT is NULL, meaning that
+#  the same constant term is used for all curve values.
+
+if (is.null(zmat)) {
+
+  rangeval <- basisobj$rangeval
+  narg     <- 10*nbasis+1
+  evalarg  <- seq(rangeval[1], rangeval[2], len=narg)
+  hmat     <- eval.monfd(evalarg, Wfdobj)
+
+  if (ndim == 2) {
+    yhatmat <- matrix(0,narg,ncurve)
+    for (icurve in 1:ncurve) {
+      yhatmat[,icurve] <- beta[1,icurve] +
+                          beta[2,icurve]*hmat[,icurve]
+    }
+    yhatcoef <- project.basis(yhatmat, evalarg, basisobj)
+    yhatfd   <- fd(yhatcoef, basisobj)
+  } else {
+    yhatcoef <- array(0,c(nbasis,ncurve,nvar))
+    yhatmati <- matrix(0,narg,ncurve)
+    for (ivar in 1:nvar) {
+      for (icurve in 1:ncurve) {
+        yhatmati[,icurve] <- beta[1,icurve,ivar] +
+                             beta[2,icurve,ivar]*hmat[,icurve,ivar]
+      }
+      yhatcoef[,,ivar] <- project.basis(yhatmati, evalarg, basisobj)
+    }
+    yhatfd <- fd(yhatcoef, basisobj)
+  }
+} else {
+  yhatfd <- NULL
+}
+
+return ( list( "Wfdobj"  = Wfdobj,  "beta"   = beta, "yhatfd" = yhatfd,
+               "Flist"   = Flist,   "y2cMap" = y2cMap,
+               "argvals" = argvals, "y"      = y ) )
 }
 
 #  ----------------------------------------------------------------
 
-linesearch.smooth.monotone <- function(Flist, hessmat, dbglev)
+linesearch.smooth.monotone <- function(Flisti, hessmat, dbglev)
 {
-  deltac   <- -symsolve(hessmat,Flist$grad)
-  cosangle <- -sum(Flist$grad*deltac)/sqrt(sum(Flist$grad^2)*sum(deltac^2))
+  deltac   <- -symsolve(hessmat,Flisti$grad)
+  cosangle <- -sum(Flisti$grad*deltac)/sqrt(sum(Flisti$grad^2)*sum(deltac^2))
   if (dbglev >= 2) {
     cat(paste("\nCos(angle) =",format(round(cosangle,4))))
     if (cosangle < 1e-7) {
       if (dbglev >=2)  cat("\nCosine of angle too small\n")
-      deltac <- -Flist$grad
+      deltac <- -Flisti$grad
     }
   }
   return(list(deltac, cosangle))
@@ -318,60 +503,69 @@ linesearch.smooth.monotone <- function(Flist, hessmat, dbglev)
 
 #  ----------------------------------------------------------------
 
-fngrad.smooth.monotone <- function(y, x, zmat, wt, Wfdobj, lambda,
-                                   Kmat, inact, basislist)
+fngrad.smooth.monotone <- function(yi, argvals, zmat, wtvec, cveci, lambda,
+                                   basisobj, Kmat, inact, basislist)
 {
-  ncov   <- ncol(zmat)
-  ncovp1 <- ncov + 1
-  nobs   <- length(x)
-  cvec   <- Wfdobj$coefs
-  nbasis <- length(cvec)
-  h      <- monfn(x, Wfdobj, basislist)
-  Dyhat  <- mongrad(x, Wfdobj, basislist)
-  xmat   <- cbind(zmat,h)
-  Dxmat  <- array(0,c(nobs,ncovp1,nbasis))
+  if (!is.null(zmat)) {
+    ncov   <- ncol(zmat)
+    ncovp1 <- ncov + 1
+  } else {
+    ncov   <- 1
+    ncovp1 <- 2
+  }
+  n      <- length(argvals)
+  nbasis <- basisobj$nbasis
+  Wfdobj <- fd(cveci, basisobj)
+  h      <- monfn(argvals, Wfdobj, basislist)
+  Dyhat  <- mongrad(argvals, Wfdobj, basislist)
+  if (!is.null(zmat)) xmat <- cbind(zmat,h)
+  else                xmat <- cbind(matrix(1,n,1),h)
+  Dxmat  <- array(0,c(n,ncovp1,nbasis))
   Dxmat[,ncovp1,] <- Dyhat
-  wtroot <- sqrt(wt)
+  wtroot <- sqrt(wtvec)
   wtrtmt <- wtroot %*% matrix(1,1,ncovp1)
-  yroot  <- y*wtroot
+  yroot  <- yi*wtroot
   xroot  <- xmat*wtrtmt
   #  compute regression coefs.
-  beta   <- lsfit(xmat, y, wt, int=FALSE)$coef
+  betai  <- lsfit(xmat, yi, wtvec, int=FALSE)$coef
   #  update fitted values
-  yhat   <- xmat %*% beta
+  yhat   <- xmat %*% betai
   #  update residuals and function values
-  res    <- y - yhat
-  f      <- mean(res^2*wt)
+  res    <- yi - yhat
+  f      <- mean(res^2*wtvec)
   grad   <- matrix(0,nbasis,1)
+  #print(betai)
   for (j in 1:nbasis) {
     Dxroot <- Dxmat[,,j]*wtrtmt
-    yDx <- crossprod(yroot,Dxroot) %*% beta
+    yDx <- crossprod(yroot,Dxroot) %*% betai
     xDx <- crossprod(xroot,Dxroot)
-    grad[j] <- crossprod(beta,(xDx+t(xDx))) %*% beta - 2*yDx
+    #print(crossprod(betai,(xDx+t(xDx))))
+    #print(2*yDx)
+    grad[j] <- crossprod(betai,(xDx+t(xDx))) %*% betai - 2*yDx
   }
-  grad <- grad/nobs
+  grad <- grad/n
   if (lambda > 0) {
-    grad <- grad +         2 * Kmat %*% cvec
-    f    <- f    + t(cvec) %*% Kmat %*% cvec
+    grad <- grad +          2 * Kmat %*% cveci
+    f    <- f    + t(cveci) %*% Kmat %*% cveci
   }
   if (any(inact)) grad[inact] <- 0
   norm <- sqrt(sum(grad^2)) #  gradient norm
-  Flist <- list("f"=f,"grad"=grad,"norm"=norm)
-  return(list(Flist, beta, Dyhat))
+  Flisti <- list("f"=f,"grad"=grad,"norm"=norm)
+  return(list(Flisti, betai, Dyhat))
 }
 
 #  ----------------------------------------------------------------
 
-hesscal.smooth.monotone <- function(beta, Dyhat, wtroot, lambda,
+hesscal.smooth.monotone <- function(betai, Dyhat, wtroot, lambda,
                                     Kmat, inact)
 {
-  nbet    <- length(beta)
+  nbet    <- length(betai)
   Dydim   <- dim(Dyhat)
-  nobs    <- Dydim[1]
+  n       <- Dydim[1]
   nbasis  <- Dydim[2]
-  temp    <- beta[nbet]*Dyhat
+  temp    <- betai[nbet]*Dyhat
   temp    <- temp*(wtroot %*% matrix(1,1,nbasis))
-  hessmat <- 2*crossprod(temp)/nobs
+  hessmat <- 2*crossprod(temp)/n
   #  adjust for penalty
   if (lambda > 0) hessmat <- hessmat + 2*Kmat
   #  adjust for inactive coefficients

@@ -25,8 +25,7 @@ fRegress.stderr <- function(fRegressList, y2cMap, SigmaE) {
 #  C2BMAP         ... the matrix mapping from response variable coefficients
 #                     to coefficients for regression coefficients
 
-#  Last modified 2007.11.28 by Spencer Graves
-#  previosly modified 5 March 2005
+#  Last modified 21 October 2008 by Jim Ramsay
 
 #  get number of independent variables
 
@@ -36,7 +35,6 @@ betalist <- fRegressList$betalist
 Cmatinv  <- fRegressList$Cmatinv
 
 p <- length(xfdlist)
-
 
 #  compute number of coefficients
 
@@ -93,7 +91,7 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
             mk2    <- mk2 + N
             indexk <- mk1:mk2
             tempk  <- bbasismatj*ybasismat[,k]
-		     basisprodmat[indexj,indexk] <-
+            basisprodmat[indexj,indexk] <-
                      deltat*crossprod(tempk,tempj)
         }
     }
@@ -119,11 +117,11 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
         ncoefj     <- betabasisj$nbasis
         mj1 	     <- mj2 + 1
         mj2 	     <- mj2 + ncoefj
-        indexj 	  <- mj1:mj2
+        indexj 	   <- mj1:mj2
         bbasismat  <- eval.basis(tfine, betabasisj)
         bvarj      <- bvar[indexj,indexj]
         bstderrj   <- sqrt(diag(bbasismat %*% bvarj %*% t(bbasismat)))
-        bstderrfdj <- data2fd(bstderrj, tfine, betabasisj)
+        bstderrfdj <- smooth.basis(tfine, bstderrj, betabasisj)$fd
         betastderrlist[[j]] <- bstderrfdj
     }
 
@@ -147,10 +145,9 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
             Jpsithetaj <- inprod(xbasis,bbasis)
             Zmat       <- cbind(Zmat,t(xcoef) %*% Jpsithetaj)
         }
-        else if (inherits(xfdj, "double")) {
+        else if (inherits(xfdj, "numeric")) {
             Zmatj <- xfdj
             Zmat  <- cbind(Zmat,Zmatj)
-
         }
     }
 
@@ -163,9 +160,9 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
     betastderrlist <- vector("list",p)
     mj2 <- 0
     for (j in 1:p) {
-	    betafdParj <- betalist[[j]]
+	      betafdParj <- betalist[[j]]
         betabasisj <- betafdParj$fd$basis
-	    ncoefj  <- betabasisj$nbasis
+	      ncoefj <- betabasisj$nbasis
         mj1    <- mj2 + 1
         mj2    <- mj2 + ncoefj
         indexj <- mj1:mj2
@@ -177,11 +174,11 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
             tfine      <- seq(betarng[1], betarng[2], len=nfine)
             bbasismat  <- eval.basis(tfine, betabasisj)
             bstderrj   <- sqrt(diag(bbasismat %*% bvarj %*% t(bbasismat)))
-            bstderrfdj <- data2fd(bstderrj, tfine, betabasisj)
+            bstderrfdj <- smooth.basis(tfine, bstderrj, betabasisj)$fd
         } else {
-	         bsterrj    <- sqrt(diag(bvarj))
-#	         bstderrfdj <- fd(t(bstderrj), onebasis)
-	         bstderrfdj <- fd(t(bstderrj), ynbasis)
+	          bsterrj    <- sqrt(diag(bvarj))
+	          onebasis   <- create.constant.basis(betabasisj$rangeval)
+	          bstderrfdj <- fd(t(bstderrj), onebasis)
         }
         betastderrlist[[j]] <- bstderrfdj
     }

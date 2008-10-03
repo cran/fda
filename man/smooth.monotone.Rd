@@ -17,116 +17,154 @@
 
   The monotone smooth is beta[1]+beta[2]*integral(exp(Wfdobj)), where
   Wfdobj is a functional data object.  Since exp(Wfdobj)>0, its integral
-  is monotonically increasing.   
+  is monotonically increasing.
 }
 \usage{
-smooth.monotone(x, y, WfdParobj, wt=rep(1,nobs),
-                zmat=matrix(1,nobs,1), conv=.0001, iterlim=20,
-                active=c(FALSE,rep(TRUE,ncvec-1)), dbglev=1)
+smooth.monotone(argvals, y, WfdParobj, wtvec=rep(1,n),
+                zmat=NULL, conv=.0001, iterlim=50,
+                active=rep(TRUE,nbasis), dbglev=1)
 }
 \arguments{
-\item{x}{
-a vector of argument values.
-}
-\item{y}{
-a vector of data values.  This function can only smooth
-one set of data at a time.
-}
-\item{WfdParobj}{
-a functional parameter object that provides an initial
-value for the coefficients defining function $W(t)$,
-and a roughness penalty on this function.
-}
-\item{wt}{
-a vector of weights to be used in the smoothing.
-}
-\item{zmat}{
-a design matrix or a matrix of covariate values that also
-define the smooth of the data.
-}
-\item{conv}{
-a convergence criterion.
-}
-\item{iterlim}{
-the maximum number of iterations allowed in the minimization
-of error sum of squares.
-}
-\item{active}{
-a logical vector specifying which coefficients defining
-$W(t)$ are estimated.  Normally, the first coefficient
-is fixed.
-}
-\item{dbglev}{
-either 0, 1, or 2.  This controls the amount information printed out on
-each iteration, with 0 implying no output, 1 intermediate output level,
-and 2 full output.  If either level 1 or 2 is specified, it can be
-helpful to turn off the output buffering feature of S-PLUS.
-}
-}
-\value{
-a named list of length 5 containing:
+  \item{argvals}{
+    Argument value array of length N, where N is the number of observed
+    curve values for each curve.  It is assumed that that these argument
+    values are common to all observed curves.  If this is not the case,
+    you will need to run this function inside one or more loops,
+    smoothing each curve separately.
+  }
+  \item{y}{
+    a vector of data values.  This function can only smooth one set of
+    data at a time.
 
-\item{Wfdobj}{
-a functional data object defining function $W(x)$ that optimizes the fit
-to the data of the monotone function that it defines. 
+    Function value array (the values to be fit).  If the functional data
+    are univariate, this array will be an N by NCURVE matrix, where N is
+    the number of observed curve values for each curve and NCURVE is the
+    number of curves observed.  If the functional data are muliivariate,
+    this array will be an N by NCURVE by NVAR matrix, where NVAR the
+    number of functions observed per case.  For example, for the gait
+    data, NVAR = 2, since we observe knee and hip angles.
+  }
+  \item{WfdParobj}{
+    A functional parameter or fdPar object.  This object contains the
+    specifications for the functional data object to be estimated by
+    smoothing the data.  See comment lines in function fdPar for
+    details.  The functional data object WFD in WFDPAROBJ is used to
+    initialize the optimization process.  Its coefficient array contains
+    the starting values for the iterative minimization of mean squared
+    error.
+  }
+  \item{wtvec}{
+    a vector of weights to be used in the smoothing.
+  }
+  \item{zmat}{
+    a design matrix or a matrix of covariate values that also define the
+    smooth of the data.
+  }
+  \item{conv}{
+    a convergence criterion.
+  }
+  \item{iterlim}{
+    the maximum number of iterations allowed in the minimization of
+    error sum of squares.
+  }
+  \item{active}{
+    a logical vector specifying which coefficients defining $W(t)$ are
+    estimated.  Normally, the first coefficient is fixed.
+  }
+  \item{dbglev}{
+    either 0, 1, or 2.  This controls the amount information printed out
+    on each iteration, with 0 implying no output, 1 intermediate output
+    level, and 2 full output.  If either level 1 or 2 is specified, it
+    can be helpful to turn off the output buffering feature of S-PLUS.
+  }
 }
-\item{beta}{
-the optimal regression coefficient values.
-}
-\item{Flist}{
-a named list containing three results for the final converged solution:
-(1)
-\bold{f}: the optimal function value being minimized,
-(2)
-\bold{grad}: the gradient vector at the optimal solution,   and
-(3)
-\bold{norm}: the norm of the gradient vector at the optimal solution.
-}
-\item{iternum}{
-the number of iterations.
-}
-\item{iterhist}{
-\code{iternum+1} by 5 matrix containing the iteration
-history.
-}
+
+\value{
+  a named list of length 5 containing:
+
+  \item{Wfdobj}{
+    a functional data object defining function $W(argvals)$ that
+    optimizes the fit to the data of the monotone function that it
+    defines.
+  }
+  \item{beta}{
+    The regression coefficients $b_0$ and $b_1$ for each smoothed
+    curve.
+
+    If the curves are univariate and
+    ... ZMAT is NULL,       BETA is 2   by NCURVE.
+    ... ZMAT has P columns, BETA is P+1 by NCURVE.
+
+    If the curves are multivariate and
+    ... ZMAT is NULL,       BETA is 2   by NCURVE by NVAR.
+    ... ZMAT has P columns, BETA is P+1 by NCURVE by NVAR.
+  }
+  \item{yhatfd}{
+    A functional data object for the monotone curves that smooth the
+    data
+  }
+  \item{Flist}{
+    a named list containing three results for the final converged
+    solution:  (1) \bold{f}: the optimal function value being minimized,
+    (2) \bold{grad}: the gradient vector at the optimal solution, and
+    (3) \bold{norm}: the norm of the gradient vector at the optimal
+    solution.
+  }
+  \item{y2cMap}{
+    For each estimated curve (and variable if functions are
+    multivariate, this is an N by NBASIS matrix containing a linear
+    mappping from data to coefficients that can be used for computing
+    point-wise confidence intervals.  If NCURVE = NVAR = 1, a matrix is
+    returned.  Otherwise an NCURVE by NVAR list is returned, with each
+    slot containing this mapping.
+  }
+  \item{argvals}{
+    input \code{argvals}, possibly modified / clarified by
+    \code{argcheck}.
+  }
+  \item{y}{
+    input argument \code{y}, possibly modified / clarified by
+    \code{ycheck}.
+  }
 }
 \details{
-The smoothing function  $f(x)$ is determined by
-three objects that need to be estimated from the data:
+  The smoothing function  $f(argvals)$ is determined by three objects
+  that need to be estimated from the data:
 
-\itemize{
-	\item $W(x)$, a functional data object that is first
-	exponentiated and then the result integrated.  This is the heart
-	of the monotone smooth.  The closer $W(x)$ is to zero, the
+  \itemize{
+    \item $W(argvals)$, a functional data object that is first
+        exponentiated and then the result integrated.  This is the heart
+	of the monotone smooth.  The closer $W(argvals)$ is to zero, the
 	closer the monotone smooth becomes a straight line.  The closer
-	$W(x)$ becomes a constant, the more the monotone smoother
+	$W(argvals)$ becomes a constant, the more the monotone smoother
 	becomes an exponential function.  It is assumed that $W(0) = 0.$
-	
+
 	\item $b0$, an intercept term that determines the value of the
-	smoothing function at $x = 0$. 
+	smoothing function at $argvals = 0$.
 
 	\item $b1$, a regression coefficient that determines the slope
-	of the smoothing function at $x = 0$. 
-}
-In addition, it is possible to have the intercept $b0$
-depend in turn on the values of one or more covariates through the
-design matrix \code{Zmat} as follows:
-$b0 = Z c$. In this case, the single
-intercept coefficient is replaced by the regression coefficients
-in vector $c$ multipying the design matrix.
+	of the smoothing function at $argvals = 0$.
+  }
 
-}\references{
-  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional 
-    Data Analysis, 2nd ed.}, Springer, New York. 
+  In addition, it is possible to have the intercept $b0$
+  depend in turn on the values of one or more covariates through the
+  design matrix \code{Zmat} as follows:
+  $b0 = Z c$. In this case, the single
+  intercept coefficient is replaced by the regression coefficients
+  in vector $c$ multipying the design matrix.
+}
+\references{
+  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional
+    Data Analysis, 2nd ed.}, Springer, New York.
 
   Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
     Functional Data Analysis}, Springer, New York.
 }
 
 \seealso{
-\code{\link{smooth.basis}}, 
-\code{\link{smooth.pos}}, 
-\code{\link{smooth.morph}}
+  \code{\link{smooth.basis}},
+  \code{\link{smooth.pos}},
+  \code{\link{smooth.morph}}
 }
 \examples{
 

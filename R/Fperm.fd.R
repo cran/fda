@@ -1,22 +1,27 @@
-Fperm.fd <- function(yfdPar, xfdlist, betalist,wt=NULL, # Standard inputs to fRegress
-            nperm=200,argvals=NULL,q=0.05,plotres=TRUE,...) # number of permutations,
-{                                                       # where to evaluate functional
-    Fnull = rep(0,nperm)                                # responses, quantile to compare
-                                                        # and do we plot the results?
-    Fnullvals = c()
+Fperm.fd <- function(yfdPar, xfdlist, betalist,wt=NULL,
+            nperm=200,argvals=NULL,q=0.05,plotres=TRUE,...)
+{
+# yfdpar, xfdList, betalist, wt = standard inputs to fRegress
+# nperm = number of permutations,
+# argvals = where to evaluate functional responses,
+# q =  quantile to compare
+# plotres:  Do we plot the results?
+
+  Fnull = rep(0,nperm)
+  Fnullvals = c()
 
     q = 1-q
 
     begin <- proc.time()
     fRegressList <- fRegress(yfdPar, xfdlist, betalist)
-    elapsed.time <- max(proc.time()-begin,na.rm=TRUE)       
+    elapsed.time <- max(proc.time()-begin,na.rm=TRUE)
 
     if( elapsed.time > 30/nperm ){
         print(paste('Estimated Computing time =',round(nperm*elapsed.time),'seconds.'))
     }
 
     yhat <- fRegressList$yhatfdobj
-        
+
     tFstat <- Fstat.fd(yfdPar,yhat,argvals)
 
     Fvals <- tFstat$F
@@ -28,20 +33,20 @@ Fperm.fd <- function(yfdPar, xfdlist, betalist,wt=NULL, # Standard inputs to fRe
     else{ n = ncol(yfdPar$coefs) }
 
     for(i in 1:nperm){
-        
+
         tyfdPar = yfdPar[sample(n)]
 
         fRegressList <- fRegress(tyfdPar, xfdlist, betalist)
-        
+
         yhat <- fRegressList$yhatfdobj
 
         tFstat = Fstat.fd(yfdPar,yhat,argvals)
-        
+
         Fnullvals <- cbind(Fnullvals,tFstat$F)
-        
+
         Fnull[i] = max(Fnullvals[,i])
     }
-    
+
 
     pval = mean( Fobs < Fnull )
     qval = quantile(Fnull,q)
@@ -53,7 +58,7 @@ Fperm.fd <- function(yfdPar, xfdlist, betalist,wt=NULL, # Standard inputs to fRe
     if(plotres){
         if(is.fd(yfdPar)){
             ylims = c(min(c(Fvals,qval,qvals.pts)),max(c(Fobs,qval)))
-    
+
 		if( is.null(names(yhat$fdnames)) ){ xlab = 'argvals' }
 		else{ xlab = names(yhat$fdnames)[1] }
 
@@ -83,7 +88,7 @@ Fperm.fd <- function(yfdPar, xfdlist, betalist,wt=NULL, # Standard inputs to fRe
 			lty=c(1,2),lwd=c(2,2))
         }
     }
-    
+
     return(list(pval=pval,qval=qval,Fobs=Fobs,Fnull=Fnull,
         Fvals=Fvals,Fnullvals=Fnullvals,pvals.pts=pvals.pts,qvals.pts=qvals.pts,
         fRegressList=fRegressList,argvals=argvals))

@@ -1,30 +1,29 @@
 #  --------------------------------------------------------------
 
-monfn <- function(x, Wfd, basislist=vector("list",JMAX)) {
+monfn <- function(argvals, Wfdobj, basislist=vector("list",JMAX)) {
 #  evaluates a monotone function of the form
-#            h(x) = [D^{-1} exp Wfd](x)
+#            h(x) = [D^{-1} exp Wfdobj](x)
 #  where  D^{-1} means taking the indefinite integral.
 #  The interval over which the integration takes places is defined in
-#  the basis object in Wfd.
+#  the basis object in Wfdobj.
 #  Arguments:
-#  X      ... argument values at which function and derivatives are evaluated
-#  WFD    ... a functional data object
+#  ARGVALS   ... argument values at which function and derivatives are evaluated
+#  WFDOBJ    ... a functional data object
 #  BASISLIST ... a list containing values of basis functions
 #  Returns:
-#  HVAL   ... value of h at input argument array X in first column.
+#  HVAL   ... matrix or array containing values of h.
 
-#  Last modified 26 October 2003
-
+#  Last modified 19 December 2007
   JMAX <- 15
   JMIN <- 11
   EPS  <- 1E-5
 
-  coef  <- Wfd$coefs
+  coef  <- Wfdobj$coefs
   coefd <- dim(coef)
   ndim  <- length(coefd)
-  if (ndim > 1 && coefd[2] != 1) stop("Wfd is not a single function")
+  if (ndim > 1 && coefd[2] != 1) stop("WFDOBJ is not a single function")
 
-  basisobj  <- Wfd$basis
+  basisobj <- Wfdobj$basis
   rangeval <- basisobj$rangeval
 
   #  set up first iteration
@@ -82,7 +81,7 @@ monfn <- function(x, Wfd, basislist=vector("list",JMAX)) {
         nx     <- length(tval)
         del    <- tval[2] - tval[1]
         fval   <- del*(cumsum(fval) - 0.5*(fval[1] + fval))
-        hval   <- approx(tval, fval, x)$y
+        hval   <- approx(tval, fval, argvals)$y
         return(hval)
       }
     }

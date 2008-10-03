@@ -1,7 +1,7 @@
 smooth.basis <- function (argvals, y, fdParobj,
-                          wtvec=rep(1,length(argvals)), fdnames=NULL) 
+                          wtvec=rep(1,length(argvals)), fdnames=NULL)
 {
-# ARGVALS ... A set of argument values, set by default to equally spaced 
+# ARGVALS ... A set of argument values, set by default to equally spaced
 #             on the unit interval (0,1).
 # Y       ... an array containing values of curves
 #             If the array is a matrix, rows must correspond to argument
@@ -41,7 +41,7 @@ smooth.basis <- function (argvals, y, fdParobj,
 #   PENMAT...  the penalty matrix.
 #   Y2CMAP...  the matrix mapping the data to the coefficients.
 
-# last modified 2008.07.01 by Spencer Graves   
+# last modified 2008.07.01 by Spencer Graves
 #  previously modified:  2007.09.29 and 1 March 2007
 
 #  ---------------------------------------------------------------------
@@ -58,7 +58,7 @@ smooth.basis <- function (argvals, y, fdParobj,
   #  check Y
 
   if (is.vector(y)) y <- as.matrix(y)
-	
+
   if(!inherits(y, "matrix") && !inherits(y, "array"))
     stop("'y' is not of class matrix or class array.")
 
@@ -117,20 +117,20 @@ smooth.basis <- function (argvals, y, fdParobj,
     nrep <- 1
     nvar <- 1
     coef <- rep(0,nbasis)
-#   This should be unnecessary as when ndim<3, coef is overwritten below    
+#   This should be unnecessary as when ndim<3, coef is overwritten below
 #   names(coef) <- bnames
     y <- matrix(y,n,1, dimnames=list(tnames, NULL))
     ynames <- 'rep'
-    vnames <- 'value' 
+    vnames <- 'value'
   }
   if (ndim == 2)  {
     nrep <- ncol(y)
     nvar <- 1
     coef <- matrix(0,nbasis,nrep)
 #   This should be unnecessary as when ndim<3, coef is overwritten below
-#   dimnames(coef) <- list(bnames, ynames) 
+#   dimnames(coef) <- list(bnames, ynames)
     ynames <- dimnames(y)[[2]]
-    vnames <- 'value' 
+    vnames <- 'value'
   }
   if (ndim == 3)  {
     nrep <- dim(y)[2]
@@ -138,7 +138,7 @@ smooth.basis <- function (argvals, y, fdParobj,
     coef <- array(0,c(nbasis,nrep,nvar))
     ynames <- dimnames(y)[[2]]
     vnames <- dimnames(y)[[3]]
-    dimnames(coef) <- list(bnames, ynames, vnames) 
+    dimnames(coef) <- list(bnames, ynames, vnames)
   }
 
   #  set up matrix of basis function values
@@ -208,7 +208,7 @@ smooth.basis <- function (argvals, y, fdParobj,
     }
 
 #  ----------------------------------------------------------------
-#       Compute the coefficients defining the smooth and 
+#       Compute the coefficients defining the smooth and
 #            summary properties of the smooth
 #  ----------------------------------------------------------------
 
@@ -228,7 +228,7 @@ smooth.basis <- function (argvals, y, fdParobj,
     else for (ivar in 1:nvar)
 			coef[,,ivar] <- Bmatinv %*% Dmat[,,ivar]
 
-  } else { 
+  } else {
 #  if((n <= nbasis) && (lambda<=0))
     if(n == nbasis) {
       y2cMap <- solve(basismat[, 1:n])
@@ -237,18 +237,18 @@ smooth.basis <- function (argvals, y, fdParobj,
         if(ndim==1)
           coef[1:n] <- (y2cMap %*% y)
         else if (ndim==2)
-          coef[1:n, ] <-(y2cMap %*% y) 
+          coef[1:n, ] <-(y2cMap %*% y)
         else
           for(ivar in 1:var)
             coef[1:n, , ivar] <- (y2cMap %*% y[,,ivar])
       }
       penmat <- matrix(0,nbasis,nbasis)
     } else {
-      warning("The number of basis functions = ", nbasis, " exceeds ", 
+      warning("The number of basis functions = ", nbasis, " exceeds ",
               n, " = the number of points to be smoothed.  ",
-              "With no smoothing (lambda = 0), this will produce ", 
+              "With no smoothing (lambda = 0), this will produce ",
               "a perfect fit to data that typically has wild ",
-              "excursions between data points.") 
+              "excursions between data points.")
 #  ------------------------------------------------------------------
 #  The following code is for the underdetermined coefficients:
 #  the number of basis functions exceeds the number of argument values.
@@ -270,12 +270,12 @@ smooth.basis <- function (argvals, y, fdParobj,
       v.d <- with(svdB, v / rep(d, each=nbasis))
       vdu <- tcrossprod(v.d, svdB$u)
       y2cMap <- (vdu * rep(w.5, each=nbasis))
-#      
+#
       if (ndim < 3) {
 #        z1mat <- solve(Rmat,y)
 #        z2mat <- solve(Q2tHQ2mat, Q2tHQ1mat %*% z1mat)
 #        coef <- Q1mat %*% z1mat + Q2mat %*% z2mat
-        coef <- y2cMap %*% y 
+        coef <- y2cMap %*% y
       } else {
         for (ivar in 1:nvar) {
 #          z1mat <- solve(Rmat,y[,,ivar])
@@ -289,7 +289,7 @@ smooth.basis <- function (argvals, y, fdParobj,
 #      basisinv <- solve(basismat)
 #      basisiw <- basisinv / rep(wt, each=n)
 #      Bmatinv <- tcrossprod(basisiw, basisinv)
-#      y2cMap = Bmatinv %*% t(basisw)    
+#      y2cMap = Bmatinv %*% t(basisw)
     }
   }
 #  ----------------------------------------------------------------
@@ -297,7 +297,7 @@ smooth.basis <- function (argvals, y, fdParobj,
 #  ----------------------------------------------------------------
 
   #  compute error sum of squares
-    
+
   if (ndim < 3) {
     yhat <- basismat %*% coef
     SSE <- sum((y - yhat)^2)
@@ -307,7 +307,7 @@ smooth.basis <- function (argvals, y, fdParobj,
     yhat <- array(0,c(n, nrep, nvar))
     dimnames(yhat) <- list(dimnames(basismat)[[1]],
                            dimnames(coef)[[2]],
-                           dimnames(coef)[[3]]) 
+                           dimnames(coef)[[3]])
     for (ivar in 1:nvar) {
       yhat[,,ivar] <- basismat %*% coef[,,ivar]
       SSE <- SSE + sum((y[,,ivar] - yhat[,,ivar])^2)
@@ -316,8 +316,8 @@ smooth.basis <- function (argvals, y, fdParobj,
     if(is.null(vnames))vnames <- dimnames(yhat)[[2]]
   }
   if(is.null(ynames))ynames <- paste('rep', 1:nrep, sep='')
-  if(is.null(vnames))vnames <- paste('value', 1:nvar, sep='') 
-    
+  if(is.null(vnames))vnames <- paste('value', 1:nvar, sep='')
+
   #  compute  GCV index
   if (df. < n) {
     if (ndim < 3) {
@@ -335,13 +335,13 @@ smooth.basis <- function (argvals, y, fdParobj,
           gcv[i,ivar] <- (SSEi/n)/((n - df.)/n)^2
         }
       }
-      dimnames(gcv) <- list(ynames, vnames)       
-    }    
+      dimnames(gcv) <- list(ynames, vnames)
+    }
   } else {
 #    gcv <- NA
-    gcv <- Inf 
+    gcv <- Inf
   }
-    
+
   #  ------------------------------------------------------------------
   #          Set up the functional data objects for the smooths
   #  ------------------------------------------------------------------
@@ -365,13 +365,14 @@ smooth.basis <- function (argvals, y, fdParobj,
 #          paste("values",as.character(1:nvar)) )
 #    names(fdnames) <- c("args", "reps", "funs")
   }
-  fdobj <- fd(coef, basisobj, fdnames)    
+  fdobj <- fd(coef, basisobj, fdnames)
 #
 #  smoothlist <- list(fd=fdobj, df=df., gcv=gcv, coef=coef,
 #                     SSE=SSE, penmat=penmat, y2cMap=y2cMap )
   smoothlist <- list(fd=fdobj, df=df., gcv=gcv,
-                     SSE=SSE, penmat=penmat, y2cMap=y2cMap )
-  
-  class(smoothlist) <- 'fdSmooth' 
+                     SSE=SSE, penmat=penmat, y2cMap=y2cMap,
+                     argvals=argvals, y=y)
+
+  class(smoothlist) <- 'fdSmooth'
   return(smoothlist)
 }

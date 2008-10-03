@@ -7,24 +7,28 @@ create.constant.basis <- function(rangeval = c(0,1))
 #  BASISOBJ  ... a functional data basis object of type "constant"
 #
 
-#  Last modified 8 December 2005
+#  Last modified 6 January 2008
 
-type     <- "const"
-nbasis   <- 1
-params   <- NULL
-dropind  <- NULL
-quadvals <- NULL
-values   <- NULL
+#  check RANGEVAL
 
 if (length(rangeval) == 1){
-    if (rangeval <= 0) stop("RANGEVAL a single value that is not postive.")
+    if (rangeval <= 0) stop("RANGEVAL a single value that is not positive.")
     rangeval = c(0,rangeval)
 }
 
 if (!rangechk(rangeval)) stop("Argument RANGEVAL is not correct.")
 
+type        <- "const"
+nbasis      <- 1
+params      <- vector("numeric",0)
+dropind     <- vector("numeric",0)
+quadvals    <- vector("numeric",0)
+values      <- vector("list",0)
+basisvalues <- vector("list",0)
+
 basisobj <- basisfd(type=type, rangeval=rangeval, nbasis=nbasis, params=params,
-                    dropind=dropind, quadvals=quadvals, values=values)
+                    dropind=dropind, quadvals=quadvals, values=values,
+                    basisvalues=basisvalues)
 
 basisobj
 

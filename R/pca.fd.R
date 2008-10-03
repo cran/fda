@@ -3,7 +3,7 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
 {
 #  Carry out a functional PCA with regularization
 #  Arguments:
-#  FDOBJ        ... Functional data object
+#  FDOBJ      ... Functional data object
 #  NHARM     ... Number of principal components or harmonics to be kept
 #  HARMFDPAR ... Functional parameter object for the harmonics
 #  CENTERFNS ... If TRUE, the mean function is first subtracted from each function
@@ -17,30 +17,43 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
 #  meanfd     ... A functional data object giving the mean function
 #
 
-# last modified 2007 April 26 by Spencer Graves
-  #  Last modified:  26 October 2005
+#  Last modified:  3 January 2008 by Jim Ramsay
+# Previously modified 2007 April 26 by Spencer Graves
 
-  #  Check arguments
+  #  Check FDOBJ
 
   if (!(inherits(fdobj, "fd"))) stop(
-        "Argument FD  not a functional data object.")
+    "Argument FD  not a functional data object.")
 
   #  compute mean function and center if required
 
   meanfd <- mean.fd(fdobj)
   if (centerfns) fdobj <- center.fd(fdobj)
 
+  #  get coefficient matrix and its dimensions
+
   coef  <- fdobj$coefs
   coefd <- dim(coef)
   ndim  <- length(coefd)
+  nrep  <- coefd[2]
   coefnames <- dimnames(coef)
+  if (nrep < 2) stop("PCA not possible without replications.")
 
   basisobj <- fdobj$basis
   nbasis   <- basisobj$nbasis
   type     <- basisobj$type
 
-  nrep <- coefd[2]
-  if (nrep < 2) stop("PCA not possible without replications.")
+  #  set up HARMBASIS
+  #  currently this is required to be BASISOBJ
+
+  harmbasis <- basisobj
+
+  #  set up LFDOBJ and LAMBDA
+
+  Lfdobj <- harmfdPar$Lfd
+  lambda <- harmfdPar$lambda
+
+  #  compute CTEMP whose cross product is needed
 
   if (ndim == 3) {
     nvar <- coefd[3]
@@ -56,8 +69,6 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
 
   #  set up cross product and penalty matrices
 
-  Lfdobj <- harmfdPar$Lfd
-  lambda <- harmfdPar$lambda
   Cmat <- crossprod(t(ctemp))/nrep
   Jmat <- eval.penalty(basisobj, 0)
   if(lambda > 0) {
@@ -124,7 +135,7 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
   for(i in 1:nharm)
     harmnames[i] <- paste("PC", i, sep = "")
   if(length(coefd) == 2)
-    harmnames <- list(coefnames[[1]], harmnames,'values')
+    harmnames <- list(coefnames[[1]], harmnames,"values")
   if(length(coefd) == 3)
     harmnames <- list(coefnames[[1]], harmnames, coefnames[[3]])
   harmfd   <- fd(harmcoef, basisobj, harmnames)

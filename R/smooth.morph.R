@@ -1,6 +1,5 @@
-smooth.morph <- function(x, y, WfdParobj, wt=rep(1,nobs), conv=.0001,
-                            iterlim=20, active=c(FALSE,rep(TRUE,ncvec-1)),
-                            dbglev=1) 
+smooth.morph <- function(x, y, WfdPar, wt=rep(1,nobs),
+                         conv=.0001, iterlim=20, dbglev=0)
 {
 #SMOOTH_MORPH smooths the relationship of Y to X
 #  by fitting a monotone fn.  f(argvals) = b_0 + b_1 D^{-1} exp W(t)
@@ -15,7 +14,7 @@ smooth.morph <- function(x, y, WfdParobj, wt=rep(1,nobs), conv=.0001,
 #  Arguments:
 #  X       ...  vector of argument values
 #  Y       ...  vector of function values to be fit
-#  WFDPAROBJ  ...  functional parameter object for W(x).  The coefficient array
+#  WFDPAR  ...  functional parameter object for W(x).  The coefficient array
 #               for WFDPAROBJ$FD has a single column, and these are the
 #               starting values for the iterative minimization of mean squared error.
 #  WT      ...  a vector of weights
@@ -37,27 +36,42 @@ smooth.morph <- function(x, y, WfdParobj, wt=rep(1,nobs), conv=.0001,
 #  ITERNUM   ...  number of iterations
 #  ITERHIST  ...  ITERNUM+1 by 5 array containing iteration history
 
-#  Last modified 26 October 2005
+# last modified 3 January 2008 by Jim Ramsay
 
 #  initialize some arrays
 
   x      <- as.vector(x)
   nobs   <- length(x)         #  number of observations
 
-#  the starting values for the coefficients are in FD object WFDOBJ
+#  check WfdPar
 
-  if (!(inherits(WfdParobj, "fdPar"))) stop(
+  if (!(inherits(WfdPar, "fdPar"))) stop(
 		"Argument WFDPAROBJ is not a functional data object.")
 
-  Wfdobj   <- WfdParobj$fd
-	Lfdobj   <- WfdParobj$Lfd
-  lambda   <- WfdParobj$lambda
+#  extract information from WfdPar
+
+  Wfdobj   <- WfdPar$fd
+  Lfdobj   <- WfdPar$Lfd
+  lambda   <- WfdPar$lambda
+
+#  check LFDOBJ
+
+  Lfdobj   <- int2Lfd(Lfdobj)
+
+#  extract further information
+
   basisobj <- Wfdobj$basis     #  basis for W(x)
   nbasis   <- basisobj$nbasis  #  number of basis functions
   type     <- basisobj$type
   rangeval <- basisobj$rangeval
   cvec     <- Wfdobj$coefs
   ncvec    <- length(cvec)
+
+  if (type == "bspline" || type == "fourier") {
+      active <- c(F, rep(T, nbasis-1))
+  } else {
+      active <- rep(T, nbasis)
+  }
 
 #  check some arguments
 
@@ -70,8 +84,6 @@ smooth.morph <- function(x, y, WfdParobj, wt=rep(1,nobs), conv=.0001,
 #  set up some variables
 
   wtroot <- sqrt(wt)
-  # wtrtmt <- wtroot %*% matrix(1,1,ncovp1)
-  yroot  <- y*wtroot
   climit <- c(-100*rep(1,nbasis), 100*rep(1,nbasis))
   inact  <- !active   #  indices of inactive coefficients
 
@@ -82,13 +94,18 @@ smooth.morph <- function(x, y, WfdParobj, wt=rep(1,nobs), conv=.0001,
 
 #  initialize matrix Kmat defining penalty term
 
-  if (lambda > 0) Kmat <- lambda*getbasispenalty(basisobj, Lfdobj)
-  else            Kmat <- NULL
+  if (lambda > 0) {
+      Kmat <- lambda*getbasispenalty(basisobj, Lfdobj)
+  } else {
+      Kmat <- NULL
+  }
 
 #  Compute initial function and gradient values
 
-  Flist <- fngrad.smooth.morph(y, x, wt, WfdParobj, Kmat, inact, basislist)
-  Dyhat  <- result[[3]]
+  fngradlist <- fngrad.smooth.morph(y, x, wt, Wfdobj, lambda,
+                                    Kmat, inact, basislist)
+  Flist <- fngradlist[[1]]
+  Dyhat <- fngradlist[[2]]
 
 #  compute the initial expected Hessian
 
@@ -113,7 +130,8 @@ smooth.morph <- function(x, y, WfdParobj, wt=rep(1,nobs), conv=.0001,
     cat("      ")
     cat(round(status[3],4))
   }
-  if (dbglev == 0 && iterlim > 1) cat("Progress:  Each dot is an iteration\n")
+  # if (dbglev == 0 && iterlim > 1)
+  #       cat("Progress:  Each dot is an iteration\n")
 
   iterhist <- matrix(0,iterlim+1,length(status))
   iterhist[1,]  <- status
@@ -134,20 +152,20 @@ smooth.morph <- function(x, y, WfdParobj, wt=rep(1,nobs), conv=.0001,
 
   for (iter in 1:iterlim)
   {
-     if (dbglev == 0 && iterlim > 1) cat(".")
-     iternum <- iternum + 1
-     #  initialize logical variables controlling line search
-     dblwrd <- c(0,0)
-     limwrd <- c(0,0)
-     stpwrd <- 0
-     ind    <- 0
-     ips    <- 0
-     #  compute slope at 0 for line search
-     linemat[2,1] <- sum(deltac*Flist$grad)
-     #  normalize search direction vector
+
+      # if (dbglev == 0 && iterlim > 1) cat(".")
+      iternum <- iternum + 1
+      #  initialize logical variables controlling line search
+      dblwrd <- c(0,0)
+      limwrd <- c(0,0)
+      stpwrd <- 0
+      ind    <- 0
+      ips    <- 0
+      #  compute slope at 0 for line search
+      linemat[2,1] <- sum(deltac*Flist$grad)
+      #  normalize search direction vector
       sdg     <- sqrt(sum(deltac^2))
       deltac  <- deltac/sdg
-      dgsum   <- sum(deltac)
       linemat[2,1] <- linemat[2,1]/sdg
       # initialize line search vectors
       linemat[,1:4] <- outer(c(0, linemat[2,1], Flist$f),rep(1,4))
@@ -156,6 +174,7 @@ smooth.morph <- function(x, y, WfdParobj, wt=rep(1,nobs), conv=.0001,
           cat("\n")
           cat(paste("                 ", stepiter, "  "))
           cat(format(round(t(linemat[,1]),6)))
+          cat("\n")
       }
       #  return with error condition if initial slope is nonnegative
       if (linemat[2,1] >= 0) {
@@ -190,7 +209,8 @@ smooth.morph <- function(x, y, WfdParobj, wt=rep(1,nobs), conv=.0001,
           #  Current step size too small ... terminate
           if (dbglev >= 2) {
             print("Stepsize too small")
-            # print(avec[5])
+#            print(avec[5])
+            print(linemat[1, 5])
           }
           if (limflg) ind <- 1 else ind <- 4
           break
@@ -198,18 +218,20 @@ smooth.morph <- function(x, y, WfdParobj, wt=rep(1,nobs), conv=.0001,
         #  compute new function value and gradient
         cvecnew <- cvec + linemat[1,5]*deltac
         Wfdnew$coefs <- as.matrix(cvecnew)
-        Flist <- fngrad.smooth.morph(y, x, wt, Wfdnew, lambda,
-                                       Kmat, inact, basislist)
+        fngradlist   <- fngrad.smooth.morph(y, x, wt, Wfdnew, lambda,
+                                          Kmat, inact, basislist)
+        Flist <- fngradlist[[1]]
+        Dyhat <- fngradlist[[2]]
         linemat[3,5] <- Flist$f
         #  compute new directional derivative
         linemat[2,5] <- sum(deltac*Flist$grad)
         if (dbglev >= 2) {
-          cat("\n")
           cat(paste("                 ", stepiter, "  "))
           cat(format(round(t(linemat[,5]),6)))
+          cat("\n")
         }
         #  compute next line search step, also test for convergence
-        result  <- stepit(linemat, ips, ind, dblwrd, MAXSTEP, dbglev)
+        result  <- stepit(linemat, ips, dblwrd, MAXSTEP)
         linemat <- result[[1]]
         ips     <- result[[2]]
         ind     <- result[[3]]
@@ -245,7 +267,7 @@ smooth.morph <- function(x, y, WfdParobj, wt=rep(1,nobs), conv=.0001,
         }
      } else {
        if (abs(Foldlist$f - Flist$f) < conv) {
-	       cat("\n")
+	       # cat("\n")
 	       break
        }
        cvecold  <- cvec
@@ -294,35 +316,17 @@ linesearch.smooth.morph <- function(Flist, hessmat, dbglev)
 fngrad.smooth.morph <- function(y, x, wt, Wfdobj, lambda,
                                    Kmat, inact, basislist)
 {
-# last modified 2007.11.28 by Spencer Graves
-# set up   
   nobs   <- length(x)
+  width  <- y[nobs] - y[1]
   cvec   <- Wfdobj$coefs
   nbasis <- length(cvec)
-
-# Get unnormalized function and gradient values   
-  h      <- monfn(x, Wfdobj, basislist)
-  Dyhat  <- mongrad(x, Wfdobj, basislist)
-  
-#  adjust h and Dyhat for normalization
-  hmax   <- y[nobs]
+  h      <- monfn(x, Wfdobj)
+  Dyhat  <- mongrad(x, Wfdobj)
+  #  adjust h and Dyhat for normalization
+  hmax   <- h[nobs]
   Dymax  <- Dyhat[nobs,]
-
-# Update residulas and function values 
-  width  <- y[nobs] - y[1]
-  Dyhat  <- width*(hmax*Dyhat - h*Dymax)/hmax^2
+  Dyhat  <- width*(hmax*Dyhat - outer(h, Dymax))/hmax^2
   h      <- y[1] + width*h/hmax
-
-# 'ncovp1' and 'xmat were used but not defined;  
-#  wtroot, yroot, xroot were not used here
-#  I couldn't find them in the Matlab version,
-#  and I couldn't see any need for them, so I commented them out 
-#  
-#  wtroot <- sqrt(wt)
-#  wtrtmt <- wtroot %*% matrix(1,1,ncovp1)
-#  yroot  <- y*wtroot
-#  xroot  <- xmat*wtrtmt
-  
   #  update residuals and function values
   res    <- y - h
   f      <- mean(res^2*wt)
@@ -335,7 +339,7 @@ fngrad.smooth.morph <- function(y, x, wt, Wfdobj, lambda,
   if (any(inact)) grad[inact] <- 0
   norm <- sqrt(sum(grad^2)) #  gradient norm
   Flist <- list("f"=f,"grad"=grad,"norm"=norm)
-  return(list(Flist, beta, Dyhat))
+  return(list(Flist, Dyhat))
 }
 
 #  ----------------------------------------------------------------

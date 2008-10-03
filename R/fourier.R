@@ -7,13 +7,13 @@ fourier <- function(x, nbasis = n, period = span, nderiv = 0)
   #  Note:  The number of basis functions always odd.  If the argument
   #   NBASIS is even, it is increased by one.
 
-  #  last modified 23 February 2006 by Spencer Graves
+  #  last modified 23 February 2007 by Spencer Graves
   #  Previously modified 15 December 2005
 
   #  check x and set up range
 
   xNames <- names(x)
-#  
+#
   x      <- as.vector(x)
   n      <- length(x)
   onen   <- rep(1,n)
@@ -83,8 +83,8 @@ fourier <- function(x, nbasis = n, period = span, nderiv = 0)
     SC <- outer(c("sin", "cos"), 1:n2, paste, sep="")
     fNames <- c(fNames, as.vector(SC))
   }
-# 
+#
   dimnames(basismat) <- list(xNames, fNames)
-#  
+#
   return(basismat)
 }

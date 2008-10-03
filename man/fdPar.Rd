@@ -10,7 +10,7 @@
   data object with additional slots specifying a roughness penalty, a
   smoothing parameter and whether or not the functional parameter is to
   be estimated or held fixed.  Functional parameter objects are used as
-  arguments to functions that estimate functional parameters.  
+  arguments to functions that estimate functional parameters.
 }
 \usage{
 fdPar(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE, penmat=NULL)
@@ -18,28 +18,26 @@ fdPar(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE, penmat=NULL)
 }
 \arguments{
   \item{fdobj}{
-    a functional data object, functional basis object, a functional 
-    parameter object or a matrix.  If class(fdobj) == 'basisfd', it is 
-    converted to functional data objects with the identity matrix as the
-    coefficient matrix.  If it a matrix, it is replaced by fd(fdobj).      
+    a functional data object, functional basis object, a functional
+    parameter object or a matrix.  If class(fdobj) == 'basisfd', it is
+    converted to an object of class \code{fd} with the identity matrix
+    as the coefficient matrix.  If it a matrix, it is replaced by
+    fd(fdobj).
   }
   \item{Lfdobj}{
     either a nonnegative integer or a linear differential operator
     object.  If NULL and fdobj[['type']] == 'bspline', Lfdobj =
-    int2Lfd(max(0, norder-2)), where norder = order of fdobj.   
+    int2Lfd(max(0, norder-2)), where norder = order of fdobj.
   }
   \item{lambda}{
     a nonnegative real number specifying the amount of smoothing
     to be applied to the estimated functional parameter.
   }
-  \item{estimate}{
-    a logical value:  if \code{TRUE}, the functional parameter is
-    estimated, otherwise, it is held fixed.
-  }
+  \item{estimate}{not currently used.}
   \item{penmat}{
     a roughness penalty matrix.  Including this can eliminate the need
     to compute this matrix over and over again in some types of
-    calculations.  
+    calculations.
   }
 }
 \details{
@@ -51,7 +49,7 @@ fdPar(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE, penmat=NULL)
   as an argument, and it may be that some of these parameters are
   considered known and must remain fixed during the analysis.  This is
   the case for functions \code{fRegress} and  \code{pda.fd}, for
-  example.  
+  example.
 }
 \value{
   a functional parameter object (i.e., an object of class \code{fdPar}),
@@ -68,12 +66,10 @@ fdPar(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE, penmat=NULL)
     \item{lambda}{
       a nonnegative real number
     }
-    \item{estimate}{
-      a logical:  if \code{TRUE}, the functional parameter is estimate.
-    }
+    \item{estimate}{not currently used}
     \item{penmat}{
       either NULL or a square, symmetric matrix with penmat[i, j] =
-      integral over fd[['basis']][['rangeval']] of basis[i]*basis[j] 
+      integral over fd[['basis']][['rangeval']] of basis[i]*basis[j]
     }
   }
 }
@@ -85,14 +81,14 @@ fdPar(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE, penmat=NULL)
     Functional Data Analysis}, Springer, New York
 }
 \seealso{
-  \code{\link{cca.fd}}, 
-  \code{\link{density.fd}}, 
-  \code{\link{fRegress}}, 
-  \code{\link{intensity.fd}}, 
-  \code{\link{pca.fd}}, 
-  \code{\link{smooth.fdPar}}, 
-  \code{\link{smooth.basis}}, 
-  \code{\link{smooth.basisPar}}, 
+  \code{\link{cca.fd}},
+  \code{\link{density.fd}},
+  \code{\link{fRegress}},
+  \code{\link{intensity.fd}},
+  \code{\link{pca.fd}},
+  \code{\link{smooth.fdPar}},
+  \code{\link{smooth.basis}},
+  \code{\link{smooth.basisPar}},
   \code{\link{smooth.monotone}},
   \code{\line{int2Lfd}}
 }
@@ -116,7 +112,7 @@ WfdParobj <- fdPar(Wfd0)
 WfdP3 <- fdPar(seq(-3, 3, length=11))
 
 ##
-##  smooth the Canadian daily temperature data 
+##  smooth the Canadian daily temperature data
 ##
 #    set up the fourier basis
 nbasis   <- 365
@@ -155,4 +151,3 @@ lambda   <- 0.01  #  minimum GCV estimate
 
 % docclass is function
 \keyword{smooth}
- 

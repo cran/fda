@@ -15,12 +15,12 @@ monhess <- function(x, Wfd, basislist)
 #  D2H   values of D2 h wrt c
 #  TVAL  Arguments used for trapezoidal approximation to integral
 
-#  Last modified 15 December 2005
+#  Last modified 21 October 2008 by Jim Ramsay
 
 #  set some constants
 
-EPS    <- 1e-5
-JMIN   <- 11
+EPS    <- 1e-4
+JMIN   <-  7
 JMAX   <- 15
 
 #  get coefficient matrix and check it
@@ -51,14 +51,14 @@ smatD2h <- matrix(0,JMAXP,nbaspr)
 #  array FVAL contains the integral values at these argument values,
 #     rows corresponding to argument values
 #  the first iteration uses just the endpoints
-j    <- 1
-tj   <- rangeval
-tval <- tj
-if (is.null(basislist[[j]])) {
+iter  <- 1
+xiter <- rangeval
+tval  <- xiter
+if (is.null(basislist[[iter]])) {
     bmat <- getbasismatrix(tval, basis)
-    basislist[[j]] <- bmat
+    basislist[[iter]] <- bmat
 } else {
-    bmat <- basislist[[j]]
+    bmat <- basislist[[iter]]
 }
 fx   <- exp(bmat %*% coef)
 D2fx <- matrix(0,2,nbaspr)
@@ -72,21 +72,23 @@ for (ib in 1:nbasis) {
 D2fval <- D2fx
 smatD2h[1,] <- width*sum(D2fx)/2
 tnm <- 0.5
+
 #  now iterate to convergence
-for (j in 2:JMAX) {
-   tnm  <- tnm*2
-   del  <- width/tnm
-   hdel <- del/2
-   tj   <- seq(rangeval[1]+del/2, rangeval[2]-del/2, del)
-   tval <- c(tval, tj)
-   if (is.null(basislist[[j]])) {
-      bmat <- getbasismatrix(tj, basis)
-      basislist[[j]] <- bmat
+
+for (iter in 2:JMAX) {
+   tnm   <- tnm*2
+   del   <- width/tnm
+   hdel  <- del/2
+   xiter <- seq(rangeval[1]+del/2, rangeval[2]-del/2, del)
+   tval  <- c(tval, xiter)
+   if (is.null(basislist[[iter]])) {
+      bmat <- getbasismatrix(xiter, basis)
+      basislist[[iter]] <- bmat
    } else {
-      bmat <- basislist[[j]]
+      bmat <- basislist[[iter]]
    }
    fx   <- exp(bmat%*%coef)
-   D2fx <- matrix(0,length(tj),nbaspr)
+   D2fx <- matrix(0,length(xiter),nbaspr)
    m <- 0
    for (ib in 1:nbasis) {
       for (jb in 1:ib) {
@@ -95,20 +97,20 @@ for (j in 2:JMAX) {
       }
    }
    D2fval <- rbind(D2fval, D2fx)
-   smatD2h[j,] <- (smatD2h[j-1,] + del*sum(D2fx))/2
-   if (j >= max(c(JMIN,5))) {
-      ind <- (j-4):j
+   smatD2h[iter,] <- (smatD2h[iter-1,] + del*sum(D2fx))/2
+   if (iter >= max(c(JMIN,5))) {
+      ind <- (iter-4):iter
       result <- polintmat(h[ind],smatD2h[ind,],0)
       D2ss   <- result[[1]]
       D2dss  <- result[[2]]
-      if (all(abs(D2dss) < EPS*max(abs(D2ss)))) {
+      if (all(abs(D2dss) < EPS*max(abs(D2ss))) || iter >= JMAX) {
          # successful convergence
          # sort argument values and corresponding function values
-         ordind <- order(tval)
-         tval   <- tval[ordind] 
-         D2fval   <- as.matrix(D2fval[ordind,])
+         ordind  <- order(tval)
+         tval    <- tval[ordind]
+         D2fval  <- as.matrix(D2fval[ordind,])
          # set up partial integral values
-         lval   <- outer(rep(1,length(tval)),D2fval[1,])
+         lval    <- outer(rep(1,length(tval)),D2fval[1,])
          del     <- tval[2] - tval[1]
          D2ifval <- del*(apply(D2fval,2,cumsum) - 0.5*(lval + D2fval))
          D2h     <- matrix(0,length(x),nbaspr)
@@ -116,8 +118,7 @@ for (j in 2:JMAX) {
          return(D2h)
       }
     }
-    h[j+1] <- 0.25*h[j]
+    h[iter+1] <- 0.25*h[iter]
   }
-  stop(paste("No convergence after ",(JMAX)," steps in D2CMONFN"))
 }
 

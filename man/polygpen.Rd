@@ -36,7 +36,7 @@ this is the default. To apply this roughness penalty, the matrix of
 inner products produced by this function is necessary.
 }
 \seealso{
-\code{\link{create.polygonal.basis}}, 
+\code{\link{create.polygonal.basis}},
 \code{\link{polyg}}
 }
 \examples{
@@ -47,8 +47,7 @@ argvals <- seq(0,1,0.1)
 basisobj <- create.polygonal.basis(argvals)
 #  compute the 11 by 11 penalty matrix
 
-# The following should work but doesn't;  2007.05.01
-#penmat <- polygpen(basisobj)
+penmat <- polygpen(basisobj)
 
 }
 % docclass is function

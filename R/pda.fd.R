@@ -449,7 +449,7 @@ if (nforce > 0) {
         	mi1 <- mi2 + 1
         	mi2 <- mi2 + afdPari$fd$basis$nbasis
         	indexi <- mi1:mi2
-        	afdPari$fd$coefs <- dvec[indexi]
+        	afdPari$fd$coefs <- as.matrix(dvec[indexi])
           awtlist[[iu]] <- afdPari
     	}
 	}
@@ -464,7 +464,7 @@ for (j in 1:difeorder) {
         mij1 <- mij2 + 1
         mij2 <- mij2 + bfdParj$fd$basis$nbasis
         indexij <- mij1:mij2
-        bfdParj$fd$coefs <- dvec[indexij]
+        bfdParj$fd$coefs <- as.matrix(dvec[indexij])
         bwtlist[[j]] <- bfdParj
     }
 }
@@ -927,7 +927,7 @@ for (ivar in 1:nvar) {
             mi1 <- mi2 + 1
             mi2 <- mi2 + afdPari$fd$basis$nbasis
             indexi <- mi1:mi2
-            afdPari$fd$coefs <- dvec[indexi]
+            afdPari$fd$coefs <- as.matrix(dvec[indexi])
         }
     }
 
@@ -942,7 +942,7 @@ for (ivar in 1:nvar) {
             mij1 <- mij2 + 1
             mij2 <- mij2 + bfdParij$fd$basis$nbasis
             indexij <- mij1:mij2
-            bfdParij$fd$coefs <- dvec[indexij]
+            bfdParij$fd$coefs <- as.matrix(dvec[indexij])
             bwtlist[[ivar,i1,j1]] <- bfdParij
         }
     }

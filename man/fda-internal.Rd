@@ -1,9 +1,7 @@
 \name{fda-internal}
 \title{FDA internal functions}
 \description{Internal undocumentation functions}
-\usage{
-center.fd(fdobj)
-}
+\usage{center.fd(fdobj)}
 \alias{/.fd}
 \alias{Varfnden}
 \alias{Varfninten}
@@ -66,6 +64,12 @@ center.fd(fdobj)
 \alias{symsolve}
 \alias{trapzmat}
 \alias{use.proper.basis}
+\alias{PENSSEfun}
+\alias{PENSSEhess}
+\alias{argcheck}
+\alias{fdParcheck}
+\alias{wtcheck}
+\alias{ycheck}
 
 % docclass is function
 \keyword{internal}

@@ -22,15 +22,19 @@ eval.fd <- function(evalarg, fdobj, Lfdobj=0) {
 #  Returns:  An array of function values corresponding to the evaluation
 #              arguments in EVALARG
 
-#  Last modified 26 October 2005
+#  Last modified 3 January 2008 by Jim Ramsay
+
+#  Check LFDOBJ
+
+Lfdobj <- int2Lfd(Lfdobj)
 
 #  Exchange the first two arguments if the first is an FD object
 #    and the second numeric
 
 if (inherits(fdobj, "numeric") && inherits(evalarg, "fd")) {
-	temp    <- fdobj
-	fdobj   <- evalarg
-	evalarg <- temp
+  temp    <- fdobj
+  fdobj   <- evalarg
+  evalarg <- temp
 }
 
 #  check EVALARG
@@ -40,15 +44,11 @@ if (!(is.numeric(evalarg))) stop("Argument EVALARG is not numeric.")
 evaldim <- dim(evalarg)
 if (!(length(evaldim) < 3)) stop(
    "Argument EVALARG is not a vector or a matrix.")
-	
+
 #  check FDOBJ
 
 if (!(inherits(fdobj, "fd"))) stop(
      "Argument FD is not a functional data object.")
-
-#  Check LFDOBJ
-
-Lfdobj <- int2Lfd(Lfdobj)
 
 #  Extract information about the basis
 
@@ -61,7 +61,7 @@ temp <- c(evalarg)
 temp <- temp[!(is.na(temp))]
 EPS  <- 1e-14
 if (min(temp) < rangeval[1]-EPS || max(temp) > rangeval[2]+EPS) {
-	warning(paste(
+  warning(paste(
     "Values in argument EVALARG are outside of permitted range,",
     "and will be ignored."))
     print(c(rangeval[1]-min(temp), max(temp) - rangeval[2]))
@@ -70,14 +70,10 @@ if (min(temp) < rangeval[1]-EPS || max(temp) > rangeval[2]+EPS) {
 #  get maximum number of evaluation values
 
 if (is.vector(evalarg)) {
-	n <- length(evalarg)
+  n <- length(evalarg)
 } else {
-	n <- evaldim[1]
+  n <- evaldim[1]
 }
-
-#  determine the highest order of derivative NDERIV required
-
-nderiv <- Lfdobj$nderiv;
 
 #  Set up coefficient array for FD
 
@@ -93,7 +89,7 @@ if (ndim <= 2) evalarray <- matrix(0,n,nrep)
 else           evalarray <- array(0,c(n,nrep,nvar))
 if (ndim == 2) dimnames(evalarray) <- list(NULL,dimnames(coef)[[2]])
 if (ndim == 3) dimnames(evalarray) <- list(NULL,dimnames(coef)[[2]],
-	                                             dimnames(coef)[[3]])
+                                                dimnames(coef)[[3]])
 
 #  Case where EVALARG is a vector of values to be used for all curves
 
@@ -106,23 +102,24 @@ if (is.vector(evalarg)) {
     #  evaluate the functions at arguments in EVALARG
 
     if (ndim <= 2) {
-	    evalarray <- basismat %*% coef
+      evalarray <- basismat %*% coef
     } else {
        evalarray <- array(0,c(n,nrep,nvar))
        for (ivar in 1:nvar) evalarray[,,ivar] <- basismat %*% coef[,,ivar]
     }
 
 } else {
-	
-	#  case of evaluation values varying from curve to curve
-	
-	for (i in 1:nrep) {
-		evalargi <- evalarg[,i]
+
+  #  case of evaluation values varying from curve to curve
+
+  for (i in 1:nrep) {
+    evalargi <- evalarg[,i]
        if (all(is.na(evalargi))) stop(
             paste("All values are NA for replication",i))
 
-		index    <- !(is.na(evalargi) | evalargi < rangeval[1] | evalargi > rangeval[2])
-		evalargi <- evalargi[index]
+    index    <- !(is.na(evalargi) | evalargi < rangeval[1] |
+                                    evalargi > rangeval[2])
+    evalargi <- evalargi[index]
        basismat <- eval.basis(evalargi, basisobj, Lfdobj)
 
        #  evaluate the functions at arguments in EVALARG
@@ -133,12 +130,12 @@ if (is.vector(evalarg)) {
        }
        if (ndim == 3) {
            for (ivar in 1:nvar) {
-	           evalarray[   index,i,ivar] <- basismat %*% coef[,i,ivar]
+             evalarray[   index,i,ivar] <- basismat %*% coef[,i,ivar]
                evalarray[!(index),i,ivar] <- NA
            }
        }
-	}
-	
+  }
+
 }
 
 return(evalarray)

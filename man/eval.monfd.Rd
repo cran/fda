@@ -8,14 +8,14 @@ Evaluate a monotone functional data object at specified argument values,
 or evaluate a derivative of the functional object.
 }
 \usage{
-eval.monfd(evalarg, Wfd, Lfdobj=int2Lfd(0))
+eval.monfd(evalarg, Wfdobj, Lfdobj=int2Lfd(0))
 }
 \arguments{
 \item{evalarg}{
 a vector of argument values at which the functional data object is to be
 evaluated.
 }
-\item{Wfd}{
+\item{Wfdobj}{
 a functional data object that defines the monotone function to be
 evaluated.  Only univariate functions are permitted.
 }
@@ -32,20 +32,20 @@ values.  The first dimension corresponds to the argument values in
 the second to replications.
 }
 \details{
-A monotone function data object $h(t)$ is defined by 
-$h(t) = [D^\{-1\} exp Wfd](t)$.  In this equation, the operator  $D^\{-1\}$ means
+A monotone function data object $h(t)$ is defined by
+$h(t) = [D^\{-1\} exp Wfdobj](t)$.  In this equation, the operator  $D^\{-1\}$ means
 taking the indefinite integral of the function to which it applies.
 Note that this equation implies that the monotone function has a value
 of zero at the lower limit of the arguments.  To actually fit monotone
 data, it will usually be necessary to estimate an intercept and a
 regression coefficient to be applied to $h(t)$, usually with the
 least squares regression function \code{lsfit}.
-The function \code{Wfd} that defines the monotone function is
+The function \code{Wfdobj} that defines the monotone function is
 usually estimated by monotone smoothing function
 \code{smooth.monotone.}
 }
 \seealso{
-\code{\link{eval.fd}}, 
+\code{\link{eval.fd}},
 \code{\link{eval.posfd}}
 }
 \examples{

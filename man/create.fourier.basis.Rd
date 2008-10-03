@@ -9,55 +9,83 @@
 }
 \usage{
 create.fourier.basis(rangeval=c(0, 1), nbasis=3,
-              period=width,  dropind=NULL, quadvals=NULL,
-              values=NULL, longNames=TRUE)
+              period=diff(rangeval), dropind=NULL, quadvals=NULL,
+              values=NULL, basisvalues=NULL, names=NULL)
 }
 \arguments{
   \item{rangeval}{
-    a vector of length 2 containing the initial and final
-    values of the interval over which the functional
-    data object can be evaluated.  Default value \code{c(0,1)}
+    a vector of length 2 containing the initial and final values of the
+    interval over which the functional data object can be evaluated.
   }
   \item{nbasis}{
-    the number of basis functions, rounded up to the nearest odd
-    integer.  The number of basis functions is always odd, even when an
-    even number is specified, so as to preserve the pairing of sine and
-    cosine functions.  Default value 3. 
+    positive odd integer:  If an even number is specified, it is rounded
+    up to the nearest odd integer to preserve the pairing of sine and
+    cosine functions.  An even number of basis functions  only makes
+    sense when there are always only an even number of observations at
+    equally spaced points;  that case can be accomodated using dropind =
+    nbasis-1 (because the bases are \code{const}, \code{sin},
+    \code{cos}, ...).
   }
   \item{period}{
     the width of any interval over which the Fourier functions repeat
-    themselves, or are periodic.  The default is the width of the
-    interval defined in rangeval.
+    themselves or are periodic.
   }
   \item{dropind}{
-    a vector of integers specifiying the basis functions to
-    be dropped, if any. Default value NULL.
+    an optional vector of integers specifiying basis functions to be
+    dropped.
   }
   \item{quadvals}{
-    a matrix with two columns and a number of rows equal to the number
-    of argument values used to approximate an integral using Simpson's
-    rule.  The first column contains these argument values.  A minimum
-    of 5 values are required for each inter-knot interval, and that is
-    often enough. These are equally spaced between two adjacent knots.
-    The second column contains the weights used for Simpson's rule.
-    These are proportional to 1, 4, 2, 4, ..., 2, 4, 1.  
+    an optional matrix with two columns and a number of rows equal to
+    the number of quadrature points for numerical evaluation of the
+    penalty integral.  The first column of \code{quadvals} contains the
+    quadrature points, and the second column the quadrature weights.  A
+    minimum of 5 values are required for each inter-knot interval, and
+    that is often enough.  For Simpson's rule, these points are equally
+    spaced, and the weights are proportional to 1, 4, 2, 4, ..., 2, 4,
+    1.
   }
   \item{values}{
-    a list containing the basis functions and their derivatives
-    evaluated at the quadrature points contained in the first
-    column of \code{ quadvals }.
+    an optional list of matrices with one row for each row of
+    \code{quadvals} and one column for each basis function.  The
+    elements of the list correspond to the basis functions and their
+    derivatives evaluated at the quadrature points contained in the
+    first column of \code{quadvals}.
   }
-  \item{longNames}{
-    if FALSE, the function value will include a component 'names', the
-    first of which will be 'const', followed by 'sin1', 'cos1', 'sin2',
-    ... . 
+  \item{basisvalues}{
+    an optional list of lists, allocated by code such as
+    vector("list",1).  This field is designed to avoid evaluation of a
+    basis system repeatedly at a set of argument values.  Each sublist
+    corresponds to a specific set of argument values, and must have at
+    least two components:  a vector of argument values and a matrix of
+    the values the basis functions evaluated at the arguments in the
+    first component.  Third and subsequent components, if present,
+    contain matrices of values their derivatives.  Whenever function
+    getbasismatrix is called, it checks the first list in each row to
+    see, first, if the number of argument values corresponds to the size
+    of the first dimension, and if this test succeeds, checks that all
+    of the argument values match.  This takes time, of course, but is
+    much faster than re-evaluation of the basis system.  Even this time
+    can be avoided by direct retrieval of the desired array.  For
+    example, you might set up a vector of argument values called
+    "evalargs" along with a matrix of basis function values for these
+    argument values called "basismat".  You might want too use tags like
+    "args" and "values", respectively for these.  You would then assign
+    them to \code{basisvalues} with code such as the following:
 
-    if TRUE, the function value will include 'names' as when longNames =
-    FALSE, but with the 'period' rounded to 4 significant digits and
-    pasted onto 'sin1', etc.  For example, with period=12, the second
-    name would be 'sin1.12'.
+	basisobj\$basisvalues <- vector("list",1)
 
-    if NA, no 'names' will be provided.      
+	basisobj\$basisvalues[[1]] <- list(args=evalargs,
+	values=basismat)
+  }
+  \item{names}{
+    either a character vector of the same length as the number of basis
+    functions or a simple stem used to construct such a vector.
+
+    If \code{nbasis} = 3, \code{names} defaults to c('const', 'cos',
+    'sin').  If \code{nbasis} > 3, \code{names} defaults to c('const',
+    outer(c('cos', 'sin'), 1:((nbasis-1)/2), paste, sep='')).
+
+    If names = NA, no names are used.
   }
 }
 \value{
@@ -75,17 +103,17 @@ create.fourier.basis(rangeval=c(0, 1), nbasis=3,
   base period. The number of basis functions generated is always odd.
 }
 \seealso{
-  \code{\link{basisfd}}, 
-  \code{\link{create.bspline.basis}}, 
-  \code{\link{create.constant.basis}}, 
-  \code{\link{create.exponential.basis}}, 
-  \code{\link{create.monomial.basis}}, 
-  \code{\link{create.polygonal.basis}}, 
-  \code{\link{create.polynomial.basis}}, 
+  \code{\link{basisfd}},
+  \code{\link{create.bspline.basis}},
+  \code{\link{create.constant.basis}},
+  \code{\link{create.exponential.basis}},
+  \code{\link{create.monomial.basis}},
+  \code{\link{create.polygonal.basis}},
+  \code{\link{create.polynomial.basis}},
   \code{\link{create.power.basis}}
 }
 \examples{
-# Create a minimal Fourier basis for the monthly temperature data, 
+# Create a minimal Fourier basis for the monthly temperature data,
 #  using 3 basis functions with period 12 months.
 monthbasis3 <- create.fourier.basis(c(0,12) )
 #  plot the basis
@@ -98,9 +126,9 @@ monthbasis <- create.fourier.basis(c(0,12), 9, 12.0)
 #  plot the basis
 plot(monthbasis)
 
-# Create a false Fourier basis using 1 basis function.  
+# Create a false Fourier basis using 1 basis function.
 falseFourierBasis <- create.fourier.basis(nbasis=1)
-#  plot the basis:  constant 
+#  plot the basis:  constant
 plot(falseFourierBasis)
 
 }

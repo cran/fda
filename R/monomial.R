@@ -12,8 +12,8 @@ monomial <- function(evalarg, exponents=1:nbasis, nderiv=0)
 #  A matrix with length(EVALARG) rows and NBASIS columns containing
 #    the values of the monomials or their derivatives
 
-#  last modified 17 September 2005
-
+#  last modified 2008.08.23 by Spencer Graves;
+#  previously modified 17 September 2005
 	evalarg <- as.vector(evalarg)
 	n       <- length(evalarg)
 
@@ -32,15 +32,15 @@ monomial <- function(evalarg, exponents=1:nbasis, nderiv=0)
 
 	# check if there are duplicate exponents
 
-        if((length(exponents)>1) && (min(diff(sort(exponents))) <= 0)) 
+        if((length(exponents)>1) && (min(diff(sort(exponents))) <= 0))
           stop("There are duplicate exponents.")
 
 	monommat <- matrix(0,n,nbasis)
 
 	if (nderiv == 0) {
     	#  use the recursion formula to compute monomnomial values
-    	for (ibasis in 1:nbasis) { 
-			monommat[,ibasis] <- evalarg^exponents[ibasis] 
+    	for (ibasis in 1:nbasis) {
+			monommat[,ibasis] <- evalarg^exponents[ibasis]
 		}
 	} else {
     	for (ibasis in 1:nbasis) {

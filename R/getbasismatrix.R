@@ -25,7 +25,8 @@ getbasismatrix <- function(evalarg, basisobj, nderiv=0) {
 #
 #  Note that the first two arguments may be interchanged.
 #
-#  Last modified 26 October 2005
+
+#  Last modified 27 October 2008 by Jim Ramsay
 
 #  Exchange the first two arguments if the first is an BASIS.FD object
 #    and the second numeric
@@ -45,6 +46,33 @@ if (!(is.numeric(evalarg)))  stop("Argument EVALARG is not numeric.")
 if (!(inherits(basisobj, "basisfd"))) stop(
     "Second argument is not a basis object.")
 
+#  search for stored basis matrix
+
+if (!(length(basisobj$basisvalues) == 0 || is.null(basisobj$basisvalues))) {
+    #  one or more stored basis matrices found,
+    #  check that requested derivative is available
+    if (!is.vector(basisvalues)) stop("BASISVALUES is not a vector.")
+    basisvalues <- basisobj$basisvalues
+    nvalues     <- length(basisvalues)
+    #  search for argvals match
+    N  <- length(evalarg)
+    OK <- FALSE
+    for (ivalues in 1:nvalues) {
+        basisvaluesi <- basisvalues[ivalues]
+        if (!is.list(basisvaluesi)) stop("BASISVALUES does not contain lists.")
+        argvals <- basisvaluesi[[1]]
+        if (!length(basisvaluesi) < nderiv+2) {
+            if (N == length(argvals)) {
+                if (all(argvals == evalarg)) {
+                    basismat <- basisvaluesi[[nderiv+2]]
+                    OK <- TRUE
+                }
+            }
+        }
+    }
+    if (OK) return(basismat)
+}
+
 #  Extract information about the basis
 
 type     <- basisobj$type
@@ -56,7 +84,11 @@ dropind  <- basisobj$dropind
 #  -----------------------------  B-spline basis  -------------------
 
 if (type == "bspline") {
-   	breaks   <- c(rangeval[1], params, rangeval[2])
+      if (length(params) == 0) {
+          breaks   <- c(rangeval[1], rangeval[2])
+      } else {
+   	    breaks   <- c(rangeval[1], params, rangeval[2])
+      }
    	norder   <- nbasis - length(breaks) + 2
    	basismat <- bsplineS(evalarg, breaks, norder, nderiv)
 

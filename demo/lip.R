@@ -144,7 +144,7 @@ WfdPar    <- fdPar(fd(basisobj=warpbasis), 2, 1e-4)
 WfdPar.    <- fdPar(fd(matrix(0,wnbasis,1), warpbasis), 2, 1e-4)
 all.equal(WfdPar, WfdPar.)
 
-lipreglist <- landmarkreg(lipfd, lipmarks, lipmeanmarks, WfdPar)
+lipreglist <- landmarkreg(lipfd, as.matrix(lipmarks), lipmeanmarks, WfdPar)
 
 lipregfd   <- lipreglist$regfd
 lipwarpfd  <- lipreglist$warpfd
@@ -196,6 +196,8 @@ plot(1:19, log10(lipeigvals[1:19]), type="b",
 
 #  set up a second order linear differnetial equation solution
 
+liprange = range(liptime)
+
 pdabasisfd <- create.bspline.basis(liprange, nbasis=21)
 betafdPar  <- fdPar(pdabasisfd)
 
@@ -216,7 +218,8 @@ bwtestlist <- pdaList$bwtlist
 par(mfrow=c(2,1),pty="m")
 for (j in 1:2) {
 	bfdParj <- bwtestlist[[j]]
-	plot(bfdParj$fd)
+	bvals = eval.fd(liptime,bwtestlist[[j]]$fd)
+	plot(liptime,bvals,type='l')
 }
 
 #  compute forcing functions

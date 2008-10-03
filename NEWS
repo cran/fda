@@ -3,6 +3,11 @@ second edition (2006) and 'Applied Functional Data Analysis'
 (2002), both by James O. Ramsay and Bernard W. Silverman
 (Springer).
 
+Release 2.0.2 and 2.0.3 fixed bugs in "+.fd" and "-.fd" and
+other places like 'plotfit.fd'.  Release 2.0.3 also introduced
+changes to 'create.bspline.basis' and 'create.fourier.basis'
+to make them more consistent and easier to use.
+
 Release 2.0.1 added a map to CanadianWeather.Rd showing the
 location of each weather station by region.
 

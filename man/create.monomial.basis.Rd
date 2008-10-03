@@ -24,7 +24,7 @@ create.monomial.basis(rangeval=c(0, 1), nbasis=2,
   }
   \item{exponents}{
     the nonnegative integer powers to be used.  By default,
-    these are 0, 1, 2, ..., \code{ nbasis }.
+    these are 0, 1, 2, ..., (nbasis-1).
   }
   \item{dropind}{
     a vector of integers specifiying the basis functions to
@@ -34,9 +34,9 @@ create.monomial.basis(rangeval=c(0, 1), nbasis=2,
     is nonzero at that point. Default value NULL.
   }
   \item{quadvals}{
-    a matrix with two columns and a number of rows equal to the number of
-    argument values used to approximate an integral using Simpson's rule.
-    The first column contains these argument values.
+    a matrix with two columns and a number of rows equal to the number
+    of argument values used to approximate an integral using Simpson's
+    rule.  The first column contains these argument values.
     A minimum of 5 values are required for
     each inter-knot interval, and that is often enough. These
     are equally spaced between two adjacent knots.
@@ -53,18 +53,18 @@ create.monomial.basis(rangeval=c(0, 1), nbasis=2,
   a basis object with the type \code{monom}.
 }
 \seealso{
-  \code{\link{basisfd}}, 
-  \code{\link{create.bspline.basis}}, 
-  \code{\link{create.constant.basis}}, 
-  \code{\link{create.fourier.basis}}, 
-  \code{\link{create.exponential.basis}}, 
-  \code{\link{create.polygonal.basis}}, 
-  \code{\link{create.polynomial.basis}}, 
+  \code{\link{basisfd}},
+  \code{\link{create.bspline.basis}},
+  \code{\link{create.constant.basis}},
+  \code{\link{create.fourier.basis}},
+  \code{\link{create.exponential.basis}},
+  \code{\link{create.polygonal.basis}},
+  \code{\link{create.polynomial.basis}},
   \code{\link{create.power.basis}}
 }
 \examples{
 ##
-## simplest example: one constant 'basis function' 
+## simplest example: one constant 'basis function'
 ##
 m0 <- create.monomial.basis(nbasis=1, exponents=0)
 plot(m0)

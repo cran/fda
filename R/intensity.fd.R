@@ -20,7 +20,7 @@ intensity.fd <- function(x, WfdParobj, conv=0.0001, iterlim=20, dbglev=1) {
 #  ITERNUM   Number of iterations
 #  ITERHIST  History of iterations
 
-#  last modified 24 March 2006
+#  last modified 3 January 2008 by Jim Ramsay
 
 	#  check WfdParobj
 	
@@ -218,7 +218,7 @@ intensity.fd <- function(x, WfdParobj, conv=0.0001, iterlim=20, dbglev=1) {
 				cat("\n")
 			}
         	#  compute next step
-			result <- stepit(linemat, ips, ind, dblwrd, MAXSTEP, dbgwrd)
+			result <- stepit(linemat, ips, dblwrd, MAXSTEP)
 			linemat <- result[[1]]
 			ips     <- result[[2]]
 			ind     <- result[[3]]

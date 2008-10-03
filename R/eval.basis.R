@@ -23,10 +23,9 @@ eval.basis <- function(evalarg, basisobj, Lfdobj=0) {
 #  LFDOBJ   ... A linear differential operator object
 #               applied to the basis functions before they are to be evaluated.
 
-#
 #  Note that the first two arguments may be interchanged.
-#
-#  Last modified 26 October 2005
+
+#  Last modified 22 December 2007
 
 #  Exchange the first two arguments if the first is an BASIS.FD object
 #    and the second numeric
@@ -45,8 +44,8 @@ if (!is.vector(evalarg))    stop("Argument EVALARG is not a vector.")
 	
 #  check basisobj
 	
-if (!(inherits(basisobj, "basisfd")))
-  stop("Second argument is not a basis object.")
+if (!(inherits(basisobj, "basisfd"))) stop(
+    "Second argument is not a basis object.")
 
 #  check LFDOBJ
 
@@ -62,7 +61,7 @@ bwtlist <- Lfdobj$bwtlist
 
 #  get highest order of basis matrix
 
-evalarray <- getbasismatrix(evalarg, basisobj, nderiv)
+evalarray <- as.matrix(getbasismatrix(evalarg, basisobj, nderiv))
 nbasis    <- dim(evalarray)[2]
 oneb      <- matrix(1,1,nbasis)
 

@@ -14,7 +14,7 @@ mongrad <- function(x, Wfdobj, basislist=vector("list",JMAX)) {
 #  Returns:
 #  GVAL   ... value of gradient at input values in X.
 
-#  Last modified 19 December 2007
+#  Last modified 21 October 2008 by Jim Ramsay
 
   JMAX <- 15
   JMIN <- 11
@@ -57,27 +57,27 @@ mongrad <- function(x, Wfdobj, basislist=vector("list",JMAX)) {
   tnm <- 0.5
 
   #  now iterate to convergence
-  for (j in 2:JMAX) {
+  for (iter in 2:JMAX) {
     tnm  <- tnm*2
     del  <- width/tnm
     tj   <- seq(rangeval[1]+del/2, rangeval[2]-del/2, del)
     tval <- c(tval, tj)
-    if (is.null(basislist[[j]])) {
+    if (is.null(basislist[[iter]])) {
         bmat <- getbasismatrix(tj, basisfd)
-        basislist[[j]] <- bmat
+        basislist[[iter]] <- bmat
     } else {
-        bmat <- basislist[[j]]
+        bmat <- basislist[[iter]]
     }
     fx   <- exp(bmat %*% coef)
     gval <- outer(c(fx),onebas)*bmat
     fval <- rbind(fval,gval)
-    smat[j,] <- (smat[j-1,] + width*apply(fval,2,sum)/tnm)/2
-    if (j >= max(c(5,JMIN))) {
-      ind <- (j-4):j
+    smat[iter,] <- (smat[iter-1,] + width*apply(fval,2,sum)/tnm)/2
+    if (iter >= max(c(5,JMIN))) {
+      ind <- (iter-4):iter
       result <- polintmat(h[ind],smat[ind,],0)
       ss  <- result[[1]]
       dss <- result[[2]]
-      if (all(abs(dss) < EPS*max(abs(ss))) || j == JMAX) {
+      if (all(abs(dss) < EPS*max(abs(ss))) || iter >= JMAX) {
         # successful convergence
         # sort argument values and corresponding function values
         ordind <- order(tval)
@@ -92,8 +92,7 @@ mongrad <- function(x, Wfdobj, basislist=vector("list",JMAX)) {
         return(gval)
       }
     }
-    smat[j+1,] <- smat[j,]
-    h[j+1]     <- 0.25*h[j]
+    smat[iter+1,] <- smat[iter,]
+    h[iter+1]     <- 0.25*h[iter]
   }
-  #stop(paste("No convergence after",JMAX," steps in MONGRAD"))
 }

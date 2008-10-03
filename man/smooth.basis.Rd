@@ -1,7 +1,7 @@
 \name{smooth.basis}
 \alias{smooth.basis}
 \title{
-  Smooth Data with an Indirectly Specified Roughness Penalty 
+  Smooth Data with an Indirectly Specified Roughness Penalty
 }
 \description{
   This is the main function for smoothing data using a roughness
@@ -28,7 +28,7 @@ smooth.basis(argvals, y, fdParobj, wtvec=rep(1, length(argvals)),
     \code{y} is a three-dimensional array, the first dimension
     corresponds to argument values, the second to replications, and the
     third to variables within replications.  If \code{y} is a vector,
-    only one replicate and variable are assumed.  
+    only one replicate and variable are assumed.
   }
   \item{fdParobj}{
     a functional parameter object, a functional data object or a
@@ -42,11 +42,11 @@ smooth.basis(argvals, y, fdParobj, wtvec=rep(1, length(argvals)),
   }
   \item{wtvec}{
     a vector of the same length as \code{argvals} containing weights for
-    the values to be smoothed. 
+    the values to be smoothed.
   }
   \item{fdnames}{
     a list of length 3 containing character vectors of names for the
-    following: 
+    following:
 
     \itemize{
       \item{args}{
@@ -70,7 +70,7 @@ smooth.basis(argvals, y, fdParobj, wtvec=rep(1, length(argvals)),
   more smooth.  Ultimately, the curves are forced to have zero roughness
   in the sense of being in the null space of the linear differential
   operator object \code{Lfdobj}that is a member of the \code{fdParobj}.
-  
+
   For example, a common choice of roughness penalty is the integrated
   square of the second derivative.  This penalizes curvature.  Since the
   second derivative of a straight line is zero, very large values of
@@ -91,7 +91,7 @@ smooth.basis(argvals, y, fdParobj, wtvec=rep(1, length(argvals)),
   values a few log units up and down from this value to see what the
   smoothing function and its derivatives look like.  The function
   \code{plotfit.fd} was designed for this purpose.
-  
+
   An alternative to using \code{smooth.basis} is to first represent
   the data in a basis system with reasonably high resolution using
   \code{data2fd}, and then smooth the resulting functional data object
@@ -99,10 +99,10 @@ smooth.basis(argvals, y, fdParobj, wtvec=rep(1, length(argvals)),
 }
 \value{
   an object of class \code{fdSmooth}, which is a names list of length 6
-  with the following components: 
+  with the following components:
 
   \item{fd}{
-    a functional data object containing a smooth of the data. 
+    a functional data object containing a smooth of the data.
   }
   \item{df}{
     a degrees of freedom measure of the smooth
@@ -117,11 +117,11 @@ smooth.basis(argvals, y, fdParobj, wtvec=rep(1, length(argvals)),
   }
 %  \item{coef}{
 %    the coefficient matrix or array for the basis function expansion of
-%    the smoothing function 
+%    the smoothing function
 %  }
   \item{SSE}{
     the error sums of squares.  SSE is a vector or a matrix of the same
-    size as GCV. 
+    size as GCV.
   }
   \item{penmat}{
     the penalty matrix.
@@ -129,17 +129,18 @@ smooth.basis(argvals, y, fdParobj, wtvec=rep(1, length(argvals)),
   \item{y2cMap}{
     the matrix mapping the data to the coefficients.
   }
+  \item{argvals, y}{input arguments}
 }
 \seealso{
-  \code{\link{data2fd}}, \code{\link{df2lambda}}, 
-  \code{\link{lambda2df}}, \code{\link{lambda2gcv}}, 
-  \code{\link{plot.fd}}, \code{\link{project.basis}}, 
-  \code{\link{smooth.fd}}, \code{\link{smooth.monotone}}, 
+  \code{\link{data2fd}}, \code{\link{df2lambda}},
+  \code{\link{lambda2df}}, \code{\link{lambda2gcv}},
+  \code{\link{plot.fd}}, \code{\link{project.basis}},
+  \code{\link{smooth.fd}}, \code{\link{smooth.monotone}},
   \code{\link{smooth.pos}}, \code{\link{smooth.basisPar}}
 }
 \examples{
 ##
-## Example 1:  Inappropriate smoothing  
+## Example 1:  Inappropriate smoothing
 ##
 # A toy example that creates problems with
 # data2fd:  (0,0) -> (0.5, -0.25) -> (1,1)
@@ -149,35 +150,35 @@ b2.3 <- create.bspline.basis(norder=2, breaks=c(0, .5, 1))
 fdPar2 <- fdPar(b2.3, Lfdobj=2, lambda=1)
 
 \dontrun{
-# Penalize excessive slope Lfdobj=1;  
+# Penalize excessive slope Lfdobj=1;
 # second derivative Lfdobj=2 is discontinuous,
 # so the following generates an error:
   fd2.3s0 <- smooth.basis(0:1, 0:1, fdPar2)
-Derivative of order 2 cannot be taken for B-spline of order 2 
+Derivative of order 2 cannot be taken for B-spline of order 2
 Probable cause is a value of the nbasis argument
  in function create.basis.fd that is too small.
 Error in bsplinepen(basisobj, Lfdobj, rng) :
 }
 
 ##
-## Example 2.  Better 
+## Example 2.  Better
 ##
 b3.4 <- create.bspline.basis(norder=3, breaks=c(0, .5, 1))
 # 4 bases, order 3 = degree 2 =
-# continuous, bounded, locally quadratic 
+# continuous, bounded, locally quadratic
 fdPar3 <- fdPar(b3.4, lambda=1)
-# Penalize excessive slope Lfdobj=1;  
+# Penalize excessive slope Lfdobj=1;
 # second derivative Lfdobj=2 is discontinuous.
 fd3.4s0 <- smooth.basis(0:1, 0:1, fdPar3)
 
 plot(fd3.4s0$fd)
 # same plot via plot.fdSmooth
-plot(fd3.4s0) 
+plot(fd3.4s0)
 
 ##
 ## Example 3.  lambda = 1, 0.0001, 0
 ##
-#  Example 3.  lambda = 1 
+#  Example 3.  lambda = 1
 #  Shows the effects of three levels of smoothing
 #  where the size of the third derivative is penalized.
 #  The null space contains quadratic functions.
@@ -195,13 +196,13 @@ fdPar.0001 <- fdPar(basisobj, 2, lambda=0.0001)
 result2  <- smooth.basis(x, y, fdPar.0001)
 with(result2, c(df, gcv, SSE))
 # less smoothing, more degrees of freedom,
-# smaller gcv, smaller SSE 
+# smaller gcv, smaller SSE
 
 #  Example 3.  lambda = 0
 fdPar0 <- fdPar(basisobj, 2, lambda=0)
 result3  <- smooth.basis(x, y, fdPar0)
 with(result3, c(df, gcv, SSE))
-# Saturate fit:  number of observations = nbasis 
+# Saturate fit:  number of observations = nbasis
 # with no smoothing, so degrees of freedom = nbasis,
 # gcv = Inf indicating overfitting;
 # SSE = 0 (to within roundoff error)
@@ -219,7 +220,7 @@ plotfit.fd(y, x, result2[['fd']])  # plot data and smooth
 ##
 basis104 <- create.bspline.basis(c(-1,1), 104)
 
-fdPar104.0 <- fdPar(basis104, 2, lambda=0) 
+fdPar104.0 <- fdPar(basis104, 2, lambda=0)
 result104.0  <- smooth.basis(x, y, fdPar104.0)
 with(result104.0, c(df, gcv, SSE))
 
@@ -239,7 +240,7 @@ harmaccelLfd <- vec2Lfd(c(0, 0, (2*pi)^2, 0))
 gaitfdPar <- fdPar(gaitbasis, harmaccelLfd, lambda)
 gaitfd <- smooth.basis(gaittime, gait, gaitfdPar)$fd
 \dontrun{
-# by default creats multiple plots, asking for a click between plots 
+# by default creats multiple plots, asking for a click between plots
 plotfit.fd(gait, gaittime, gaitfd)
 }
 }

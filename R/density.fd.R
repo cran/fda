@@ -33,9 +33,8 @@ density.fd <- function(x, WfdParobj, conv=0.0001, iterlim=20,
 #  exponentiate the resulting vector, and then divide by the normalizing
 #  constant C.
 
-# last modified 2007 May 3 by Spencer Graves   
-#  last modified 24 March 2006
-
+# last modified 3 January 2008 by Jim Ramsay
+# Previously modified 2007 May 3 by Spencer Graves   
 	#  check WfdParobj
 	
 	if (!inherits(WfdParobj, "fdPar"))
@@ -264,7 +263,7 @@ density.fd <- function(x, WfdParobj, conv=0.0001, iterlim=20,
 				cat("\n")
 			}
         	#  compute next step
-			result <- stepit(linemat, ips, ind, dblwrd, MAXSTEP, dbgwrd)
+			result <- stepit(linemat, ips, dblwrd, MAXSTEP)
 			linemat <- result[[1]]
 			ips     <- result[[2]]
 			ind     <- result[[3]]

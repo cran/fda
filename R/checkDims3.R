@@ -2,6 +2,11 @@ checkDims3 <- function(x, y=NULL, xdim=2:3, ydim=2:3, defaultNames='x',
          subset=c('xiny', 'yinx', 'neither'),
          xName=substring(deparse(substitute(x)), 1, 33),
          yName=substring(deparse(substitute(y)), 1, 33) ){
+#  checkDims3 coerces arguments 'x' and 'y' to 3-d arrays, compares their 
+#  dimensions, subsets one or the other or throws an error or a warning 
+#  as seems appropriate.  It returns a list with components 'x' and 'y' 
+#  with appropriate dimnames.
+
 ###  
 ###
 ### 1.  length(xdim) == length(ydim)?
@@ -20,17 +25,16 @@ checkDims3 <- function(x, y=NULL, xdim=2:3, ydim=2:3, defaultNames='x',
   {
     if(nDefault<1){
       dNames0 <- NULL
-      dNames <- rep(list(NULL), mDims)
+      dNames  <- rep(list(NULL), mDims)
     }
     else {
       dNames0 <- defaultNames[[nDefault]]      
-      dNames <- rep(as.list(defaultNames), length=mDims)
-      dNms <- names(defaultNames)
-      if(!is.null(dNms)){
-        if(is.null(dNames0))dNames0 <- dNms[nDefault]
-        for(i in 1:mDims)
-          if(is.null(dNames[[i]]))
-            dNames[[i]] <- dNms[i]
+      dNames  <- rep(as.list(defaultNames), length=mDims)
+      dNms    <- names(defaultNames)
+      if (!is.null(dNms)) {
+        if(is.null(dNames0)) dNames0 <- dNms[nDefault]
+        for (i in 1:mDims)
+          if(is.null(dNames[[i]])) dNames[[i]] <- dNms[i]
       }
     }
   }
@@ -40,10 +44,10 @@ checkDims3 <- function(x, y=NULL, xdim=2:3, ydim=2:3, defaultNames='x',
 ###
 ###  
   for(id in 1:mDims){
-    dNi <- c(dNames[id], dNames0)
+    dNi  <- c(dNames[id], dNames0)
     xNmi <- paste('subscript', id, 'of', xName)
     yNmi <- paste('subscript', id, 'of', yName) 
-    out <- checkDim3(x, y, xdim[id], ydim[id], dNi, subset,
+    out  <- checkDim3(x, y, xdim[id], ydim[id], dNi, subset,
                      xName=xNmi, yName=yNmi)
     x <- out$x
     y <- out$y
@@ -56,6 +60,8 @@ checkDims3 <- function(x, y=NULL, xdim=2:3, ydim=2:3, defaultNames='x',
   out
 }
 
+#  -----------------------------------------------------------------
+
 checkDim3 <- function(x, y=NULL, xdim=1, ydim=1, defaultNames='x',
          subset=c('xiny', 'yinx', 'neither'),
          xName=substring(deparse(substitute(x)), 1, 33),
@@ -65,14 +71,14 @@ checkDim3 <- function(x, y=NULL, xdim=1, ydim=1, defaultNames='x',
 ### 1.  Check xdim, ydim 
 ###
 ###  
-  if(xdim>3)stop('Requested matching xdim = ', xdim,
-                 ' > 3 = maximum allowed.')
-  if(is.null(y)){ 
+  if (xdim>3) stop('Requested matching xdim = ', xdim,
+                   ' > 3 = maximum allowed.')
+  if (is.null(y)){ 
     y <- x
     yName <- xName
   }
-  if(ydim>3)stop('Requested matching ydim = ', ydim,
-                 ' > 3 = maximum allowed.')
+  if (ydim>3) stop('Requested matching ydim = ', ydim,
+                   ' > 3 = maximum allowed.')
 ###
 ###  
 ### 2.  ixperm, iyperm 

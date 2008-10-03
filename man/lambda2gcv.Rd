@@ -7,13 +7,10 @@
   The generalized cross-validation or GCV criterion is often used to
   select an appropriate smoothing parameter value, by finding the
   smoothing parameter that minimizes GCV.  This function locates that
-  value. 
+  value.
 }
 \usage{
-%lambda2gcv(log10lambda, argvals, y, fdParobj,
-%           wtvec=rep(1, length(y)), dffactor=1)
-lambda2gcv(log10lambda, argvals, y, fdParobj,
-           wtvec=rep(1, length(y)))
+  lambda2gcv(log10lambda, argvals, y, fdParobj, wtvec=rep(1,length(argvals)))
 }
 \arguments{
   \item{log10lambda}{
@@ -31,11 +28,9 @@ lambda2gcv(log10lambda, argvals, y, fdParobj,
   \item{wtvec}{
     a weight vector used in the smoothing.
   }
-%\item{dffactor}{a factor used to define the GCV criterion.  See
-%\code{smooth.basis} for details.}
 }
 \details{
-  Currently, \code{lambda2gcv} 
+  Currently, \code{lambda2gcv}
 }
 \value{
   1.  \eqn{fdParobj[['lambda']] <- 10^log10lambda}

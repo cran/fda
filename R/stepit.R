@@ -1,17 +1,16 @@
-stepit <- function(linemat, ips, ind, dblwrd, MAXSTEP, dbgwrd) {
+stepit <- function(linemat, ips, dblwrd, MAXSTEP)
+{
 #STEPIT computes next step size in line search algorithm
 #  Arguments:
 #  LINEMAT:  Row 1 contains step values
 #            Row 2 contains slope values
 #            Row 3 contains function values
 #  IPS:      If 1, previous slope was positive
-#  IND:      Termination status
 #  DBLWRD:   Vector of length 2:  dblwrd[1] TRUE means step halved
 #                                 dblwrd[2] TRUE means step doubled
-#  DBGWRD:   Print out details of step
 #  MAXSTEP:  maximum size of step
 
-#  Last modified 19 September 2005
+#  Last modified 3 January 2008
 
 test1 <- abs(linemat[2,5]) < abs(linemat[2,1])/10
 test2 <- linemat[3,5] > linemat[3,1]

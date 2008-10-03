@@ -1,19 +1,21 @@
 
 #  Generator function of class basisfd
 
-basisfd <- function(type, rangeval, nbasis, params, dropind=NULL, 
-                  quadvals=NULL, values=vector("list",0))
+basisfd <- function(type, rangeval, nbasis, params, dropind=vector("list",0),
+                    quadvals=vector("list",0), values=vector("list",0), 
+                    basisvalues=vector("list",0))
 {
 #  BASISFD  generator function of "basisfd" class.
 #  Arguments:
-#  BASISTYPE ... a string indicating the type of basisobj$  This may be one of
-#               "Fourier", "fourier", "Fou", "fou",
+#  TYPE     ... a string indicating the type of basisobj.
+#               This may be one of:
 #               "Bspline", "bspline", "Bsp", "bsp",
-#               "pol", "poly", "polynomial",
-#               "mon", "monom", "monomial",
 #               "con", "const", "constant"
 #               "exp", "exponen", "exponential"
-#               "polyg" "polygon", "polygonal"
+#               "Fourier", "fourier", "Fou", "fou",
+#               "mon", "monom", "monomial",
+#               "polyg", "polygon", "polygonal"
+#               "power" "pow"
 #  RANGEVAL ... an array of length 2 containing the lower and upper
 #               boundaries for (the rangeval of argument values
 #  NBASIS   ... the number of basis functions
@@ -27,16 +29,17 @@ basisfd <- function(type, rangeval, nbasis, params, dropind=NULL,
 #                 interior knots, that is the length of PARAMS.
 #               This means that NBASIS must be at least 1 larger than the
 #                 length of PARAMS.
-#  DROPIND ... A set of indices in 1:NBASIS of basis functions to drop
-#                when basis objects are arguments.  Default is NULL  Note
-#                that argument NBASIS is reduced by the number of indices,
-#                and the derivative matrices in VALUES are also clipped.
+#  DROPIND ... A set of indices in 1:NBASIS of basis functions to drop when 
+#                basis objects are arguments.  Default is vector("list",0) 
+#                Note that argument NBASIS is reduced by the number of 
+#                indices, and the derivative matrices in VALUES are also clipped.
 #  QUADVALS .. A NQUAD by 2 matrix.  The firs t column contains quadrature
 #                points to be used in a fixed point quadrature.  The second
 #                contains quadrature weights.  For example, for (Simpson"s
 #                rule for (NQUAD = 7, the points are equally spaced and the
 #                weights are delta.*[1, 4, 2, 4, 2, 4, 1]/3.  DELTA is the
-#                spacing between quadrature points.  The default is NULL.
+#                spacing between quadrature points.  The default is 
+#                matrix("numeric",0,0).
 #  VALUES  ... A list, with entries containing the values of
 #                the basis function derivatives starting with 0 and
 #                going up to the highest derivative needed.  The values
@@ -48,7 +51,44 @@ basisfd <- function(type, rangeval, nbasis, params, dropind=NULL,
 #                Values are checked against QUADVALS to ensure the correct
 #                number of rows, and against NBASIS to ensure the correct
 #                number of columns.
-#                The default is VALUES{1} = NULL
+#                The default value of is VALUES is vector("list",0).
+#                VALUES contains values of basis functions and derivatives at
+#                quadrature points weighted by square root of quadrature weights.
+#                These values are only generated as required, and only if slot
+#                QUADVALS is not matrix("numeric",0,0).
+#  BASISVALUES ... A vector of lists, allocated by code such as 
+#                vector("list",1).
+#                This field is designed to avoid evaluation of a
+#                basis system repeatedly at a set of argument values.
+#                Each list within the vector corresponds to a specific set 
+#                of argument values, and must have at least two components, 
+#                which may be tagged as you wish.  
+#                The first component in an element of the list vector contains the 
+#                argument values.
+#                The second component in an element of the list vector 
+#                contains a matrix of values of the basis functions evaluated
+#                at the arguments in the first component. 
+#                The third and subsequent components, if present, contain 
+#                matrices of values their derivatives up to a maximum 
+#                derivative order.
+#                Whenever function getbasismatrix is called, it checks
+#                the first list in each row to see, first, if the number of
+#                argument values corresponds to the size of the first dimension,
+#                and if this test succeeds, checks that all of the argument
+#                values match.  This takes time, of course, but is much
+#                faster than re-evaluation of the basis system.  Even this
+#                time can be avoided by direct retrieval of the desired
+#                array.
+#                For example, you might set up a vector of argument values
+#                called "evalargs" along with a matrix of basis function
+#                values for these argument values called "basismat".
+#                You might want too use tags like "args" and "values",
+#                respectively for these.  You would then assign them
+#                to BASISVALUES with code such as
+#                  basisobj$basisvalues <- vector("list",1)
+#                  basisobj$basisvalues[[1]] <- 
+#                               list(args=evalargs, values=basismat)
+#
 #  Returns
 #  BASISOBJ  ... a basisfd object with slots
 #         type
@@ -58,6 +98,7 @@ basisfd <- function(type, rangeval, nbasis, params, dropind=NULL,
 #         dropind
 #         quadvals
 #         values
+#         basisvalues
 #  Slot VALUES contains values of basis functions and derivatives at
 #   quadrature points weighted by square root of quadrature weights.
 #   These values are only generated as required, and only if slot
@@ -74,23 +115,28 @@ basisfd <- function(type, rangeval, nbasis, params, dropind=NULL,
 #  CREATE_POLYGON_BASIS     ...  creates a polygonal basis
 #  CREATE_POLYNOMIAL_BASIS  ...  creates a polynomial basis
 #  CREATE_POWER_BASIS       ...  creates a monomial basis
-#  last modified 2007.09.09 by Spencer Graves
-#  Previously modified 8 December 2005
+
+#  Last       modified 29 September 2008 by Jim Ramsay
+#  Previously modified  4 January   2008 by Jim Ramsay
+
+#  Set up default basis if there are no arguments:
+#     order 2 monomial basis over [0,1]
 
 if (nargs()==0) {
-    type      <- "bspline"
-    rangeval  <- c(0,1)
-    nbasis    <- 2
-    params    <- NULL
-    dropind   <- NULL
-    quadvals  <- NULL
-    values    <- vector("list",0)
+    type        <- "bspline"
+    rangeval    <- c(0,1)
+    nbasis      <- 2
+    params      <- vector("list",0)
+    dropind     <- vector("list",0)
+    quadvals    <- vector("list",0)
+    values      <- vector("list",0)
+    basisvalues <- vector("list",0)
 
-    basisobj  <- list(type=type, rangeval=rangeval, nbasis=nbasis, 
-                      params=params, dropind=dropind, quadvals=quadvals, 
-                      values=values)
+    basisobj  <- list(type=type,     rangeval=rangeval, nbasis=nbasis,
+                      params=params, dropind=dropind,   quadvals=quadvals,
+                      values=values, basisvalues=basisvalues)
     oldClass(basisobj) <- "basisfd"
-    basisobj
+    return(basisobj)
 }
 
 #  if first argument is a basis object, return
@@ -109,8 +155,8 @@ if (type=="unknown"){
 
 #  check if QUADVALS is present, and set to default if not
 
-if (missing(quadvals)) quadvals <- NULL
-else if(!is.null(quadvals)){
+if (missing(quadvals)) quadvals <- vector("list",0)
+else if(!(length(quadvals) == 0 || is.null(quadvals))){
      nquad <- dim(quadvals)[1]
      ncol  <- dim(quadvals)[2]
      if ((nquad == 2) && (ncol > 2)){
@@ -122,20 +168,39 @@ else if(!is.null(quadvals)){
      if (ncol != 2) stop("'quadvals' does not have two columns.")
 }
 
-#  check VALUES if present, and set to a single empty cell if not.
-if(!missing(values) && !is.null(values)) {
- 	 n <- dim(values)[1]
-	 k <- dim(values)[2]
-    if (n != nquad)   
-        stop("Number of rows in 'values' not equal to number of quadrature points.")
-    if (k != nbasis)  
-        stop("Number of columns in 'values' not equal to number of basis functions.")
+#  check VALUES is present, and set to a single empty list if not.
+if(!(length(values) == 0 || missing(values) || is.null(values))) {
+   n <- dim(values)[1]
+   k <- dim(values)[2]
+    if (n != nquad)
+        stop(paste("Number of rows in 'values' not equal to number of",
+                   "quadrature points."))
+    if (k != nbasis)
+        stop(paste("Number of columns in 'values' not equal to number of",
+                   "basis functions."))
 }
-else values <- NULL
+else values <- vector("list",0)
+
+#  check BASISVALUES is present, and set to vector("list",0) if not.
+#  If present, it must be a two-dimensional list created by a command like
+#  listobj <- matrix("list", 2, 3)
+
+if(!(length(basisvalues) == 0 || missing(basisvalues) || !is.null(basisvalues))) {
+    if (!is.list(basisvalues)) stop("BASISVALUES is not a list object.")
+    sizevec <- dim(basisvalues)
+    if (length(sizevec) != 2) stop("BASISVALUES is not 2-dimensional.")
+    for (i in 1:sizevec[1]) {
+        if (length(basisvalues[[i,1]]) != dim(basisvalues[[i,2]])[1]) stop(
+            paste("Number of argument values not equal number",
+                  "of values."))
+    }
+}
+else basisvalues <- vector("list",0)
+
 
 #  check if DROPIND is present, and set to default if not
 
-if(missing(dropind)) dropind<-NULL
+if(missing(dropind)) dropind <- vector("list",0)
 
 #  select the appropriate type and process
 
@@ -149,28 +214,28 @@ if (type=="fourier"){
     if (!missing(params)){
         nparams  <- length(params)
         if(nparams>0){
-          if (params[1] <= rangeval[1])       
+          if (params[1] <= rangeval[1])
             stop("Smallest value in BREAKS not within RANGEVAL")
-          if (params[nparams] >= rangeval[2]) 
+          if (params[nparams] >= rangeval[2])
             stop("Largest value in BREAKS not within RANGEVAL")
         }
     }
 } else if(type=="expon") {
-    if (length(params) != nbasis) 
+    if (length(params) != nbasis)
         stop("No. of parameters not equal to no. of basis fns for (exponential basisobj$")
 } else if(type=="polyg") {
-    if (length(params) != nbasis) 
+    if (length(params) != nbasis)
         stop("No. of parameters not equal to no. of basis fns for (polygonal basisobj$")
 } else if(type=="power") {
-    if (length(params) != nbasis) 
+    if (length(params) != nbasis)
         stop("No. of parameters not equal to no. of basis fns for (power basisobj$")
 } else if(type=="const") {
     params <- 0
 } else if(type=="monom") {
-    if (length(params) != nbasis) 
+    if (length(params) != nbasis)
         stop("No. of parameters not equal to no. of basis fns for (monomial basisobj$")
 } else if(type=="polynom") {
-    if (length(params) > 1) 
+    if (length(params) > 1)
         stop("More than one parameter for (a polynomial basisobj$")
 } else stop("Unrecognizable basis")
 
@@ -179,13 +244,16 @@ if (type=="fourier"){
 obj.call <- match.call()
 
 #  S4 definition
-# basisobj <- new("basisfd", call=obj.call, type=type, rangeval=rangeval, nbasis=nbasis, 
-#                 params=params, dropind=dropind, quadvals=quadvals, values=values)
+
+# basisobj <- new("basisfd", call=obj.call, type=type, rangeval=rangeval, nbasis=nbasis,
+#                 params=params, dropind=dropind, quadvals=quadvals,
+#                 values=values, basisvalues=basisvalues)
 
 #  S3 definition
 
-basisobj <- list(call=obj.call, type=type, rangeval=rangeval, nbasis=nbasis, 
-                 params=params, dropind=dropind, quadvals=quadvals, values=values)
+basisobj <- list(call=obj.call, type=type, rangeval=rangeval, nbasis=nbasis,
+                 params=params, dropind=dropind, quadvals=quadvals,
+                 values=values, basisvalues=basisvalues)
 oldClass(basisobj) <- "basisfd"
 
 basisobj
@@ -198,16 +266,34 @@ basisobj
 
 print.basisfd <- function(x, ...)
 {
+
+#  Last modified 3 January 2008 by Jim Ramsay
+
   basisobj <- x
-  cat("\nBasis object:\n")	
+  cat("\nBasis object:\n")
   if (!inherits(basisobj, "basisfd"))
     stop("Argument not a functional data object")
+
+#  print type
+
   cat(paste("\n  Type:  ", basisobj$type,"\n"))
-  cat(paste("\n  Range: ", basisobj$rangeval[1], 
+
+#  print range
+
+  cat(paste("\n  Range: ", basisobj$rangeval[1],
             " to ",        basisobj$rangeval[2],"\n"))
+
+#  return if a constant basis
+
   if (basisobj$type == "const") return
-  cat(paste("\n  Number of basis functions: ", 
+
+#  print number of basis functions
+
+  cat(paste("\n  Number of basis functions: ",
             basisobj$nbasis,     "\n"))
+
+#  print parameters according to type of basis
+
   if (basisobj$type == "fourier")
     cat(paste("\n  Period: ",basisobj$params,"\n"))
   if (basisobj$type == "bspline") {
@@ -228,14 +314,23 @@ print.basisfd <- function(x, ...)
     print("  Rate coefficients")
     print(basisobj$params)
   }
+  if (basisobj$type == "monom") {
+    print("  Exponents")
+    print(basisobj$params)
+  }
   if (basisobj$type == "power") {
     print("  Exponents")
     print(basisobj$params)
   }
+
+
+#  display indices of basis functions to be dropped
+
   if (length(basisobj$dropind) > 0) {
     print("  Indices of basis functions to be dropped")
     print(basisobj$dropind)
   }
+
 }
 
 #  --------------------------------------------------------------------------
@@ -245,14 +340,14 @@ print.basisfd <- function(x, ...)
 summary.basisfd <- function(object, ...)
 {
   basisobj <- object
-  cat("\nBasis object:\n")	
+  cat("\nBasis object:\n")
   if (!inherits(basisobj, "basisfd"))
     stop("Argument not a functional data object")
   cat(paste("\n  Type:  ", basisobj$type,"\n"))
-  cat(paste("\n  Range: ", basisobj$rangeval[1], 
+  cat(paste("\n  Range: ", basisobj$rangeval[1],
             " to ",        basisobj$rangeval[2],"\n"))
   if (basisobj$type == "const") return
-  cat(paste("\n  Number of basis functions: ", 
+  cat(paste("\n  Number of basis functions: ",
             basisobj$nbasis,     "\n"))
   if (basisobj$type == "fourier")
     cat(paste("\n  Period: ",basisobj$params,"\n"))
@@ -334,7 +429,7 @@ return(basisequal)
 {
 # TIMES for (two basis objects sets up a basis suitable for (
 #  expanding the pointwise product of two functional data
-#  objects with these respective bases.  
+#  objects with these respective bases.
 # In the absence of a true product basis system in this code,
 #  the rules followed are inevitably a compromise:
 #  (1) if both bases are B-splines, the norder is the sum of the
@@ -343,15 +438,15 @@ return(basisequal)
 #      of the multiplicities of the value in the two break sequences.
 #      That is, no knot in the product knot sequence will have a
 #      multiplicity greater than the multiplicities of this value
-#      in the two knot sequences.  
+#      in the two knot sequences.
 #      The rationale this rule is that order of differentiability
 #      of the product at eachy value will be controlled  by
-#      whichever knot sequence has the greater multiplicity.  
+#      whichever knot sequence has the greater multiplicity.
 #      In the case where one of the splines is order 1, or a step
 #      function, the problem is dealt with by replacing the
 #      original knot values by multiple values at that location
 #      to give a discontinuous derivative.
-#  (2) if both bases are Fourier bases, AND the periods are the 
+#  (2) if both bases are Fourier bases, AND the periods are the
 #      the same, the product is a Fourier basis with number of
 #      basis functions the sum of the two numbers of basis fns.
 #  (3) if only one of the bases is B-spline, the product basis
@@ -359,48 +454,48 @@ return(basisequal)
 #      higher.
 #  (4) in all other cases, the product is a B-spline basis with
 #      number of basis functions equal to the sum of the two
-#      numbers of bases and equally spaced knots.  
- 
+#      numbers of bases and equally spaced knots.
+
 #  Of course the ranges must also match.
- 
+
 #  Last modified 22 March 2007
- 
+
 #  check the ranges
- 
+
 range1 <- basisobj1$rangeval
 range2 <- basisobj2$rangeval
 if (range1[1] != range2[1] || range1[2] != range2[2])
     stop("Ranges are not equal.")
- 
+
 #  get the types
- 
+
 type1 <- basisobj1$type
 type2 <- basisobj2$type
- 
+
 #  deal with constant bases
- 
+
 if (type1 == "const" && type2 == "const") {
     prodbasisobj <- create.constant.basis(range1)
     return(prodbasisobj)
 }
- 
+
 if (type1 == "const") {
     prodbasisobj <- basisobj2
     return(prodbasisobj)
 }
- 
+
 if (type2 == "const") {
     prodbasisobj <- basisobj1
     return(prodbasisobj)
 }
- 
+
 #  get the numbers of basis functions
- 
+
 nbasis1 <- basisobj1$nbasis
 nbasis2 <- basisobj2$nbasis
- 
+
 #  work through the cases
- 
+
 if (type1 == "bspline" && type2 == "bspline") {
     #  both are bases B-splines
     #  get orders
@@ -416,13 +511,13 @@ if (type1 == "bspline" && type2 == "bspline") {
         else 0
       }
       mult2 <- {
-        if(length(interiorknots2)>0) 
+        if(length(interiorknots2)>0)
           length(interiorknots2[interiorknots2==uniqueknots[i]])
         else 0
       }
       multunique[i] <- max(mult1,mult2)
     }
-#        
+#
     allknots <- rep(0,sum(multunique))
     m2 <- 0
     for (i in seq(length=nunique)) {
@@ -435,12 +530,12 @@ if (type1 == "bspline" && type2 == "bspline") {
     norder  <- norder1 + norder2 - 1
     allbreaks  <- c(range1[1], allknots, range1[2])
     nbasis <- length(allbreaks) + norder - 2
-    prodbasisobj <- 
+    prodbasisobj <-
         create.bspline.basis(range1, nbasis, norder, allbreaks)
     return(prodbasisobj)
 }
-#  end if(type1 & type2 == 'bspline') 
- 
+#  end if(type1 & type2 == 'bspline')
+
 if (type1 == "fourier" && type2 == "fourier") {
     #  both bases Fourier
     #  check whether periods match
@@ -453,14 +548,14 @@ if (type1 == "fourier" && type2 == "fourier") {
         return(prodbasisobj)
     }
 }
- 
-#  default case when all else fails: the product basis is B-spline 
+
+#  default case when all else fails: the product basis is B-spline
 #  When neither basis is a B-spline basis, the order
 #  is the sum of numbers of bases, but no more than 8.
 #  When one of the bases if B-spline and the other isn"t,
 #  the order is the smaller of 8 or the order of the spline
 #  plus 2.
- 
+
 if (type1 == "bspline" || type2 == "bspline") {
     norder <- 8
     if (type1 == "bspline") {
@@ -482,3 +577,23 @@ nbasis <- max(c(nbasis1+nbasis2, norder+1))
 prodbasisobj <- create.bspline.basis(range1, nbasis, norder)
 return(prodbasisobj)
 }
+
+#  ---------------------------------------------------------
+#        Subscripted reference to a basis object
+#  ---------------------------------------------------------
+
+#  Last modified 22 December 2007
+
+"[.basisfd" <- function(basisobj, subs=TRUE)
+{
+  #  select subsets of basis functions in a basis object
+
+    dropind = vector("numeric", 0);
+    nbasis <- basisobj$nbasis
+    for (i in 1:nbasis) {
+        if (!any(subs==i)) dropind = c(dropind, i);
+    }
+    basisobj$dropind <- dropind
+    return(basisobj)
+}
+

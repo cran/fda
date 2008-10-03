@@ -57,7 +57,7 @@ pca.fd(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
   }
 }
 \seealso{
-\code{\link{cca.fd}}, 
+\code{\link{cca.fd}},
 \code{\link{pda.fd}}
 }
 \examples{
@@ -80,6 +80,9 @@ plot.pca.fd(daytemppcaobj, cex.main=0.9)
 
 plot.pca.fd(daytemppcaVarmx, cex.main=0.9)
 par(op)
+
+plot(daytemppcaobj$harmonics)
+plot(daytemppcaVarmx$harmonics)
 }
 % docclass is function
 \keyword{smooth}

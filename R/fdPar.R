@@ -8,9 +8,9 @@
 
 #  Generator function of class fdPar
 
-fdPar <- function(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE, 
+fdPar <- function(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
                   penmat=NULL){
-		
+
 # Sets up a functional parameter object
 #  Arguments:
 #  FDOBJ    ... A functional data object.
@@ -42,43 +42,42 @@ fdPar <- function(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
 #
 #  Return:
 #  FDPAROBJ ... A functional parameter object
-#  Last modified 2007.09.18 by Spencer Graves
-#  Previously modified 1 March 2007
+
+#  Last modified 6 January 2008 by Jim Ramsay
+#  Previously modified 2007.09.18 by Spencer Graves
+
+#  ----------------------------------------------------------------------
+#                            Default fdPar objects
+#  ----------------------------------------------------------------------
+
+  if(!inherits(fdobj, 'fd')) {
+    if (is.null(fdobj)) {
+    #  fdPar called without arguments
+      fdobj = fd()
+    }  else {
+      if (inherits(fdobj, "basisfd")) {
+       #  if the first argument is a basis object, convert it to
+       #  a default FD object with an empty coefficient matrix.
+        nbasis  <- fdobj$nbasis
+        dropind <- fdobj$dropind
+        coef    <- matrix(0,nbasis-length(dropind),1)
+        fdobj   <- fd(coef, fdobj)
+      }
+#    else if (inherits(fdobj,"fd")) {
+#      #  if the first object is a FD object, do nothing
+#    }
+      else if(is.numeric(fdobj))fdobj <- fd(fdobj)
+
+      else stop("First argument is neither a functional data object nor a basis object.")
+    }
+  }
 
 #  ----------------------------------------------------------------------
 #                            Check parameters
 #  ----------------------------------------------------------------------
 
-  if (nargs()==0) {
-	#  case of no argument:  no default argument defined at this point
-    stop("fdPar called with no arguments.")
-  }  else {
-    if (inherits(fdobj, "basisfd")) {
-       #  if the first argument is a basis object, convert it to
-       #  a default FD object with an empty coefficient matrix.
-      nbasis  <- fdobj$nbasis
-      dropind <- fdobj$dropind
-      nbasis  <- nbasis - length(dropind)
-      coef    <- matrix(0,nbasis,1)
-      fdobj   <- fd(coef, fdobj)
-    }
-    else if (inherits(fdobj,"fd")) {
-      basisobj <- fdobj$basis
-      nbasis   <- basisobj$nbasis
-      dropind  <- basisobj$dropind
-      nbasis   <- nbasis - length(dropind)
-    }
-    else if(is.numeric(fdobj)){
-      fdobj <- fd(fdobj)
-      nbasis <- fdobj$nbasis
-    }
-    else 
-      stop("First argument is neither a functional data object, ",
-           "nor a basis object, nor a parameter object, nor ",
-           "a matrix.")
-  }
-
 #  check Lfdobj
+
   {
     if(is.null(Lfdobj)){
       norder <- {
@@ -90,6 +89,7 @@ fdPar <- function(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
     else
       Lfdobj <- int2Lfd(Lfdobj)
   }
+
   if (!inherits(Lfdobj, "Lfd"))
     stop("'Lfdobj' is not a linear differential operator object.")
 
@@ -137,17 +137,17 @@ fdParobj
 print.fdPar <- function(x, ...)
 {
   object <- x
-	cat("Functional parameter object:\n\n")	
+  cat("Functional parameter object:\n\n")
       print("Functional data object:")
-	print.fd(object$fd)	
+  print.fd(object$fd)
       print("Linear differential operator object:")
-	print.Lfd(object$Lfd)	
-	cat(paste("\nSmoothing parameter =",object$lambda,"\n"))	
-	cat(paste("\nEstimation status =",object$estimate,"\n"))
+  print.Lfd(object$Lfd)
+  cat(paste("\nSmoothing parameter =",object$lambda,"\n"))
+  cat(paste("\nEstimation status =",object$estimate,"\n"))
       if (!is.null(object$penmat)) {
           print("Penalty matrix:")
           print(object$penmat)
-      }	
+      }
 }
 
 #  ----------------------------------------------------------------------
@@ -156,14 +156,14 @@ print.fdPar <- function(x, ...)
 
 summary.fdPar <- function(object, ...)
 {
-	cat("Functional parameter object:\n\n")	
+  cat("Functional parameter object:\n\n")
       print("Functional data object:")
-	summary.fd(object$fd)	
+  summary.fd(object$fd)
       print("Linear differential operator object:")
-	summary.Lfd(object$Lfd)	
-	cat(paste("\nSmoothing parameter =",object$lambda,"\n"))	
-	cat(paste("\nEstimation status =",object$estimate,"\n"))
-      if (!is.null(object$penmat)) 
+  summary.Lfd(object$Lfd)
+  cat(paste("\nSmoothing parameter =",object$lambda,"\n"))
+  cat(paste("\nEstimation status =",object$estimate,"\n"))
+      if (!is.null(object$penmat))
           print(paste("Penalty matrix dimensions:",dim(object$penmat)))
 }
 

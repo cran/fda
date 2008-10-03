@@ -1,10 +1,14 @@
-rangechk <- function(rangeval) {
+rangechk <- function(rangeval)
+{
 #  check a range vector argument
 
-#  last modified 16 May 1999
+#  last modified 29 September 2008 by Jim Ramsay
 
-  if (!is.vector(rangeval))       return(FALSE)
-  if (length(rangeval) != 2)      return(FALSE)
-  if (rangeval[1] >= rangeval[2]) return(FALSE)
-  return(TRUE)
+  nrangeval = length(rangeval)
+  OK <- TRUE
+  if (!is.numeric(rangeval))          OK <- FALSE
+  if (!is.vector(rangeval))           OK <- FALSE
+  if (nrangeval < 1 || nrangeval > 2) OK <- FALSE
+  if (rangeval[1] >= rangeval[2])     OK <- FALSE
+  return(OK)
 }
