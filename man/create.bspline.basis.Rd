@@ -23,9 +23,9 @@ create.bspline.basis(rangeval=NULL, nbasis=NULL, norder=4,
 }
 \arguments{
   \item{rangeval}{
-    a numeric vector of length 2 defining the interval over
-    which the functional data object can be evaluated;  default value
-    is \code{if(is.null(breaks)) 0:1 else range(breaks)}.
+    a numeric vector of length 2 defining the interval over which the
+    functional data object can be evaluated;  default value is
+    \code{if(is.null(breaks)) 0:1 else range(breaks)}.
 
     If \code{length(rangeval) == 1} and \code{rangeval <= 0}, this is an
     error.  Otherwise, if \code{length(rangeval) == 1}, \code{rangeval}
@@ -60,17 +60,17 @@ create.bspline.basis(rangeval=NULL, nbasis=NULL, norder=4,
     be dropped, if any.  For example, if it is required that
     a function be zero at the left boundary, this is achieved
     by dropping the first basis function, the only one that
-    is nonzero at that point. Default value NULL.
+    is nonzero at that point.
   }
   \item{quadvals}{
     a matrix with two columns and a number of rows equal to the number
-    of argument values used to approximate an integral using Simpson's
-    rule.  The first column contains these argument values.
-    A minimum of 5 values are required for
-    each inter-knot interval, and that is often enough. These
-    are equally spaced between two adjacent knots.
-    The second column contains the weights used for Simpson's
-    rule.  These are proportional to 1, 4, 2, 4, ..., 2, 4, 1.
+    of quadrature points for numerical evaluation of the penalty
+    integral.  The first column of \code{quadvals} contains the
+    quadrature points, and the second column the quadrature weights.  A
+    minimum of 5 values are required for each inter-knot interval, and
+    that is often enough.  For Simpson's rule, these points are equally
+    spaced, and the weights are proportional to 1, 4, 2, 4, ..., 2, 4,
+    1.
   }
   \item{values}{
     a list containing the basis functions and their derivatives
@@ -98,7 +98,7 @@ create.bspline.basis(rangeval=NULL, nbasis=NULL, norder=4,
     either a character vector of the same length as the number of basis
     functions or a single character string to which \code{norder, "."}
     and \code{1:nbasis} are appended as \code{paste(names, norder, ".",
-    1:nbreaks, sep="")}.  For example, if \code{norder = 4}, this
+    1:nbasis, sep="")}.  For example, if \code{norder = 4}, this
     defaults to \code{'bspl4.1', 'bspl4.2'}, ... .
   }
 }

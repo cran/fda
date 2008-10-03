@@ -65,8 +65,8 @@
 #  for a variable like precipitation.
 #  -----------------------------------------------------------------------
 
-#  Last modified 2 March 2007 by Spencer Graves
-#  Previously modified 20 March 2006
+#  Last modified 5 November 2008 by Jim Ramsay
+#  Previously modified 2 March 2007 by Spencer Graves
 
 #  ------------------------  input the data  -----------------------
 
@@ -97,8 +97,9 @@ qqnorm(CanadianWeather$dailyAv[,,"Temperature.C"], datax=TRUE)
 # Cosnsitent with a strong annual cycle
 # plus weaker normal noise 
 
-daytempfd <- with(CanadianWeather, data2fd(dailyAv[,,"Temperature.C"],
-       day.5, daybasis65, argnames=list("Day", "Station", "Deg C")) )
+daytempfd <- with(CanadianWeather, smooth.basis(day.5, 
+       dailyAv[,,"Temperature.C"],
+       daybasis65, argnames=list("Day", "Station", "Deg C"))$fd )
 plot(daytempfd, axes=FALSE)
 axisIntervals(1) 
 axis(2)
@@ -135,15 +136,16 @@ qqnorm(CanadianWeather$dailyAv[,,"log10precip"], datax=TRUE)
 # Conclusion:  Prefer analysis on the log scale
 # Back transform to get answers in 'mm' or approx. percent
 # (recalling log(1+x) = x if x is small) 
-dayprecfd <- with(CanadianWeather, data2fd(dailyAv[,,"log10precip"],
-     day.5, daybasis65, argnames=list("Day", "Station", "log10(mm)")) )
+dayprecfd <- with(CanadianWeather, smooth.basis(day.5, 
+     dailyAv[,,"log10precip"], daybasis65, 
+     argnames=list("Day", "Station", "log10(mm)"))$fd )
 plot(dayprecfd, axes=FALSE)
 axisIntervals(1)
 axis(2)
 
 # Or create a functional data object with Temp and log10precip together:
-CanadianTempPrecip.fd <- with(CanadianWeather, data2fd(dailyAv[,,-2],
-     day.5, daybasis65) )
+CanadianTempPrecip.fd <- with(CanadianWeather, smooth.basis(day.5, 
+         dailyAv[,,-2], daybasis65)$fd )
 str(CanadianTempPrecip.fd)
 
 #  set up plotting arrangements for one and two panel displays allowing
@@ -360,7 +362,7 @@ par(op)
 #fdParobj <- fdPar(daybasis365, harmaccelLfd, lambda)
 
 #smoothlist. <- with(CanadianWeather, smooth.basis(dayOfYear-0.5,
-#                       tempav, fdParobj) )
+#                       tempav, fdParobj)$fd )
 TempSmooth.01 <- with(CanadianWeather, smooth.basisPar(
      argvals=day.5, y=dailyAv[,, "Temperature.C"], fdobj=daybasis365,
      Lfdobj=harmaccelLfd365, lambda=0.01) )
@@ -669,7 +671,7 @@ with(CanadianWeather, plotfit.fd(dailyAv[,,"log10precip"],
 
 #PRprecfd <- smooth.basis(daytime, CanadianWeather$precav[,29], fdParobj)$fd
 PRprecfd <- smooth.basisPar(day.5, CanadianWeather$dailyAv[,29,"log10precip"],
-                            PrecSmooth6$fd, harmaccelLfd365, lambda=1e6)$fd
+                            PrecSmooth6$fd, harmaccelLfd365, lambda=1e6)
 
 PRprecvec <- eval.fd(day.5, PRprecfd)
 
@@ -689,11 +691,11 @@ qqnorm(CanadianWeather$dailyAv[,,"Temperature.C"], datax=TRUE)
 # plausibly modest normal error
 
 # Recreate daytempfd, dayprecfd created above
-daytempfd <- data2fd(CanadianWeather$dailyAv[,,"Temperature.C"], day.5,
-         daybasis65, argnames=list("Day", "Station", "Deg C")) 
+daytempfd <- smooth.basis(day.5, CanadianWeather$dailyAv[,,"Temperature.C"], 
+         daybasis65, argnames=list("Day", "Station", "Deg C"))$fd 
 
-dayprecfd <- data2fd(CanadianWeather$dailyAv[,,"log10precip"], day.5,
-         daybasis65, argnames=list("Day", "Station", "log10(mm)")) 
+dayprecfd <- smooth.basis(day.5, CanadianWeather$dailyAv[,,"log10precip"], 
+         daybasis65, argnames=list("Day", "Station", "log10(mm)"))$fd 
                  
 #  --  compute and plot mean and standard deviation of temperature -------
 
@@ -876,8 +878,8 @@ text(harmscr[,3], harmscr[,4], CanadianWeather$place, col=4)
 #smallbasis  <- create.fourier.basis(c(0, 365), smallnbasis)
 smallbasis  <- create.fourier.basis(c(0, 365), 65)
 
-tempfd      <- data2fd(CanadianWeather$dailyAv[,,"Temperature.C"],
-                       day.5, smallbasis)
+tempfd      <- smooth.basis(day.5, CanadianWeather$dailyAv[,,"Temperature.C"],
+                       smallbasis)$fd
 
 smallbasismat <- eval.basis(day.5, smallbasis)
 y2cMap <- solve(crossprod(smallbasismat), t(smallbasismat))
@@ -1041,12 +1043,12 @@ F.res = Fperm.fd(tempfd, xfdlist, betalist,cex.axis=1.5,cex.lab=1.5)
 
 #  set up functional data object for log precipitation
 
-precfd <- data2fd(CanadianWeather$dailyAv[,,"Precipitation.mm"],
-                  day.5, smallbasis)
+precfd <- smooth.basis(day.5, CanadianWeather$dailyAv[,,"Precipitation.mm"],
+                  smallbasis)$fd
 
 logprecmat <- log10(eval.fd(day.5, precfd))
 
-lnprecfd <- data2fd(logprecmat, day.5, smallbasis)
+lnprecfd <- smooth.basis(day.5, logprecmat, smallbasis)$fd
 lnprecfd$fdnames[[1]] <- "Days"
 lnprecfd$fdnames[[2]] <- "Station"
 lnprecfd$fdnames[[3]] <- "log.{10} mm"
@@ -1198,8 +1200,8 @@ annualprec <- log10(apply(CanadianWeather$dailyAv[,,"Precipitation.mm"],
 
 smallnbasis <- 65
 smallbasis  <- create.fourier.basis(c(0, 365), smallnbasis)
-tempfd      <- data2fd(CanadianWeather$dailyAv[,,"Temperature.C"],
-                       day.5, smallbasis)
+tempfd      <- smooth.basis(day.5, CanadianWeather$dailyAv[,,"Temperature.C"],
+                       smallbasis)$fd
 
 smallbasismat <- eval.basis(day.5, smallbasis)
 y2cMap <- solve(crossprod(smallbasismat)) %*% t(smallbasismat)
@@ -1372,8 +1374,8 @@ F.res2 = Fperm.fd(annualprec, xfdlist, betalist)
 smallnbasis <- 65
 smallbasis  <- create.fourier.basis(c(0, 365), smallnbasis)
 
-tempfd      <- data2fd(CanadianWeather$dailyAv[,,"Temperature.C"],
-                       day.5, smallbasis)
+tempfd      <- smooth.basis(day.5, CanadianWeather$dailyAv[,,"Temperature.C"],
+                       smallbasis)$fd
 
 #  change 0's to 0.05 mm in precipitation data
 
@@ -1389,7 +1391,7 @@ logprecmat <- log10(prectmp)
 
 #  set up functional data object for log precipitation
 
-lnprecfd <- data2fd(logprecmat, day.5, smallbasis)
+lnprecfd <- smooth.basis(day.5, logprecmat, smallbasis)$fd
 lnprecfdnames <- vector("list",3)
 lnprecfdnames[[1]] <- "Days"
 lnprecfdnames[[2]] <- "Station"
@@ -1541,8 +1543,9 @@ legend(100, 8, c("Weighted", "Unweighted"),
 
      daybasis65 <- create.fourier.basis(c(0, 365), 65)
 
-     daytempfd <- data2fd(CanadianWeather$dailyAv[,,"Temperature.C"],
-         day.5, daybasis65, argnames=list("Day", "Station", "Deg C")) )
+     daytempfd <- smooth.basis(day.5, 
+         CanadianWeather$dailyAv[,,"Temperature.C"],
+         daybasis65, argnames=list("Day", "Station", "Deg C"))$fd
       
      with(CanadianWeather, plotfit.fd(y=dailyAv[,,"Temperature.C"],
             argvals=day.5, daytempfd, index=1, titles=place) )

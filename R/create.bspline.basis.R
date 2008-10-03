@@ -283,7 +283,7 @@ create.bspline.basis <- function (rangeval=NULL, nbasis=NULL,
 ##
 ## 6.  check DROPIND
 ##
-  if (length(dropind) == 0 || missing(dropind)) dropind <- NULL
+  if (length(dropind) == 0) dropind <- NULL
   if (length(dropind) > 0) {
 #    if (!is.integer(nbasis)) stop("Argument 'DROPIND' is not integer-valued.")
     if(!is.numeric(dropind))
@@ -315,18 +315,17 @@ create.bspline.basis <- function (rangeval=NULL, nbasis=NULL,
   basisobj <- basisfd(type=type, rangeval=rangeval, nbasis=nbasis,
                   params=params, dropind=dropind,   quadvals=quadvals,
                   values=values, basisvalues=basisvalues)
-#
-  basisobj$names <- {
-    if(length(names) == nbasis) names
+##
+## 8.  names
+##
+  {
+    if(length(names) == nbasis)
+      basisobj$names <- names
     else {
-      if(length(names)<1)
-        paste("bspl", norder, '.', 1:nbasis, sep='')
-      else {
-        if(length(names)>1)
-          stop('length(names) = ', length(names), ';  must be either ',
-               '1 or nbasis = ', nbasis)
-        paste(names, norder, ".", 1:nbasis, sep="")
-      }
+      if(length(names)>1)
+        stop('length(names) = ', length(names), ';  must be either ',
+             '1 or nbasis = ', nbasis)
+      paste(names, norder, ".", 1:nbasis, sep="")
     }
   }
 

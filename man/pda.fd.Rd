@@ -5,8 +5,28 @@
 }
 \description{
 Principal differential analysis (PDA) estimates a
-system of linear differential equations that define functions
-that fit the data and their derivatives.
+system of \eqn{n} linear differential equations that define functions
+that fit the data and their derivatives.  There is an equation in the
+system for each variable.  
+
+Each equation has on its right side the highest order derivative that is used, 
+and the order of this derivative, \eqn{m_j, j=1,...,n} can vary over equations.    
+
+On the left side of equation equation is a linear combination of all the 
+variables and all the derivatives of these variables up to order one less than 
+the order \eqn{m_j} of the highest derivative.
+
+In addition, the right side may contain linear combinations of forcing
+functions as well, with the number of forcing functions varying over 
+equations.
+
+The linear combinations are defined by weighting functions multiplying each
+variable, derivative, and forcing function in the equation.  These weighting
+functions may be constant or vary over time.  They are each represented by a
+functional parameter object, specifying a basis for an expansion of a
+coefficient, a linear differential operator for smoothing purposes, a 
+smoothing parameter value, and a logical variable indicating whether the
+function is to be estimated, or kept fixed.
 }
 \usage{
 pda.fd(xfdlist, bwtlist=NULL,
@@ -14,97 +34,86 @@ pda.fd(xfdlist, bwtlist=NULL,
 }
 \arguments{
 \item{xfdlist}{
-a list whose members are functional data objects.  Each of these objects
-contain one or more functions that are variables to be represented
-by a differential equation.  The length of the list is the size of the
-system of differential equations. The number of replications must be
+a list whose members are functional data objects representing each
+variable in the system of differential equations.  Each of these objects
+contain one or more curves to be represented by the corresponding differential 
+equation.  The length of the list is equal to the number of 
+differential equations. The number \eqn{N} of replications must be
 the same for each member functional data object.
 }
 \item{bwtlist}{
+this argument contains the weight coefficients that multiply, in the right
+side of each equation, all the variables in the system, and all their 
+derivatives, where the derivatives are used up to one less than the order
+of the variable.   This argument has, in general, a three-level structure,
+defined by a three-level hierarchy of list objects.  
 
+At the top level, the argument is a single list of length equal to the number of 
+variables. Each component of this list is itself a list 
 
-a list array with the first two dimensions are equal to the number of
-variables in the system (the length of list \code{xfdlist}) and
-the last dimension equal to the order of each equation.  The order of
-the equations is assumed to be the same for each equation.  If only a
-single differential equation is involved, this argument can be an
-ordinary list with length equal to the order of the equation.
+At the second level, each component of the top level list is itself a list, also 
+of length equal to the number of variables.  
 
- Each member of \code{bwtlist} defines a weight function
-in the system of linear differential equation.  For any equation,
-there can be a term in the equation for each order of derivative
-from 0 to m-1, where m is the order of the equation.  These derivatives
-can be those of each variable in the system, moreover.  Thus, a two-variable
-system of order 3 can have, for each of the two equations, contributions
-from derivatives of order 0, 1 and 2 for each of the variables, or
-six terms in total.
+At the third and bottom level, each component of a second level list is a list 
+of length equal to the number of orders of derivatives appearing on the right       
+side of the equation, including  the variable itself, a derivative of order 0. 
+If m indicates the order of the equation, that is the order of the derivative
+on the left side, then this list is length m.  
 
- The first dimension of \code{bwtlist} corresponds to equations,
-and the second dimension to contributions of variables for a fixed derivative
-within the equation defined by the first index.  The third index indicates
-the order of derivative of the contribution, which is one less than the
-index value.
+The components in the third level lists are functional parameter objects
+defining estimates for weight functions.  For a first order equation,
+for example, \eqn{m = 1} and the single component in each list contains a weight 
+function for the variable.  Since each equation has a term involving each
+variable in the system, a system of first order equations will have \eqn{n^2}
+at the third level of this structure.
 
- Each member of \code{bwtlist} is a either a functional
-parameter object or a functional data object.  Functional data objects
-are converted to functional parameters objects with no smoothing.
-Functional parameter objects permit selected weight functions to be
-held fixed and not estimated.  These are often constant functions with
-the value 0, corresponding to variables and derivatives that make no
-contribution.
+There MUST be a component for each weight function, even if the corresponding  
+term does not appear in the equation.  In the case of a missing term, the 
+corresponding component can be \code{NULL}, and it will be treated as a 
+coefficient fixed at 0.  
 
- For example, the harmonic acceleration differential equation
-would be of the form $D^3 x(t) = -b Dx(t)$ so that
-\code{bwtlist}
-would be an ordinary list of length 3, each functional parameter object
-being defined with a constant basis, but only the second object would
-have a value of TRUE for the \code{estimate} slot, and the first
-and third coefficient functions would have value 0.
+However, in the case of a single differential equation, \code{bwtlist} can be
+given a simpler structure, since in this case only \eqn{m} coefficients are
+required.  Therefore, for a single equation, \code{bwtlist} can be a list
+of length \eqn{m} with each component containing a functional parameter 
+object for the corresponding derivative. 
 }
+                                                      
 \item{awtlist}{
-a list containing weight functions for forcing functions.
+a two-level list containing weight functions for forcing functions.
 
- In addition to terms in each of the equations involving terms corresponding
+In addition to terms in each of the equations involving terms corresponding
 to each derivative of each variable in the system, each equation can
 also have a contribution from one or more exogenous variables, often
-called forcing functions.
+called \emph{forcing functions.}
 
- This argument defines the weights multiplying these
-forcing functions, and is a list array with first dimension equal to
-the number of variables or equations, and second dimension equal to the
-number of forcing functions. It is assumed that the number of forcing functions is
-the same for all equations. If only one forcing function is involved,
-or there is only one equation, then \code{awtlist} can be an
-ordinary list.
-
- Each member is a functional parameter object
-(or a functional data object) defining a weighting function for a
-forcing function.  As with
-\code{bwtlist}, each of these weighting functions may be estimated
-or held fixed.  If the number of forcing functions actually varies from
-equation to equation, one can still use all forcing functions for all
-variables, but just weight unwanted ones in a particular equation by a
-fixed zero function.
-
- Each member's functional data object has only a single replicate.
+This argument defines the weights multiplying these
+forcing functions, and is a list of length \eqn{n}, the number of variables.
+Each component of this is is in turn a list, each component of which contains
+a functional parameter object defining a weight function for a forcing function.
+If there are no forcing functions for an equation, this list can be \code{NULL}.
+If none of the equations involve forcing functions, \code{awtlist} can be
+\code{NULL}, which is its default value if it is not in the argument list.
 }
+
 \item{ufdlist}{
-a list containing forcing functions.
-This is a list array of the same size as \code{awtlist} and each
-member is a functional data object corresponding to a forcing function.
-The number of replicates must be equal to that of the variables themselves,
-which is assumed to be the same for all variables.
+a two-level list containing forcing functions.  This list structure is 
+identical to that for \code{awtlist}, the only difference being that the
+components in the second level contain functional data objects for the 
+forcing functions, rather than functional parameter objects.
 }
+
 \item{nfine}{
 a number of values for a fine mesh.
 The estimation of the differential equation involves discrete
 numerical quadrature estimates of integrals, and these require
 that functions be evaluated at a fine mesh of values of the
-argument.  This argument defines the number to use.  If not
-constant, this number is set to five times the largest number of
-basis functions used to represent any variable in the system.
+argument.  This argument defines the number to use.  The default value of 501
+is reset to five times the largest number of basis functions used to represent 
+any variable in the system, if this number is larger.
 }
 }
+
 \value{
 a named list of length 3 with components:
 
@@ -133,6 +142,234 @@ a forcing function.
 }
 \examples{
 #See analyses of daily weather data for examples.
+##
+##  set up objects for examples
+##
+#  constant basis for estimating weight functions
+cbasis = create.constant.basis(c(0,1))
+#  monomial basis: {1,t}  for estimating weight functions
+mbasis = create.monomial.basis(c(0,1),2)
+#  quartic spline basis with 54 basis functions for
+#    defining functions to be analyzed
+xbasis = create.bspline.basis(c(0,1),24,5)
+#  set up functional parameter objects for weight bases
+cfdPar = fdPar(cbasis)
+mfdPar = fdPar(mbasis)
+#  sampling points over [0,1]
+tvec = seq(0,1,len=101)
+##
+##  Example 1:  a single first order constant coefficient unforced equation
+##     Dx = -4*x  for  x(t) = exp(-4t)
+beta    = 4
+xvec    = exp(-beta*tvec)
+xfd     = smooth.basis(tvec, xvec, xbasis)$fd
+xfdlist = list(xfd)
+bwtlist = list(cfdPar)
+#  perform the principal differential analysis
+result = pda.fd(xfdlist, bwtlist)
+#  display weight coefficient for variable
+bwtlistout = result$bwtlist
+bwtfd      = bwtlistout[[1]]$fd
+par(mfrow=c(1,1))
+plot(bwtfd)
+title("Weight coefficient for variable")
+print(round(bwtfd$coefs,3))
+#  display residual functions
+reslist    = result$resfdlist
+plot(reslist[[1]])
+title("Residual function")
+##
+##  Example 2:  a single first order varying coefficient unforced equation
+##     Dx(t) = -t*x(t) or x(t) = exp(-t^2/2)
+bvec    = tvec
+xvec    = exp(-tvec^2/2)
+xfd     = smooth.basis(tvec, xvec, xbasis)$fd
+xfdlist = list(xfd)
+bwtlist = list(mfdPar)
+#  perform the principal differential analysis
+result = pda.fd(xfdlist, bwtlist)
+#  display weight coefficient for variable
+bwtlistout = result$bwtlist
+bwtfd      = bwtlistout[[1]]$fd
+par(mfrow=c(1,1))
+plot(bwtfd)
+title("Weight coefficient for variable")
+print(round(bwtfd$coefs,3))
+#  display residual function
+reslist    = result$resfdlist
+plot(reslist[[1]])
+title("Residual function")
+##
+##  Example 3:  a single second order constant coefficient unforced equation
+##     Dx(t) = -(2*pi)^2*x(t) or x(t) = sin(2*pi*t)
+##
+xvec    = sin(2*pi*tvec)
+xfd     = smooth.basis(tvec, xvec, xbasis)$fd
+xfdlist = list(xfd)
+bwtlist = list(cfdPar,cfdPar)
+#  perform the principal differential analysis
+result = pda.fd(xfdlist, bwtlist)
+#  display weight coefficients
+bwtlistout = result$bwtlist
+bwtfd1     = bwtlistout[[1]]$fd
+bwtfd2     = bwtlistout[[2]]$fd
+par(mfrow=c(2,1))
+plot(bwtfd1)
+title("Weight coefficient for variable")
+plot(bwtfd2)
+title("Weight coefficient for derivative of variable")
+print(round(c(bwtfd1$coefs, bwtfd2$coefs),3))
+print(bwtfd2$coefs)
+#  display residual function
+reslist    = result$resfdlist
+par(mfrow=c(1,1))
+plot(reslist[[1]])
+title("Residual function")
+##
+##  Example 4:  two first order constant coefficient unforced equations
+##     Dx1(t) = x2(t) and Dx2(t) = -x1(t)  
+##   equivalent to  x1(t) = sin(2*pi*t)
+##
+xvec1     = sin(2*pi*tvec)
+xvec2     = 2*pi*cos(2*pi*tvec)
+xfd1      = smooth.basis(tvec, xvec1, xbasis)$fd
+xfd2      = smooth.basis(tvec, xvec2, xbasis)$fd
+xfdlist   = list(xfd1,xfd2)
+bwtlist   = list(
+                 list(
+                      list(cfdPar),
+                      list(cfdPar)
+                     ),
+                 list(
+                      list(cfdPar),
+                      list(cfdPar)
+                     )
+                )
+#  perform the principal differential analysis
+result = pda.fd(xfdlist, bwtlist)
+#  display weight coefficients
+bwtlistout = result$bwtlist
+bwtfd11    = bwtlistout[[1]][[1]][[1]]$fd
+bwtfd21    = bwtlistout[[2]][[1]][[1]]$fd
+bwtfd12    = bwtlistout[[1]][[2]][[1]]$fd
+bwtfd22    = bwtlistout[[2]][[2]][[1]]$fd
+par(mfrow=c(2,2))
+plot(bwtfd11)
+title("Weight for variable 1 in equation 1")
+plot(bwtfd21)
+title("Weight for variable 2 in equation 1")
+plot(bwtfd12)
+title("Weight for variable 1 in equation 2")
+plot(bwtfd22)
+title("Weight for variable 2 in equation 2")
+print(round(bwtfd11$coefs,3))
+print(round(bwtfd21$coefs,3))
+print(round(bwtfd12$coefs,3))
+print(round(bwtfd22$coefs,3))
+#  display residual functions
+reslist = result$resfdlist
+par(mfrow=c(2,1))
+plot(reslist[[1]])
+title("Residual function for variable 1")
+plot(reslist[[2]])
+title("Residual function for variable 2")
+##
+##  Example 5:  a single first order constant coefficient equation
+##     Dx = -4*x  for  x(t) = exp(-4t) forced by u(t) = 2
+##
+beta    = 4
+alpha   = 2
+xvec0   = exp(-beta*tvec)
+intv    = (exp(beta*tvec) - 1)/beta
+xvec    = xvec0*(1 + alpha*intv)
+xfd     = smooth.basis(tvec, xvec, xbasis)$fd
+xfdlist = list(xfd)
+bwtlist = list(cfdPar)
+awtlist = list(cfdPar)
+ufdlist = list(fd(1,cbasis))
+#  perform the principal differential analysis
+result = pda.fd(xfdlist, bwtlist, awtlist, ufdlist)
+#  display weight coefficients
+bwtlistout = result$bwtlist
+bwtfd      = bwtlistout[[1]]$fd
+awtlistout = result$awtlist
+awtfd      = awtlistout[[1]]$fd
+par(mfrow=c(2,1))
+plot(bwtfd)
+title("Weight for variable")
+plot(awtfd)
+title("Weight for forcing function")
+#  display residual function
+reslist = result$resfdlist
+par(mfrow=c(1,1))
+plot(reslist[[1]], ylab="residual")
+title("Residual function")
+##
+##  Example 6:  two first order constant coefficient equations
+##     Dx = -4*x    for  x(t) = exp(-4t)     forced by u(t) =  2
+##     Dx = -4*t*x  for  x(t) = exp(-4t^2/2) forced by u(t) = -1
+##
+beta    = 4
+xvec10  = exp(-beta*tvec)
+alpha1  = 2
+alpha2  = -1
+xvec1   = xvec0 + alpha1*(1-xvec10)/beta
+xvec20  = exp(-beta*tvec^2/2)
+vvec    = exp(beta*tvec^2/2);
+intv    = 0.01*(cumsum(vvec) - 0.5*vvec)
+xvec2   = xvec20*(1 + alpha2*intv)
+xfd1    = smooth.basis(tvec, xvec1, xbasis)$fd
+xfd2    = smooth.basis(tvec, xvec2, xbasis)$fd
+xfdlist = list(xfd1, xfd2)
+bwtlist    = list(
+                 list(
+                      list(cfdPar),
+                      list(cfdPar)
+                     ),
+                 list(
+                      list(cfdPar),
+                      list(mfdPar)
+                     )
+                )
+awtlist = list(list(cfdPar), list(cfdPar))
+ufdlist = list(list(fd(1,cbasis)), list(fd(1,cbasis)))
+#  perform the principal differential analysis
+result = pda.fd(xfdlist, bwtlist, awtlist, ufdlist)
+# display weight functions for variables
+bwtlistout = result$bwtlist
+bwtfd11    = bwtlistout[[1]][[1]][[1]]$fd
+bwtfd21    = bwtlistout[[2]][[1]][[1]]$fd
+bwtfd12    = bwtlistout[[1]][[2]][[1]]$fd
+bwtfd22    = bwtlistout[[2]][[2]][[1]]$fd
+par(mfrow=c(2,2))
+plot(bwtfd11)
+title("weight on variable 1 in equation 1")
+plot(bwtfd21)
+title("weight on variable 2 in equation 1")
+plot(bwtfd12)
+title("weight on variable 1 in equation 2")
+plot(bwtfd22)
+title("weight on variable 2 in equation 2")
+print(round(bwtfd11$coefs,3))
+print(round(bwtfd21$coefs,3))
+print(round(bwtfd12$coefs,3))
+print(round(bwtfd22$coefs,3))
+#  display weight functions for forcing functions
+awtlistout = result$awtlist
+awtfd1     = awtlistout[[1]][[1]]$fd
+awtfd2     = awtlistout[[2]][[1]]$fd
+par(mfrow=c(2,1))
+plot(awtfd1)
+title("weight on forcing function in equation 1")
+plot(awtfd2)
+title("weight on forcing function in equation 2")
+#  display residual functions
+reslist    = result$resfdlist
+par(mfrow=c(2,1))
+plot(reslist[[1]])
+title("residual function for equation 1")
+plot(reslist[[2]])
+title("residual function for equation 2")
 }
 % docclass is function
 \keyword{smooth}

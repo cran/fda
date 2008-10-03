@@ -178,7 +178,6 @@ plot(fd3.4s0)
 ##
 ## Example 3.  lambda = 1, 0.0001, 0
 ##
-#  Example 3.  lambda = 1
 #  Shows the effects of three levels of smoothing
 #  where the size of the third derivative is penalized.
 #  The null space contains quadratic functions.
@@ -191,14 +190,18 @@ fdPar1 <- fdPar(basisobj, 2, lambda=1)
 result1  <- smooth.basis(x, y, fdPar1)
 with(result1, c(df, gcv, SSE))
 
-#  Example 2.  lambda = 0.0001
+##
+## Example 4.  lambda = 0.0001
+##
 fdPar.0001 <- fdPar(basisobj, 2, lambda=0.0001)
 result2  <- smooth.basis(x, y, fdPar.0001)
 with(result2, c(df, gcv, SSE))
 # less smoothing, more degrees of freedom,
 # smaller gcv, smaller SSE
 
-#  Example 3.  lambda = 0
+##
+##  Example 5.  lambda = 0
+##
 fdPar0 <- fdPar(basisobj, 2, lambda=0)
 result3  <- smooth.basis(x, y, fdPar0)
 with(result3, c(df, gcv, SSE))
@@ -216,7 +219,7 @@ legend(-1,3,c("1","0.0001","0"),lty=c(2,1,3))
 plotfit.fd(y, x, result2[['fd']])  # plot data and smooth
 
 ##
-## Example 4.  Supersaturated
+## Example 6.  Supersaturated
 ##
 basis104 <- create.bspline.basis(c(-1,1), 104)
 
@@ -229,7 +232,7 @@ plotfit.fd(y, x, result104.0[['fd']], nfine=501)
 # Need lambda > 0.
 
 ##
-## Example 5.  gait
+## Example 7.  gait
 ##
 gaittime  <- (1:20)/21
 gaitrange <- c(0,1)
@@ -240,7 +243,7 @@ harmaccelLfd <- vec2Lfd(c(0, 0, (2*pi)^2, 0))
 gaitfdPar <- fdPar(gaitbasis, harmaccelLfd, lambda)
 gaitfd <- smooth.basis(gaittime, gait, gaitfdPar)$fd
 \dontrun{
-# by default creats multiple plots, asking for a click between plots
+# by default creates multiple plots, asking for a click between plots
 plotfit.fd(gait, gaittime, gaitfd)
 }
 }

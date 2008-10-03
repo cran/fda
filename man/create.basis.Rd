@@ -55,7 +55,7 @@
       For \code{exponential} bases, if \code{nbasis} is not specified,
       it defaults to length(ratevec) if \code{ratevec} is provided.
       Otherwise, in \code{fda_2.0.2}, \code{ratevec} defaults to 1,
-      which makes \code{nbasis} = 1;  in \code{fda_2.0.3},
+      which makes \code{nbasis} = 1;  in \code{fda_2.0.4},
       \code{ratevec} will default to 0:1, so \code{nbasis} will then
       default to 2.
 
@@ -65,7 +65,7 @@
       to 2 for \code{monomial} and \code{power} bases.  (Temporary
       exception:  In \code{fda_2.0.2}, the default \code{nbasis} for
       \code{power} bases is 1.  This will be increased to 2 in
-      \code{fda_2.0.3}.)
+      \code{fda_2.0.4}.)
 
       For \code{polynomial} bases, \code{nbasis} defaults to 2.
     }
@@ -126,7 +126,7 @@
 	weights.  A minimum of 5 values are required for each inter-knot
 	interval, and that is often enough.  For Simpson's rule, these
 	points are equally spaced, and the weights are proportional to
-	These are proportional to 1, 4, 2, 4, ..., 2, 4, 1.
+	1, 4, 2, 4, ..., 2, 4, 1.
       }
       \item{values}{
 	a list of matrices with one row for each row of \code{quadvals}

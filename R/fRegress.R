@@ -303,7 +303,7 @@ if (inherits(yfdPar, "fdPar")) {
         betavecj   <- eval.fd(tfine, betafdj)
         yhatmat    <- yhatmat + xmatj*as.vector(betavecj)
     }
-    yhatfdobj <- data2fd(yhatmat, tfine, ybasisobj)
+    yhatfdobj <- smooth.basis(tfine, yhatmat, ybasisobj)$fd
 
     #  set up output list object
 

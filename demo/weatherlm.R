@@ -1,6 +1,6 @@
 Some linear models for the daily weather data
 
-#  Last modified 7 March 2007
+#  Last modified 5 November 2008
 
 load("weatherfd")
 load("weatherdata")
@@ -370,7 +370,7 @@ lines(dayrange,c(0,0),lty=2)
 smallnbasis <- 65
 smallbasis  <- create.fourier.basis(dayrange, smallnbasis)
 
-tempfd      <- data2fd(tempav, daytime, smallbasis)
+tempfd      <- smooth.basis(daytime, tempav, smallbasis)$fd
 
 #  change 0's to 0.05 mm in precipitation data
 
@@ -386,7 +386,7 @@ logprecmat <- log10(prectmp)
 
 #  set up functional data object for log precipitation
 
-lndayprecfd <- data2fd(logprecmat, daytime, smallbasis)
+lndayprecfd <- smooth.basis(daytime, logprecmat, smallbasis)$fd
 lndayprecfdnames <- vector("list",3)
 lndayprecfdnames[[1]] <- "Days"
 lndayprecfdnames[[2]] <- "Station"

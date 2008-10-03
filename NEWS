@@ -3,6 +3,11 @@ second edition (2006) and 'Applied Functional Data Analysis'
 (2002), both by James O. Ramsay and Bernard W. Silverman
 (Springer).
 
+Release 2.0.4 introduced changes to make the syntax for all
+the 'create.*.basis' function calls more consistent.  This
+included added names for all the basis functions to make it
+easier to understand how 'fda' works.
+
 Release 2.0.2 and 2.0.3 fixed bugs in "+.fd" and "-.fd" and
 other places like 'plotfit.fd'.  Release 2.0.3 also introduced
 changes to 'create.bspline.basis' and 'create.fourier.basis'

@@ -26,8 +26,8 @@
 #
 #  -----------------------------------------------------------------------
 
-#  Previously modified 27 March 2006
-#  Last modified 25 February 2007 by Spencer Graves
+#  Last modified 5 November 2008 by Jim Ramsay
+#  Previously modified 25 February 2007 by Spencer Graves
 
 #  attach the FDA functions
 
@@ -70,7 +70,7 @@ harmaccelLfd <- vec2Lfd(c(0, 0, (2*pi)^2, 0))
 #  functions. Recall that a fourier basis has an odd number of basis functions.
 
 gaitbasis3 <- create.fourier.basis(nbasis=3)
-gaitfd3 <- data2fd(gait, basisobj=gaitbasis3)
+gaitfd3 <- smooth.basis(gaittime, gait, basisobj=gaitbasis3)$fd
 str(gaitfd3)
 gaitVar.fd3 <- var.fd(gaitfd3)
 str(gaitVar.fd3)

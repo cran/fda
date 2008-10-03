@@ -18,8 +18,8 @@
 
 #  Windows ... R
 
-#  Last modified 18 August 2007 by Giles Hooker
-#  Previously modified 21 March 2006
+#  Last modified 5 November 2008 by Jim Ramsay
+#  Previously 18 August 2007 by Giles Hooker
 
 #  ------------------------------------------------------------------------
 #                    Set up the data for analysis
@@ -96,7 +96,7 @@ lines(c(1966,1966),c(1.61,1.73),lty=2)
 
 longtermbasis <- create.bspline.basis(goodsrange, 83)
 
-longtermfit <- data2fd(lognondur, durtime, longtermbasis)
+longtermfit <- smooth.basis(lognondur, durtime, longtermbasis)$fd
 
 #  compute and plot seasonal trend
 

@@ -2,7 +2,7 @@
 #                   Figure Refinery 
 # ---------------------------------------------------------------
 
-#  Last modified  21 March 2006
+#  Last modified  5 November 2008
 
 #  attach the FDA functions
 
@@ -47,7 +47,7 @@ nubasis <- 2
 ubreaks <- c(refrange[1], tbreak, refrange[2])
 ubasis  <- create.bspline.basis(refrange, nubasis, norder, ubreaks)
 
-ufd <- data2fd(uval, tval, ubasis)
+ufd <- smooth.basis(tval, uval, ubasis)$fd
 
 #  set up basis for the output variable
 #  put three coincident knots at tbreak
@@ -57,7 +57,7 @@ yknots  <- c(seq(0, tbreak, len=3), tbreak, seq(tbreak, refrange[2], len=5))
 nybasis <- length(yknots) + norder - 2
 ybasis  <- create.bspline.basis(refrange, nybasis, norder, yknots)
 
-yfd <- data2fd(yval, tval, ybasis)
+yfd <- smooth.basis(tval, yval, ybasis)$fd
 
 yvec <- eval.fd(tval, yfd)
 
@@ -110,7 +110,7 @@ Dybasis  <- create.bspline.basis(refrange, nDybasis, 3, yknots)
 
 tvalD <- c(tval[1:66], tbreak - 1e-5, tbreak + 1e-5, tval[68:n])
 Dyvec <- eval.fd(tvalD, yfd, 1)
-Dyfd  <- data2fd(Dyvec, tvalD, Dybasis)
+Dyfd  <- smooth.basis(tvalD, Dyvec, Dybasis)$fd
 Dyfdhat <- eval.fd(tvalD, Dyfd)
 
 p <- 2
