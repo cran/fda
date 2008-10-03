@@ -1,3 +1,21 @@
+#  Last modified 2008.11.22 by Spencer Graves
+#  Previously modified 21 March 2006 (by Jim Ramsay?)
+predict.posfd <- function(object, newdata=NULL, Lfdobj=0, ...){
+  if(is.null(newdata))newdata <- object$argvals
+  evalPos <- eval.posfd(newdata, object$Wfdobj, Lfdobj)
+#
+  evalPos
+}
+
+fitted.posfd <- function(object, ...){
+  predict(object)
+}
+
+residuals.posfd <- function(object, ...){
+  pred <- predict(object)
+  object$y-pred
+}
+
 eval.posfd <- function(evalarg, Wfdobj, Lfdobj=int2Lfd(0))
 {
 #  Evaluates a value or a derivative of a positive functional
@@ -19,8 +37,6 @@ eval.posfd <- function(evalarg, Wfdobj, Lfdobj=int2Lfd(0))
 #
 #  Returns:  An array of function values corresponding to the
 #              argument values in EVALARG
-
-#  Last modified 21 March 2006
 
 #  Exchange the first two arguments if the first is an FD object
 #    and the second numeric

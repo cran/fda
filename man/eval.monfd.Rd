@@ -1,52 +1,68 @@
 \name{eval.monfd}
 \alias{eval.monfd}
+\alias{predict.monfd}
+\alias{fitted.monfd}
+\alias{residuals.monfd}
 \title{
   Values of a Monotone Functional Data Object
 }
 \description{
-Evaluate a monotone functional data object at specified argument values,
-or evaluate a derivative of the functional object.
+  Evaluate a monotone functional data object at specified argument
+  values, or evaluate a derivative of the functional object.
 }
 \usage{
 eval.monfd(evalarg, Wfdobj, Lfdobj=int2Lfd(0))
+\method{predict}{monfd}(object, newdata=NULL, Lfdobj=0, ...)
+\method{fitted}{monfd}(object, ...)
+\method{residuals}{monfd}(object, ...)
 }
 \arguments{
-\item{evalarg}{
-a vector of argument values at which the functional data object is to be
-evaluated.
-}
-\item{Wfdobj}{
-a functional data object that defines the monotone function to be
-evaluated.  Only univariate functions are permitted.
-}
-\item{Lfdobj}{
-a nonnegative integer specifying a derivative to be evaluated.  AT
-this time of writing, permissible derivative values are 0, 1, 2, or 3.
-A linear differential operator is not allowed.
-}
-}
-\value{
-a matrix containing the monotone function
-values.  The first dimension corresponds to the argument values in
-\code{evalarg} and
-the second to replications.
+  \item{evalarg, newdata}{
+    a vector of argument values at which the functional data object is
+    to be evaluated.
+  }
+  \item{Wfdobj}{
+    an object of class \code{fd} that defines the monotone function
+    to be evaluated.  Only univariate functions are permitted.
+  }
+  \item{Lfdobj}{
+    a nonnegative integer specifying a derivative to be evaluated.  At
+    this time of writing, permissible derivative values are 0, 1, 2, or
+    3.  A linear differential operator is not allowed.
+  }
+  \item{object}{
+    an object of class \code{monfd} that defines the monotone function
+    to be evaluated.  Only univariate functions are permitted.
+  }
+  \item{\dots}{
+    optional arguments required by \code{predict};  not currently used.
+  }
 }
 \details{
-A monotone function data object $h(t)$ is defined by
-$h(t) = [D^\{-1\} exp Wfdobj](t)$.  In this equation, the operator  $D^\{-1\}$ means
-taking the indefinite integral of the function to which it applies.
-Note that this equation implies that the monotone function has a value
-of zero at the lower limit of the arguments.  To actually fit monotone
-data, it will usually be necessary to estimate an intercept and a
-regression coefficient to be applied to $h(t)$, usually with the
-least squares regression function \code{lsfit}.
-The function \code{Wfdobj} that defines the monotone function is
-usually estimated by monotone smoothing function
-\code{smooth.monotone.}
+  A monotone function data object $h(t)$ is defined by $h(t) = [D^\{-1\}
+  exp Wfdobj](t)$.  In this equation, the operator  $D^\{-1\}$ means
+  taking the indefinite integral of the function to which it applies.
+  Note that this equation implies that the monotone function has a value
+  of zero at the lower limit of the arguments.  To actually fit monotone
+  data, it will usually be necessary to estimate an intercept and a
+  regression coefficient to be applied to $h(t)$, usually with the least
+  squares regression function \code{lsfit}.  The function \code{Wfdobj}
+  that defines the monotone function is usually estimated by monotone
+  smoothing function \code{smooth.monotone.}
+
+  \code{eval.monfd} only computes the standardized monotone form.
+  \code{predict.monfd} computes the scaled version using
+  \code{with(object, beta[1] + beta[2]*eval.monfd(...))}.
+}
+\value{
+  a matrix containing the monotone function values.  The first dimension
+  corresponds to the argument values in \code{evalarg} and the second to
+  replications.
 }
 \seealso{
-\code{\link{eval.fd}},
-\code{\link{eval.posfd}}
+  \code{\link{eval.fd}},
+  \code{\link{smooth.monotone}}
+  \code{\link{eval.posfd}}
 }
 \examples{
 
@@ -90,6 +106,25 @@ accfine <- beta[2]*eval.monfd(agefine, Wfd, 2)
 #  Plot the acceleration curve
 plot(agefine, accfine, type="l")
 lines(c(1,18),c(0,0),lty=4)
+
+##
+## using predict.monfd
+##
+hgtfit <- with(result, beta[1]+beta[2]*eval.monfd(argvals, Wfdobj))
+hgtfit. <- fitted(result)
+\dontshow{stopifnot(}
+all.equal(hgtfit, hgtfit.)
+\dontshow{)}
+
+accfine. <- predict(result, agefine, Lfdobj=2)
+\dontshow{stopifnot(}
+all.equal(accfine, accfine.)
+\dontshow{)}
+
+growthResid <- resid(result)
+\dontshow{stopifnot(}
+all.equal(growthResid, with(result, y-hgtfit.))
+\dontshow{)}
 
 }
 % docclass is function

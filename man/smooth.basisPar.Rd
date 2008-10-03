@@ -5,7 +5,7 @@
 }
 \description{
   Smooth (argvals, y) data with roughness penalty defined by the
-  remaining arguments.   
+  remaining arguments.
 }
 \usage{
 smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
@@ -25,7 +25,7 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
     \code{y} is a three-dimensional array, the first dimension
     corresponds to argument values, the second to replications, and the
     third to variables within replications.  If \code{y} is a vector,
-    only one replicate and variable are assumed.  
+    only one replicate and variable are assumed.
   }
   \item{fdobj}{
     One of the following:
@@ -37,7 +37,7 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
       \item{basisfd}{
 	a functional basis object (class \code{basisfd}), which is
 	converted to a functional data object with the identity matrix
-	as the coefficient matrix. 
+	as the coefficient matrix.
       }
       \item{fdPar}{
 	a functional parameter object (class \code{fdPar})
@@ -45,9 +45,9 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
       \item{integer}{
 	an integer giving the order of a B-spline basis, which is
 	further converted to a functional data object with the identity
-	matrix as the coefficient matrix.  
+	matrix as the coefficient matrix.
       }
-      \item{matrix or array}{replaced by fd(fdobj)}	
+      \item{matrix or array}{replaced by fd(fdobj)}
       \item{NULL}{
 	Defaults to fdobj = create.bspline.basis(argvals).
       }
@@ -56,7 +56,7 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
   \item{Lfdobj}{
     either a nonnegative integer or a linear differential operator
     object.  If NULL and fdobj[['type']] == 'bspline', Lfdobj =
-    int2Lfd(max(0, norder-2)), where norder = order of fdobj.   
+    int2Lfd(max(0, norder-2)), where norder = order of fdobj.
   }
   \item{lambda}{
     a nonnegative real number specifying the amount of smoothing
@@ -73,18 +73,18 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
   }
   \item{wtvec}{
     a vector of the same length as \code{argvals} containing weights for
-    the values to be smoothed. 
+    the values to be smoothed.
   }
 %  \item{dffactor}{
 %    Chong Gu in his book \emph{Smoothing Spline ANOVA Models} suggests a
 %    modification of the GCV criterion using a factor modifying the
 %    effective degrees of freedom of the smooth.  He suggests that values
 %    like 1.2 are effective at avoiding undersmoothing of the data.  The
-%    default value of 1 is the classic definition. 
+%    default value of 1 is the classic definition.
 %  }
   \item{fdnames}{
     a list of length 3 containing character vectors of names for the
-    following: 
+    following:
 
     \itemize{
       \item{args}{
@@ -104,15 +104,16 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
 \details{
   1.  if(is.null(fdobj))fdobj <- create.bspline.basis(argvals).  Else
   if(is.integer(fdobj)) fdobj <- create.bspline.basis(argvals, norder =
-  fdobj) 
-  
+  fdobj)
+
   2.  fdPar
 
-  3.  smooth.basis 
+  3.  smooth.basis
 }
 \value{
-  The output of a call to 'smooth.basis', which is a named list of
-  length 6 and class \code{fdSmooth} with the following components:  
+  The output of a call to \code{smooth.basis}, which is an object of
+  class \code{fdSmooth}, being a list of length 8 with the following
+  components:
 
   \item{fd}{
     a functional data object that smooths the data.
@@ -124,15 +125,15 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
     the value of the generalized cross-validation or GCV criterion.  If
     there are multiple curves, this is a vector of values, one per
     curve.  If the smooth is multivariate, the result is a matrix of gcv
-    values, with columns corresponding to variables.  
+    values, with columns corresponding to variables.
   }
 %  \item{coef}{
 %    the coefficient matrix or array for the basis function expansion of
-%    the smoothing function 
+%    the smoothing function
 %  }
   \item{SSE}{
     the error sums of squares.  SSE is a vector or a matrix of the same
-    size as 'gcv'. 
+    size as 'gcv'.
   }
   \item{penmat}{
     the penalty matrix.
@@ -140,25 +141,26 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
   \item{y2cMap}{
     the matrix mapping the data to the coefficients.
   }
+  \item{argvals, y}{input arguments}
 }
 \references{
-  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional 
-    Data Analysis, 2nd ed.}, Springer, New York. 
+  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional
+    Data Analysis, 2nd ed.}, Springer, New York.
 
   Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
     Functional Data Analysis}, Springer, New York.
 }
 \seealso{
-  \code{\link{Data2fd}}, 
-  \code{\link{df2lambda}}, 
-  \code{\link{fdPar}}, 
-  \code{\link{lambda2df}}, 
-  \code{\link{lambda2gcv}}, 
-  \code{\link{plot.fd}}, 
-  \code{\link{project.basis}}, 
-  \code{\link{smooth.basis}}, 
-  \code{\link{smooth.fd}}, 
-  \code{\link{smooth.monotone}}, 
+  \code{\link{Data2fd}},
+  \code{\link{df2lambda}},
+  \code{\link{fdPar}},
+  \code{\link{lambda2df}},
+  \code{\link{lambda2gcv}},
+  \code{\link{plot.fd}},
+  \code{\link{project.basis}},
+  \code{\link{smooth.basis}},
+  \code{\link{smooth.fd}},
+  \code{\link{smooth.monotone}},
   \code{\link{smooth.pos}}
 }
 \examples{
@@ -184,16 +186,16 @@ lipSm <- smooth.basisPar(liptime, lip)
 plot(lipSm)
 # oversmoothing
 plot(smooth.basisPar(liptime, lip, lambda=1e-9))
-# more sensible 
+# more sensible
 
 ##
-## A third example 
+## A third example
 ##
 
 x <- seq(-1,1,0.02)
 y <- x + 3*exp(-6*x^2) + sin(1:101)/2
 # sin not rnorm to make it easier to compare
-# results across platforms 
+# results across platforms
 
 #  set up a saturated B-spline basis
 basisobj101 <- create.bspline.basis(x)
@@ -204,13 +206,13 @@ resultP <- smooth.basisPar(argvals=x, y=y, fdobj=basisobj101, lambda=1)
 \dontshow{stopifnot(}
 all.equal(result101, resultP)
 \dontshow{)}
-# TRUE 
+# TRUE
 
 result4 <- smooth.basisPar(argvals=x, y=y, fdobj=4, lambda=1)
 \dontshow{stopifnot(}
 all.equal(resultP, result4)
 \dontshow{)}
-# TRUE 
+# TRUE
 
 result4. <- smooth.basisPar(argvals=x, y=y, lambda=1)
 \dontshow{stopifnot(}
@@ -222,7 +224,7 @@ with(result4, c(df, gcv)) #  display df and gcv measures
 
 result4.4 <- smooth.basisPar(argvals=x, y=y, lambda=1e-4)
 with(result4.4, c(df, gcv)) #  display df and gcv measures
-# less smoothing, more degrees of freedom, better fit 
+# less smoothing, more degrees of freedom, better fit
 
 plot(result4.4)
 lines(result4, col='green')
@@ -236,15 +238,15 @@ all.equal(result4.0, result4.0a)
 \dontshow{)}
 
 with(result4.0, c(df, gcv)) #  display df and gcv measures
-# no smoothing, degrees of freedom = number of points 
+# no smoothing, degrees of freedom = number of points
 # but generalized cross validation = Inf
-# suggesting overfitting.  
+# suggesting overfitting.
 
 ##
 ## fdnames?
 ##
 girlGrow12 <- with(growth, smooth.basisPar(argvals=age, y=hgtf[, 1:2],
-              fdnames=c('age', 'girl', 'height')) ) 
+              fdnames=c('age', 'girl', 'height')) )
 girlGrow12. <- with(growth, smooth.basisPar(argvals=age, y=hgtf[, 1:2],
     fdnames=list(age=age, girl=c('Carol', 'Sally'), value='height')) )
 

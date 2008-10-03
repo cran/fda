@@ -58,11 +58,11 @@ smooth.pos(argvals, y, WfdParobj, wtvec=rep(1,n),
   }
 }
 \value{
-  a named list of length 4 containing:
+  an object of class \code{posfd}, being a list with 4 components:
 
   \item{Wfdobj}{
     a functional data object defining function $W(x)$ that that
-    optimizes the fit to the data of the monotone function that it
+    optimizes the fit to the data of the positive function that it
     defines.
   }
   \item{Flist}{
@@ -72,7 +72,9 @@ smooth.pos(argvals, y, WfdParobj, wtvec=rep(1,n),
     (3) \bold{norm}: the norm of the gradient vector at the optimal
     solution.
   }
-%  \item{iternum}{the number of iterations.}
+  \item{argvals, y}{
+    the corresponding input arguments
+  }
 %  \item{iternum}{the number of iterations.}
 %  \item{iterhist}{
 %    a \code{iternum+1} by 5 matrix containing the iteration history.
@@ -83,7 +85,16 @@ smooth.pos(argvals, y, WfdParobj, wtvec=rep(1,n),
   \code{\link{smooth.morph}}
 }
 \examples{
-#See the analyses of the daily weather data for examples.
+smallbasis  <- create.fourier.basis(c(0, 365), 65)
+harmaccelLfd365 <- vec2Lfd(c(0,(2*pi/365)^2,0), c(0, 365))
+
+index <- (1:35)[CanadianWeather$place == "Vancouver"]
+VanPrec  <- CanadianWeather$dailyAv[,index, "Precipitation.mm"]
+
+lambda    <- 1e4
+dayfdPar <- fdPar(smallbasis, harmaccelLfd365, lambda)
+smooth.pos(day.5, VanPrec, dayfdPar)
+
 }
 % docclass is function
 \keyword{smooth}

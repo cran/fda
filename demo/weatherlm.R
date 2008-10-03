@@ -1,6 +1,13 @@
-Some linear models for the daily weather data
+#  Some linear models for the daily weather data
 
-#  Last modified 5 November 2008
+#  This file is intended to be used after the commands in files
+#  weathersetup.R and weathersmooth.R have been executed.
+
+#  Many other interesting ways of describing the data and plotting results
+#  can be found in the file canadian-weather.R, set up in 2008 by 
+#  Spencer Graves.
+
+#  Last modified 17 November 2008
 
 load("weatherfd")
 load("weatherdata")

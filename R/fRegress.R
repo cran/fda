@@ -388,7 +388,8 @@ if (inherits(yfdPar, "fdPar")) {
 
     #  compute and print degrees of freedom measure
 
-    df <- sum(diag(Zmat %*% Cmatinv %*% t(Zmat)))
+    hatvals = diag(Zmat %*% Cmatinv %*% t(Zmat))	
+    df <- sum(hatvals)
 
     #  set up fdPar object for BETAESTFDPAR
 
@@ -448,6 +449,11 @@ if (inherits(yfdPar, "fdPar")) {
     }
     yhatfdobj <- yhatmat
 
+    OCV = sum( (ymat-yhatmat)^2/(1-hatvals)^2 )
+
+    
+
+
     #  set up output list object
 
     fRegressList <-
@@ -458,7 +464,8 @@ if (inherits(yfdPar, "fdPar")) {
                  yhatfdobj   = yhatfdobj,
                  Cmatinv     = Cmatinv,
                  wt          = wt,
-                 df          = df)
+                 df          = df,
+		     OCV         = OCV)
  }
 
  return(fRegressList)

@@ -1,3 +1,18 @@
+predict.basisfd <- function(object, newdata=NULL, Lfdobj=0, ...){
+  if(is.null(newdata)){
+    type <- object$type
+    if(length(type) != 1)
+      stop('length(object$type) must be 1;  is ',
+           length(type) )
+    newdata <- {
+      if(type=='bspline')
+        unique(knots(object, interior=FALSE))
+      else object$rangeval
+    }
+  }
+  eval.basis(newdata, object, Lfdobj)
+}
+
 eval.basis <- function(evalarg, basisobj, Lfdobj=0) {
 #  Computes the basis matrix evaluated at arguments in EVALARG associated
 #    with basis.fd object BASISOBJ.  The basis matrix contains the values
@@ -41,9 +56,9 @@ if (is.numeric(basisobj) && inherits(evalarg, "basisfd")) {
 if (!(is.numeric(evalarg))) stop("Argument EVALARG is not numeric.")
 
 if (!is.vector(evalarg))    stop("Argument EVALARG is not a vector.")
-	
+
 #  check basisobj
-	
+
 if (!(inherits(basisobj, "basisfd"))) stop(
     "Second argument is not a basis object.")
 

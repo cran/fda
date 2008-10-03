@@ -1,7 +1,14 @@
-Analysis variance for the temperature and precipitation data with
-climate zone being the grouping factor
+#  Analysis variance for the temperature and precipitation data with
+#  climate zone being the grouping factor
 
-#  Last modified 8 March 2007
+#  This file is intended to be used after the commands in files
+#  weathersetup.R and weathersmooth.R have been executed.
+
+#  Many other interesting ways of describing the data and plotting results
+#  can be found in the file canadian-weather.R, set up in 2008 by 
+#  Spencer Graves.
+
+#  Last modified 17 November 2008
 
 load("weatherdata")
 
@@ -9,8 +16,7 @@ station <- weatherdata$station
 
 #  names for (climate zones
 
-zonenames <- c("Canada  ",
-               "Atlantic", "Pacific ", "Contintl", "Arctic  ")
+zonenames <- c("Canada  ", "Atlantic", "Pacific ", "Contintl", "Arctic  ")
 
 #  indices for (weather stations in each of four climate zones
 

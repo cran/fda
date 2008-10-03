@@ -11,12 +11,15 @@
   plot to another.  The function also accepts the other plot
   specification arguments that the regular \code{plot} does.  Calling
   \code{plot} with an \code{fdSmooth} object is simply plots its
-  code{fd} component.   
+  code{fd} component.
 }
 \usage{
 \method{plot}{fd}(x, y, Lfdobj=0, href=TRUE, titles=NULL,
                     xlim=NULL, ylim=NULL, xlab=NULL,
                     ylab=NULL, ask=FALSE, nx=NULL, ...)
+%\method{plot}{fdPar}(x, y, Lfdobj=0, href=TRUE, titles=NULL,
+%                    xlim=NULL, ylim=NULL, xlab=NULL,
+%                    ylab=NULL, ask=FALSE, nx=NULL, ...)
 \method{plot}{fdSmooth}(x, y, Lfdobj=0, href=TRUE, titles=NULL,
                     xlim=NULL, ylim=NULL, xlab=NULL,
                     ylab=NULL, ask=FALSE, nx=NULL, ...)
@@ -33,7 +36,7 @@
     length = nx).
 
     NOTE:  This will be the values on the horizontal axis, NOT the
-    vertical axis.  
+    vertical axis.
   }
   \item{Lfdobj}{
     either a nonnegative integer or a linear differential operator
@@ -42,7 +45,7 @@
   }
   \item{href}{
     a logical variable:  If \code{TRUE}, add a horizontal reference line
-    at 0.  
+    at 0.
   }
   \item{titles}{
     a vector of strings for identifying curves
@@ -75,14 +78,14 @@
 }
 \details{
   Note that for multivariate data, a
-  suitable array must first be defined using the \code{par} function. 
+  suitable array must first be defined using the \code{par} function.
 }
 \value{
   'done'
   % This used to return 'invisible(NULL)'.
   % However, with R 2.7.0 under XEmacs with ESS,
   % it sometimes failed to plot.  I changed the return value,
-  % and the problem disappeared.  
+  % and the problem disappeared.
 }
 \section{Side Effects}{
   a plot of the functional observations
@@ -92,7 +95,7 @@
 }
 \examples{
 ##
-## plot.df
+## plot.fd
 ##
 #daytime   <- (1:365)-0.5
 #dayrange  <- c(0,365)
@@ -105,14 +108,14 @@ harmaccelLfd <- vec2Lfd(c(0,(2*pi/365)^2,0), c(0, 365))
 
 harmfdPar     <- fdPar(daybasis65, harmaccelLfd, lambda=1e5)
 
-daytempfd <- with(CanadianWeather, Data2fd(day.5, 
-        dailyAv[,,"Temperature.C"], daybasis65)) 
+daytempfd <- with(CanadianWeather, Data2fd(day.5,
+        dailyAv[,,"Temperature.C"], daybasis65))
 
 #  plot all the temperature functions for the monthly weather data
 plot(daytempfd, main="Temperature Functions")
 
 \dontrun{
-# To plot one at a time:  
+# To plot one at a time:
 # The following pauses to request page changes.
 \dontshow{
 # (Without 'dontrun', the package build process
@@ -127,16 +130,19 @@ plot(daytempfd, ask=TRUE)
 ##
 b3.4 <- create.bspline.basis(norder=3, breaks=c(0, .5, 1))
 # 4 bases, order 3 = degree 2 =
-# continuous, bounded, locally quadratic 
+# continuous, bounded, locally quadratic
 fdPar3 <- fdPar(b3.4, lambda=1)
-# Penalize excessive slope Lfdobj=1;  
+%plot(fdPar3)
+%# constant 0 because fdPar3$coefs = c(0,0,0,0)
+
+# Penalize excessive slope Lfdobj=1;
 # (Can not smooth on second derivative Lfdobj=2 at it is discontinuous.)
 fd3.4s0 <- smooth.basis(0:1, 0:1, fdPar3)
 
-# using plot.fd directly 
+# using plot.fd directly
 plot(fd3.4s0$fd)
 
-# same plot via plot.fdSmooth 
+# same plot via plot.fdSmooth
 plot(fd3.4s0)
 
 }

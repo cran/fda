@@ -1,5 +1,5 @@
 landmarkreg <- function(fdobj, ximarks, x0marks=xmeanmarks,
-                        WfdPar, monwrd=FALSE)
+                        WfdPar=NULL, monwrd=FALSE)
 {
 #  Arguments:
 #  FDOBJ   ... functional data object for curves to be registered
@@ -17,8 +17,10 @@ landmarkreg <- function(fdobj, ximarks, x0marks=xmeanmarks,
 #  Returns:
 #  FDREG   ... a functional data object for the registered curves
 #  WARPFD  ... a functional data object for the warping functions
+#  WFD     ... a functional data object for the W functions defining the 
+#              warping functions
 
- #  Last modified 24 September 2008 by Jim Ramsay
+ #  Last modified 13 November 2008 by Jim Ramsay
 
   #  check FDOBJ
 
@@ -48,17 +50,27 @@ landmarkreg <- function(fdobj, ximarks, x0marks=xmeanmarks,
   if (is.vector(ximarks)) ximarks = as.matrix(ximarks)
   ximarksd <- dim(ximarks)
   if (ximarksd[1] != ncurve) stop(
-     "Number of rows of third argument wrong.")
-  nlandm <- dim(ximarks)[2]
+     "Number of rows of XIMARKS is incorrect.")
+    if (any(ximarks <= rangeval[1]) || any(ximarks >= rangeval[2])) stop(
+     "Some landmark values are not within the range.")
+nlandm <- dim(ximarks)[2]
   xmeanmarks <- apply(ximarks,2,mean)
 
   if (length(x0marks) != nlandm) stop(
      "Number of target landmarks not equal to number of curve landmarks.")
-  if (any(ximarks <= rangeval[1]) || any(ximarks >= rangeval[2])) stop(
-     "Some landmark values are not within the range.")
  
+  #  set up default WfdPar
+  
+  if (is.null(WfdPar)) {
+    basisobj  <- fdobj$basis
+    rangex    <- basisobj$rangeval
+    wnbasis   <- length(x0marks) + 2
+    wbasis    <- create.bspline.basis(rangex, wnbasis)
+    WfdParobj <- fdPar(wbasis)
+  }
+   
   #  check WFDPAR
-
+   
   WfdPar <- fdParcheck(WfdPar)
 		
   #  set up WFD0 and WBASIS
@@ -107,59 +119,50 @@ landmarkreg <- function(fdobj, ximarks, x0marks=xmeanmarks,
     #  smooth relation between this curve"s values and target"s values
     if (monwrd) {
        #  use monotone smoother
-       conv    <- 1e-4
-       iterlim <- 20
-       dblev   <- 0
-       Wfd     <- smooth.morph(xval, yval, WfdPar, wval)$Wfdobj
-       h       <- monfn(x, Wfd)
-       b       <- (rangeval[2]-rangeval[1])/(h[n]-h[1])
-       a       <- rangeval[1] - b*h[1]
-       h       <- a + b*h
-       h[1]    <- rangeval[1]
-       h[n]    <- rangeval[2]
+       Wfd       <- smooth.morph(xval, yval, WfdPar)$Wfdobj
+       h         <- monfn(x, Wfd)
+       b         <- (rangeval[2]-rangeval[1])/(h[n]-h[1])
+       a         <- rangeval[1] - b*h[1]
+       h         <- a + b*h
+       h[c(1,n)] <- rangeval
        wcoefi  <- Wfd$coefs
        Wcoef[,icurve] <- wcoefi
     } else {
+       #  use unconstrained smoother
        warpfd <- smooth.basis(xval, yval, WfdPar, wval)$fd
        #  set up warping function by evaluating at sampling values
-       h <- as.vector(eval.fd(x, warpfd))
-       b       <- (rangeval[2]-rangeval[1])/(h[n]-h[1])
-       a       <- rangeval[1] - b*h[1]
-       h       <- a + b*h
-       h[1]    <- rangeval[1]
-       h[n]    <- rangeval[2]
+       h         <- as.vector(eval.fd(x, warpfd))
+       b         <- (rangeval[2]-rangeval[1])/(h[n]-h[1])
+       a         <- rangeval[1] - b*h[1]
+       h         <- a + b*h
+       h[c(1,n)] <- rangeval
        #  check for monotonicity
        deltah <- diff(h)
        if (any(deltah <= 0)) stop(
-           paste("Non-increasing warping function estimated for curve",icurve))
+           paste("Non-increasing warping function estimated for curve",icurve,
+                 " Try setting MONWRD to TRUE."))
     }
     hfunmat[,icurve] <- h
 
     #  compute h-inverse  in order to register curves
 
     if (monwrd) {
-       wcoef   <- Wfd$coefs
-       Wfdinv  <- fd(-wcoef,wbasis)
-       WfdParinv <- fdPar(Wfdinv, wLfd, lambda)
-       conv    <- 1e-4
-       iterlim <- 20
-       dblev   <- 0
-       Wfdinv  <- smooth.morph(h, x, WfdParinv, wtn,
-                              conv, iterlim, dbglev=0)$Wfdobj
-       hinv    <- monfn(x, Wfdinv)
-       b       <- (rangeval[2]-rangeval[1])/(hinv[n]-hinv[1])
-       a       <- rangeval[1] - b*hinv[1]
-       hinv    <- a + b*hinv
-       hinv[1] <- rangeval[1]
-       hinv[n] <- rangeval[2]
+       wcoef        <- Wfd$coefs
+       Wfdinv       <- fd(-wcoef,wbasis)
+       WfdParinv    <- fdPar(Wfdinv, wLfd, lambda)
+       Wfdinv       <- smooth.morph(h, x, WfdParinv)$Wfdobj
+       hinv         <- monfn(x, Wfdinv)
+       b            <- (rangeval[2]-rangeval[1])/(hinv[n]-hinv[1])
+       a            <- rangeval[1] - b*hinv[1]
+       hinv         <- a + b*hinv
+       hinv[c(1,n)] <- rangeval
    } else {
-       hinvfd  <- smooth.basis(h, x, WfdPar)$fd
-       hinv    <- as.vector(eval.fd(x, hinvfd))
-       b       <- (rangeval[2]-rangeval[1])/(hinv[n]-hinv[1])
-       a       <- rangeval[1] - b*hinv[1]
-       hinv    <- a + b*hinv
-       hinv[1] <- rangeval[1]
-       hinv[n] <- rangeval[2]
+       hinvfd       <- smooth.basis(h, x, WfdPar)$fd
+       hinv         <- as.vector(eval.fd(x, hinvfd))
+       b            <- (rangeval[2]-rangeval[1])/(hinv[n]-hinv[1])
+       a            <- rangeval[1] - b*hinv[1]
+       hinv         <- a + b*hinv
+       hinv[c(1,n)] <- rangeval
        deltahinv <- diff(hinv)
        if (any(deltahinv <= 0)) stop(
            paste("Non-increasing warping function estimated for curve",icurve))
@@ -194,10 +197,12 @@ landmarkreg <- function(fdobj, ximarks, x0marks=xmeanmarks,
 
   #  create functional data objects for the warping functions
 
-  warpfdobj   <- smooth.basis(x, hfunmat, fdParobj)$fd
-  warpfdnames <- fdobj$fdnames
+  warpfdobj             <- smooth.basis(x, hfunmat, fdParobj)$fd
+  warpfdnames           <- fdobj$fdnames
   names(warpfdnames)[3] <- paste("Warped",names(regnames)[1])
-  warpfdobj$fdnames <- warpfdnames
+  warpfdobj$fdnames     <- warpfdnames      
+  
+  Wfd <- fd(wcoef, wbasis)
 
-  return( list("regfd" = regfdobj, "warpfd" = warpfdobj) )
+  return( list("regfd" = regfdobj, "warpfd" = warpfdobj, "Wfd" = Wfd) )
 }

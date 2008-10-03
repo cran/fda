@@ -97,8 +97,6 @@ if (inherits(xfdlist, "fd")) xfdlist = list(xfdlist)
 if (!inherits(xfdlist, "list")) stop(
 		"XFDLIST is neither a list or a FD object")
 
-if (length(dim(xfdlist)) > 0) stop("XFDLIST is not a vector.")
-	
 nvar <- length(xfdlist)
 
 #  ----------------------------------------------------------------
@@ -215,19 +213,19 @@ for (j in 1:difeorder) {
     bfdParj <- bwtlist[[j]]
     if (!inherits(bfdParj,"fdPar")) {
       print(paste(
-            "BWTLIST[[",iu,"]] is not a functional parameter object.",sep=""))
+            "BWTLIST[[",j,"]] is not a functional parameter object.",sep=""))
       errorwrd <- TRUE      
     }  else {
       bfdj <- bfdParj$fd
       if (!inherits(bfdj, "fd")) {
         print(paste(
-              "BFDJ in BWTLIST[[",iu,"]] is not a functional data object.",
+              "BFDJ in BWTLIST[[",j,"]] is not a functional data object.",
               sep=""))
         errorwrd <- TRUE      
       } else {
         basisj <- bfdj$basis
         if (any(basisj$rangeval != xrange)) print(paste(
-			    "Ranges are incompatible for BWTLIST[[",iu,"]].",sep=""))
+			    "Ranges are incompatible for BWTLIST[[",j,"]].",sep=""))
       }
     }
     nbasmax <- max(c(nbasmax,basisj$nbasis))
@@ -671,7 +669,7 @@ for (ivar in 1:nvar) {
 }
 if (errorwrd) stop("")
 
-nbasmax <- xbasis$nbasis  #  This will be the maximum number of basis functions
+nbasmax <- xbasis1$nbasis  #  This will be the maximum number of basis functions
 
 #  check compatibility of UFDLIST and AWTLIST
 
@@ -722,7 +720,7 @@ for (ivar1 in 1:nvar) {
       if (!is.null(bwtlist[[ivar1]][[ivar2]][[j]])) {
         bfdPari1i2j <- bwtlist[[ivar1]][[ivar2]][[j]]
         if (!inherits(bfdPari1i2j, "fdPar")) {
-          print(paste("BWTLIST[[",ivar1, ",",ivar2, ",",iu,
+          print(paste("BWTLIST[[",ivar1, ",",ivar2, ",",j,
                       "]] is not a functional parameter object.",sep=""))
           errorwrd = TRUE
         }
@@ -730,7 +728,7 @@ for (ivar1 in 1:nvar) {
         if (any(basisi1i2j$rangeval != xrange1)) {
           print(paste(
               "Ranges are incompatible for BWTLIST[[",ivar1,"]][[",ivar2,"]][[",
-            iu,"]]",sep=""))
+            j,"]]",sep=""))
           errorwrd <- TRUE
         }
         nbasmax <- max(c(nbasmax,basisi1i2j$nbasis))
@@ -801,10 +799,11 @@ for (i1 in 1:nvar) {
     for (i2 in 1:nvar) {
       difeord2p1 <- length(bwtlist[[i2]][[i2]]) + 1
       for (j2 in 1:difeord2p1) {
-        if (ncurve == 1)
+        if (ncurve == 1) {
             yprodval <-       yarray[[i1]][,1,j1]*yarray[[i2]][,1,j2]
-        else
-            yprodval <- apply(yarray[[i1]][,,j1]*yarray[[i2]][,,j2],2,mean)
+        } else {
+            yprodval <- apply(yarray[[i1]][,,j1]*yarray[[i2]][,,j2],1,mean)
+        }
         yprod[[i1]][[i2]][,j1,j2] <- yprodval
       }
     }
@@ -828,6 +827,7 @@ if (!is.null(ufdlist)) {
       }
     }
   }
+  onesncurve <- rep(1,ncurve)
   for (i1 in 1:nvar) {
     if (!is.null(ufdlist[[i1]])) {
       nforce <- length(ufdlist[[i1]])
@@ -835,9 +835,12 @@ if (!is.null(ufdlist)) {
         difeordp1 <- length(bwtlist[[i1]][[i1]]) + 1
         for (iu in 1:nforce) {
           for (j1 in 1:difeordp1) {
-            if (ncurve == 1) yuprodval <- yarray[[i1]][,1,j1]*uarray[[i1]][[iu]]
-            else             yuprodval <- apply(yarray[[i1]][,,j1]*
-                                outer(uarray[[i1]][[iu]],onesncurve),2,mean)
+            if (ncurve == 1) {
+              yuprodval <- yarray[[i1]][,1,j1]*uarray[[i1]][[iu]]
+            } else {
+              yuprodval <- apply(yarray[[i1]][,,j1]*
+                                outer(uarray[[i1]][[iu]],onesncurve),1,mean)
+            }
             yuprod[[i1]][[iu]][,j1] <- yuprodval
           }
         }
@@ -1179,8 +1182,11 @@ for (ivar in 1:nvar) {
         bfdParij <- bwtlist[[ivar]][[i1]][[j1]]
         bfdij    <- bfdParij$fd
         bvecij   <- as.vector(eval.fd(tx, bfdij))
-        if (ncurve == 1) bmatij <- bvecij
-        else             bmatij <- outer(bvecij,onesncurve)
+        if (ncurve == 1) {
+          bmatij <- bvecij
+        }  else  {             
+          bmatij <- outer(bvecij,onesncurve)
+        }
         xmatij <- eval.fd(tx, xfdlist[[i1]], j1-1)
         resmat <- resmat + bmatij*xmatij
       }

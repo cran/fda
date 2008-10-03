@@ -94,12 +94,12 @@ harmaccelLfd365 <- vec2Lfd(c(0,(2*pi/365)^2,0), c(0, 365))
 
 # First check the distribution
 qqnorm(CanadianWeather$dailyAv[,,"Temperature.C"], datax=TRUE)
-# Cosnsitent with a strong annual cycle
+# Consistent with a strong annual cycle
 # plus weaker normal noise 
 
 daytempfd <- with(CanadianWeather, smooth.basis(day.5, 
        dailyAv[,,"Temperature.C"],
-       daybasis65, argnames=list("Day", "Station", "Deg C"))$fd )
+       daybasis65, fdnames=list("Day", "Station", "Deg C"))$fd )
 plot(daytempfd, axes=FALSE)
 axisIntervals(1) 
 axis(2)
@@ -138,7 +138,7 @@ qqnorm(CanadianWeather$dailyAv[,,"log10precip"], datax=TRUE)
 # (recalling log(1+x) = x if x is small) 
 dayprecfd <- with(CanadianWeather, smooth.basis(day.5, 
      dailyAv[,,"log10precip"], daybasis65, 
-     argnames=list("Day", "Station", "log10(mm)"))$fd )
+     fdnames=list("Day", "Station", "log10(mm)"))$fd )
 plot(dayprecfd, axes=FALSE)
 axisIntervals(1)
 axis(2)
@@ -294,7 +294,7 @@ for (i in 1:length(CanadianWeather$place) ) {
 # Uncomment the following line 'par(ask=TRUE)' 
 #  to plot the cuves one at a time
 # Otherwise, they fly by faster than the eye can see.  
-#  par(ask=TRUE)
+   par(ask=TRUE)
 }
 par(mfrow=c(1,1), pty="m", ask=FALSE)
 
@@ -418,6 +418,7 @@ axisIntervals(1)
 axis(2)
 lines(TempSmooth.01$fd, lty=1, lwd=2)
 title("Canadian Annual Temperature Cycle;  lambda = 0.01")
+par(mfrow=c(1,1))
 
 with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5,
           TempSmooth.1$fd, index=c(1,35), titles=place, axes=FALSE) )
@@ -1020,7 +1021,7 @@ par(op)
 
 
 
-# Now a couple of perumatation tests
+# Now a couple of permutation tests
 
 # permutation t-test between atlantic and pacific 
 

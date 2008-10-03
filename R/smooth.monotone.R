@@ -2,12 +2,13 @@ smooth.monotone <- function(argvals, y, WfdParobj, wtvec=rep(1,n),
                             zmat=NULL, conv=.0001, iterlim=50,
                             active=rep(TRUE,nbasis), dbglev=1)
 {
-#  Smooths the relationship of Y to ARGVALS using weights in WTVEC by fitting a
-#     monotone function of the form
+#  Smooths the relationship of Y to ARGVALS using weights in WTVEC by
+#  fitting a monotone function of the form
 #                   f(x) = b_0 + b_1 D^{-1} exp W(x)
 #     where  W  is a function defined over the same range as ARGVALS,
 #                 W + ln b_1 = log Df and w = D W = D^2f/Df.
-#  The constant term b_0 in turn can be a linear combinations of covariates:
+#  The constant term b_0 in turn can be a linear combinations of
+#  covariates:
 #                         b_0 = zmat * c.
 #  The fitting criterion is penalized mean squared error:
 #    PENSSE(lambda) = \sum w_i[y_i - f(x_i)]^2 +
@@ -15,25 +16,27 @@ smooth.monotone <- function(argvals, y, WfdParobj, wtvec=rep(1,n),
 #  where L is a linear differential operator defined in argument Lfdobj,
 #  and w_i is a positive weight applied to the observation.
 #  The function W(x) is expanded by the basis in functional data object
-#    Wfdobj.   The coefficients of this expansion are called "coefficients"
-#    in the comments, while the b's are called "regression coefficients"
+#  Wfdobj.   The coefficients of this expansion are called
+#  "coefficients" in the comments, while the b's are called "regression
+#  coefficients"
 
 #  Arguments:
-#  ARGVALS ...  Argument value array of length N, where N is the number of
-#               observed curve values for each curve.  It is assumed that
+#  ARGVALS ...  Argument value array of length N, where N is the number
+#               of observed curve values for each curve.  It is assumed
 #               that these argument values are common to all observed
 #               curves.  If this is not the case, you will need to
 #               run this function inside one or more loops, smoothing
 #               each curve separately.
 #  Y       ...  Function value array (the values to be fit).
-#               If the functional data are univariate, this array will be
-#               an N by NCURVE matrix, where N is the number of observed
-#               curve values for each curve and NCURVE is the number of
-#               curves observed.
-#               If the functional data are muliivariate, this array will be
-#               an N by NCURVE by NVAR matrix, where NVAR the number of
-#               functions observed per case.  For example, for the gait
-#               data, NVAR = 2, since we observe knee and hip angles.
+#               If the functional data are univariate, this array will
+#               be an N by NCURVE matrix, where N is the number of
+#               observed curve values for each curve and NCURVE is the
+#               number of curves observed.
+#               If the functional data are muliivariate, this array will
+#               be an N by NCURVE by NVAR matrix, where NVAR the number
+#               of functions observed per case.  For example, for the
+#               gait data, NVAR = 2, since we observe knee and hip
+#               angles.
 #  WFDPAROBJ... A functional parameter or fdPar object.  This object
 #               contains the specifications for the functional data
 #               object to be estimated by smoothing the data.  See
@@ -42,9 +45,10 @@ smooth.monotone <- function(argvals, y, WfdParobj, wtvec=rep(1,n),
 #               to initialize the optimization process.
 #               Its coefficient array contains the starting values for
 #               the iterative minimization of mean squared error.
-#  ZMAT    ...  An N by NCOV matrix of covariate values for the constant term.
-#               It defaults to NULL, in this case the constant term is the
-#               value of BETA[1] for all values of a given curve.
+#  ZMAT    ...  An N by NCOV matrix of covariate values for the constant
+#               term.  It defaults to NULL, in this case the constant
+#               term is the value of BETA[1] for all values of a given
+#               curve.
 #  WTVEC   ...  A vector of weights, a vector of N one's by default.
 #  CONV    ...  Convergence criterion, 0.0001 by default
 #  ITERLIM ...  maximum number of iterations, 50 by default.
@@ -70,24 +74,25 @@ smooth.monotone <- function(argvals, y, WfdParobj, wtvec=rep(1,n),
 #  YHATFD ...   A functional data object for the monotone curves that
 #               smooth the data
 #  FLIST  ...   A list object or a vector of list objects, one for
-#               each curve (and each variable if functions are multivariate).
+#               each curve (and each variable if functions are
+#               multivariate).
 #               Each list object has slots:
 #                 f    ... The sum of squared errors
 #                 grad ... The gradient
 #                 norm ... The norm of the gradient
 #  Y2CMAP ...   For each estimated curve (and variable if functions are
 #               multivariate, this is an N by NBASIS matrix containing
-#               a linear mappping from data to coefficients that can be used
-#               for computing point-wise confidence intervals.
+#               a linear mappping from data to coefficients that can be
+#               used for computing point-wise confidence intervals.
 #               If NCURVE = NVAR = 1, a matrix is returned.  Otherwise
 #               an NCURVE by NVAR list is returned, with each
 #               slot containing this mapping.
 #  When multiple curves and variables are analyzed, the lists containing
-#  FLIST and Y2CMAP objects are indexed linear with curves varying inside
-#  variables.
+#  FLIST and Y2CMAP objects are indexed linear with curves varying
+#  inside variables.
 
-# last modified       26 September 2008 by Jim Ramsay
-# previously modified  3 January   2008 by Jim Ramsay
+# last modified 2008.11.22 by Spencer Graves
+# previously modified 26 September 2008 by Jim Ramsay
 
 #  check ARGVALS
 
@@ -185,7 +190,7 @@ if (ncurve > 1 || nvar > 1)  {
     y2cMap <- NULL
 }
 
-if (dbglev == 0) cat("Progress:  Each dot is a curve\n")
+if (dbglev == 0 && ncurve > 1) cat("Progress:  Each dot is a curve\n")
 
 for (ivar in 1:nvar) {
   for (icurve in 1:ncurve) {
@@ -480,9 +485,11 @@ if (is.null(zmat)) {
   yhatfd <- NULL
 }
 
-return ( list( "Wfdobj"  = Wfdobj,  "beta"   = beta, "yhatfd" = yhatfd,
+monFd <- list( "Wfdobj"  = Wfdobj,  "beta"   = beta, "yhatfd" = yhatfd,
                "Flist"   = Flist,   "y2cMap" = y2cMap,
-               "argvals" = argvals, "y"      = y ) )
+               "argvals" = argvals, "y"      = y )
+class(monFd) <- 'monfd'
+monFd
 }
 
 #  ----------------------------------------------------------------

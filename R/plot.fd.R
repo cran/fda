@@ -1,3 +1,13 @@
+#plot.fdPar <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
+#                          xlim=NULL, ylim=NULL, xlab=NULL,
+#                          ylab=NULL, ask=FALSE, nx=NULL, ...){
+# plot(x$fd, y, Lfdobj=Lfdobj, href=href, titles=titles,
+#       xlim=xlim, ylim=ylim, xlab=xlab,
+#      ylab=ylab, ask=ask, nx=nx, ...)
+#}
+# NO:  fdPar(...)$fd$coef = 0
+# regardless of '...'
+
 plot.fdSmooth <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
                           xlim=NULL, ylim=NULL, xlab=NULL,
                           ylab=NULL, ask=FALSE, nx=NULL, ...){
@@ -23,7 +33,7 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
   #  The argument ASK, if TRUE, causes the curves to be displayed one at a time.
   #  NX     ... The number of sampling points to use for
   #             plotting.  (default 101)
-  
+
   #  The remaining optional arguments are the same as those available
   #     in the regular "plot" function.
 
@@ -51,10 +61,10 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
   coef   <- fdobj$coefs
   coefd  <- dim(coef)
   ndim   <- length(coefd)
-  # Number of basis functions   
+  # Number of basis functions
   nbasis    <- coefd[1]
   if(is.null(nx)) nx <- 10*nbasis + 1
-  # Number of functional observations   
+  # Number of functional observations
   nrep   <- coefd[2]
   if (ndim > 2) nvar <- coefd[3] else nvar <- 1
 
@@ -72,7 +82,7 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
   }
 
   if (length(y) == 1) {
-    if (y >= 1) { 
+    if (y >= 1) {
       y <- seq(rangex[1],rangex[2],len=floor(y))
     } else {
       stop("'y' a single number less than one.")
@@ -86,20 +96,20 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
   fdmat    <- eval.fd(y, fdobj, Lfdobj)
   rangey   <- range(c(fdmat))
   if(is.null(ylim))ylim <- rangey
-  
-  #  set up axis labels and, 
+
+  #  set up axis labels and,
   #  optionally, caselabels and variable labels
 
   fdnames      = fdobj$fdnames
   fdlabelslist = fdlabels(fdnames, nrep, nvar)
 
-# Ramsay 2008.08.26  
+# Ramsay 2008.08.26
   xlabel    = fdlabelslist$xlabel
   ylabel    = fdlabelslist$ylabel
   casenames = fdlabelslist$casenames
   varnames  = fdlabelslist$varnames
 
-# Graves 2008.07.04  
+# Graves 2008.07.04
 #  xlabel   <- names(fdobj$fdnames)[[1]]
 #  ylabel   <- names(fdobj$fdnames)[[3]]
 #  if (is.character(xlabel) == FALSE) xlabel <- ""
@@ -112,47 +122,47 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
 #  if (missing(ylab)) ylab <- ylabel
 #  crvnames <- fdobj$fdnames[[2]]
 #  varnames <- fdobj$fdnames[[3]]
-# Don't ask for the first plot, but do for later plots if(ask)   
+# Don't ask for the first plot, but do for later plots if(ask)
 #  op <- par(ask=FALSE)
 # Don't ask for the first plot,
-# but if ask==TRUE, do ask for succeeding plots 
+# but if ask==TRUE, do ask for succeeding plots
 #  on.exit(par(op))
 # A single line?
-  
-  # A single line?  
+
+  # A single line?
   if (ndim < 2) {
     plot (y, fdmat, type="l", xlim=xlim, ylim=ylim,
           xlab=xlab, ylab=ylab, ...)
-#   Ramsay 2008.08.26     
+#   Ramsay 2008.08.26
     if (zerofind(fdmat) && href) abline(h=0,lty=2)
-#   Graves 2008.07.04     
-#    if (zerofind(ylim) && href) abline(h=0,lty=2)    
+#   Graves 2008.07.04
+#    if (zerofind(ylim) && href) abline(h=0,lty=2)
   }
-  # Several copies of one function?    
+  # Several copies of one function?
   if (ndim ==2 ) {
     if (!ask) {
-      matplot(y, fdmat, type="l", 
+      matplot(y, fdmat, type="l",
               xlim=xlim,   ylim=ylim,
               xlab=xlabel, ylab=ylabel, ...)
-#   Ramsay 2008.08.26     
+#   Ramsay 2008.08.26
       if (zerofind(fdmat) && href) abline(h=0,lty=2)
-#   Graves 2008.07.04     
-#    if (zerofind(ylim) && href) abline(h=0,lty=2)    
+#   Graves 2008.07.04
+#    if (zerofind(ylim) && href) abline(h=0,lty=2)
     } else  {
 #   Graves 2008.07.04:  par, cat absent from Ramsay 2008.08.26
       op <- par(ask=FALSE)
 # Don't ask for the first plot,
-# but if ask==TRUE, do ask for succeeding plots 
+# but if ask==TRUE, do ask for succeeding plots
       on.exit(par(op))
-      cat('Multiple plots:  Click in the plot to advance to the next') 
+      cat('Multiple plots:  Click in the plot to advance to the next')
 #      op <- par(ask = TRUE)
 #      on.exit(par(op))
       for (irep in 1:nrep) {
-        plot (y, fdmat[,irep], type="l", 
+        plot (y, fdmat[,irep], type="l",
               xlim=xlim, ylim=ylim,
               xlab=xlab, ylab=ylab, ...)
         if(irep<2) par(ask=ask)
-        
+
 #        if (zerofind(ylim) && href) abline(h=0,lty=2)
 #        if (!is.null(titles)) title(titles[irep])
 #        else title(paste(crvnames[irep]))
@@ -161,17 +171,17 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
         else                     title(paste("Case",irep))
 #        if (zerofind(fdmat[,irep]) && href) abline(h=0,lty=2)
         if (zerofind(ylim) && href) abline(h=0,lty=2)
-        
+
 #        mtext("Click in graph to see next plot", side=3, outer=FALSE)
 #        text("",locator(1))
       }
     }
   }
-  # Possibly multiple copies of different functions   
+  # Possibly multiple copies of different functions
   if (ndim == 3) {
     if (!ask) {
       for (ivar in 1:nvar) {
-        matplot (y, fdmat[,,ivar], type="l", 
+        matplot (y, fdmat[,,ivar], type="l",
                  xlim=xlim, ylim=ylim,
                  xlab=xlab, ylab=ylab, ask=FALSE, ...)
         if (!is.null(varnames)) title(varnames[ivar])
@@ -182,20 +192,20 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
     } else {
       op <- par(ask=FALSE)
 # Don't ask for the first plot,
-# but if ask==TRUE, do ask for succeeding plots 
+# but if ask==TRUE, do ask for succeeding plots
       on.exit(par(op))
       cat('Multiple plots:  Click in the plot to advance to the next')
 
       for (irep in 1:nrep) {
         for (ivar in 1:nvar) {
-          plot(y,fdmat[,irep,ivar],type="l", 
+          plot(y,fdmat[,irep,ivar],type="l",
                xlim=xlim, ylim=ylim,
                xlab=xlab, ylab=ylab, ...)
           if (!is.null(casenames)) titlestr = casenames[irep]
           else                     titlestr = paste("Case",irep)
-          if (!is.null(varnames)) { 
+          if (!is.null(varnames)) {
              titlestr = paste(titlestr,"  ",varnames[ivar])
-          } else {                   
+          } else {
              titlestr = paste(titlestr,"  ","Variable",ivar)
           }
           title(titlestr)
@@ -214,7 +224,7 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
 # This used to return 'invisible(NULL)'.
 # However, with R 2.7.0 under XEmacs with ESS,
 # it sometimes failed to plot.  I changed the return value,
-# and the problem disappeared.  
+# and the problem disappeared.
   'done'
 }
 

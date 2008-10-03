@@ -1,7 +1,14 @@
-#  Comute and display various descriptive statistics for daily
+#  This file is intended to be used after the commands in files
+#  weathersetup.R and weathersmooth.R have been executed.
+
+#  Many other interesting ways of describing the data and plotting results
+#  can be found in the file canadian-weather.R, set up in 2008 by 
+#  Spencer Graves.
+
+#  Compute and display various descriptive statistics for daily
 #  temperature and precipitation
 
-#  Last modified 6 March 2007
+#  Last modified 17 November 2008
 
 load("weatherfd")
 load("weatherdata")
@@ -113,6 +120,17 @@ par(mfrow=c(1,1), pty="s")
 persp(weeks, weeks, cormat, theta = 45, phi=45, d=4, shade=0.25, 
       xlab="Weeks", ylab="Weeks", zlab="Correlation")
 mtext("Temperature-Precipitation Correlation", line=-4, outer=T, cex=1.2)
+
+#  Suggestion:  redo these plots using this index vector to reorder days
+#  so that they run from July 1 to June 30.  In this way, you will see
+#  in the middle of the plot that part of the weather year that has the
+#  most variation and the most interesting structure.
+#  If this reordering is desired, use commands
+#  daytime = daytime[JJindex]
+#  tempav = tempav[JJindex,]
+#  precav = precav[JJindex,]
+
+JJindex = c(182:365, 1:181)
 
 
 

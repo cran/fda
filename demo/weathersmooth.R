@@ -1,14 +1,43 @@
+
+#  This file is intended to be used after the weather data have been set up
+#  by the commands in weathersetup.R
+
 #  The weather data are smoothed using the harmonic acceleration penaltym
 #  and the smoothed data are saved as a named list weatherfd.
 
-#  Last modified 8 March 2007
+#  Many other interesting ways of smoothing the data and plotting results
+#  can be found in the file canadian-weather.R, set up in 2008 by 
+#  Spencer Graves.
+
+#  Last modified 17 November 2008
 
 #  load the data
 
 load("weatherdata")
 
+#  ------------------------  set up the data  -----------------------
+
+tempav  <- daily$tempav
+precav  <- daily$precav
+station <- daily$place
+
+#  set up the times of observation at noon
+
+daytime   <- (1:365)-0.5
+
 daytime <- weatherdata$daytime
 station <- weatherdata$station
+
+#  JJindex re-orders days so that they run from July 1 to June 30.
+#  This can be useful for understanding weather data because variation 
+#  from curve to curve is greater and more interesting in mid-winter.  
+#  July 1 is the 182nd day.
+#  If this reordering is desired, use commands
+#  daytime = daytime[JJindex]
+#  tempav = tempav[JJindex,]
+#  precav = precav[JJindex,]
+
+JJindex = c(182:365, 1:181)
 
 #  -------------  set up fourier basis  ---------------------------
 
@@ -137,8 +166,6 @@ for (i in 1:35) {
 #  ---------------------------------------------------------------------
 #                        Smooth precipitation  
 #  ---------------------------------------------------------------------
-
-precav <- weatherdata$precav
 
 #                 Choose level of smoothing using
 #          the generalized cross-validation criterion
@@ -309,7 +336,7 @@ lines(daytime, VanPrecvarhat, lwd=2)
 
 #  set up a weight function for (revised smoothing
 
-wtvec <- 1/VanPrecvarhat
+wtvec <- as.vector(1/VanPrecvarhat)
 
 lambda   <- 1e3
 fdParobj <- fdPar(daybasis65, harmaccelLfd, lambda)

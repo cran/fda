@@ -79,8 +79,35 @@ smooth.monotone(argvals, y, WfdParobj, wtvec=rep(1,n),
   }
 }
 
+\details{
+  The smoothing function  $f(argvals)$ is determined by three objects
+  that need to be estimated from the data:
+
+  \itemize{
+    \item $W(argvals)$, a functional data object that is first
+        exponentiated and then the result integrated.  This is the heart
+	of the monotone smooth.  The closer $W(argvals)$ is to zero, the
+	closer the monotone smooth becomes a straight line.  The closer
+	$W(argvals)$ becomes a constant, the more the monotone smoother
+	becomes an exponential function.  It is assumed that $W(0) = 0.$
+
+	\item $b0$, an intercept term that determines the value of the
+	smoothing function at $argvals = 0$.
+
+	\item $b1$, a regression coefficient that determines the slope
+	of the smoothing function at $argvals = 0$.
+  }
+
+  In addition, it is possible to have the intercept $b0$
+  depend in turn on the values of one or more covariates through the
+  design matrix \code{Zmat} as follows:
+  $b0 = Z c$. In this case, the single
+  intercept coefficient is replaced by the regression coefficients
+  in vector $c$ multipying the design matrix.
+}
 \value{
-  a named list of length 5 containing:
+  an object of class \code{monfd}, which is a list with the following 5
+  components:
 
   \item{Wfdobj}{
     a functional data object defining function $W(argvals)$ that
@@ -126,32 +153,6 @@ smooth.monotone(argvals, y, WfdParobj, wtvec=rep(1,n),
     input argument \code{y}, possibly modified / clarified by
     \code{ycheck}.
   }
-}
-\details{
-  The smoothing function  $f(argvals)$ is determined by three objects
-  that need to be estimated from the data:
-
-  \itemize{
-    \item $W(argvals)$, a functional data object that is first
-        exponentiated and then the result integrated.  This is the heart
-	of the monotone smooth.  The closer $W(argvals)$ is to zero, the
-	closer the monotone smooth becomes a straight line.  The closer
-	$W(argvals)$ becomes a constant, the more the monotone smoother
-	becomes an exponential function.  It is assumed that $W(0) = 0.$
-
-	\item $b0$, an intercept term that determines the value of the
-	smoothing function at $argvals = 0$.
-
-	\item $b1$, a regression coefficient that determines the slope
-	of the smoothing function at $argvals = 0$.
-  }
-
-  In addition, it is possible to have the intercept $b0$
-  depend in turn on the values of one or more covariates through the
-  design matrix \code{Zmat} as follows:
-  $b0 = Z c$. In this case, the single
-  intercept coefficient is replaced by the regression coefficients
-  in vector $c$ multipying the design matrix.
 }
 \references{
   Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional

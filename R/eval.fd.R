@@ -1,3 +1,37 @@
+predict.fdSmooth <- function(object, newdata=NULL, Lfdobj=0, ...){
+  if(is.null(newdata)){
+    newdata <- object$argvals
+  }
+  eval.fd(newdata, object$fd, Lfdobj)
+}
+
+fitted.fdSmooth <- function(object, ...){
+  newdata <- object$argvals
+  eval.fd(newdata, object$fd)
+}
+
+residuals.fdSmooth <- function(object, ...){
+  newdata <- object$argvals
+  pred <- eval.fd(newdata, object$fd)
+  object$y-pred
+}
+
+predict.fd <- function(object, newdata=NULL, Lfdobj=0, ...){
+  if(is.null(newdata)){
+    basis <- object$basis
+    type <- basis$type
+    if(length(type) != 1)
+      stop('length(object$type) must be 1;  is ',
+           length(type) )
+    newdata <- {
+      if(type=='bspline')
+        unique(knots(basis, interior=FALSE))
+      else basis$rangeval
+    }
+  }
+  eval.fd(newdata, object, Lfdobj)
+}
+
 #  ----------------------------------------------------------------------------
 
 eval.fd <- function(evalarg, fdobj, Lfdobj=0) {

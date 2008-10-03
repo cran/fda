@@ -98,7 +98,7 @@ smooth.basis(argvals, y, fdParobj, wtvec=rep(1, length(argvals)),
   using function \code{smooth.fd}.
 }
 \value{
-  an object of class \code{fdSmooth}, which is a names list of length 6
+  an object of class \code{fdSmooth}, which is a named list of length 8
   with the following components:
 
   \item{fd}{

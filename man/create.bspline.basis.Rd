@@ -196,16 +196,12 @@ all.equal(bspl1.1, b1.1)
 
 bspl2.2 <- create.bspline.basis(norder=2)
 plot(bspl2.2)
-# PROBLEM:  Should be 2 right triangles;  isn't
 
 bspl3.3 <- create.bspline.basis(norder=3)
 plot(bspl3.3)
-# PROBLEM:  Should be 3 parabolas, x^2, 1-(x-.5)^2, (x-1)^2
-# isn't
 
 bspl4.4 <- create.bspline.basis()
 plot(bspl4.4)
-# PROBLEM:  Should be 4 cubics;  isn't
 
 bspl1.2 <- create.bspline.basis(norder=1, breaks=c(0,.5, 1))
 plot(bspl1.2)

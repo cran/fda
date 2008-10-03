@@ -1,7 +1,7 @@
 smooth.pos <- function(argvals, y, WfdParobj, wtvec=rep(1,n), conv=1e-4,
                        iterlim=50, dbglev=1) {
-#  Smooths the relationship of Y to ARGVALS using weights in WTVEC by fitting a
-#     positive function of the form
+#  Smooths the relationship of Y to ARGVALS using weights in WTVEC by
+#  fitting a positive function of the form
 #                      f(x) = exp W(x)
 #     where  W  is a function defined over the same range as ARGVALS,
 #                         W = log Df.
@@ -11,61 +11,63 @@ smooth.pos <- function(argvals, y, WfdParobj, wtvec=rep(1,n), conv=1e-4,
 #  where L is a linear differential operator defined in argument Lfdobj,
 #  and w_i is a positive weight applied to the observation.
 #  The function W(x) is expanded by the basis in functional data object
-#    Wfdobj.   
+#    Wfdobj.
 
 #  Arguments:
-#  ARGVALS ...  Argument value array of length N, where N is the number of 
-#               observed curve values for each curve.  It is assumed that
+#  ARGVALS ...  Argument value array of length N, where N is the number
+#               of observed curve values for each curve.  It is assumed
 #               that these argument values are common to all observed
-#               curves.  If this is not the case, you will need to 
+#               curves.  If this is not the case, you will need to
 #               run this function inside one or more loops, smoothing
 #               each curve separately.
 #  Y       ...  Function value array (the values to be fit).
-#               If the functional data are univariate, this array will be 
+#               If the functional data are univariate, this array will be
 #               an N by NCURVE matrix, where N is the number of observed
 #               curve values for each curve and NCURVE is the number of
 #               curves observed.
-#               If the functional data are muliivariate, this array will be 
-#               an N by NCURVE by NVAR matrix, where NVAR the number of
-#               functions observed per case.  For example, for the gait
-#               data, NVAR = 2, since we observe knee and hip angles.
-#  WFDPAROBJ... A functional parameter or fdPar object.  This object 
+#
+#               If the functional data are muliivariate, this array will
+#               be an N by NCURVE by NVAR matrix, where NVAR the number
+#               of functions observed per case.  For example, for the
+#               gait data, NVAR = 2, since we observe knee and hip
+#               angles.
+#  WFDPAROBJ... A functional parameter or fdPar object.  This object
 #               contains the specifications for the functional data
 #               object to be estimated by smoothing the data.  See
 #               comment lines in function fdPar for details.
 #               The functional data object WFD in WFDPAROBJ is used
 #               to initialize the optimization process.
-#               Its coefficient array contains the starting values for 
+#               Its coefficient array contains the starting values for
 #               the iterative minimization of mean squared error.
 #  WTVEC   ...  a vector of weights, a vector of N one's by default.
 #  CONV    ...  convergence criterion, 0.0001 by default
 #  ITERLIM ...  maximum number of iterations, 50 by default.
 #  DBGLEV  ...  Controls the level of output on each iteration.  If 0,
-#               no output, if 1, output at each iteration, if higher, 
+#               no output, if 1, output at each iteration, if higher,
 #               output at each line search iteration. 1 by default.
 
 #  Returns are:
-#  WFD     ...  Functional data object for W. 
+#  WFD     ...  Functional data object for W.
 #               Its coefficient matrix an N by NCURVE (by NVAR) matrix
 #               (or array), depending on whether the functional
 #               observations are univariate or multivariate.
-#  FLIST ... A list object or a vector of list objects, one for 
+#  FLIST ... A list object or a vector of list objects, one for
 #            each curve (and each variable if functions are multivariate).
 #            Each list object has slots:
-#                 f    ... The sum of squared errors   
-#                 grad ... The gradient  
-#                 norm ... The norm of the gradient  
+#                 f    ... The sum of squared errors
+#                 grad ... The gradient
+#                 norm ... The norm of the gradient
 #  When multiple curves and variables are analyzed, the lists containing
 #  FLIST objects are indexed linear with curves varying inside
 #  variables.
 
-# last modified 21 September 2008 by Jim Ramsay
-# previously modified 3 January 2008 by Jim Ramsay  
+# last modified 2008.11.22 by Spencer Graves
+# previously modified 21 September 2008 by Jim Ramsay
 
 #  check ARGVALS
 
 argvals <- argcheck(argvals)
-n       <- length(argvals)         
+n       <- length(argvals)
 onesobs <- matrix(1,n,1)
 
 #  at least two points are necessary for monotone smoothing
@@ -182,9 +184,9 @@ for (ivar in 1:nvar) {
             cat("\n")
             curvetitle = paste('Results for variable',ivar)
           }
+          cat("\n")
+          cat(curvetitle)
         }
-        cat("\n")
-        cat(curvetitle)
         cat("\n")
         cat("\nIter.   PENSSE   Grad Length")
         cat("\n")
@@ -193,7 +195,7 @@ for (ivar in 1:nvar) {
         cat(round(status[2],4))
         cat("      ")
         cat(round(status[3],4))
-      }
+     }
 	#  -------  Begin iterations  -----------
 
 	MAXSTEPITER <- 10
@@ -204,7 +206,7 @@ for (ivar in 1:nvar) {
       gvec        <- gvec0
       dbgwrd      <- dbglev > 1
 
-	if (iterlim == 0) {      
+	if (iterlim == 0) {
             cat("\n")
       } else {
 	for (iter in 1:iterlim) {
@@ -326,27 +328,31 @@ for (ivar in 1:nvar) {
       }
 
       #  save coefficients in arrays COEF and BETA
-        
+
       if (ndim == 2) {
         coef[,icurve] = cveci
       } else {
         coef[,icurve,ivar] = cveci
       }
-        
-      #  save Flisti 
-        
+
+      #  save Flisti
+
       if (ncurve == 1 && nvar == 1) {
         Flist = Flisti
       } else {
         Flist[[(ivar-1)*ncurve+icurve]] = Flisti
       }
-        
+
     }
   }
 
   Wfdobj = fd(coef, basisobj)
 
-  return( list("Wfdobj"=Wfdobj, "Flist"=Flist) )
+#  return( list("Wfdobj"=Wfdobj, "Flist"=Flist) )
+  posFd <- list(Wfdobj=Wfdobj, Flist=Flist,
+                argvals=argvals, y=y)
+  class(posFd) <- 'posfd'
+  posFd
 }
 
 #  ---------------------------------------------------------------
@@ -380,5 +386,5 @@ PENSSEhess <- function(argvals, yi, basisobj, cveci, Kmat, wtvec) {
   	D2PENSSE  <- 2*crossprod(Dres)/n + 2*Kmat
 	return(D2PENSSE)
 }
-	
+
 

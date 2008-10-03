@@ -1,3 +1,24 @@
+  #  Last modified 2008.11.22 by Spencer Graves
+  #  Previously modified 26 September 2008 (by Jim Ramsay?)
+predict.monfd <- function(object, newdata=NULL, Lfdobj=0, ...){
+  if(is.null(newdata))newdata <- object$argvals
+  evalMon <- eval.monfd(newdata, object$Wfdobj, Lfdobj)
+#
+  if(Lfdobj>0)
+    return(object$beta[2]*evalMon)
+#
+  with(object, beta[1]+beta[2]*evalMon)
+}
+
+fitted.monfd <- function(object, ...){
+  predict(object)
+}
+
+residuals.monfd <- function(object, ...){
+  pred <- predict(object)
+  object$y-pred
+}
+
 eval.monfd <- function(evalarg, Wfdobj, Lfdobj=int2Lfd(0)) {
   #  Evaluates a monotone functional data observation, or the value of a linear
   #  differential operator LFD applied to the object,
@@ -16,7 +37,6 @@ eval.monfd <- function(evalarg, Wfdobj, Lfdobj=int2Lfd(0)) {
   #  The interval over which the integration takes places is defined in
   #  the basisfd object in WFD.
 
-  #  Last modified 26 September 2008
 
   coef  <- Wfdobj$coefs
   if (is.vector(coef)) coef <- as.matrix(coef)
@@ -46,9 +66,9 @@ eval.monfd <- function(evalarg, Wfdobj, Lfdobj=int2Lfd(0)) {
   if (nderiv >= 2) Dwmat  <- getbasismatrix(evalarg, Wfdobj$basis, 1)
   if (nderiv == 3) D2wmat <- getbasismatrix(evalarg, Wfdobj$basis, 2)
 
-  for (ivar in 1:nvar) { 
+  for (ivar in 1:nvar) {
     for (icurve in 1:ncurve) {
-	
+
   	if (nderiv == 0) {
     	  if (ndim == 2) hmat[,icurve,ivar] <- monfn(evalarg, Wfdobj[icurve])
         else           hmat[,icurve,ivar] <- monfn(evalarg, Wfdobj[icurve,ivar])
@@ -71,11 +91,11 @@ eval.monfd <- function(evalarg, Wfdobj, Lfdobj=int2Lfd(0)) {
 
   	if (nderiv == 3) {
         if (ndim == 2) {
-    	    hmat[,icurve,ivar] <- ((D2wmat %*% coef[,icurve]) + 
+    	    hmat[,icurve,ivar] <- ((D2wmat %*% coef[,icurve]) +
                                  (Dwmat  %*% coef[,icurve])^2)*
                                   exp(eval.fd(evalarg, Wfdobj[icurve]))
         } else {
-    	    hmat[,icurve,ivar] <- ((D2wmat %*% coef[,icurve,ivar]) + 
+    	    hmat[,icurve,ivar] <- ((D2wmat %*% coef[,icurve,ivar]) +
                                  (Dwmat  %*% coef[,icurve,ivar])^2)*
                                   exp(eval.fd(evalarg, Wfdobj[icurve,ivar]))
         }
