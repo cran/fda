@@ -52,7 +52,8 @@ eval.monfd(evalarg, Wfdobj, Lfdobj=int2Lfd(0))
 
   \code{eval.monfd} only computes the standardized monotone form.
   \code{predict.monfd} computes the scaled version using
-  \code{with(object, beta[1] + beta[2]*eval.monfd(...))}.
+  \code{with(object, beta[1] + beta[2]*eval.monfd(...))} if Lfdobj = 0
+  or beta[2]*eval.monfd(...) if Lfdobj > 0.
 }
 \value{
   a matrix containing the monotone function values.  The first dimension

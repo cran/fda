@@ -1,0 +1,518 @@
+%
+%  this version the file slabbrev.tex is designed to work with
+%  the beamer package
+%
+
+\newcommand{\ns}{
+  \end{slide}
+  \begin{slide}
+  \sffamily
+}
+\newcommand{\bs}{
+  \begin{slide}
+  \sffamily
+}
+\newcommand{\es}{
+  \end{slide}
+}
+
+\newcommand{\bi}{
+  \begin{itemize}
+}
+
+\newcommand{\ei}{
+  \end{itemize}
+}
+
+%
+%  Inner product macro
+%
+\newcommand{\IP}[2]{ \langle #1 , #2 \rangle }
+%
+\newcommand{\twobytwo}[4]{\left ( \begin{array}{cc}#1&#2\\#3&#4 \end{array}
+\right ) }
+\newcommand{\twobyone}[2]{\left ( \begin{array}{c}#1 \\ #2 \end{array}
+\right ) }
+\newcommand{\twobytwob}[4]{\left [ \! \begin{array}{cc}#1&#2\\#3&#4 \end{array}
+\! \right ] }
+\newcommand{\twobyoneb}[2]{\left [\! \begin{array}{c}#1 \\ #2 \end{array}
+\! \right ] }
+\renewcommand{\ne}{\! \not \, = }
+\newcommand{\be}[1]{\begin{equation}\label{#1}}
+\newcommand{\ee}{\end{equation}}
+\newcommand{\cJ}{{\cal J}}
+\newcommand{\cK}{{\cal K}}
+\newcommand{\cM}{{\cal M}}
+\newcommand{\cS}{{\cal S}}
+\newcommand{\cT}{{\cal T}}
+\newcommand{\cV}{{\cal V}}
+\newcommand{\cZ}{{\cal Z}}
+\newcommand{\muh}{\hat{\mu}}
+\newcommand{\Gamh}{\hat{\Gamma}}
+\newcommand{\gamh}{\hat{\gamma}}
+\newcommand{\gamt}{\tilde{\gamma}}
+\newcommand{\xit}{\tilde{\xi}}
+\newcommand{\ut}{\tilde{u}}
+\newcommand{\vt}{\tilde{v}}
+\newcommand{\lamh}{\hat{\lambda}}
+\newcommand{\gamb}{\mbox{\boldmath$\gamma$}}
+\newcommand{\Gamb}{\mbox{\boldmath$\Gamma$}}
+\newcommand{\betb}{\mbox{\boldmath$\beta$}}
+\newcommand{\bX}{{\bf X}}
+\newcommand{\bg}{{\bf g}}
+
+\newcommand{\Ddo}   {\mbox{D}}
+\newcommand{\Ldo}   {\mbox{L}}
+
+\newcommand{\ROUPEN}   {\mbox{\tt ROUPEN}}
+\newcommand{\MINEIG}   {\mbox{\tt MINEIG}}
+\newcommand{\PEN}      {\mbox{\tt PEN}}
+\newcommand{\PENRSS}   {\mbox{\tt PENRSS}}
+\newcommand{\REGSSE}   {\mbox{\tt REGSSE}}
+\newcommand{\PCASSE}   {\mbox{\tt PCASSE}}
+\newcommand{\PCAPSV}   {\mbox{\tt PCAPSV}}
+\newcommand{\LMSSE}    {\mbox{\tt LMSSE}}
+\newcommand{\PENSSE}   {\mbox{\tt PENSSE}}
+\newcommand{\SMPENSSE} {\mbox{\tt SMPENSSE}}
+\newcommand{\RSQ}      {\mbox{\tt RSQ}}
+\newcommand{\FRATIO}   {\mbox{\tt FRATIO}}
+\newcommand{\SMSSE}    {\mbox{\tt SMSSE}}
+\newcommand{\LOCSSE}   {\mbox{\tt SMLOCSSE}}
+\newcommand{\Kern}     {\mbox{\tt Kern}}
+\newcommand{\Triang}   {\mbox{\tt Triang}}
+\newcommand{\cov}      {\mbox{\tt cov}}
+\newcommand{\corr}     {\mbox{\tt corr}}
+\newcommand{\var}      {\mbox{\tt var}}
+\newcommand{\GCV}      {\mbox{\tt GCV}}
+\newcommand{\CV}       {\mbox{\tt CV}}
+\newcommand{\DF}       {\mbox{\tt DF}}
+\newcommand{\GFR}      {{\tt GFR}}
+\newcommand{\GOP}      {{\tt GOP}}
+\newcommand{\KUC}      {{\tt KUC}}
+\newcommand{\LMISE}    {\mbox{\tt LMISE}}
+\newcommand{\sign}     {\mbox{\tt sign}}
+
+\newcommand{\Height}   {\mbox{\tt Height}}
+\newcommand{\Acceleration}   {\mbox{\tt Acceleration}}
+\newcommand{\Temp}     {\mbox{\tt Temp}}
+\newcommand{\Prec}     {\mbox{\tt Prec}}
+\newcommand{\PrecTot}  {\mbox{\tt PrecTot}}
+\newcommand{\LogPrec}  {\mbox{\tt LogPrec}}
+\newcommand{\Precmn}   {\mbox{\tt Precmn}}
+\newcommand{\Precstar} {\mbox{{\tt Prec}^{*}}}
+\newcommand{\LPrec}    {\mbox{\tt LPrec}}
+\newcommand{\TempRes}      {\mbox{\tt TempRes}}
+\newcommand{\Tempbold}     {\mbox{\tt \bf Temp}}
+
+\newcommand{\Hi}       {\mbox{\footnotesize \tt H}}
+\newcommand{\Kn}       {\mbox{\footnotesize \tt K}}
+\newcommand{\Hipsmall}  {\mbox{\footnotesize \tt Hip}}
+\newcommand{\Kneesmall} {\mbox{\footnotesize \tt Knee}}
+\newcommand{\Hip}      {\mbox{\tt Hip}}
+\newcommand{\Knee}     {\mbox{\tt Knee}}
+\newcommand{\Hipmn}    {\mbox{\tt Hipmn}}
+\newcommand{\Kneemn}   {\mbox{\tt Kneemn}}
+\newcommand{\Angles}   {\mbox{\tt Angles}}
+\newcommand{\ScriptX}  {\mbox{\tt ScriptX}}
+\newcommand{\ScriptY}  {\mbox{\tt ScriptY}}
+\newcommand{\GDP}      {\mbox{\tt GDP}}
+\newcommand{\Bias}     {\mbox{\tt Bias}}
+\newcommand{\IMSE}     {\mbox{\tt IMSE}}
+\newcommand{\RMSE}     {\mbox{\tt RMSE}}
+\newcommand{\Var}      {\mbox{\tt Var}}
+\newcommand{\Stt}      {\mbox{\tt S}}
+\newcommand{\Ctt}      {\mbox{\tt C}}
+\newcommand{\SSE}      {\mbox{\tt SSE}}
+\newcommand{\SSY}      {\mbox{\tt SSY}}
+\newcommand{\SAD}      {\mbox{\tt SAD}}
+\newcommand{\MSE}   {\mbox{\tt MSE}}
+\newcommand{\PSSE}  {\mbox{\tt PSSE}}
+\newcommand{\MSR}   {\mbox{\tt MSR}}
+\newcommand{\tPDA}  {\mbox{\tiny PDA}}
+\newcommand{\tPCA}  {\mbox{\tiny PCA}}
+\newcommand{\Force} {\mbox{\tt Force}}
+\newcommand{\ForceX}    {\mbox{\tt ForceX}}
+\newcommand{\ForceY}    {\mbox{\tt ForceY}}
+\newcommand{\Contrast}  {\mbox{\tt Contrast}}
+
+\newcommand{\Tray}     {\mbox{\tt Temp}}
+\newcommand{\Reflux}     {\mbox{\tt Prec}}
+
+\newcommand{\rhat}     {\hat{r}}
+\newcommand{\uhat}     {\hat{u}}
+\newcommand{\vhat}     {\hat{v}}
+\newcommand{\xhat}     {\hat{x}}
+\newcommand{\yhat}     {\hat{y}}
+\newcommand{\Fhat}     {\hat{F}}
+\newcommand{\Mhat}     {\hat{M}}
+\newcommand{\alphahat} {\hat{\alpha}}
+\newcommand{\betahat}  {\hat{\beta}}
+
+\newcommand{\xtilde}   {\tilde{x}}
+\newcommand{\etilde}   {\tilde{e}}
+\newcommand{\ktilde}   {\tilde{k}}
+
+\newcommand{\lcal}     {\ell}
+\newcommand{\Bcal}     {\mbox{$\cal B$}}
+\newcommand{\Fcal}     {\mbox{$\cal F$}}
+\newcommand{\Gcal}     {\mbox{$\cal G$}}
+\newcommand{\Hcal}     {\mbox{$\cal H$}}
+\newcommand{\Lcal}     {\mbox{$\cal L$}}
+\newcommand{\Pcal}     {\mbox{$\cal P$}}
+\newcommand{\Rcal}     {\mbox{$\cal R$}}
+\newcommand{\Tcal}     {\mbox{$\cal T$}}
+\newcommand{\Ucal}     {\mbox{$\cal U$}}
+\newcommand{\Ycal}     {\mbox{$\cal Y$}}
+
+\newcommand{\TcalX}     {{{\cal T}_{\!X}}}
+\newcommand{\TcalY}     {{{\cal T}_{\!Y}}}
+
+
+\newcommand{\spann}    {\mbox{span}}
+\newcommand{\diag}     {\mbox{diag}}
+\newcommand{\Exp}      {\mbox{E}}
+
+\newcommand{\abold}    {\mbox{\bf a}}
+\newcommand{\bbold}    {\mbox{\bf b}}
+\newcommand{\cbold}    {\mbox{\bf c}}
+\newcommand{\dbold}    {\mbox{\bf d}}
+\newcommand{\ebold}    {\mbox{\bf e}}
+\newcommand{\fbold}    {\mbox{\bf f}}
+\newcommand{\gbold}    {\mbox{\bf g}}
+\newcommand{\hbold}    {\mbox{\bf h}}
+\newcommand{\kbold}    {\mbox{\bf k}}
+\newcommand{\rbold}    {\mbox{\bf r}}
+\newcommand{\sbold}    {\mbox{\bf s}}
+\newcommand{\tbold}    {\mbox{\bf t}}
+\newcommand{\ubold}    {\mbox{\bf u}}
+\newcommand{\vbold}    {\mbox{\bf v}}
+\newcommand{\wbold}    {\mbox{\bf w}}
+\newcommand{\xbold}    {\mbox{\bf x}}
+\newcommand{\ybold}    {\mbox{\bf y}}
+\newcommand{\zbold}    {\mbox{\bf z}}
+\newcommand{\Abold}    {\mbox{\bf A}}
+\newcommand{\Bbold}    {\mbox{\bf B}}
+\newcommand{\Cbold}    {\mbox{\bf C}}
+\newcommand{\Dbold}    {\mbox{\bf D}}
+\newcommand{\Ebold}    {\mbox{\bf E}}
+\newcommand{\Fbold}    {\mbox{\bf F}}
+\newcommand{\Gbold}    {\mbox{\bf G}}
+\newcommand{\Hbold}    {\mbox{\bf H}}
+\newcommand{\Ibold}    {\mbox{\bf I}}
+\newcommand{\Jbold}    {\mbox{\bf J}}
+\newcommand{\Kbold}    {\mbox{\bf K}}
+\newcommand{\Lbold}    {\mbox{\bf L}}
+\newcommand{\Mbold}    {\mbox{\bf M}}
+\newcommand{\Nbold}    {\mbox{\bf N}}
+\newcommand{\Pbold}    {\mbox{\bf P}}
+\newcommand{\Qbold}    {\mbox{\bf Q}}
+\newcommand{\Rbold}    {\mbox{\bf R}}
+\newcommand{\Sbold}    {\mbox{\bf S}}
+\newcommand{\Tbold}    {\mbox{\bf T}}
+\newcommand{\Ubold}    {\mbox{\bf U}}
+\newcommand{\Vbold}    {\mbox{\bf V}}
+\newcommand{\Wbold}    {\mbox{\bf W}}
+\newcommand{\Xbold}    {\mbox{\bf X}}
+\newcommand{\Ybold}    {\mbox{\bf Y}}
+\newcommand{\Zbold}    {\mbox{\bf Z}}
+
+
+\newcommand{\onebold}   {\mbox{\bf 1}}
+\newcommand{\zerobold}  {\mbox{\bf 0}}
+
+\newcommand{\xhatbold} {\hat{\mbox{\bf x}}}
+\newcommand{\yhatbold} {\hat{\mbox{\bf y}}}
+\newcommand{\Ahatbold} {\hat{\mbox{\bf A}}}
+\newcommand{\Bhatbold} {\hat{\mbox{\bf B}}}
+\newcommand{\Qhatbold} {\hat{\mbox{\bf Q}}}
+\newcommand{\Rhatbold} {\hat{\mbox{\bf R}}}
+\newcommand{\Yhatbold} {\hat{\mbox{\bf Y}}}
+
+\newcommand{\cboldhat}    {\hat{\mbox{\bf c}}}
+
+\newcommand{\alphabold}   {\mbox{\boldmath${\alpha}$}}
+\newcommand{\betabold}    {\mbox{\boldmath${\beta}$}}
+\newcommand{\deltabold}   {\mbox{\boldmath${\delta}$}}
+\newcommand{\Deltabold}   {\mbox{\boldmath${\Delta}$}}
+\newcommand{\epsilonbold} {\mbox{\boldmath${\epsilon}$}}
+\newcommand{\gammabold}   {\mbox{\boldmath${\gamma}$}}
+\newcommand{\lambdabold}  {\mbox{\boldmath${\lambda}$}}
+\newcommand{\mubold}      {\mbox{\boldmath${\mu}$}}
+\newcommand{\thetabold}   {\mbox{\boldmath${\theta}$}}
+\newcommand{\Thetabold}   {\mbox{\boldmath${\Theta}$}}
+\newcommand{\phibold}     {\mbox{\boldmath${\phi}$}}
+\newcommand{\Phibold}     {\mbox{\boldmath${\Phi}$}}
+\newcommand{\psibold}     {\mbox{\boldmath${\psi}$}}
+\newcommand{\Psibold}     {\mbox{\boldmath${\Psi}$}}
+\newcommand{\Sigmabold}   {\mbox{\boldmath${\Sigma}$}}
+\newcommand{\xibold}      {\mbox{\boldmath${\xi}$}}
+
+\newcommand{\thetaboldhat} {\hat{\mbox{\boldmath${\theta}$}}}
+
+\newcommand{\xbar}     {\bar{x}}
+\newcommand{\ybar}     {\bar{y}}
+\newcommand{\Pbar}     {\bar{P}}
+
+\newcommand{\gtilde}       {\tilde{g}}
+\newcommand{\ntilde}       {\tilde{n}}
+\newcommand{\alphatilde}   {\tilde{\alpha}}
+\newcommand{\betatilde}    {\tilde{\beta}}
+
+\newcommand{\estar}    {e^{*}}
+\newcommand{\fstar}    {f^{*}}
+\newcommand{\ustar}    {u^{*}}
+\newcommand{\vstar}    {v^{*}}
+\newcommand{\xstar}    {x^{*}}
+\newcommand{\ystar}    {y^{*}}
+\newcommand{\Astar}    {A^{*}}
+\newcommand{\Bstar}    {B^{*}}
+\newcommand{\Estar}    {E^{*}}
+\newcommand{\Fstar}    {F^{*}}
+\newcommand{\Lstar}    {L^{*}}
+\newcommand{\Pstar}    {P^{*}}
+\newcommand{\Ustar}    {U^{*}}
+\newcommand{\Vstar}    {V^{*}}
+\newcommand{\Xstar}    {X^{*}}
+
+\newcommand{\eperp}     {e^{\bot}}
+\newcommand{\xboldstar}{ {\mbox{\bf x}}^{*}}
+\newcommand{\yboldstar}{ {\mbox{\bf y}}^{*}}
+\newcommand{\ystarhat}{ \hat{y}^{*}}
+\newcommand{\yboldstarhat}{ \hat{\mbox{\bf y}}^{*}}
+
+\newcommand{\betastar} {\beta^{*}}
+\newcommand{\etastar}  {\eta^{*}}
+
+\newcommand{\Pbarstar} {\bar{P}^{*}}
+
+\newcommand{\Aplus}    {A^{+}}
+
+\newcommand{\Amins}    {A^{-}}
+\newcommand{\Xmins}    {X^{-}}
+\newcommand{\Zmins}    {Z^{-}}
+
+\newcommand{\Zinv}     {Z^{-1}}
+\newcommand{\Zginv}    {Z^{-}}
+
+
+\newcommand{\Zboldinv} {\mbox{\bf Z}^{-1}}
+
+\newcommand{\Qboldginv}{\mbox{\bf Q}^{-}}
+\newcommand{\Rboldginv}{\mbox{\bf R}^{-}}
+\newcommand{\Zboldginv}{\mbox{\bf Z}^{-}}
+
+\newcommand{\rank}     {\mbox{rank}}
+\newcommand{\trace}    {\mbox{trace}}
+\newcommand{\veccom}   {\mbox{vec}}
+
+\newcommand{\smint}{\! \int \!}
+\newcommand{\Gambt}{\tilde{\mbox{\boldmath${\Gamma}$}}}
+
+\newcommand{\cvu}{a}
+\newcommand{\cvv}{b}
+\newcommand{\cfu}{\xi}
+\newcommand{\cfv}{\eta}
+\newcommand{\Vboldt}{\tilde{\Vbold}}
+\newcommand{\funcov}{v}
+\newcommand{\funcovh}{\hat{v}}
+\newcommand{\Funcov}{V}
+\newcommand{\Funcovh}{\hat{V}}
+\newcommand{\cancov}{{\mbox{\tt ccorsq}}^{pop}}
+\newcommand{\cancovh}{\mbox{\tt ccorsq}}
+
+\newcommand{\Splus}{S-PLUS}
+\newcommand{\df}{\mbox{\tt df}}
+\newcommand{\etal}{et al.\ }
+
+\setbeamercovered{dynamic}
+
+\newcommand{\Lang}[1]{\operatorname{\text{\textsc{#1}}}}
+
+\newcommand{\Class}[1]{\operatorname{\mathchoice
+  {\text{\sf \small #1}}
+  {\text{\sf \small #1}}
+  {\text{\sf #1}}
+  {\text{\sf #1}}}}
+
+\newcommand{\NumSAT}      {\text{\small\#SAT}}
+\newcommand{\NumA}        {\#_{\!A}}
+
+\newcommand{\barA}        {\,\bar{\!A}}
+
+\newcommand{\Nat}{\mathbb{N}}
+\newcommand{\Set}[1]{\{#1\}}
+
+\pgfdeclaremask{tu}{beamer-tu-logo-mask} \pgfdeclaremask{computer}{beamer-computer-mask}
+\pgfdeclareimage[interpolate=true,mask=computer,height=2cm]{computerimage}{beamer-computer}
+\pgfdeclareimage[interpolate=true,mask=computer,height=2cm]{computerworkingimage}{beamer-computerred}
+\pgfdeclareimage[mask=tu,height=.5cm]{logo}{beamer-tu-logo}
+
+%\logo{\pgfuseimage{logo}}
+
+\colorlet{redshaded}{red!25!bg} \colorlet{shaded}{black!25!bg} \colorlet{shadedshaded}{black!10!bg}
+\colorlet{blackshaded}{black!40!bg}
+
+\colorlet{darkred}{red!80!black} \colorlet{darkblue}{blue!80!black}
+\colorlet{darkgreen}{green!80!black}
+
+\def\radius{0.96cm}
+\def\innerradius{0.85cm}
+
+\def\softness{0.4}
+\definecolor{softred}{rgb}{1,\softness,\softness}
+\definecolor{softgreen}{rgb}{\softness,1,\softness}
+\definecolor{softblue}{rgb}{\softness,\softness,1}
+
+\definecolor{softrg}{rgb}{1,1,\softness}
+\definecolor{softrb}{rgb}{1,\softness,1}
+\definecolor{softgb}{rgb}{\softness,1,1}
+
+\newcommand{\Bandshaded}[2]{
+  \color{shadedshaded}
+  \pgfmoveto{\pgfxy(-0.5,0)}
+  \pgflineto{\pgfxy(-0.6,0.1)}
+  \pgflineto{\pgfxy(-0.4,0.2)}
+  \pgflineto{\pgfxy(-0.6,0.3)}
+  \pgflineto{\pgfxy(-0.4,0.4)}
+  \pgflineto{\pgfxy(-0.5,0.5)}
+  \pgflineto{\pgfxy(4,0.5)}
+  \pgflineto{\pgfxy(4.1,0.4)}
+  \pgflineto{\pgfxy(3.9,0.3)}
+  \pgflineto{\pgfxy(4.1,0.2)}
+  \pgflineto{\pgfxy(3.9,0.1)}
+  \pgflineto{\pgfxy(4,0)}
+  \pgfclosepath
+  \pgffill
+
+  \color{black}
+  \pgfputat{\pgfxy(0,0.7)}{\pgfbox[left,base]{#1}}
+  \pgfputat{\pgfxy(0,-0.1)}{\pgfbox[left,top]{#2}}
+}
+
+\newcommand{\Band}[2]{
+  \color{shaded}
+  \pgfmoveto{\pgfxy(-0.5,0)}
+  \pgflineto{\pgfxy(-0.6,0.1)}
+  \pgflineto{\pgfxy(-0.4,0.2)}
+  \pgflineto{\pgfxy(-0.6,0.3)}
+  \pgflineto{\pgfxy(-0.4,0.4)}
+  \pgflineto{\pgfxy(-0.5,0.5)}
+  \pgflineto{\pgfxy(4,0.5)}
+  \pgflineto{\pgfxy(4.1,0.4)}
+  \pgflineto{\pgfxy(3.9,0.3)}
+  \pgflineto{\pgfxy(4.1,0.2)}
+  \pgflineto{\pgfxy(3.9,0.1)}
+  \pgflineto{\pgfxy(4,0)}
+  \pgfclosepath
+  \pgffill
+
+  \color{black}
+  \pgfputat{\pgfxy(0,0.7)}{\pgfbox[left,base]{#1}}
+  \pgfputat{\pgfxy(0,-0.1)}{\pgfbox[left,top]{#2}}
+}
+
+\newcommand{\BaenderNormal}
+{%
+  \pgfsetlinewidth{0.4pt}
+  \color{black}
+  \pgfputat{\pgfxy(0,5)}{\Band{input tapes}{}}
+  \pgfputat{\pgfxy(0.35,4.6)}{\pgfbox[center,base]{$\vdots$}}
+  \pgfputat{\pgfxy(0,4)}{\Band{}{}}
+
+  \pgfxyline(0,5)(0,5.5)
+  \pgfxyline(1.2,5)(1.2,5.5)
+  \pgfputat{\pgfxy(0.25,5.25)}{\pgfbox[left,center]{$w_1$}}
+
+  \pgfxyline(0,4)(0,4.5)
+  \pgfxyline(1.8,4)(1.8,4.5)
+  \pgfputat{\pgfxy(0.25,4.25)}{\pgfbox[left,center]{$w_n$}}
+  \ignorespaces}
+
+\newcommand{\BaenderZweiNormal}
+{%
+  \pgfsetlinewidth{0.4pt}
+  \color{black}
+  \pgfputat{\pgfxy(0,5)}{\Band{Zwei Eingabebänder}{}}
+  \pgfputat{\pgfxy(0,4.25)}{\Band{}{}}
+
+  \pgfxyline(0,5)(0,5.5)
+  \pgfxyline(1.2,5)(1.2,5.5)
+  \pgfputat{\pgfxy(0.25,5.25)}{\pgfbox[left,center]{$u$}}
+
+  \pgfxyline(0,4.25)(0,4.75)
+  \pgfxyline(1.8,4.25)(1.8,4.75)
+  \pgfputat{\pgfxy(0.25,4.5)}{\pgfbox[left,center]{$v$}}
+  \ignorespaces}
+
+\newcommand{\BaenderHell}
+{%
+  \pgfsetlinewidth{0.4pt}
+  \color{black}
+  \pgfputat{\pgfxy(0,5)}{\Bandshaded{input tapes}{}}
+  \color{shaded}
+  \pgfputat{\pgfxy(0.35,4.6)}{\pgfbox[center,base]{$\vdots$}}
+  \pgfputat{\pgfxy(0,4)}{\Bandshaded{}{}}
+
+  \color{blackshaded}
+  \pgfxyline(0,5)(0,5.5)
+  \pgfxyline(1.2,5)(1.2,5.5)
+  \pgfputat{\pgfxy(0.25,5.25)}{\pgfbox[left,center]{$w_1$}}
+
+  \pgfxyline(0,4)(0,4.5)
+  \pgfxyline(1.8,4)(1.8,4.5)
+  \pgfputat{\pgfxy(0.25,4.25)}{\pgfbox[left,center]{$w_n$}}
+  \ignorespaces}
+
+\newcommand{\BaenderZweiHell}
+{%
+  \pgfsetlinewidth{0.4pt}
+  \color{black}
+  \pgfputat{\pgfxy(0,5)}{\Bandshaded{Zwei Eingabebänder}{}}%
+  \color{blackshaded}
+  \pgfputat{\pgfxy(0,4.25)}{\Bandshaded{}{}}
+  \pgfputat{\pgfxy(0.25,4.5)}{\pgfbox[left,center]{$v$}}
+  \pgfputat{\pgfxy(0.25,5.25)}{\pgfbox[left,center]{$u$}}%
+
+  \pgfxyline(0,5)(0,5.5)
+  \pgfxyline(1.2,5)(1.2,5.5)
+
+  \pgfxyline(0,4.25)(0,4.75)
+  \pgfxyline(1.8,4.25)(1.8,4.75)
+  \ignorespaces}
+
+\newcommand{\Slot}[1]{%
+  \begin{pgftranslate}{\pgfpoint{#1}{0pt}}%
+    \pgfsetlinewidth{0.6pt}%
+    \color{structure}%
+    \pgfmoveto{\pgfxy(-0.1,5.5)}%
+    \pgfbezier{\pgfxy(-0.1,5.55)}{\pgfxy(-0.05,5.6)}{\pgfxy(0,5.6)}%
+    \pgfbezier{\pgfxy(0.05,5.6)}{\pgfxy(0.1,5.55)}{\pgfxy(0.1,5.5)}%
+    \pgflineto{\pgfxy(0.1,4.0)}%
+    \pgfbezier{\pgfxy(0.1,3.95)}{\pgfxy(0.05,3.9)}{\pgfxy(0,3.9)}%
+    \pgfbezier{\pgfxy(-0.05,3.9)}{\pgfxy(-0.1,3.95)}{\pgfxy(-0.1,4.0)}%
+    \pgfclosepath%
+    \pgfstroke%
+  \end{pgftranslate}\ignorespaces}
+
+\newcommand{\SlotZwei}[1]{%
+  \begin{pgftranslate}{\pgfpoint{#1}{0pt}}%
+    \pgfsetlinewidth{0.6pt}%
+    \color{structure}%
+    \pgfmoveto{\pgfxy(-0.1,5.5)}%
+    \pgfbezier{\pgfxy(-0.1,5.55)}{\pgfxy(-0.05,5.6)}{\pgfxy(0,5.6)}%
+    \pgfbezier{\pgfxy(0.05,5.6)}{\pgfxy(0.1,5.55)}{\pgfxy(0.1,5.5)}%
+    \pgflineto{\pgfxy(0.1,4.25)}%
+    \pgfbezier{\pgfxy(0.1,4.25)}{\pgfxy(0.05,4.15)}{\pgfxy(0,4.15)}%
+    \pgfbezier{\pgfxy(-0.05,4.15)}{\pgfxy(-0.1,4.2)}{\pgfxy(-0.1,4.25)}%
+    \pgfclosepath%
+    \pgfstroke%
+  \end{pgftranslate}\ignorespaces}
+
+\newcommand{\ClipSlot}[1]{%
+  \pgfrect[clip]{\pgfrelative{\pgfxy(-0.1,0)}{\pgfpoint{#1}{4cm}}}{\pgfxy(0.2,1.5)}\ignorespaces}
+
+\newcommand{\ClipSlotZwei}[1]{%
+  \pgfrect[clip]{\pgfrelative{\pgfxy(-0.1,0)}{\pgfpoint{#1}{4.25cm}}}{\pgfxy(0.2,1.25)}\ignorespaces}
+
+
+\AtBeginSection[]{\frame{\frametitle{Outline}\tableofcontents[current]}}

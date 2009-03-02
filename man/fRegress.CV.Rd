@@ -69,8 +69,8 @@ fRegress.CV(y, xfdlist, betalist, CVobs=NULL, ...)
 
 #### A scalar response example.
 
-annualprec <- log10(apply(CanadianWeather$dailyAv[,,"Precipitation.mm"],
-                          2,sum))
+annualprec <- log10(apply(CanadianWeather$dailyAv[,,
+                              "Precipitation.mm"], 2,sum))
 # The simplest 'fRegress' call is singular with more bases
 # than observations, so we use a small basis for this example
 smallbasis  <- create.fourier.basis(c(0, 365), 25)
@@ -83,8 +83,8 @@ tempfd <- smooth.basis(day.5,
 
 xfdlist <- list(const=rep(1, 35), tempfd=tempfd)
 
-# And some functional parameter objects to define the coefficient functions.
-# The intercept must be constant for a scalar response
+# And some functional parameter objects to define the coefficient
+# functions.  The intercept must be constant for a scalar response
 betabasis1 <- create.constant.basis(c(0, 365))
 betafd1    <- fd(0, betabasis1)
 betafdPar1 <- fdPar(betafd1)
@@ -102,14 +102,15 @@ precip.Temp <- fRegress(annualprec, xfdlist, betalist)
 precip.cv = fRegress.CV(annualprec,xfdlist,betalist)
 
 
-## Are the temperature profiles different accross regions, a functional response
-# model
+# Are the temperature profiles different accross regions,
+# a functional response model
 
 region.contrasts <- model.matrix(~factor(CanadianWeather$region))
 rgnContr3 <- region.contrasts
 dim(rgnContr3) <- c(1, 35, 4)
-dimnames(rgnContr3) <- list('', CanadianWeather$place, c('const',
-   paste('region', c('Atlantic', 'Continental', 'Pacific'), sep='.')) )
+rgns <- paste('region', c('Atlantic', 'Continental', 'Pacific'),
+              sep='.')
+dimnames(rgnContr3) <- list('', CanadianWeather$place, c('const', rgns))
 
 const365 <- create.constant.basis(c(0, 365))
 region.fd.Atlantic <- fd(matrix(rgnContr3[,,2], 1), const365)

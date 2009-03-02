@@ -2,7 +2,7 @@ function centerfd = center(fd)
 %  CENTER Center functional observations by subtracting mean function
 %  Returns CENTERFD, the centered functional data object
 
-%  Last modified 25 July 2006
+%  Last modified 2 March 2009
 
 if ~isa_fd(fd)
     error ('Argument is not a functional data object.');
@@ -25,7 +25,11 @@ else
     end
 end
 fdnames = getnames(fd);
-fdnames{3} = ['Centered ', fdnames{3}];
+if iscell(fdnames{3})
+    fdnames{3}{1} = ['Centered ', fdnames{3}{1}];
+else
+    fdnames{3} = ['Centered ', fdnames{3}];
+end
 
 centerfd.coef     = coef;
 centerfd.basisobj = basisobj;

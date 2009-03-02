@@ -117,7 +117,6 @@ daily
 
   Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
     Functional Data Analysis}, Springer, New York
-
 }
 \seealso{
   \code{\link{monthAccessories}}

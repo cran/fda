@@ -1,4 +1,4 @@
-inprod <- function(fdobj1, fdobj2, Lfdobj1=int2Lfd(0), Lfdobj2=int2Lfd(0),
+inprod <- function(fdobj1, fdobj2=NULL, Lfdobj1=int2Lfd(0), Lfdobj2=int2Lfd(0),
                    rng = range1, wtfd = 0)
 {
 
@@ -6,13 +6,17 @@ inprod <- function(fdobj1, fdobj2, Lfdobj1=int2Lfd(0), Lfdobj2=int2Lfd(0),
 #    integration using Romberg integration
 
 #  Arguments:
-#  FDOBJ1 and FDOBJ2    these may be either functional data or basis
+#  FDOBJ1 and FDOBJ2    These may be either functional data or basis
 #               function objects.  In the latter case, a functional
 #               data object is created from a basis function object
 #               by using the identity matrix as the coefficient matrix.
 #               Both functional data objects must be univariate.
 #               If inner products for multivariate objects are needed,
 #               use a loop and call inprod(FDOBJ1[i],FDOBJ2[i]).
+#     If FDOBJ2 is not provided or is NULL, it defaults to a function
+#     having a constant basis and coefficient 1 for all replications. 
+#     This permits the evaluation of simple integrals of functional data
+#     objects.
 #  LFDOBJ1 and LFDOBJ2  order of derivatives for inner product for
 #               FDOBJ1 and FDOBJ2, respectively, or functional data
 #               objects defining linear differential operators
@@ -25,7 +29,7 @@ inprod <- function(fdobj1, fdobj2, Lfdobj1=int2Lfd(0), Lfdobj2=int2Lfd(0),
 #  A matrix of NREP1 by NREP2 of inner products for each possible pair
 #  of functions.
 
-#  Last modified 25 May 2007
+#  Last modified 5 May 2009
 
 #  Check FDOBJ1 and get no. replications and basis object
 
@@ -36,6 +40,23 @@ coef1     <- fdobj1$coefs
 basisobj1 <- fdobj1$basis
 type1     <- basisobj1$type
 range1    <- basisobj1$rangeval
+
+#  Default FDOBJ2 to a constant function, using a basis that matches 
+#  that of FDOBJ1 if possible.
+
+if (is.null(fdobj2)) {
+    tempfd    <- fdobj1
+    tempbasis <- tempfd$basis
+    temptype  <- tempbasis$type
+    temprng   <- tempbasis$rangeval
+    if (temptype == "bspline") {
+        basis2 <- create.bspline.basis(temprng, 1, 1)
+    } else {
+        if (temptype == "fourier") basis2 <- create.fourier.basis(temprng, 1)
+        else                       basis2 <- create.constant.basis(temprng)
+    }
+    fdobj2 <- fd(1,basis2)
+}
 
 #  Check FDOBJ2 and get no. replications and basis object
 
@@ -70,6 +91,11 @@ if (inherits(fdobj1,"fd")       && inherits(fdobj2,"fd")   &&
                      Lfdobj1$nderiv, Lfdobj2$nderiv)
     return(inprodmat)
 }
+
+#  check LFDOBJ1 and LFDOBJ2
+
+Lfdobj1 <- int2Lfd(Lfdobj1)
+Lfdobj2 <- int2Lfd(Lfdobj2)
 
 #  Else proceed with the use of the Romberg integration.
 

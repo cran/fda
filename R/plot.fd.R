@@ -7,6 +7,14 @@ plot.fdSmooth <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
        ylab=ylab, ask=ask, nx=nx, axes=axes, ...)
 }
 
+plot.fdPar <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
+                    xlim=NULL, ylim=NULL, xlab=NULL,
+                    ylab=NULL, ask=FALSE, nx=NULL, axes=NULL, ...){
+  plot(x$fd, y, Lfdobj=Lfdobj, href=href, titles=titles,
+       xlim=xlim, ylim=ylim, xlab=xlab,
+       ylab=ylab, ask=ask, nx=nx, axes=axes, ...)
+}
+
 plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
                     xlim=NULL, ylim=NULL, xlab=NULL,
                     ylab=NULL, ask=FALSE, nx=NULL, axes=NULL, ...)

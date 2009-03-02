@@ -32,7 +32,6 @@
 \alias{loglfnpos}
 \alias{loglhesspos}
 \alias{m2ij}
-\alias{monfn}
 \alias{mongrad}
 \alias{monhess}
 \alias{normalize.phi}
@@ -67,6 +66,7 @@
 \alias{PENSSEhess}
 \alias{argcheck}
 \alias{fdParcheck}
+\alias{trapz}
 \alias{ycheck}
 
 % docclass is function

@@ -1,13 +1,19 @@
 Software and datasets to support three books:
 
-James O. Ramsay and Bernard W. Silverman (2006),
+James O. Ramsay, Giles Hooker, and Spencer Graves
+      (2009) Functional DAta Analysis with R and Matlab
+      (Springer)
+James O. Ramsay and Bernard W. Silverman (2005),
       'Functional Data Analysis', 2nd ed. (Springer)
 _______ (2002) 'Applied Functional Data Analysis' (Springer)
 James O. Ramsay, Giles Hooker, and Spencer Graves (2009)
       'Functional Data Analysis with R and Matlab' (Springer)
 
+Release 2.1.2 fixed problems with linmod among others and
+completed script files for Ramsay, Hooker and Graves.
+
 Release 2.1.1 added partial script files for
-      Ramsay, Hooker and Graves, and fixed some bugs.
+Ramsay, Hooker and Graves, and fixed some bugs.
 
 Release 2.1.0 made 'fRegress' much easier to use by adding
 a formula interface to handle the laborious setup.  To do

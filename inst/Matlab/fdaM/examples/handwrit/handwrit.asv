@@ -807,3 +807,21 @@ axis([0, 2300, 0, 6e-3])
 %  This may be due to poor registration at this point, or to the fact
 %  that this cusp has a lot of variation from one replication to another.
 
+% Combined analysis; time-varying second order equation
+
+bfd     = fd(zeros(nwbasis,1), wbasis);
+bfdPar  = fdPar(bfd, 1, 0);
+bwtcell = cell(2,2,2);
+bwtcell(:) = {bfdPar};
+
+yfdcell = cell(2,1);
+yfdcell{1} = fdafd(:,1);
+yfdcell{2} = fdafd(:,2);
+
+%  carry out principal differential analysis
+
+[bestwtcell, aestwtcell, resfdcell] = ...
+    pda_fd(yfdcell, bwtcell, [], [], 2,501);
+
+
+

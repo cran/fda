@@ -1,13 +1,52 @@
-  #  Last modified 2008.11.22 by Spencer Graves
-  #  Previously modified 26 September 2008 (by Jim Ramsay?)
+#  Last modified 2009.03.14 by Spencer Graves
+#  previously  modified 2008.11.22 by Spencer Graves
+
 predict.monfd <- function(object, newdata=NULL, Lfdobj=0, ...){
   if(is.null(newdata))newdata <- object$argvals
+##
+## 1.  eval.monfd
+##
   evalMon <- eval.monfd(newdata, object$Wfdobj, Lfdobj)
-#
-  if(Lfdobj>0)
-    return(object$beta[2]*evalMon)
-#
-  with(object, beta[1]+beta[2]*evalMon)
+##
+## 2.  beta
+##
+  beta <- object$beta
+  {
+    if(length(dim(beta))<2){
+      if(length(dim(evalMon))<2){
+        be <- beta[2]*evalMon
+        if(Lfdobj<1)
+          be <- beta[1]+be
+        return(be)
+      }
+      else
+        stop('beta does not match eval.monfd(...)')
+    }
+    else {
+      nem <- dim(evalMon)
+      if(length(dim(beta)<3)) {
+        if(length(nem)==2){
+          be <- (evalMon*rep(beta[2,], each=nem[1]))
+          if(Lfdobj<1)
+            be <- (be+rep(beta[1,], each=nem[1]))
+          return(be)
+        }
+        else
+          stop('beta does not match eval.monfd(...)')
+      }
+      else {
+        if(length(nem)==3){
+          be <- (evalMon*rep(beta[2,,], each=nem[1]))
+          if(Lfdobj<1)
+            be <- (be+rep(beta[1,,], each=nem[1]))
+          return(be)
+        }
+        else
+          stop('beta does not match eval.monfd(...)')
+      }
+    }
+  }
+
 }
 
 fitted.monfd <- function(object, ...){

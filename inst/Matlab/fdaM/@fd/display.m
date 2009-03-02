@@ -7,8 +7,16 @@ if strcmp(class(fd), 'fd')
     fprintf('Dimensions of data:\n');
     fdnames = getnames(fd);
     fprintf(['   ',fdnames{1},'\n']);
-    fprintf(['   ',fdnames{2},'\n']);
-    fprintf(['   ',fdnames{3},'\n']);
+    if iscell(fdnames{2})
+        fprintf(['   ',fdnames{2}{1},'\n']);
+    else
+        fprintf(['   ',fdnames{2},'\n']);
+    end
+    if iscell(fdnames{3})
+        fprintf(['   ',fdnames{3}{1},'\n']);
+    else
+        fprintf(['   ',fdnames{3},'\n']);
+    end
 else
     error('Argument not a functional data object');
 end

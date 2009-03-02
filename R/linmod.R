@@ -1,146 +1,242 @@
-linmod <- function(xfdobj, yfdobj, wtvec=rep(1,nrep),
-                   xLfdobj=int2Lfd(2), yLfdobj=int2Lfd(2),
-                   xlambda=0, ylambda=0)
-{
+linmod = function(xfdobj, yfdobj, betaList, wtvec=NULL)  {
+#  LINMOD  Fits an unrestricted or full functional linear model of the form
+#       y(t) = \alpha(t) + \int x(s) \beta(s,t) ds + \epsilon(t),
+#  where
+#       \beta(s,t) = \phi'(s) B \psi(t)
+#  
+#  Arguments:
+#  XFD       a functional data object for the independent variable 
+#  YFD       a functional data object for the   dependent variable 
+#  BETACELL  a List array of length 3 containing functional
+#               parameter objects for \alpha and for 
+#               \beta as a function of s and t, respectively.
+#  WTVEC    a vector of weights
+#  Returns:  a list object linmodList with fields
+#  BETA0ESTFD    a functional parameter object for \alpha
+#  BETA1ESTBIFD  a bivariate functional parameter object for \beta
+#  YHATFDOBJ     a functional data object for the approximation to y
 
-  #  This function fits an unrestricted functional linear model for a 
-  #  a functional dependent variable and a single function covariate.
-  #  Smoothing is controlled by two parameters XLAMBDA and YLAMBDA,
-  #  corresponding to the independent and dependent functional
-  #  variables, respectively.
+#  Last modified 5 May 2009
 
-  #  Argument:
-  #  XFDOBJ  ... If the independent variable is multivariate, a design matrix.
-  #              If the independent variable is functional, a "fd" object.
-  #  YFDOBJ  ... If the dependent variable is multivariate, a design matrix.
-  #              If the dependent variable is functional, a "fd" object.
-  #  WTVEC   ... a vector of weights
-  #  XLFDOBJ ... A linear differential operator object for the independent
-  #              variable.
-  #  YLFDOBJ ... A linear differential operator object for the dependent
-  #              variable.
-  #  XLAMBDA ... a smoothing parameter for the independent variable
-  #  YLAMBDA ... a smoothing parameter for the   dependent variable
-  #  ZMATRNK ... actual rank of independent variable matrix for the
-  #              functional DV/multivariate IV case
+#  check xfdobj and yfdobj
 
-  #  Returns:  a list containing
-  #  ALPHA  ... a vector of intercept values
-  #  REGFD  ... a functional data object for the regression function
+if (!is.fd(xfdobj)) {
+    stop("XFD is not a functional data object.")
+}
 
-  #  Last modified 2007.11.28 by Spencer Graves
-  #  Previously modified:   4 December 2005
+if (!is.fd(yfdobj)) {
+    stop("YFD is not a functional data object.")
+}
 
-  #  check XLfdobj and YLfdobj
+ybasis  = yfdobj$basis
+ynbasis = ybasis$nbasis
+ranget  = ybasis$rangeval
 
-  xLfdobj <- int2Lfd(xLfdobj)
-  yLfdobj <- int2Lfd(yLfdobj)
+xbasis  = xfdobj$basis
+ranges  = xbasis$rangeval
 
-  #  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  #              The multivariate IV and functional DV case
-  #  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+nfine = max(c(201,10*ynbasis+1))
+tfine = seq(ranget[1],ranget[2],len=nfine)
 
-  if (inherits(yfdobj, "fd") && !inherits(xfdobj, "fd"))  {
-      stop ("Use function fRegress for this model.")
-    }
+#  get dimensions of data
 
+coefy   = yfdobj$coef
+coefx   = xfdobj$coef
+coefdx  = dim(coefx)
+coefdy  = dim(coefy)
+ncurves = coefdx[2]
+if (coefdy[2] != ncurves) {
+    stop ("Numbers of observations in first two arguments do not match.")
+}
 
-  #  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  #             The functional IV and multivariate DV case
-  #  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#  set up or check weight vector
 
-  if (inherits(xfdobj, "fd") && !(inherits(yfdobj, "fd"))) {
+if (!is.null(wtvec)) wtvec = wtcheck(ncurves, wtvec)
 
-      stop ("Use function fRegress for this model.")
-    }
+#  get basis parameter objects
 
+if (!inherits(betaList, "list")) stop("betaList is not a list object.")
 
-  #  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  #             The functional IV and functional DV case
-  #  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+if (length(betaList) != 3) stop("betaList not of length 3.")
 
-   if (inherits(xfdobj, "fd") && inherits(yfdobj, "fd")) {
+alphafdPar = betaList[[1]]
+betasfdPar = betaList[[2]]
+betatfdPar = betaList[[3]]
 
-    coefx   <- xfdobj$coefs
-    coefy   <- yfdobj$coefs
-    coefdx  <- dim(coefx)
-    coefdy  <- dim(coefy)
-    ndimx   <- length(coefdx)
-    ndimy   <- length(coefdy)
-    if (ndimx < 2) stop(
-             "Linear modeling impossible with 1 replication")
-    if (ndimx == 3) stop(
-             "This version cannot accommodate multiple functional IVs")
-    nrep <- coefdx[2]
-    if (coefdy[2] != nrep) stop (
-      "Numbers of observations in the first two arguments do not match.")
+if (!inherits(alphafdPar, "fdPar")) {
+    stop("BETACELL[[1]] is not a fdPar object.")
+}
+if (!inherits(betasfdPar, "fdPar")) {
+    stop("BETACELL[[2]] is not a fdPar object.")
+}
+if (!inherits(betatfdPar, "fdPar")) {
+    stop("BETACELL[[3]] is not a fdPar object.")
+}
 
-    rangewt <- range(wtvec)
-    if (rangewt[1] < 0) stop("WTVEC must not contain negative values.")
-    if (rangewt[1] == rangewt[2]) wtvar <- FALSE else wtvar <- TRUE
+alphafd = alphafdPar$fd
+betasfd = betasfdPar$fd
+betatfd = betatfdPar$fd
 
-    xbasisobj <- xfdobj$basis
-    nbasisx   <- xbasisobj$nbasis
-    typex     <- xbasisobj$type
-    rangevx   <- xbasisobj$rangeval
+#  get Lfd objects
 
-    ybasisobj <- yfdobj$basis
-    nbasisy   <- ybasisobj$nbasis
-    typey     <- ybasisobj$type
-    rangevy   <- ybasisobj$rangeval
+alphaLfd = alphafdPar$Lfd
+betasLfd = betasfdPar$Lfd
+betatLfd = betatfdPar$Lfd
 
-    if (length(wtvec) != nrep) stop("WTVEC of wrong length")
-    if (min(wtvec) <= 0)    stop("All values of WTVEC must be positive.")
-    if (xlambda < 0) warning (
-              "Value of LAMBDA was negative, and 0 used instead.")
+#  get smoothing parameters
 
-    jmatx   <- inprod(xbasisobj, xbasisobj)
-    penmatx <- inprod(xbasisobj, xbasisobj, xLfdobj, xLfdobj)
-    if (ndimx == 2) {
-      zmatx   <- t(rbind(matrix(1,1,nrep),jmatx %*% coefx))
-    } else {
-      zmatx   <- t(rbind(matrix(1,1,nrep),jmatx %*% coefx[,,1]))
-    }
+alphalambda = alphafdPar$lambda
+betaslambda = betasfdPar$lambda
+betatlambda = betatfdPar$lambda
 
-    jmaty   <- inprod(ybasisobj, ybasisobj)
-    penmaty <- inprod(ybasisobj, ybasisobj, yLfdobj, yLfdobj)
+#  get basis objects
 
-    alpha  <- rep(0,nbasisy)
-    index  <- 2:(nbasisx+1)
-    kmatx <- matrix(0,nbasisx+1,nbasisx+1)
-    kmatx[index,index] <- penmatx
-    if (wtvar) {
-#      zmatw <- sweep(zmatx,2,wtmat,"*")
-      zmatw <- sweep(zmatx,2,wtvec,"*")
-      tempx <- solve(crossprod(zmatw,zmatx) + xlambda*kmatx)
-      tempy <- solve(jmaty + ylambda*penmaty)
-      gmat  <- tempx %*% crossprod(zmatw,t(coefy[,,1])) %*% jmaty %*% tempy
-    } else {
-      tempx <- solve(crossprod(zmatx) + xlambda*kmatx)
-      tempy <- solve(jmaty + ylambda*penmaty)
-      if (ndimy == 2) {
-        gmat  <- tempx %*% crossprod(zmatx,t(coefy)) %*% jmaty %*% tempy
-      } else {
-        gmat  <- tempx %*% crossprod(zmatx,t(coefy[,,1])) %*% jmaty %*% tempy
-      }
-    }
-    yhatcoef <- t(zmatx %*% gmat)
-#    bcoef <- matrix(0,nbasisx,nbasisy)
-    bcoef <- gmat[index,]
-    alpha <- as.matrix(gmat[1,])
+alphabasis = alphafd$basis
+alpharange = alphabasis$rangeval
+if (alpharange[1] != ranget[1] || alpharange[2] != ranget[2]) {
+    stop("Range of ALPHAFD coefficient and YFD not compatible.")
+}
 
-    fdnames <- yfdobj$fdnames
+betasbasis = betasfd$basis
+betasrange = betasbasis$rangeval
+if (betasrange[1] != ranges[1] || betasrange[2] != ranges[2]) {
+    stop("Range of BETASFD coefficient and XFD not compatible.")
+}
 
-    alphafdnames      <- fdnames
-    alphafdnames[[2]] <- "Intercept"
-    alphafd <- fd(alpha, ybasisobj, alphafdnames)
+betatbasis = betatfd$basis
+betatrange = betatbasis$rangeval
+if (betatrange[1] != ranget[1] || betatrange[2] != ranget[2]) {
+    stop("Range of BETATFD coefficient and YFD not compatible.")
+}
 
-    regfd   <- bifd(bcoef, xbasisobj, ybasisobj)
-    yhatfd  <- fd(yhatcoef,ybasisobj, fdnames)
+#  get numbers of basis functions
 
-    linmodlist <- list(alphafd=alphafd, regfd=regfd, yhatfd=yhatfd)
+alphanbasis = alphabasis$nbasis
+betasnbasis = betasbasis$nbasis
+betatnbasis = betatbasis$nbasis
 
-    return( linmodlist )
-  }
+#  get inner products of basis functions and data functions
+
+Finprod = inprod(ybasis, alphabasis)
+Ginprod = inprod(ybasis, betatbasis)
+Hinprod = inprod(xbasis, betasbasis)
+
+ycoef = yfdobj$coef
+xcoef = xfdobj$coef
+Fmat = t(ycoef) %*% Finprod
+Gmat = t(ycoef) %*% Ginprod
+Hmat = t(xcoef) %*% Hinprod
+
+if (is.null(wtvec)) {
+    HHCP = t(Hmat) %*% Hmat
+    HGCP = t(Hmat) %*% Gmat
+    H1CP = as.matrix(apply(Hmat,2,sum))
+    F1CP = as.matrix(apply(Fmat,2,sum))
+} else {
+    HHCP = t(Hmat) %*% (outer(wtvec,rep(betasnbasis))*Hmat)
+    HGCP = t(Hmat) %*% (outer(wtvec,rep(betatnbasis))*Gmat)
+    H1CP = t(Hmat) %*% wtvec
+    F1CP = t(Fmat) %*% wtvec
+}
+
+#  get inner products of basis functions
+
+alphattmat = inprod(alphabasis, alphabasis)
+betalttmat = inprod(betatbasis, alphabasis)
+betassmat  = inprod(betasbasis, betasbasis)
+betattmat  = inprod(betatbasis, betatbasis)
+
+#  get penalty matrices
+
+if (alphalambda > 0) {
+    alphapenmat = eval.penalty(alphabasis, alphaLfd)
+} else {
+    alphapenmat = NULL
+}
+if (betaslambda > 0) {
+    betaspenmat = eval.penalty(betasbasis, betasLfd)
+} else {
+    betaspenmat = NULL
+}
+if (betatlambda > 0) {
+    betatpenmat = eval.penalty(betatbasis, betatLfd)
+} else {
+    betatpenmat = NULL
+}
+
+#  set up coefficient matrix and right side for stationary equations
+
+betan = betasnbasis*betatnbasis
+ncoef = alphanbasis + betan
+Cmat  = matrix(0,ncoef,ncoef)
+Dmat  = matrix(0,ncoef,1)
+
+#  rows for alpha
+
+ind1 = 1:alphanbasis
+ind2 = ind1
+Cmat[ind1,ind2] = ncurves*alphattmat
+if (alphalambda > 0) {
+    Cmat[ind1,ind2] = Cmat[ind1,ind2] + alphalambda*alphapenmat
+}
+ind2 = alphanbasis + (1:betan)
+Cmat[ind1,ind2] = t(kronecker(H1CP,betalttmat))
+
+Dmat[ind1] = F1CP
+
+#  rows for beta
+
+ind1 = alphanbasis + (1:betan)
+ind2 = 1:alphanbasis
+Cmat[ind1,ind2] = t(Cmat[ind2,ind1])
+ind2 = ind1
+Cmat[ind1,ind2] = kronecker(HHCP,betattmat)
+if (betaslambda > 0) {
+    Cmat[ind1,ind2] = Cmat[ind1,ind2] + 
+                      betaslambda*kronecker(betaspenmat,betattmat)
+}
+if (betatlambda > 0) {
+    Cmat[ind1,ind2] = Cmat[ind1,ind2] + 
+                      betatlambda*kronecker(betassmat,betatpenmat)
+}
+
+Dmat[ind1] = matrix(t(HGCP),betan,1)
+
+#  solve the equations
+
+coefvec = symsolve(Cmat, Dmat)
+
+#  set up the coefficient function estimates
+
+#  functional structure for the alpha function
+
+ind1 = 1:alphanbasis
+alphacoef = coefvec[ind1]
+
+alphafdnames = yfdobj$fdnames
+alphafdnames[[3]] = "Intercept"
+alphafd = fd(alphacoef, alphabasis, alphafdnames)
+
+#  bi-functional structure for the beta function
+
+ind1 = alphanbasis + (1:betan)
+betacoef    = matrix(coefvec[ind1],betatnbasis,betasnbasis)
+betafdnames = xfdobj$fdnames
+betafdnames[[3]] = "Reg. Coefficient"
+betafd = bifd(t(betacoef), betasbasis, betatbasis, betafdnames)
+
+#  functional data structure for the yhat functions
+
+xbetacoef = betacoef %*% t(Hmat)
+xbetafd   = fd(xbetacoef, betatbasis)
+yhatmat   = eval.fd(tfine, alphafd) %*% matrix(1,1,ncurves) + 
+            eval.fd(tfine, xbetafd)
+yhatfd    = smooth.basis(tfine, yhatmat, ybasis)$fd 
+
+linmodList = list(beta0estfd=alphafd, beta1estbifd=betafd, yhatfdobj=yhatfd)
+
+return(linmodList)
 
 }
+
+

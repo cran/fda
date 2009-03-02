@@ -78,6 +78,11 @@ cca.fd <- function(fdobj1, fdobj2=fdobj1, ncan = 2,
 
   #  add roughness penalty
 
+  if (inherits(ccafdParobj1, "fd") || inherits(ccafdParobj1, "basisfd"))
+      ccafdParobj1 <- fdPar(ccafdParobj1)
+  if (inherits(ccafdParobj2, "fd") || inherits(ccafdParobj2, "basisfd"))
+      ccafdParobj2 <- fdPar(ccafdParobj2)
+
   if (!inherits(ccafdParobj1, "fdPar")) stop(
 		"ccafdParobj1 is not a fdPar object.")
   if (!inherits(ccafdParobj2, "fdPar")) stop(
@@ -139,8 +144,8 @@ cca.fd <- function(fdobj1, fdobj2=fdobj1, ncan = 2,
 
   ccafd        <- list(canwtfd1, canwtfd2, corrs,
                        canvarvalues1, canvarvalues2)
-  names(ccafd) <- c("ccwtfd1", "ccwtfd2", "ccacorr",
-                    "ccavar1", "ccavar2")
+  names(ccafd) <- c("ccawtfd1", "ccawtfd2", "ccacorr",
+                    "ccavar1",  "ccavar2")
 
 #  setOldClass("cca.fd")
 #  oldClass(ccafd) <- "cca.fd"

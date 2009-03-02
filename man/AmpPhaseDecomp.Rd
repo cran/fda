@@ -12,7 +12,7 @@
   variation in the unregistered functions is due to  phase.
 }
 \usage{
-AmpPhaseDecomp(xfd, yfd, wfd)
+AmpPhaseDecomp(xfd, yfd, hfd, rng=xrng)
 }
 \arguments{
   \item{xfd}{
@@ -21,12 +21,24 @@ AmpPhaseDecomp(xfd, yfd, wfd)
   \item{yfd}{
     a functional data object containing the registered curves.
   }
-  \item{wfd}{
-    a functional data object defining the functions $w(t)$ that define
-    the strictly monotone warping functions $h(t)$.  This is typically
-    returned by the functions \code{landmarkreg} and
-    \code{register.fd}.
+  \item{hfd}{
+    a functional data object containing the strictly monotone warping
+    functions $h(t)$.  This is typically returned by the functions
+    \code{landmarkreg} and \code{register.fd}.
   }
+  \item{rng}{
+    a vector of length 2 specifying a range of values over which the
+    decomposition is to be computed.  Both values must be within the
+    range of the functional data objects in the argument.  By default
+    the whole range of the functional data objects is used.
+  }
+}
+\details{
+  The decomposition can yield negative values for \code{MS.phas} if the
+  registration does not improve the alignment of the curves, or if used
+  to compare two registration processes based on different principles,
+  such as  is the case for functions \code{landmarkreg} and
+  \code{register.fd}.
 }
 \value{
   a named list with the following components:
@@ -46,13 +58,6 @@ AmpPhaseDecomp(xfd, yfd, wfd)
     derivatives the warping functions are independent of the squared
     registered functions.
   }
-}
-\details{
-  The decomposition can yield negative values for \code{MS.phas} if the
-  registration does not improve the alignment of the curves, or if used
-  to compare two registration processes based on different principles,
-  such as  is the case for functions \code{landmarkreg} and
-  \code{register.fd}.
 }
 \seealso{
   \code{\link{landmarkreg}},

@@ -1,15 +1,19 @@
 ###
 ###
-### Ramsey, Hooker & Graves (2009)
+### Ramsay, Hooker & Graves (2009)
 ### Functional Data Analysis with R and Matlab (Springer)
 ###
 ### ch. 4  How to Build Functional Data Objects
 ###
+
 library(fda)
+
 ##
 ## Section 4.1 Adding Coefficients to Bases to Define Functions
 ##
+
 #  4.1.1 Coefficient Vectors, Matrices and Arrays
+
 daybasis65 = create.fourier.basis(c(0,365), 65)
 # dummy coefmat
 coefmat = matrix(0, 65, 35, dimnames=list(
@@ -43,28 +47,30 @@ fdnames = list("Day", "Weather Station" = station,
 ##
 ## 4.2 Methods for Functional Data Objects
 ##
+
 bspl2 = create.bspline.basis(norder=2)
-plot(bspl2)
+plot(bspl2, lwd=2)
 
 tstFn0 = fd(c(-1, 2), bspl2)
 tstFn1 = fd(c(1, 3), bspl2)
 
-plot(tstFn0)
-plot(tstFn1)
+plot(tstFn0, lwd=2)
+plot(tstFn1, lwd=2)
 
 fdsumobj = tstFn0+tstFn1
-plot(fdsumobj)
+plot(fdsumobj, lwd=2)
 
 fddifobj = tstFn1-tstFn0
-plot(fddifobj)
+plot(fddifobj, lwd=2)
 
 fdprdobj = tstFn0 * tstFn1
-plot(fdprdobj)
+plot(fdprdobj, lwd=2)
+
 # NOT good:  must approximate a parabola over [0, 1]
 # with a straight line (i.e., same basis set)
 
 fdsqrobj = tstFn0^2
-plot(fdsqrobj)
+plot(fdsqrobj, lwd=2)
 # Again:  NOT good:  approx. a parabola with a straight line
 
 a   = 0.5
@@ -88,15 +94,14 @@ plot((meanTempfd-sumTempfd*(1/35))^2)
 # round off error, as it should be.
 
 # Figure 4.1.
-plot(Tempfd)
+
+plot(Tempfd, lwd=1)
 lines(meanTempfd, lwd=3)
-# Looks right
 
 meanTempVec = eval.fd(day.5, meanTempfd)
 meanTempVec.= predict(meanTempfd, day.5)
 all.equal(meanTempVec, meanTempVec.)
 lines(day.5, meanTempVec, col='red', lty='dashed', lwd=4)
-# Looks right
 
 DmeanTempVec = eval.fd(day.5, meanTempfd, 1)
 DmeanTempVec.= predict(meanTempfd, day.5, 1)
@@ -121,7 +126,7 @@ tempfd        = temp.fdSmooth$fd
 tempfd$fdnames= list("Day (July 2 to June 30)",
     "Weather Station",
     "Mean temperature (deg. C)")
-plot(tempfd, col=1, lty=1, xlab='Day (July 1 to June 30)',
+plot(tempfd, lwd=2, xlab='Day (July 1 to June 30)',
      ylab='Mean temperature (deg. C)')
 
 # Section 4.2.1 Illustration: Sinusoidal Coefficients
@@ -153,8 +158,8 @@ daytime  = ((16:47)+0.5)
 plot(daytime, apply(thawdata,1,mean), "b", lwd=2,
      xlab="Day", ylab="Temperature (deg C)", cex=1.2)
 
-thawbasis   = create.bspline.basis(c(16,48),7)
-thawbasismat= eval.basis(thawbasis, daytime)
+thawbasis    = create.bspline.basis(c(16,48),7)
+thawbasismat = eval.basis(thawbasis, daytime)
 
 # Figure 4.4
 
@@ -172,8 +177,9 @@ plotfit.fd(thawdata[,1], daytime, thawfd[1],
 ##
 ## Section 4.4 The Linear Differential Operator or Lfd Class
 ##
-omega          = (2*pi/365)
-thawconst.basis= create.constant.basis(thawbasis$rangeval)
+
+omega           = (2*pi/365)
+thawconst.basis = create.constant.basis(thawbasis$rangeval)
 
 betalist       = vector("list", 3)
 betalist[[1]]  = fd(0, thawconst.basis)
@@ -189,8 +195,8 @@ all.equal(harmaccelLfd.[-1], harmaccelLfd.thaw[-1])
 class(accelLfd)
 class(harmaccelLfd)
 
-Ltempmat = eval.fd(day.5, tempfd, harmaccelLfd)
-Ltempmat.= predict(tempfd, day.5, harmaccelLfd)
+Ltempmat  = eval.fd(day.5, tempfd, harmaccelLfd)
+Ltempmat. = predict(tempfd, day.5, harmaccelLfd)
 all.equal(Ltempmat, Ltempmat.)
 
 D2tempfd = deriv.fd(tempfd, 2)
@@ -200,15 +206,17 @@ Ltempfd  = deriv.fd(tempfd, harmaccelLfd)
 ## Section 4.5 Bivariate Functional Data Objects:
 ##             Functions of Two Arguments
 ##
+
 Bspl2 = create.bspline.basis(nbasis=2, norder=1)
 Bspl3 = create.bspline.basis(nbasis=3, norder=2)
 
-corrmat = array(1:6/6, dim=2:3)
-bBspl2.3= bifd(corrmat, Bspl2, Bspl3)
+corrmat  = array(1:6/6, dim=2:3)
+bBspl2.3 = bifd(corrmat, Bspl2, Bspl3)
 
 ##
 ## Section4.6 The structure of the fd and Lfd Classes
 ##
+
 help(fd)
 help(Lfd)
 

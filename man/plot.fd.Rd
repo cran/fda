@@ -1,5 +1,6 @@
 \name{plot.fd}
 \alias{plot.fd}
+\alias{plot.fdPar}
 \alias{plot.fdSmooth}
 \title{
   Plot a Functional Data Object
@@ -10,16 +11,16 @@
   multivariate data, or one by one with a mouse click to move from one
   plot to another.  The function also accepts the other plot
   specification arguments that the regular \code{plot} does.  Calling
-  \code{plot} with an \code{fdSmooth} object plots its \code{fd}
-  component.
+  \code{plot} with an \code{fdSmooth} or an \code{fdPar}
+  object plots its \code{fd} component.
 }
 \usage{
 \method{plot}{fd}(x, y, Lfdobj=0, href=TRUE, titles=NULL,
                     xlim=NULL, ylim=NULL, xlab=NULL,
                     ylab=NULL, ask=FALSE, nx=NULL, axes=NULL, ...)
-%\method{plot}{fdPar}(x, y, Lfdobj=0, href=TRUE, titles=NULL,
-%                    xlim=NULL, ylim=NULL, xlab=NULL,
-%                    ylab=NULL, ask=FALSE, nx=NULL, ...)
+\method{plot}{fdPar}(x, y, Lfdobj=0, href=TRUE, titles=NULL,
+                    xlim=NULL, ylim=NULL, xlab=NULL,
+                    ylab=NULL, ask=FALSE, nx=NULL, axes=NULL, ...)
 \method{plot}{fdSmooth}(x, y, Lfdobj=0, href=TRUE, titles=NULL,
                     xlim=NULL, ylim=NULL, xlab=NULL,
                     ylab=NULL, ask=FALSE, nx=NULL, axes=NULL, ...)

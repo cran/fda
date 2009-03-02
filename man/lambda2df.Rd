@@ -16,27 +16,27 @@ lambda2df(argvals, basisobj, wtvec=rep(1, n),
           Lfdobj=NULL, lambda=0)
 }
 \arguments{
-\item{argvals}{
-a vector containing the argument values used in the
-smooth of the data.
-}
-\item{basisobj}{
-the basis object used in the smoothing of the data.
-}
-\item{wtvec}{
-the weight vector, if any, that was used in the smoothing
-of the data.
-}
-\item{Lfdobj}{
-the linear differential operator object used to defining
-the roughness penalty employed in smoothing the data.
-}
-\item{lambda}{
-the smoothing parameter to be converted.
-}
+  \item{argvals}{
+    a vector containing the argument values used in the
+    smooth of the data.
+  }
+  \item{basisobj}{
+    the basis object used in the smoothing of the data.
+  }
+  \item{wtvec}{
+    the weight vector, if any, that was used in the smoothing
+    of the data.
+  }
+  \item{Lfdobj}{
+    the linear differential operator object used to defining
+    the roughness penalty employed in smoothing the data.
+  }
+  \item{lambda}{
+    the smoothing parameter to be converted.
+  }
 }
 \value{
-the equivalent degrees of freedom value.
+  the equivalent degrees of freedom value.
 }
 \seealso{
 \code{\link{df2lambda}}

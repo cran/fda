@@ -5,7 +5,8 @@
   Mark Intervals on a Plot Axis
 }
 \description{
-  Adds an axis to the current plot, with tick marks delimiting interval
+  Adds an axis (axisintervals) or two axes (axesIntervals)
+  to the current plot with tick marks delimiting interval
   described by labels
 }
 \usage{

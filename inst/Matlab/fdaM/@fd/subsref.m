@@ -1,16 +1,16 @@
-function subfd = subsref(fd, substr)
+function subfd = subsref(fdobj, substr)
 %  SUBSREF  subscripted reference to a functional data object
-%    FD     ... an object of class 'fd'
+%    FDOBJ  ... an object of class 'fd'
 %    SUBSTR ... a cell object containing the subscripts
 
-%  last modified 20 July 2006
+%  last modified 4 March 2009
 
-coef = getcoef(fd);
+coef = getcoef(fdobj);
 
 type = substr.type;
 
 if strcmp(type, '.')
-    subfd = eval(['fd',substr.subs{2}]);
+    subfd = eval(['fdobj',substr.subs{2}]);
 elseif strcmp(type, '()')
     sizec = size(coef);
     ndim  = length(sizec);
@@ -19,8 +19,6 @@ elseif strcmp(type, '()')
     switch nsubs
         case 1
             switch ndim
-                case 1
-                    error('Too many subscripts.');
                 case 2
                     newcoef = coef(:,subs{1});
                 case 3
@@ -30,8 +28,6 @@ elseif strcmp(type, '()')
             end
         case 2
             switch ndim
-                case 1
-                    error('Too many subscripts.');
                 case 2
                     error('Too many subscripts.');
                 case 3
@@ -42,10 +38,27 @@ elseif strcmp(type, '()')
         case 3
             error('Too many subscripts.');
     end
+    
+    nrep = sizec(2);
+    if ndim == 2
+        nvar = 1;
+    else
+        nvar = sizec(3);
+    end
 
     subfd.coef     = newcoef;
-    subfd.basisobj = getbasis(fd);
-    subfd.fdnames  = getnames(fd);
+    subfd.basisobj = getbasis(fdobj);
+    fdnames        = getnames(fdobj);
+%    caselabels     = getfdlabels(fdnames{2},nrep);
+%    varlabels      = getfdlabels(fdnames{3},nvar);
+    [caselabels, varlabels] = getfdlabels(fdnames,nrep,nvar);
+    if ~isempty(caselabels) && iscell(fdnames{2})
+        fdnames{2}{2} = caselabels(subs{1},:);
+    end
+    if ~isempty(varlabels) && iscell(fdnames{3}) 
+        fdnames{3}{2} = varlabels(subs{2},:);
+    end
+    subfd.fdnames = fdnames;
 
     subfd = class(subfd, 'fd');
 else

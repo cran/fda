@@ -272,7 +272,7 @@ awtcell = {};
 ufdcell = {};
 
 nwbasis = 21;
-wbasis = create_bspline_basis([0,1], nwbasis);
+wbasis = create_bspline_basis([0,0.35], nwbasis);
 wcoef0 = zeros(nwbasis,1);
 betafd = fd(wcoef0, wbasis); 
 betafdPar = fdPar(betafd);
@@ -290,9 +290,13 @@ xfdcell{1} = lipfd;
 
 for j=1:2
     subplot(2,1,j)
-    plot(bfdcell{1,j});
+    plot(getfd(bfdcell{1,j}));
     ylabel(['Weight function ',num2str(j-1)]);
 end
+
+% overlay plot
+
+pda_overlay(bfdcell)
 
 %  set up a linear differential operator 
 

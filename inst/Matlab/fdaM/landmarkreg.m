@@ -1,5 +1,5 @@
 function [regfd, warpfd, Wfd] = landmarkreg(fdobj, ximarks, x0marks, ...
-                                            WfdParobj, monwrd)
+                                            WfdParobj, monwrd, ylambda)
 %  LANDMARKREG ... Register curves using landmarks.
 %  Arguments:
 %  FDOBJ     ...  a functional data object for curves to be registered
@@ -15,6 +15,11 @@ function [regfd, warpfd, Wfd] = landmarkreg(fdobj, ximarks, x0marks, ...
 %                 function.  If MONWRD is 0 and an error message results 
 %                 indicating nonmonotonicity, rerun with MONWRD = 1.
 %                 Default:  1
+%  YLAMBDA ... smoothing parameter to be used in computing the registered
+%                 functions.  For high dimensional bases, local wiggles may be 
+%                 found in the registered functions or its derivatives that are
+%                 not seen in the unregistered functions.  In this event, this
+%                 parameter should be increased until they disappear.             
 %  Returns:
 %  REGFD  ...  A functional data object for the registered curves
 %  WARPFD ...  A functional data object for the warping functions.  
@@ -28,7 +33,7 @@ function [regfd, warpfd, Wfd] = landmarkreg(fdobj, ximarks, x0marks, ...
 %                     warpvec = rng(1) + width.*harg./rng(2);
 %              where rng is the argument range vector.
 
-%  last modified 19 December 2007
+%  last modified 15 May 2009 by Jim Ramsay
 
 %  check FDOBJ
 
@@ -51,6 +56,7 @@ end
 fdbasisobj = getbasis(fdobj);
 fdnbasis   = getnbasis(fdbasisobj);
 rangeval   = getbasisrange(fdbasisobj);
+fdParobj   = fdPar(fdobj, 2, ylambda);
 
 %  check landmarks
 
@@ -71,7 +77,8 @@ if size(x0marks,2) == 1, x0marks = x0marks';  end
 
 %  set default argument values
 
-if nargin < 5, monwrd  = 1;  end
+if nargin < 6, ylambda = 1e-10;  end
+if nargin < 5, monwrd  = 1;      end
 
 if nargin < 4
     basisobj  = getbasis(fdobj);
@@ -81,15 +88,7 @@ if nargin < 4
     WfdParobj = fdPar(wbasis);
 else
     %  check  WfdParobj object
-    if ~isa_fdPar(WfdParobj) 
-        if isa_fd(WfdParobj) || isa_basis(WfdParobj)
-            WfdParobj = fdPar(WfdParobj);
-        else
-            error(['WfdParobj is not a functional parameter object, ', ...
-                    'not a functional data object, and ', ...
-                    'not a basis object.']);
-        end
-    end
+    WfdParobj = fdParcheck(WfdParobj);
 end
 
 %  set up WFD0 and WBASIS
@@ -104,11 +103,13 @@ WLfdobj = int2Lfd(WLfdobj);
 
 %  set up LAMBDA
 
-lambda = getlambda(WfdParobj);
+wlambda = getlambda(WfdParobj);
 
 %  check landmark target values
 
-if any(ximarks <= rangeval(1)) || any(ximarks >= rangeval(2))
+test1 = any(x0marks(:) <= rangeval(1));
+test2 = any(ximarks(:) >= rangeval(2));
+if  test1 || test2
     error('Some landmark values are not within the range.');
 end
 
@@ -119,13 +120,13 @@ x   = linspace(rangeval(1),rangeval(2),n)';
 y   = eval_fd(x, fdobj);
 yregmat = y;
 hfunmat = zeros(n,ncurve);
-lambda  = max([lambda,1e-10]);
+wlambda = max([wlambda,1e-10]);
 
 xval      = [rangeval(1),x0marks,rangeval(2)]';
 nwbasis   = getnbasis(wbasis);
 Wfd0      = fd(zeros(nwbasis,1),wbasis);
 Wcoef     = zeros(nwbasis,ncurve);
-WinvfdParobj = fdPar(getbasis(fdobj), 2, 1e-6);
+WfdParobj = fdPar(Wfd0, WLfdobj, wlambda);
 
 %  --------------------------------------------------------------------
 %                  Iterate through curves to register
@@ -147,33 +148,23 @@ for icurve = 1:ncurve
         %  h is a vector of warping function values corresponding to arguments x
         if monwrd
             %  use monotone smoother
-            WfdParobj = fdPar(Wfd0, WLfdobj, lambda);
-            wt = ones(length(yval),1);
-            conv    = 1e-4;
-            iterlim = 20;
-            dbglev  = 0;
-            Wfd    = smooth_morph(xval, yval, WfdParobj, wt, ...
-                       conv, iterlim, dbglev);
-            h      = monfn(x, Wfd);
+            Wfd      = smooth_morph(xval, yval, WfdParobj);
+            h        = monfn(x, Wfd);
             %  normalize h
-            b      = (rangeval(2)-rangeval(1))/(h(n)-h(1));
-            a      = rangeval(1) - b*h(1);
-            h      = a + b.*h;
-            h(1)   = rangeval(1);
-            h(n)   = rangeval(2);
-            wcoefi = getcoef(Wfd);
-            Wcoef(:,icurve) = wcoefi;
+            b        = (rangeval(2)-rangeval(1))/(h(n)-h(1));
+            a        = rangeval(1) - b*h(1);
+            h        = a + b.*h;
+            h([1,n]) = rangeval;
         else
             %  use regular smoother
-            warpfd = smooth_basis(xval, yval, wbasis);
+            warpfd   = smooth_basis(xval, yval, wbasis);
             %  set up warping function sampling values
-            h      = eval_fd(x, warpfd);
+            h        = eval_fd(x, warpfd);
             %  normalize h
-            b      = (rangeval(2)-rangeval(1))/(h(n)-h(1));
-            a      = rangeval(1) - b*h(1);
-            h      = a + b.*h;
-            h(1) = rangeval(1);
-            h(n) = rangeval(2);
+            b        = (rangeval(2)-rangeval(1))/(h(n)-h(1));
+            a        = rangeval(1) - b*h(1);
+            h        = a + b.*h;
+            h([1,n]) = rangeval;
             %  check for monotonicity because regular smooth may not be monotone
             deltah = diff(h);
             if any(deltah <= 0) 
@@ -187,24 +178,21 @@ for icurve = 1:ncurve
         %  compute h-inverse in order to register curves
         
         if monwrd
-            wt = ones(length(h),1);
-            Wfdinv  = smooth_morph(h, x, WinvfdParobj, wt, ...
-                       conv, iterlim, dbglev);
-            hinv    = monfn(x, Wfdinv);
-            b       = (rangeval(2)-rangeval(1))/(hinv(n)-hinv(1));
-            a       = rangeval(1) - b*hinv(1);
-            hinv    = a + b.*hinv;
-            hinv(n) = rangeval(2);
-            hinv(1) = rangeval(1);
+            Wfdinv      = smooth_morph(h, x, WfdParobj);
+            hinv        = monfn(x, Wfdinv);
+            b           = (rangeval(2)-rangeval(1))/(hinv(n)-hinv(1));
+            a           = rangeval(1) - b*hinv(1);
+            hinv        = a + b.*hinv;
+            hinv([1,n]) = rangeval;
         else
-            hinvfd  = smooth_basis(h, x, WfdParobj);
-            hinv    = eval_fd(x, hinvfd);
-            b       = (rangeval(2)-rangeval(1))/(hinv(n)-hinv(1));
-            a       = rangeval(1) - b*hinv(1);
-            hinv    = a + b.*hinv;
-            hinv(n) = rangeval(2);
-            hinv(1) = rangeval(1);
-            %  check for monotonicity because regular smooth may not be monotone
+            hinvfd      = smooth_basis(h, x, WfdParobj);
+            hinv        = eval_fd(x, hinvfd);
+            b           = (rangeval(2)-rangeval(1))/(hinv(n)-hinv(1));
+            a           = rangeval(1) - b*hinv(1);
+            hinv        = a + b.*hinv;
+            hinv([1,n]) = rangeval;
+            %  check for monotonicity because regular smooth may not be 
+            %  monotone
             deltahinv = diff(hinv);
             if any(deltahinv <= 0) 
                 error(['Non-increasing inverse warping function ', ...
@@ -214,7 +202,6 @@ for icurve = 1:ncurve
         
         %  compute registered curves
         
-        fdParobj = fdPar(fdobj, 2, 1e-10);
         if ndim == 2
             %  single variable case
             yregfd = smooth_basis(hinv, y(:,icurve), fdParobj);
@@ -242,10 +229,10 @@ regfd         = putnames(regfd, regfdnames);
 
 %  create functional data objects for the warping functions
 
-warpcoef       = project_basis(hfunmat, x, wbasis);
+warpfd         = smooth_basis(x, hfunmat, fdParobj);
 warpfdnames    = getnames(fdobj);
 warpfdnames{3} = ['Warped ',warpfdnames{3}];
-warpfd         = fd(warpcoef, wbasis, warpfdnames);
+warpfd         = putnames(warpfd, warpfdnames);
 
 %  create functional data object for Wfd if monwrd is true
 

@@ -13,7 +13,7 @@
   is used, and the order of this derivative, \eqn{m_j, j=1,...,n} can
   vary over equations.
 
-  On the left side of equation equation is a linear combination of all
+  On the left side of equation is a linear combination of all
   the  variables and all the derivatives of these variables up to order
   one less than the order \eqn{m_j} of the highest derivative.
 

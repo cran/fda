@@ -275,7 +275,7 @@ fRegress(y, ...)
       }
 
 
-   If \code{class(y)} is numeric, the \code{fRegress} object also includes:
+   *** If \code{class(y)} is numeric, the \code{fRegress} object also includes:
 
       \item{df}{
 	equivalent degrees of freedom for the fit.
@@ -288,7 +288,7 @@ fRegress(y, ...)
       }
 
 
-      If \code{class(y)} is either \code{fd} or \code{fdPar}, the
+      *** If \code{class(y)} is either \code{fd} or \code{fdPar}, the
       \code{fRegress} object returned also includes 5 other components:
 
       \item{y2cMap}{

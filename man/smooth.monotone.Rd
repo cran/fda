@@ -128,7 +128,12 @@ smooth.monotone(argvals, y, WfdParobj, wtvec=rep(1,n),
   }
   \item{yhatfd}{
     A functional data object for the monotone curves that smooth the
-    data
+    data.  This object is constructed using the basis for WFDOBJ, and
+    this basis may  well be too simple to accommodate the curvature
+    in the monotone function that Wfdobjnes.  It may be
+    necessary to discard this object and use a richer basis
+    externally to smooth the values defined by
+    beta[1] + beta[2]*eval.monfd(evalarg, Wfdobj).
   }
   \item{Flist}{
     a named list containing three results for the final converged

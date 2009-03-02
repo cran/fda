@@ -1,11 +1,13 @@
 ###
 ###
-### Ramsey, Hooker & Graves (2009)
+### Ramsay, Hooker & Graves (2009)
 ### Functional Data Analysis with R and Matlab (Springer)
 ###
 ### ch. 2.  Essential Comparisons of the Matlab and R Languages
 ###
+
 library(fda)
+
 ##
 ## Section 2.1 A Quick Comparison of Matlab and R Syntax
 ##
@@ -53,9 +55,9 @@ c("like",
 "but not required."
 
 # Section 2.1.2.  Using Functions
-b3.4   = create.bspline.basis(norder=3, breaks=c(0, .5, 1))
-fdPar3 = fdPar(b3.4, lambda=1)
-fd3.4s0= smooth.basis(0:1, 0:1, fdPar3)
+b3.4    = create.bspline.basis(norder=3, breaks=c(0, .5, 1))
+fdPar3  = fdPar(b3.4, lambda=1)
+fd3.4s0 = smooth.basis(0:1, 0:1, fdPar3)
 
 class(fd3.4s0) # fdSmooth
 # its 'fd' component

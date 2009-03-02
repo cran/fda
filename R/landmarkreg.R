@@ -1,5 +1,5 @@
 landmarkreg <- function(fdobj, ximarks, x0marks=xmeanmarks,
-                        WfdPar=NULL, monwrd=FALSE)
+                        WfdPar=NULL, monwrd=FALSE, ylambda=1e-10)
 {
 #  Arguments:
 #  FDOBJ   ... functional data object for curves to be registered
@@ -14,13 +14,18 @@ landmarkreg <- function(fdobj, ximarks, x0marks=xmeanmarks,
 #                 function.  If MONWRD is 0 and an error message results
 #                 indicating nonmonotonicity, rerun with MONWRD = 1.
 #                 Default:  TRUE
+#  YLAMBDA ... smoothing parameter to be used in computing the registered
+#                 functions.  For high dimensional bases, local wiggles may be 
+#                 found in the registered functions or its derivatives that are
+#                 not seen in the unregistered functions.  In this event, this
+#                 parameter should be increased.             
 #  Returns:
 #  FDREG   ... a functional data object for the registered curves
 #  WARPFD  ... a functional data object for the warping functions
 #  WFD     ... a functional data object for the W functions defining the 
 #              warping functions
 
- #  Last modified 13 November 2008 by Jim Ramsay
+ #  Last modified 15 May 2009 by Jim Ramsay
 
   #  check FDOBJ
 
@@ -43,7 +48,7 @@ landmarkreg <- function(fdobj, ximarks, x0marks=xmeanmarks,
   type     <- basisobj$type
   nbasis   <- basisobj$nbasis
   rangeval <- basisobj$rangeval
-  fdParobj <- fdPar(basisobj, 2, 1e-10)
+  fdParobj <- fdPar(basisobj, 2, ylambda)
 
   #  check landmarks
 
@@ -53,7 +58,7 @@ landmarkreg <- function(fdobj, ximarks, x0marks=xmeanmarks,
      "Number of rows of XIMARKS is incorrect.")
     if (any(ximarks <= rangeval[1]) || any(ximarks >= rangeval[2])) stop(
      "Some landmark values are not within the range.")
-nlandm <- dim(ximarks)[2]
+  nlandm <- dim(ximarks)[2]
   xmeanmarks <- apply(ximarks,2,mean)
 
   if (length(x0marks) != nlandm) stop(
@@ -79,9 +84,9 @@ nlandm <- dim(ximarks)[2]
   wLfd   <- WfdPar$Lfd
   wbasis <- Wfd0$basis
 
-  #  set up LAMBDA
+  #  set up WLAMBDA
 
-  lambda <- WfdPar$lambda
+  wlambda <- WfdPar$lambda
 
   #  check landmark target values
 
@@ -93,18 +98,17 @@ nlandm <- dim(ximarks)[2]
 
   n   <- min(c(101,10*nbasis))
   x   <- seq(rangeval[1],rangeval[2],length=n)
-  wtn <- rep(1,n)
 
   y       <- eval.fd(x, fdobj)
   yregmat <- y
   hfunmat <- matrix(0,n,ncurve)
-  lambda  <- max(lambda,1e-10)
+  wlambda  <- max(wlambda,1e-10)
 
-  xval <- c(rangeval[1],x0marks,rangeval[2])
+  xval    <- c(rangeval[1],x0marks,rangeval[2])
   nwbasis <- wbasis$nbasis
   Wcoef   <- matrix(0,nwbasis,ncurve)
-  nval <- length(xval)
-  wval <- rep(1,nval)
+  nval    <- length(xval)
+  wval    <- rep(1,nval)
 
   #  --------------------------------------------------------------------
   #                  Iterate through curves to register
@@ -125,7 +129,7 @@ nlandm <- dim(ximarks)[2]
        a         <- rangeval[1] - b*h[1]
        h         <- a + b*h
        h[c(1,n)] <- rangeval
-       wcoefi  <- Wfd$coefs
+       wcoefi    <- Wfd$coef
        Wcoef[,icurve] <- wcoefi
     } else {
        #  use unconstrained smoother
@@ -141,6 +145,8 @@ nlandm <- dim(ximarks)[2]
        if (any(deltah <= 0)) stop(
            paste("Non-increasing warping function estimated for curve",icurve,
                  " Try setting MONWRD to TRUE."))
+       wcoefi    <- warpfd$coef
+       Wcoef[,icurve] <- wcoefi
     }
     hfunmat[,icurve] <- h
 
@@ -149,7 +155,7 @@ nlandm <- dim(ximarks)[2]
     if (monwrd) {
        wcoef        <- Wfd$coefs
        Wfdinv       <- fd(-wcoef,wbasis)
-       WfdParinv    <- fdPar(Wfdinv, wLfd, lambda)
+       WfdParinv    <- fdPar(Wfdinv, wLfd, wlambda)
        Wfdinv       <- smooth.morph(h, x, WfdParinv)$Wfdobj
        hinv         <- monfn(x, Wfdinv)
        b            <- (rangeval[2]-rangeval[1])/(hinv[n]-hinv[1])
@@ -172,14 +178,14 @@ nlandm <- dim(ximarks)[2]
 
     if (length(dim(coef)) == 2) {
         #  single variable case
-        yregfd <- smooth.basis(hinv, y[,icurve], fdParobj, wtn)$fd
+        yregfd <- smooth.basis(hinv, y[,icurve], fdParobj)$fd
         yregmat[,icurve] <- eval.fd(x, yregfd)
     }
     if (length(dim(coef)) == 3) {
         #  multiple variable case
         for (ivar in 1:nvar) {
             # evaluate curve as a function of h at sampling points
-            yregfd <- smooth.basis(hinv, y[,icurve,ivar], fdParobj, wtn)$fd
+            yregfd <- smooth.basis(hinv, y[,icurve,ivar], fdParobj)$fd
             yregmat[,icurve,ivar] <- eval.fd(x, yregfd)
         }
      }
@@ -189,7 +195,7 @@ nlandm <- dim(ximarks)[2]
 
   #  create functional data objects for the registered curves
 
-  fdParobj    <- fdPar(basisobj, 2, 1e-10)
+  fdParobj    <- fdPar(basisobj, 2, ylambda)
   regfdobj    <- smooth.basis(x, yregmat, fdParobj)$fd
   regnames    <- fdobj$fdnames
   names(regnames)[3] <- paste("Registered",names(regnames)[3])
@@ -202,9 +208,7 @@ nlandm <- dim(ximarks)[2]
   names(warpfdnames)[3] <- paste("Warped",names(regnames)[1])
   warpfdobj$fdnames     <- warpfdnames      
   
-#  Wfd <- fd(wcoef, wbasis)
-if(monwrd)
+  Wfd <- fd(Wcoef, wbasis)
+
   return( list("regfd" = regfdobj, "warpfd" = warpfdobj, "Wfd" = Wfd) )
-else
-  return( list("regfd" = regfdobj, "warpfd" = warpfdobj) )
 }

@@ -46,7 +46,7 @@ if( type=='monotone'){
   xfine = eval.monfd(tfine,Wfd)
   xfine = xfine%*%diag(1/xfine[neval,])*(Wrange[2]-Wrange[1])+Wrange[1]
 }
-xfine = xfine*( xfine>yrange[1] & xfine< yrange[2]) + yrange[2]*(xfine>yrange[2]) + yrange[1]*(xfine<yrange[1])
+xfine = xfine*( xfine>yrange[1] & xfine< yrange[2]) + yrange[2]*(xfine>=yrange[2]) + yrange[1]*(xfine<=yrange[1])
 yfine = eval.fd(tfine,yfd)
 
 xdim = dim(xfine)

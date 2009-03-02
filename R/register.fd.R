@@ -7,11 +7,12 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=c(Lfdobj=2, lambda=1),
 #                contain a single curve, but this single curve
 #                can be multivariate.
 #  YFD       ... Functional data object for functions to be registered
-#  WFDPAROBJ ... Functional parameter object for function W defining warping fns
+#  WFDPAROBJ ... Functional parameter object for function W defining warping 
+#                functions. The basis must be a B-spline basis.  If constant
+#                basis is desired, use create_bspline_basis(wrng, 1, 1).
 #                Its coefficients are the starting values used in the
 #                iterative computation of the final warping fns.
-#                NB:  The first coefficient is is NOT used.
-#                For both B-spline and Fourier bases, this first
+#                NB:  The first coefficient is NOT used.  This first
 #                coefficient determines the constant term in the expansion,
 #                and, since a register function is normalized, this term
 #                is, in effect, eliminated or has no influence on the
@@ -32,14 +33,14 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=c(Lfdobj=2, lambda=1),
 #                Default:  0
 #  Returns:
 
-#  REGSTR  ...  A list with fields
-#    REGSTR$REGFD ... A functional data object for the registered curves
-#    REGSTR$WFD   ... A Functional data object for function W defining
+#  REGSTR  ...  A list with fields:
+#    REGSTR$REGFD  ... A functional data object for the registered curves
+#    REGSTR$WARPFD ... A Functional data object for warping functions h
+#    REGSTR$WFD    ... A Functional data object for functions W defining
 #                         warping fns
-#    REGSTR$SHIFT ... Shift parameter value if curves are periodic
+#    REGSTR$SHIFT  ... Shift parameter value if curves are periodic
 
-# last modified 3 January 2008 by Jim Ramsay
-# previously modified 2007.09.13 by Spencer Graves  
+# last modified 28 April 2009 by Jim Ramsay
 
 ##
 ## 1.  Check y0fd and yfd
@@ -47,7 +48,7 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=c(Lfdobj=2, lambda=1),
 
 #  check classes of first two arguments
   if(is.null(yfd)){
-    yfd <- y0fd
+    yfd  <- y0fd
     y0fd <- NULL
   }
 #  
@@ -55,12 +56,13 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=c(Lfdobj=2, lambda=1),
       stop("'yfd' must be a functional data object.  ",
            "Instead, class(yfd) = ", class(yfd))
 #
-  if(is.null(y0fd))
+  if(is.null(y0fd)) {
     y0fd <- mean.fd(yfd) 
-  else
+  } else {
     if (!(inherits(y0fd, "fd")))
         stop("First argument is not a functional data object.",
-             "Instead, class(y0fd) = ", class(y0fd))  
+             "Instead, class(y0fd) = ", class(y0fd)) 
+  } 
   
 #  Check target function to determine number of variables.
 #  If the coefficient matrix is 3-dimensional, then the second
@@ -69,6 +71,7 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=c(Lfdobj=2, lambda=1),
 #  be taken to be the number of variables for a multivariate set
 #  of curves.  A 3-dimensional coefficient matrix for the target 
 #  will then be contracted to two dimensions.  
+
   y0coefs0 <- y0fd$coefs
   y0dim0   <- dim(y0coefs0)
   ndimy00  <- length(y0dim0)
@@ -124,7 +127,11 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=c(Lfdobj=2, lambda=1),
   Wfd0   <- WfdParobj$fd
   wcoef  <- Wfd0$coefs
   wbasis <- Wfd0$basis
+  wtype  <- wbasis$type
+  if (wtype != "bspline") stop(
+      "Basis for Wfd is not a B-spline basis.")
   nbasis <- wbasis$nbasis
+  norder <- nbasis - length(wbasis$params)
   wtype  <- wbasis$type
   rangex <- wbasis$rangeval
   wdim   <- dim(wcoef)
@@ -143,7 +150,7 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=c(Lfdobj=2, lambda=1),
 
 #  set up a fine mesh of argument values
 
-NFINEMIN <- 101
+NFINEMIN <- 201
 nfine <- 10*ynbasis + 1
 if (nfine < NFINEMIN) nfine <- NFINEMIN
 xlo   <- rangex[1]
@@ -246,13 +253,15 @@ for (icurve in 1:ncurve) {
      fmax2 <- fmax*fmax
      fmax3 <- fmax*fmax2
      m <- 1
-     for (j in 2:nbasis) {
-        m <- m + 1
-        for (k in 2:j) {
+     if (nbasis > 1) {
+        for (j in 2:nbasis) {
            m <- m + 1
-           D2hwrtc[,m] <- width*(2*ffine*Dfmax[j]*Dfmax[k]
-                - fmax*(Dffine[,j]*Dfmax[k] + Dffine[,k]*Dfmax[j])
-                + fmax2*D2hwrtc[,m] - ffine*fmax*D2fmax[m])/fmax3
+           for (k in 2:j) {
+              m <- m + 1
+              D2hwrtc[,m] <- width*(2*ffine*Dfmax[j]*Dfmax[k]
+                   - fmax*(Dffine[,j]*Dfmax[k] + Dffine[,k]*Dfmax[j])
+                   + fmax2*D2hwrtc[,m] - ffine*fmax*D2fmax[m])/fmax3
+           }
         }
      }
   } else {
@@ -444,13 +453,15 @@ for (icurve in 1:ncurve) {
            fmax2 <- fmax*fmax
            fmax3 <- fmax*fmax2
            m <- 1
-           for (j in 2:nbasis) {
-              m <- m + 1
-              for (k in 2:j) {
+           if (nbasis > 1) {
+              for (j in 2:nbasis) {
                  m <- m + 1
-                 D2hwrtc[,m] <- width*(2*ffine*Dfmax[j]*Dfmax[k]
-                - fmax*(Dffine[,j]*Dfmax[k] + Dffine[,k]*Dfmax[j])
-                + fmax2*D2hwrtc[,m] - ffine*fmax*D2fmax[m])/fmax3
+                 for (k in 2:j) {
+                    m <- m + 1
+                    D2hwrtc[,m] <- width*(2*ffine*Dfmax[j]*Dfmax[k]
+                   - fmax*(Dffine[,j]*Dfmax[k] + Dffine[,k]*Dfmax[j])
+                   + fmax2*D2hwrtc[,m] - ffine*fmax*D2fmax[m])/fmax3
+                 }
               }
            }
         } else {
@@ -495,7 +506,7 @@ regfdnames[[3]] <- paste("Registered ",regfdnames[[3]])
 ybasis  <- yfd$basis
 regfd   <- fd(yregcoef, ybasis, regfdnames)
 
-#  create functional data objects for the warping functions
+#  set up vector of time shifts
 
 if (periodic) {
   shift <- c(wcoef[1,])
@@ -503,9 +514,28 @@ if (periodic) {
 } else {
   shift <- rep(0,ncurve)
 }
+
+#  functional data object for functions W(t)
+
 Wfd <- fd(wcoef, wbasis)
 
-regstr <- list("regfd"=regfd, "Wfd"=Wfd, "shift"=shift)
+#  functional data object for warping functions
+
+warpmat = eval.monfd(xfine, Wfd)
+warpmat = rangex[1] + (rangex[2]-rangex[1])*
+           warpmat/outer(rep(1,nfine),warpmat[nfine,]) + 
+           outer(rep(1,nfine),shift)
+if (nbasis > 1) {
+   warpfdobj  = smooth.basis(xfine, warpmat, wbasis)$fd
+} else {
+   wbasis    = create.monomial.basis(rangex, 2)
+   warpfdobj = smooth.basis(xfine, warpmat, wbasis)$fd
+}
+warpfdnames       <- yfd$fdnames
+warpfdnames[[3]]  <- paste("Warped",warpfdnames[[1]])
+warpfdobj$fdnames <- warpfdnames      
+
+regstr <- list("regfd"=regfd, "warpfd"=warpfdobj, "Wfd"=Wfd, "shift"=shift)
 
 return(regstr)
 }
@@ -563,11 +593,13 @@ regfngrad <- function(xfine, y0fine, Dhwrtc, yregfd, Wfd,
     }
   }
   if (!is.null(Kmat)) {
-     ind   <- 2:ncvec
-     ctemp <- cvec[ind,1]
-     Kctmp <- Kmat%*%ctemp
-     Fval  <- Fval + t(ctemp)%*%Kctmp
-     gvec[ind] <- gvec[ind] + 2*Kctmp
+     if (ncvec > 1) {
+        ind   <- 2:ncvec
+        ctemp <- cvec[ind,1]
+        Kctmp <- Kmat%*%ctemp
+        Fval  <- Fval + t(ctemp)%*%Kctmp
+        gvec[ind] <- gvec[ind] + 2*Kctmp
+     }
   }
 
 #  set up FSTR list containing function value and gradient
@@ -583,28 +615,28 @@ regfngrad <- function(xfine, y0fine, Dhwrtc, yregfd, Wfd,
 
 #  ---------------------------------------------------------------
 
-reghess <- function(xfine, y0fine, Dhwrtc, D2hwrtc, yregfd, 
+reghess <- function(xfine, y0fine, Dhfine, D2hwrtc, yregfd, 
                     Kmat, periodic, crit)
 {
 	#cat("\nreghess")
   y0dim <- dim(y0fine)
   if (length(y0dim) == 3) nvar <- y0dim[3] else nvar <- 1
   nfine   <- length(xfine)
-  ncoef   <- dim(Dhwrtc)[2]
+  ncoef   <- dim(Dhfine)[2]
   onecoef <- matrix(1,1,ncoef)
   npair   <- ncoef*(ncoef+1)/2
 
   if (periodic) {
-     Dhwrtc[,1] <- 1
+     Dhfine[,1] <- 1
   } else {
-     Dhwrtc[,1] <- 0
+     Dhfine[,1] <- 0
   }
   yregmat  <- eval.fd(yregfd, xfine)
   Dyregmat <- eval.fd(yregfd, xfine, 1)
   if (nvar > 1) {
-	 y0fine   <- y0fine[,1,]
-	 yregmat  <- yregmat[,1,]
-	 Dyregmat <- Dyregmat[,1,]
+	   y0fine   <- y0fine[,1,]
+	   yregmat  <- yregmat[,1,]
+	   Dyregmat <- Dyregmat[,1,]
   }
 
   if (crit == 2) {
@@ -612,15 +644,19 @@ reghess <- function(xfine, y0fine, Dhwrtc, D2hwrtc, yregfd,
      if (nvar > 1) D2yregmat <- D2yregmat[,1,]
      if (periodic) {
         D2hwrtc[,1] <- 0
-        for (j in 2:ncoef) {
-           m <- j*(j-1)/2 + 1
-           D2hwrtc[,m] <- Dhwrtc[,j]
+        if (ncoef > 1) {
+           for (j in 2:ncoef) {
+              m <- j*(j-1)/2 + 1
+              D2hwrtc[,m] <- Dhfine[,j]
+           }
         }
      } else {
         D2hwrtc[,1] <- 1
-        for (j in 2:ncoef) {
-           m <- j*(j-1)/2 + 1
-           D2hwrtc[,m] <- 0
+        if (ncoef > 1) {
+           for (j in 2:ncoef) {
+              m <- j*(j-1)/2 + 1
+              D2hwrtc[,m] <- 0
+           }
         }
      }
   }
@@ -630,15 +666,15 @@ reghess <- function(xfine, y0fine, Dhwrtc, D2hwrtc, yregfd,
     y0i        <-   y0fine[,ivar]
     yregmati   <-  yregmat[,ivar]
     Dyregmati  <- Dyregmat[,ivar]
-    Dywrtc <- ((Dyregmati %*% onecoef)*Dhwrtc)
+    Dywrtc <- ((Dyregmati %*% onecoef)*Dhfine)
     if (crit == 1) {
       hessmat <-  2*crossprod(Dywrtc, Dywrtc)/nfine
       m <- 0
        for (j in 1:ncoef) {
-        for (k in 1:j) {
-          m <- m + 1
-          hessvec[m] <- hessvec[m] + hessmat[j,k]
-        }
+          for (k in 1:j) {
+             m <- m + 1
+             hessvec[m] <- hessvec[m] + hessmat[j,k]
+          }
       }
     } else {
       D2yregmati <- D2yregmat[,ivar]
@@ -655,12 +691,12 @@ reghess <- function(xfine, y0fine, Dhwrtc, D2hwrtc, yregfd,
       for (j in 1:ncoef) {
         for (k in 1:j) {
           m <- m + 1
-          crossprodmat[,m] <- Dhwrtc[,j]*Dhwrtc[,k]*D2yregmati
+          crossprodmat[,m] <- Dhfine[,j]*Dhfine[,k]*D2yregmati
           DyD2hmat[,m] <- Dyregmati*D2hwrtc[,m]
           temp <- crossprodmat[,m] + DyD2hmat[,m]
           D2bb[m] <- mean(y0i*temp)
           D2cc[m] <- 2*mean(yregmati*temp +
-                     Dyregmati^2*Dhwrtc[,j]*Dhwrtc[,k])
+                     Dyregmati^2*Dhfine[,j]*Dhfine[,k])
         }
       }
       ee     <- aa + cc
@@ -691,8 +727,10 @@ reghess <- function(xfine, y0fine, Dhwrtc, D2hwrtc, yregfd,
     }
   }
   if (!is.null(Kmat)) {
-     ind <- 2:ncoef
-     hessmat[ind,ind] <- hessmat[ind,ind] + 2*Kmat
+     if (ncoef > 1) {
+        ind <- 2:ncoef
+        hessmat[ind,ind] <- hessmat[ind,ind] + 2*Kmat
+     }
   }
   if (!periodic) {
      hessmat[1,]  <- 0

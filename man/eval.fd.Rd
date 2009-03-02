@@ -1,6 +1,7 @@
 \name{eval.fd}
 \alias{eval.fd}
 \alias{predict.fd}
+\alias{predict.fdPar}
 \alias{predict.fdSmooth}
 \alias{fitted.fdSmooth}
 \alias{residuals.fdSmooth}
@@ -15,6 +16,7 @@
 \usage{
 eval.fd(evalarg, fdobj, Lfdobj=0)
 \method{predict}{fd}(object, newdata=NULL, Lfdobj=0, ...)
+\method{predict}{fdPar}(object, newdata=NULL, Lfdobj=0, ...)
 \method{predict}{fdSmooth}(object, newdata=NULL, Lfdobj=0, ...)
 \method{fitted}{fdSmooth}(object, ...)
 \method{residuals}{fdSmooth}(object, ...)

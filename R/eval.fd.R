@@ -16,6 +16,10 @@ residuals.fdSmooth <- function(object, ...){
   object$y-pred
 }
 
+predict.fdPar <- function(object, newdata=NULL, Lfdobj=0, ...){
+  predict.fd(object$fd, newdata, Lfdobj, ...)
+}
+
 predict.fd <- function(object, newdata=NULL, Lfdobj=0, ...){
   if(is.null(newdata)){
     basis <- object$basis
