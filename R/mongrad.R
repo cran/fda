@@ -14,7 +14,8 @@ mongrad <- function(x, Wfdobj, basislist=vector("list",JMAX)) {
 #  Returns:
 #  GVAL   ... value of gradient at input values in X.
 
-#  Last modified 21 October 2008 by Jim Ramsay
+#  modified 21 October 2008 by Jim Ramsay
+#  last modifed 24 April 2009 by C.J. Wong
 
   JMAX <- 15
   JMIN <- 11
@@ -60,7 +61,9 @@ mongrad <- function(x, Wfdobj, basislist=vector("list",JMAX)) {
   for (iter in 2:JMAX) {
     tnm  <- tnm*2
     del  <- width/tnm
-    tj   <- seq(rangeval[1]+del/2, rangeval[2]-del/2, del)
+   
+    flag <- ifelse(rangeval[1]+del/2 >= rangeval[2]-del/2, -1, 1)
+    tj   <- seq(rangeval[1]+del/2, rangeval[2]-del/2, by=flag*abs(del))
     tval <- c(tval, tj)
     if (is.null(basislist[[iter]])) {
         bmat <- getbasismatrix(tj, basisfd)

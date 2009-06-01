@@ -43,8 +43,8 @@ templist[[2]] = tempfd65
 conbasis   = create.constant.basis(c(0,365))
 betabasis5 = create.fourier.basis(c(0,365),5)
 betalist1  = vector("list",2)
-betalist1[[1]] = conbasis
-betalist1[[2]] = betabasis5
+betalist1[[1]] = fdPar(conbasis)
+betalist1[[2]] = fdPar(betabasis5)
 
 fRegressList1 = fRegress(annualprec,templist,betalist1)
 

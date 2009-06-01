@@ -105,7 +105,7 @@ fdPar(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
   \code{\link{smooth.basis}},
   \code{\link{smooth.basisPar}},
   \code{\link{smooth.monotone}},
-  \code{\line{int2Lfd}}
+  \code{\link{int2Lfd}}
 }
 \examples{
 ##

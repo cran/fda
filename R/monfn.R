@@ -13,7 +13,8 @@ monfn <- function(argvals, Wfdobj, basislist=vector("list",JMAX)) {
 #  Returns:
 #  HVAL   ... matrix or array containing values of h.
 
-#  Last modified 19 December 2007
+#  Last modified 24 April 2009
+
   JMAX <- 15
   JMIN <- 11
   EPS  <- 1E-5
@@ -51,12 +52,11 @@ monfn <- function(argvals, Wfdobj, basislist=vector("list",JMAX)) {
   fval <- fx
   smat[1,]  <- width*apply(fx,2,sum)/2
   tnm <- 0.5
-
-  #  now iterate to convergence
   for (j in 2:JMAX) {
     tnm  <- tnm*2
     del  <- width/tnm
-    tj   <- seq(rangeval[1]+del/2, rangeval[2]-del/2, del)
+    flag <- ifelse(rangeval[1]+del/2 >= rangeval[2]-del/2, -1, 1)
+    tj   <- seq(rangeval[1]+del/2, rangeval[2]-del/2, by=flag*abs(del))
     tval <- c(tval, tj)
     if (is.null(basislist[[j]])) {
         bmat <- getbasismatrix(tj, basisobj)

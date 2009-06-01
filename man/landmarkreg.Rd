@@ -88,6 +88,54 @@ landmarkreg(fdobj, ximarks, x0marks=xmeanmarks,
 }
 \examples{
 #See the analysis for the lip data in the examples.
+
+## setting parameters
+library(lattice)
+data(landmark.reg.expData) ## containg an simple object called sampleData
+
+eps <- .Machine$double.eps
+from <- -1.0187
+to <- 9.4551
+nb <- 201
+nbreaks <- 11
+## assign landmarks
+landmark <- matrix(c(0.4999, 0.657, 0.8141, 0.5523, 0.5523,
+                     3.3279, 3.066, 3.0137, 3.2231, 3.2231),
+                   ncol=2)
+wbasis <- create.bspline.basis(rangeval=c(from, to),
+	                       norder=4, breaks=seq(from, to, len=nbreaks))
+WfdPar <- fdPar(wbasis, 1, 1e-4)
+## get the density of the data
+x <- split(sampleData, factor(sampleData$which))
+densY <- sapply(x, function(z){
+            r <- range(z[, 1])
+            z <- z[, 1]
+            z <- z[z>r[1]+eps & z<r[2]-eps]
+            density(z, from=from, to=to, n=nb, na.rm=TRUE)$y
+        })
+
+argvals <- seq(from, to, len=nb) 
+fdobj   <- data2fd(densY, argvals, wbasis, 
+                   argnames = c("x", "samples", "density"))
+
+regDens <- landmarkreg(fdobj, landmark, WfdPar=WfdPar, monwrd=TRUE)
+warpfdobj <- regDens$warpfd
+warpedX <- eval.fd(warpfdobj, argvals)
+funs <-  apply(warpedX, 2, approxfun, argvals)
+newDat <- list()
+for (i in 1:length(funs))
+  newDat[[names(funs)[i]]] <- data.frame(data=funs[[i]](x[[i]][,1]),
+                                         which=names(funs)[i])
+## visualization
+lattice::densityplot(~ data | which, sampleData,
+                    layout=c(1,5), col="#A6CEE3", n=120,
+                     main="Original data set")
+dev.new()
+lattice::densityplot( ~ data | which, layout=c(1,length(newDat)),
+                     do.call(rbind, newDat), col="#A6CEE3", n=120,
+                     main="After warping")
+
+
 }
 % docclass is function
 \keyword{smooth}

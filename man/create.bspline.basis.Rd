@@ -187,8 +187,8 @@ create.bspline.basis(rangeval=NULL, nbasis=NULL, norder=4,
   \code{\link{create.polygonal.basis}},
   \code{\link{create.polynomial.basis}},
   \code{\link{create.power.basis}}
-  \code{\link[stats]{splineDesign}}
-  \code{\link[stats]{spline.des}}
+  \code{\link[splines]{splineDesign}}
+  \code{\link[splines]{spline.des}}
 }
 \examples{
 ##

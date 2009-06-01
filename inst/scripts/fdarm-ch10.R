@@ -513,106 +513,70 @@ lines(gaitt3, kneeAccel.R2, lty='dashed', lwd=2)
 ##
 #  (no computations in this section)
 
-##
-## Section 10.4 A Functional Linear Model for Swedish Mortality
-##
 
-# From Giles' Sweden.Rdata
-Swede.Rdata = 'C:/Users/jim/FDA2008/Sweden.Rdata'
-(mat0 = load(Swede.Rdata))
-#Swede.Rdata = 'C:/Users/spencerg/fda/Rbook/Rbook/RCode/Sweden.Rdata'
-#(mat0 = load(Swede.Rdata))
-# SwedeMat Swede1920
+
+### Section 10.4 A Functional Linear Model for Swedish Mortality
 
 # Download the contents of
 # http://www.mortality.org/hmd/SWE/STATS/fltcoh_1x1.txt
-# to a file 'Sweden Female Lifetable.txt
+# to a file 'Sweden Female Lifetable.txt'  and remove the  first two 
+# lines of header information (note, you will need to sign up to mortality.org. 
 
-SwedeTab = read.table('Sweden Female Lifetable.txt')
-SwedeTab = read.table('SwedeHazard.dat')
+SwedeTab = read.table('Sweden Female Lifetable.txt',head=TRUE)
+
+# Now Select out the death rate, ages 0-80 and take the log
+
 HazMat   = matrix(SwedeTab[,3],111,164,byrow=FALSE)
 HazMat   = matrix(as.numeric(HazMat[1:81,]),81,164)
 SwedeMat = log(HazMat)
 
-
-# *****
-#
-# GILES:  Are these names correct?
-#
+# Name it by year
 
 dimnames(SwedeMat)[[2]] <- paste('b', 1751:1914, sep='')
 
-# *****
-#
-# GILES:  Are these names correct?
-#
-
 # Figure 10.10
-
-matplot(0:80, SwedeLogHazard[, c('b1780', 'b1820', 'b1880', 'b1885')],
-        type='b')
-
-SwedeLogHazard$b1900
-# Huge spike in 1924 for the 1900 cohort
-
-# Giles said the plot was mislabeled;  try 1760, 1820, 1880, 1920:
-Swede4Lines = cbind(SwedeLogHazard[, c('b1760', 'b1820', 'b1880')],
-    b1920=Swede1920)
-
-matplot(0:80, Swede4Lines, type='l',lwd=2,xlab='age',ylab='log Hazard',col=1,
-matplot(0:80, SwedeMat[, c('b1751', 'b1810', 'b1860', 'b1914')],
-        type='b')
-
-SwedeLogHazard$b1900
-# Huge spike in 1924 for the 1900 cohort
-# in this plot but not in Fig 10.10
 
 matplot(0:80, SwedeMat[, c('b1751', 'b1810', 'b1860', 'b1914')], type='l',lwd=2,xlab='age',ylab='log Hazard',col=1,
   cex.lab=1.5,cex.axis=1.5)
 legend(x='bottomright',legend=c('1751','1810', '1860','1914'),lwd=2,col=1,lty=1:4)
 
-# Set up for 'linmod'
-
+# Smooth the data
 
 SwedeLogHazard <- SwedeMat[,1:144]
-
-SwedeBasis = create.bspline.basis(c(0,80),23)
-
-SwedeBeta0Par = fdPar(SwedeBasis, 2, 1e-5)
-SwedeBeta1Par = fdPar(SwedeBasis, 2, 1e3)
-
-SwedeBetaList = list(SwedeBeta0Par, SwedeBeta1Par, SwedeBeta1Par)
+SwedeBasis = create.bspline.basis(c(0,80),norder=6,breaks=0:80)
 
 D2fdPar = fdPar(SwedeBasis, lambda=1e-7)
 
-SwedeLogHazfd = smooth.basis(0:80, as.matrix(SwedeLogHazard), D2fdPar)$fd
+SwedeLogHazfd = smooth.basis(0:80, SwedeLogHazard, D2fdPar)$fd
 
 # The following requires manually clicking on the plot
 # for each of 144 birth year cohorts
-#plotfit.fd(as.matrix(SwedeLogHazard),0:80,SwedeLogHazfd$fd)
 
+plotfit.fd(as.matrix(SwedeLogHazard),0:80,SwedeLogHazfd$fd)
+
+# Now the setup for linmod
+
+betabasis = create.bspline.basis(c(0,80),norder=4,nbasis=23)
+
+SwedeBeta0Par = fdPar(betabasis, 2, 1e-5)
+SwedeBeta1Par = fdPar(betabasis, 2, 1e0)
+
+SwedeBetaList = list(SwedeBeta0Par, SwedeBeta1Par, SwedeBeta1Par)
 
 NextYear = SwedeLogHazfd[2:144]
 LastYear = SwedeLogHazfd[1:143]
 
 Swede.linmodSmooth = linmod(NextYear, LastYear, SwedeBetaList)
 
-# ***
-#
-# 'linmod' returns NULL
-#
-# ***????????
 
 Swede.ages = seq(0, 80, 2)
 Swede.beta1fd = eval.bifd(Swede.ages, Swede.ages,
-    Swede.linmodSmooth$regfd)
+    Swede.linmodSmooth$beta1estbifd)
+
+persp(Swede.beta1fd,xlab='s',zlab='beta0',ylab='t',theta=-190,phi=30)
 
 
-# Figure 10.11
 
-# ***?????
-
-##
 ## Section 10.5 Permutation Tests of Functional Hypotheses
 ##
 #  Section 10.5.1 Functional t-Tests

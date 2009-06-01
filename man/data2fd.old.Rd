@@ -1,7 +1,7 @@
 \name{data2fd.old}
 \alias{data2fd}
 \title{
-  Depricated:  use 'Data2fd'  
+  Depricated:  use 'Data2fd'
 }
 \description{
   This function converts an array \code{y} of function values
@@ -10,8 +10,8 @@
   do as much for the user as possible.  A basis function
   expansion is used to represent the curve, but no roughness
   penalty is used.  The data are fit using the least squares
-  fitting criterion.  NOTE:  Interpolation with data2fd(...) can be 
-  shockingly bad, as illustrated in one of the examples.  
+  fitting criterion.  NOTE:  Interpolation with data2fd(...) can be
+  shockingly bad, as illustrated in one of the examples.
 }
 \usage{
 data2fd(y, argvals=seq(0, 1, len = n), basisobj,
@@ -21,10 +21,10 @@ data2fd(y, argvals=seq(0, 1, len = n), basisobj,
 \arguments{
   \item{y}{
     an array containing sampled values of curves.
-    
+
     If \code{y} is a vector, only one replicate and variable are
     assumed.
-    
+
     If \code{y} is a matrix, rows must correspond to argument values and
     columns to replications or cases, and it will be assumed that there
     is only one variable per observation.
@@ -36,7 +36,7 @@ data2fd(y, argvals=seq(0, 1, len = n), basisobj,
     values may vary from one replication to another.  If this is the
     case, the number of rows must equal the maximum number of argument
     values, and columns of \code{y} having fewer values must be padded
-    out with NA's. 
+    out with NA's.
   }
   \item{argvals}{
     a set of argument values.
@@ -44,11 +44,11 @@ data2fd(y, argvals=seq(0, 1, len = n), basisobj,
     If this is a vector, the same set of argument values is used for all
     columns of \code{y}.  If \code{argvals} is a matrix, the columns
     correspond to the columns of \code{y}, and contain the argument
-    values for that replicate or case.    
+    values for that replicate or case.
   }
   \item{basisobj}{
     either:  A \code{basisfd} object created by function
-    create.basis.fd(), 
+    create.basis.fd(),
     or the value NULL, in which case a \code{basisfd} object is set up
     by the function, using the values of the next three arguments.
   }
@@ -61,17 +61,17 @@ data2fd(y, argvals=seq(0, 1, len = n), basisobj,
     given the default name "values".  These default names are
     assigned in function \{tt data2fd\}, which also assigns default
     string vectors by using the dimnames attribute of the discrete data
-    array. 
+    array.
   }
   \item{argnames}{
     a character vector of length 3 containing:
-    
+
     \itemize{
       \item the name of the argument, e.g. "time" or "age"
       \item a description of the cases, e.g. "weather stations"
-      \item the name of the observed function value, e.g. "temperature" 
+      \item the name of the observed function value, e.g. "temperature"
     }
-    
+
     These strings are used as names for the members of list \code{fdnames}.
   }
 }
@@ -97,12 +97,12 @@ data2fd(y, argvals=seq(0, 1, len = n), basisobj,
   applications, it would be better to use the function \code{\link{smooth.basis}}
 }
 \seealso{
-  \code{\line{Data2fd}}
-  \code{\link{smooth.basis}}, 
-  \code{\link{smooth.basisPar}}, 
-  \code{\link{project.basis}}, 
-  \code{\link{smooth.fd}}, 
-  \code{\link{smooth.monotone}}, 
+  \code{\link{Data2fd}}
+  \code{\link{smooth.basis}},
+  \code{\link{smooth.basisPar}},
+  \code{\link{project.basis}},
+  \code{\link{smooth.fd}},
+  \code{\link{smooth.monotone}},
   \code{\link{smooth.pos}}
   \code{\link{day.5}}
 }
@@ -113,7 +113,7 @@ b1.2 <- create.bspline.basis(norder=1, breaks=c(0, .5, 1))
 
 str(fd1.2 <- data2fd(0:1, basisobj=b1.2))
 plot(fd1.2)
-# A step function:  0 to time=0.5, then 1 after 
+# A step function:  0 to time=0.5, then 1 after
 
 
 b2.3 <- create.bspline.basis(norder=2, breaks=c(0, .5, 1))
@@ -122,29 +122,29 @@ b2.3 <- create.bspline.basis(norder=2, breaks=c(0, .5, 1))
 
 str(fd2.3 <- data2fd(0:1, basisobj=b2.3))
 round(fd2.3$coefs, 4)
-# 0, -.25, 1 
+# 0, -.25, 1
 plot(fd2.3)
 # Officially acceptable but crazy:
 # Initial negative slope from (0,0) to (0.5, -0.25),
-# then positive slope to (1,1).  
+# then positive slope to (1,1).
 
 
 b3.4 <- create.bspline.basis(norder=3, breaks=c(0, .5, 1))
 # 4 bases, order 3 = degree 2 =
-# continuous, bounded, locally quadratic 
+# continuous, bounded, locally quadratic
 
 str(fd3.4 <- data2fd(0:1, basisobj=b3.4))
 round(fd3.4$coefs, 4)
-# 0, .25, -.5, 1 
+# 0, .25, -.5, 1
 plot(fd3.4)
 # Officially acceptable but crazy:
 # Initial positive then swings negative
 # between 0.4 and ~0.75 before becoming positive again
-# with a steep slope running to (1,1).  
+# with a steep slope running to (1,1).
 
 
 
-#  Simple example 
+#  Simple example
 gaitbasis3 <- create.fourier.basis(nbasis=3)
 str(gaitbasis3) # note:  'names' for 3 bases
 gaitfd3 <- data2fd(gait, basisobj=gaitbasis3)
@@ -165,7 +165,7 @@ tempfd <- data2fd(CanadianWeather$dailyAv[,,"Temperature.C"],
 plot(tempfd)
 
 # Terrifying interpolation
-hgtbasis <- with(growth, create.bspline.basis(range(age), 
+hgtbasis <- with(growth, create.bspline.basis(range(age),
                                               breaks=age, norder=6))
 girl.data2fd <- with(growth, data2fd(hgtf, age, hgtbasis))
 age2 <- with(growth, sort(c(age, (age[-1]+age[-length(age)])/2)))
@@ -174,12 +174,12 @@ range(growth$hgtf)
 range(growth$hgtf-girlPred[seq(1, by=2, length=31),])
 # 5.5e-6 0.028 <
 # The predictions are consistently too small
-# but by less than 0.05 percent 
+# but by less than 0.05 percent
 
 matplot(age2, girlPred, type="l")
 with(growth, matpoints(age, hgtf))
 # girl.data2fd fits the data fine but goes berzerk
-# between points 
+# between points
 
 }
 % docclass is function
