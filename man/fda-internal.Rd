@@ -70,6 +70,12 @@
 \alias{trapz}
 \alias{ycheck}
 \alias{moreNames}
+\alias{aprops} 
+\alias{BD2} 
+\alias{BD3} 
+\alias{combinat} 
+\alias{estaEntre} 
+\alias{MBD}
 
 % docclass is function
 \keyword{internal}

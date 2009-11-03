@@ -1,5 +1,5 @@
 Package: fda
-Version: 2.2.3
+Version: 2.2.5
 Date: 2010-06
 Title: Functional Data Analysis
 Author: J. O. Ramsay <ramsay@psych.mcgill.ca>, Hadley Wickham
@@ -22,6 +22,6 @@ URL: http://www.functionaldata.org
 LazyData: true
 Repository: CRAN
 Repository/R-Forge/Project: fda
-Repository/R-Forge/Revision: 484
-Date/Publication: 2010-08-31 05:56:45
-Packaged: 2010-08-21 20:45:22 UTC; rforge
+Repository/R-Forge/Revision: 487
+Date/Publication: 2010-09-22 19:36:54
+Packaged: 2010-09-21 20:43:49 UTC; rforge
