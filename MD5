@@ -1,5 +1,5 @@
 d41d8cd98f00b204e9800998ecf8427e *CHANGELOG
-3354d340754052e7a441b1503b9f14a7 *DESCRIPTION
+9ef2a8ec56bfbd4887bcccb848852407 *DESCRIPTION
 084566cd367c9b343c27e21334de3d38 *NAMESPACE
 74ec074e643e44e06946c70603540c65 *NEWS
 39b6307f9bb0141798c3362d899c6ff5 *R/AmpPhaseDecomp.R
@@ -243,7 +243,7 @@ c95656fac6e752bbc8eca84ff9044df9 *inst/scripts/fdarm-ch11.R
 8640ab3d04475d57beb9fdcf72649586 *load.r
 e32ba2b03f49a1a15e672dbf4f3c2efb *man/AmpPhaseDecomp.Rd
 a9a08bf2a4135a510a997fd412fe7a78 *man/CRAN.Rd
-905169c6067349634c1fed041373d4f0 *man/CSTR.Rd
+f85791f40ad252c609efb3aeb85771e1 *man/CSTR.Rd
 10300a1a1bc85b0d5ec5d3aa4009c1e5 *man/CanadianWeather.Rd
 a371e235ae20ebfeb419cd39c444d1af *man/Data2fd.Rd
 36a335542207a2339dee34071cd5eb23 *man/Eigen.Rd
@@ -351,7 +351,7 @@ bea3bcd5e7169a2165b6d9c71e0c7d5f *man/monomialpen.Rd
 d71cd9d1459d031bbcb4883e8ce5b492 *man/nondurables.Rd
 bfe5cb4a44e5074faea968d77e5418c8 *man/norder.Rd
 0cd7a0958ac71048ca673e3174817647 *man/objAndNames.Rd
-27588214e75ce3a22f0f9295515ee23a *man/odesolv.Rd
+1ec288867f0266358bf7ef60fff32e1d *man/odesolv.Rd
 735c960f6e7fab3bbfe114f5a49aa782 *man/onechild.Rd
 76bc3b5820210ddd7eb8f8031903f2f2 *man/pca.fd.Rd
 b491833be4239a167da0a7fa64057ad8 *man/pda.fd.Rd

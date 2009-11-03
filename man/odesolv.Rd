@@ -59,9 +59,7 @@ linear combinations of m independent solutions.
   consider \code{\link[deSolve]{deSolve}}.  The \code{deSolve} package
   provides general solvers for ordinary and partial differential
   equations, as well as differential algebraic equations and delay
-  differential equations.  It extends \code{\link[odesolve]{lsoda}};  the
-  \code{odesolve} package is deprecated and scheduled to disapper from
-  CRAN by the end of 2012.
+  differential equations.
 }
 \examples{
 #See the analyses of the lip data.

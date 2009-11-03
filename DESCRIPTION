@@ -1,6 +1,6 @@
 Package: fda
-Version: 2.3.4
-Date: 2013-01
+Version: 2.3.6
+Date: 2013-05
 Title: Functional Data Analysis
 Author: J. O. Ramsay <ramsay@psych.mcgill.ca>, Hadley Wickham
         <h.wickham@gmail.com>, Spencer Graves
@@ -8,7 +8,7 @@ Author: J. O. Ramsay <ramsay@psych.mcgill.ca>, Hadley Wickham
 Maintainer: J. O. Ramsay <ramsay@psych.mcgill.ca>
 Depends: R (>= 2.10.0), splines, zoo, Matrix
 Imports: Matrix
-Suggests: graphics, odesolve, R.matlab, quadprog, DierckxSpline, nlme,
+Suggests: deSolve, graphics, R.matlab, quadprog, DierckxSpline, nlme,
         lattice, RCurl
 Description: These functions were developed to support functional data
         analysis as described in Ramsay, J. O. and Silverman, B. W.
@@ -38,8 +38,8 @@ URL: http://www.functionaldata.org
 LazyData: true
 Repository: CRAN
 Repository/R-Forge/Project: fda
-Repository/R-Forge/Revision: 709
-Repository/R-Forge/DateTimeStamp: 2013-04-20 06:25:33
-Date/Publication: 2013-04-21 17:55:29
-Packaged: 2013-04-20 10:15:35 UTC; rforge
+Repository/R-Forge/Revision: 712
+Repository/R-Forge/DateTimeStamp: 2013-05-22 16:07:16
+Date/Publication: 2013-05-24 19:07:52
+Packaged: 2013-05-22 18:17:09 UTC; rforge
 NeedsCompilation: no

@@ -247,7 +247,7 @@ CSTRsse(par, datstruct, fitstruct, CSTRbasis, lambda)
   desired.  CSTR2 calls CSTR2in and then computes the corresponding
   predicted first derivatives of CSTR system outputs according to the
   right hand side of the system equations.  CSTR2 can be called by
-  'lsoda' in the 'odesolve' package to actually solve the system of
+  'lsoda' in the 'deSolve' package to actually solve the system of
   equations.  To solve the CSTR equations for another set of inputs, the
   easiest modification might be to change CSTR2in to return the desired
   inputs.  Another alternative would be to add an argument
@@ -391,7 +391,7 @@ CSTRsse(par, datstruct, fitstruct, CSTRbasis, lambda)
 }
 
 \seealso{
-  \code{\link[odesolve]{lsoda}}
+  \code{\link[deSolve]{lsoda}}
   \code{\link{nls}}
 }
 \examples{
@@ -449,7 +449,7 @@ fitstruct[["Tcin"]] = coolStepInput[, "Tcin"];
 
 #  solve  differential equation with true parameter values
 
-if (require(odesolve)) {
+if (require(deSolve)) {
 coolStepSoln <- lsoda(y=yinit, times=tspan, func=CSTR2,
   parms=list(fitstruct=fitstruct, condition='all.cool.step', Tlim=Tlim) )
 }
