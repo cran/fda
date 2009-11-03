@@ -3,11 +3,11 @@ matplot <- function(x, ...) {
 }
 
 matplot.matrix <- function(x, ...){
-    fda:::matplot.default(x, ...)
+    fda::matplot.default(x, ...)
 }
 
 matplot.numeric <- function(x, ...){
-    fda:::matplot.default(x, ...)
+    fda::matplot.default(x, ...)
 }
 
 matplot.default <- function(x, y, type = "p", lty = 1:5, lwd = 1,
@@ -20,7 +20,7 @@ matplot.default <- function(x, y, type = "p", lty = 1:5, lwd = 1,
   if(is.null(ylab))
       ylab <- deparse(substitute(y))
 #
-  graphics:::matplot(x, y, type = type, lty = lty, lwd = lwd,
+  graphics::matplot(x, y, type = type, lty = lty, lwd = lwd,
     lend = lend, pch = pch, col = col, cex = cex, bg = bg,
     xlab = xlab, ylab = ylab, xlim = xlim, ylim = ylim, ..., add = add,
     verbose = getOption("verbose"))
@@ -63,7 +63,7 @@ matplot.POSIXct <- function(x, y, type = "p", lty = 1:5, lwd = 1,
     out <- matlines(x, y, type=type, cex=cex, ..., verbose=verbose)
     return(out)
   }
-  graphics:::matplot(x, y, type = type, lty = lty, lwd = lwd,
+  graphics::matplot(x, y, type = type, lty = lty, lwd = lwd,
     lend = lend, pch = pch, col = col, cex = cex, bg = bg,
     xlab = xlab, ylab = ylab, xlim = xlim, ylim = ylim, ..., add = add,
     verbose = getOption("verbose"))

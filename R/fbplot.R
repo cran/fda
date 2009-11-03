@@ -1,104 +1,63 @@
-
-#BD2
-BD2=function(matrizDatos){
-	n=dim(matrizDatos)[1]
-	p=dim(matrizDatos)[2]
-	cont=rep(0,n)
-	for (i in 1:(n-1)){
-		for (j in (i+1):n){
-			cont=cont+estaEntre(c(i,j),matrizDatos)
-		}
-	}
-	contg=(cont/combinat(n,2))
-}
-
-#indicator function
-estaEntre=function(v,matrizDatos){
-	n=dim(matrizDatos)[1]
-	p=dim(matrizDatos)[2]
-	Z=matrizDatos
-	inf=t(apply(Z[v,],2,min))
-	sup=t(apply(Z[v,],2,max))
-	resultados=colSums((t(Z)<=t(sup)%*%rep(1,n))* (t(Z)>=t(inf)%*%rep(1,n)))==p
-}
-
 #combination
 combinat=function(n,p){
-	if (n<p){combinat=0}
-	else {combinat=exp(lfactorial(n)-(lfactorial(p)+lfactorial(n-p)))}
+        if (n<p){combinat=0}
+        else {combinat=exp(lfactorial(n)-(lfactorial(p)+lfactorial(n-p)))}
 }
 
-#BD3
-BD3=function(matrizDatos){
-	n=dim(matrizDatos)[1]
-	p=dim(matrizDatos)[2]
-	cont=rep(0,n)
-	for (i in 1:(n-2)){
-		for (j in (i+1):(n-1)){
-			for (k in (j+1):n){
-				cont=cont+estaEntre(c(i,j,k),matrizDatos)
-			}
-		}
-	}
-	contg=(cont/combinat(n,3))
+
+
+#BD2
+fBD2=function(data){
+	p=dim(data)[1]
+	n=dim(data)[2]
+	rmat=apply(data,1,rank)
+	down=apply(rmat,1,min)-1
+	up=n-apply(rmat,1,max)
+	(up*down+n-1)/combinat(n,2)
+	
 }
 
 #MBD
-MBD=function(matrizDatos){
-	n=dim(matrizDatos)[1]
-	p=dim(matrizDatos)[2]
-	cont=rep(0,n)
-	for (i in 1:(n-1)){
-		for (j in (i+1):n){
-			cont=cont+aprops(c(i,j),matrizDatos)
-		}
-	}
-	contg=(cont/combinat(n,2))
+fMBD=function(data){
+	p=dim(data)[1]
+	n=dim(data)[2]
+	rmat=apply(data,1,rank)
+	down=rmat-1
+	up=n-rmat
+	(rowSums(up*down)/p+n-1)/combinat(n,2)
 }
-
-#proportion function
-aprops=function(v,matrizDatos){
-	n=dim(matrizDatos)[1]
-	p=dim(matrizDatos)[2]
-  Z=matrizDatos
-	inf=t(apply(Z[v,],2,min))
-	sup=t(apply(Z[v,],2,max))
-	resul=colSums((t(Z)<=t(sup)%*%rep(1,n))* (t(Z)>=t(inf)%*%rep(1,n)))
-	resultado=(resul/p)
-}
-
-
-
-
 #function boxplot
 #fit: p by n functional data matrix, n is the number of curves
-#method: BD2, BD3, MBD
+#method: BD2, MBD
 fbplot=function(fit,x=NULL,method='MBD',depth=NULL,plot=TRUE,prob=0.5,color=6,outliercol=2,
-				barcol=4,fullout=FALSE, factor=1.5,...){
+				barcol=4,fullout=FALSE, factor=1.5,xlim=c(1,nrow(fit)),ylim=c(min(fit)-.5*diff(range(fit)),max(fit)+.5*diff(range(fit))),...){
 				
-  if(is.fdSmooth(fit) | is.fdPar(fit)){ fit = fit$fd }  
-	if(is.fd(fit)){
-    if(length(x)==0){
-      x = seq(fit$basis$rangeval[1],fit$basis$rangeval[2],len=101)
-    }
-    fit = eval.fd(x,fit)
-  }				
+  #if(is.fdSmooth(fit) | is.fdPar(fit)){ fit = fit$fd }  
+	#if(is.fd(fit)){
+    #if(length(x)==0){
+    #  x = seq(fit$basis$rangeval[1],fit$basis$rangeval[2],len=101)
+    #}
+    #fit = eval.fd(x,fit)
+  #}				
 				
 	tp=dim(fit)[1]
 	n=dim(fit)[2]
 	if (length(x)==0) {x=1:tp}
   #compute band depth	
   if (length(depth)==0){
-	if (method=='BD2') {depth=BD2(t(fit))}
-	else if (method=='BD3') {depth=BD3(t(fit))}
-	else if (method=='MBD') {depth=MBD(t(fit))}
-	else if (method=='Both') {depth=round(BD2(t(fit)),4)*10000+MBD(t(fit))}
+	if (method=='BD2') {depth=fBD2(fit)}
+	else if (method=='MBD') {depth=fMBD(fit)}
+	else if (method=='Both') {depth=round(fBD2(fit),4)*10000+fMBD(fit)}
   }
 
-	dp_s=sort(depth,decreasing=T)
-	index=order(depth,decreasing=T)
+	dp_s=sort(depth,decreasing=TRUE)
+	index=order(depth,decreasing=TRUE)
+	med=depth==max(depth)
+	medavg=matrix(fit[,med],ncol=sum(med),nrow=tp)
+	y=apply(medavg,1,mean)
+	
 	if (plot) {
-	plot(x,fit[,index[1]],lty=1,lwd=2,col=1,type='l',...)
+	plot(x,y,lty=1,lwd=2,col=1,type='l',xlim,ylim,...)
 	}
 	for (pp in 1:length(prob)){
 		m=ceiling(n*prob[pp])#at least 50%
@@ -134,8 +93,8 @@ fbplot=function(fit,x=NULL,method='MBD',depth=NULL,plot=TRUE,prob=0.5,color=6,ou
 		    lines(c(x[bar],x[bar]),c(mincurve[bar],inf[bar]),col=barcol,lwd=2)
 			}
 		}
-		xx=c(x,x[order(x,decreasing=T)])
-		supinv=sup[order(x,decreasing=T)]
+		xx=c(x,x[order(x,decreasing=TRUE)])
+		supinv=sup[order(x,decreasing=TRUE)]
 		yy=c(inf,supinv)
 		if (plot) {
 		if (prob[pp]==0.5) {polygon(xx,yy,col=color[pp],border=barcol,lwd=2)}
@@ -154,7 +113,7 @@ fbplot=function(fit,x=NULL,method='MBD',depth=NULL,plot=TRUE,prob=0.5,color=6,ou
 			}
 		}
 	}
-	return(list(depth=depth,outpoint=outpoint))
+	return(list(depth=depth,outpoint=outpoint,medcurve=which(med)))
 }
 
 

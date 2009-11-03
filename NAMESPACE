@@ -11,6 +11,7 @@ export(AmpPhaseDecomp,
        axisIntervals, axesIntervals,
        bifd,
        bifdPar,
+       boxplot.fd, boxplot.fdPar, boxplot.fdSmooth,
        bsplinepen,
        bsplineS,
        cca.fd,
@@ -83,7 +84,7 @@ export(AmpPhaseDecomp,
        linmod,
        lmeWinsor,
        lmWinsor,
-       matplot,
+       matplot, matplot.default,
        mean.fd,
        monfn,
        monomial,
@@ -136,11 +137,12 @@ export(AmpPhaseDecomp,
        zerofind )
 
 #importFrom(base, mean, coefficients)
+importFrom(graphics, boxplot)
 
 #import(DierckxSpline)
 #import(zoo)
 import(Matrix)
-#import(zoo)
+#import(graphics)
 #import(rpart)
 
 S3method("==", basisfd)
@@ -154,6 +156,9 @@ S3method(as.fd, fdSmooth)
 S3method(as.fd, dierckx)
 S3method(as.fd, 'function')
 S3method(as.fd, smooth.spline)
+S3method(boxplot, fd)
+S3method(boxplot, fdPar)
+S3method(boxplot, fdSmooth)
 S3method(coef, fd)
 S3method(coef, fdPar)
 S3method(coef, fdSmooth)

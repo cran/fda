@@ -81,6 +81,8 @@ phaseplanePlot(evalarg, fdobj, Lfdobj1=1, Lfdobj2=2,
   \code{\link{plot}},
   \code{\link{eval.fd}}
   \code{\link{plot.fd}}
+  \code{\link{nondurables}}
+  \code{\link[zoo]{index}}
 }
 \examples{
 goodsbasis <- create.bspline.basis(rangeval=c(1919,2000),

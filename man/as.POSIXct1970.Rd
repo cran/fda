@@ -39,6 +39,7 @@ as.POSIXct1970(x, tz="GMT", ...)
 \seealso{
   \code{\link{as.POSIXct}}, \code{\link{ISOdate}},
   \code{\link{strptime}}
+  \code{\link[Ecdat]{as.Date1970}}
 }
 %\references{}
 \examples{
