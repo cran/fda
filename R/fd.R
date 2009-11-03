@@ -215,7 +215,8 @@ plus.fd <- function(e1, e2, basisobj=NULL)
 #  coefficient matrices are the same dims, the coefficient
 #  matrices are simply added.
 
-# Last modified 2008.12.26 by Spencer Graves
+# Last modified 2010.06.21 by Giles Hooker
+# Previously modified 2008.12.26 by Spencer Graves
 # Previously modified 2008.09.30 by Giles Hooker
 
   if (!(inherits(e1, "fd") || inherits(e2, "fd")))
@@ -349,8 +350,8 @@ plus.fd <- function(e1, e2, basisobj=NULL)
     basisobj <- fdobj$basis
     nbasis   <- basisobj$nbasis
     rangeval <- basisobj$rangeval
-    neval    <- max(10*nbasis + 1,201)
-    neval    <- min(neval,201)
+    neval    <- max(10*nbasis + 1,501)
+#    neval    <- min(neval,501)
     evalarg  <- seq(rangeval[1],rangeval[2], len=neval)
     fdmat    <- eval.fd(evalarg, fdobj)
     #  If one of the objects has length 1 and the other
@@ -413,7 +414,8 @@ minus.fd <- function(e1, e2, basisobj=NULL)
 #  coefficient matrices are the same dims, the coefficient
 #  matrices are simply added.
 
-# Last modified 2008.12.27 by Spencer Graved
+# Last modified 2010.06.21 by Giles Hooker
+# Previously modified 2008.12.27 by Spencer Graves
 # Previously modified 2008.09.30 by Giles Hooker
 
   if(missing(e2)){
@@ -556,8 +558,8 @@ if (inherits(e1, "fd") && inherits(e2, "fd")) {
     basisobj <- fdobj$basis
     nbasis   <- basisobj$nbasis
     rangeval <- basisobj$rangeval
-    neval    <- max(10*nbasis + 1,201)
-    neval    <- min(neval,201)
+    neval    <- max(10*nbasis + 1,501)
+#    neval    <- min(neval,201)
     evalarg  <- seq(rangeval[1],rangeval[2], len=neval)
     fdmat    <- eval.fd(evalarg, fdobj)
     #  If one of the objects has length 1 and the other

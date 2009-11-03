@@ -1,5 +1,5 @@
 Package: fda
-Version: 2.2.2
+Version: 2.2.3
 Date: 2010-06
 Title: Functional Data Analysis
 Author: J. O. Ramsay <ramsay@psych.mcgill.ca>, Hadley Wickham
@@ -20,6 +20,8 @@ Description: These functions were developed to support functional data
 License: GPL (>= 2)
 URL: http://www.functionaldata.org
 LazyData: true
-Packaged: 2010-06-21 22:00:21 UTC; gilesh
 Repository: CRAN
-Date/Publication: 2010-06-22 08:30:23
+Repository/R-Forge/Project: fda
+Repository/R-Forge/Revision: 484
+Date/Publication: 2010-08-31 05:56:45
+Packaged: 2010-08-21 20:45:22 UTC; rforge

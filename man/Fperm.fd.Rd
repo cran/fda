@@ -170,7 +170,7 @@ harmaccelLfd365 <- vec2Lfd(c(0,(2*pi/365)^2,0), c(0, 365))
 betafdPar2    <- fdPar(betafd2, harmaccelLfd365, lambda)
 betalist[[2]] <- betafdPar2
 
-F.res2 = Fperm.fd(annualprec, xfdlist, betalist)
+F.res2 = Fperm.fd(annualprec, xfdlist, betalist,nperm=20)
 
 ##
 ## 2.  yfdpar = Functional data object (class fd)
@@ -210,7 +210,7 @@ xfdlist = list(constfd,maleindfd)
 
 betalist = list(fdPar(hgtbasis,2,1e-6),fdPar(hgtbasis,2,1e-6))
 
-Fres = Fperm.fd(hgtfd,xfdlist,betalist)
+Fres = Fperm.fd(hgtfd,xfdlist,betalist,nperm=20)
 
 }
 \keyword{smooth}

@@ -454,8 +454,8 @@ fRegress.numeric <- function(y, xfdlist, betalist, wt=NULL,
                                  cbind(t(zeromat), Rmatj))
             } else {
                 Rmat  <- Rmatj
-                ncoef <- ncoef + bnbasis
             }
+            ncoef <- ncoef + bnbasis
         }
     }
 

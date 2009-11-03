@@ -116,8 +116,7 @@ basisfd <- function(type, rangeval, nbasis, params, dropind=vector("list",0),
 #  CREATE_POLYNOMIAL_BASIS  ...  creates a polynomial basis
 #  CREATE_POWER_BASIS       ...  creates a monomial basis
 
-#  Last       modified 29 September 2008 by Jim Ramsay
-#  Previously modified  4 January   2008 by Jim Ramsay
+#  Last modified 19 August 2010 by Jim Ramsay
 
 #  Set up default basis if there are no arguments:
 #     order 2 monomial basis over [0,1]
@@ -486,11 +485,12 @@ return(basisequal)
 #      two orders - 1, and the breaks are the union of the
 #      two knot sequences, each knot multiplicity being the maximum
 #      of the multiplicities of the value in the two break sequences.
+#      Order, however, is not allowed to exceed 20.
 #      That is, no knot in the product knot sequence will have a
 #      multiplicity greater than the multiplicities of this value
 #      in the two knot sequences.
 #      The rationale this rule is that order of differentiability
-#      of the product at eachy value will be controlled  by
+#      of the product at each value will be controlled  by
 #      whichever knot sequence has the greater multiplicity.
 #      In the case where one of the splines is order 1, or a step
 #      function, the problem is dealt with by replacing the
@@ -578,7 +578,8 @@ return(basisequal)
     }
     norder1 <- nbasis1 - length(interiorknots1)
     norder2 <- nbasis2 - length(interiorknots2)
-    norder  <- norder1 + norder2 - 1
+    #  norder is not allowed to exceed 20
+    norder  <- min(c(norder1 + norder2 - 1,20))
     allbreaks  <- c(range1[1], allknots, range1[2])
     nbasis <- length(allbreaks) + norder - 2
     prodbasisobj <-
@@ -600,12 +601,13 @@ return(basisequal)
     }
   }
 
-#  default case when all else fails: the product basis is B-spline
+#  Default case when all else fails: the product basis is B-spline
 #  When neither basis is a B-spline basis, the order
 #  is the sum of numbers of bases, but no more than 8.
 #  When one of the bases if B-spline and the other isn"t,
 #  the order is the smaller of 8 or the order of the spline
-#  plus 2.
+#  plus 2.  Under no circumstances can the order exceed 20, however.
+#  See BsplineS where this restriction is tested.
 
   if (type1 == "bspline" || type2 == "bspline") {
     norder <- 8
