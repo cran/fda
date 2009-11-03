@@ -26,8 +26,10 @@ eval.fd(evalarg, fdobj, Lfdobj=0, returnMatrix=FALSE)
 }
 \arguments{
   \item{evalarg, newdata}{
-    a vector of argument values at which the functional data object is
-    to be evaluated.
+    a vector or matrix of argument values at which the functional data
+    object is to be evaluated.  If a matrix with more than one column,
+    the number of columns must match ncol(dfobj[['coefs']]).
+
   }
   \item{fdobj}{
     a functional data object to be evaluated.
@@ -50,14 +52,16 @@ eval.fd(evalarg, fdobj, Lfdobj=0, returnMatrix=FALSE)
 }
 \details{
   \code{eval.fd} evaluates \code{Lfdobj} of \code{fdobj} at
-  \code{evalarg}.  \code{predict.fd} is a convenience wrapper for
+  \code{evalarg}.
+
+  \code{predict.fd} is a convenience wrapper for
   \code{eval.fd}.  If \code{newdata} is NULL and
   \code{fdobj[['basis']][['type']]} is \code{bspline}, \code{newdata} =
   \code{unique(knots(fdojb,interior=FALSE))};  otherwise, \code{newdata}
   = \code{fdobj[['basis']][['rangeval']]}.
 
   \code{predict.fdSmooth}, \code{fitted.fdSmooth} and
-  \code{residuals.fdSmooth} are other wrapper for \code{eval.fd}.
+  \code{residuals.fdSmooth} are other wrappers for \code{eval.fd}.
 }
 \value{
   an array of 2 or 3 dimensions containing the function
@@ -98,6 +102,18 @@ harmaccelLfd <- Lfd(3, bwtlist)
 #   evaluate the value of the harmonic acceleration
 #   operator at the sampling points
 Ltempmat <- eval.fd(day.5, tempfd, harmaccelLfd)
+
+#  Confirm that it still works with
+#  evalarg = a matrix with only one column
+#  when fdobj[['coefs']] is a matrix with multiple columns
+
+Ltempmat. <- eval.fd(matrix(day.5, ncol=1), tempfd, harmaccelLfd)
+#  confirm that the two answers are the same
+
+\dontshow{stopifnot(}
+all.equal(Ltempmat, Ltempmat.)
+\dontshow{)}
+
 #  Plot the values of this operator
 matplot(day.5, Ltempmat, type="l")
 

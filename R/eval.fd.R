@@ -67,9 +67,7 @@ eval.fd <- function(evalarg, fdobj, Lfdobj=0, returnMatrix=FALSE) {
 #  Returns:  An array of function values corresponding to the evaluation
 #              arguments in EVALARG
 
-#  Last modified July 5, 2012 by Spencer Graves
-#    to accept evalarg of class Date and POSIXct
-#  Previously modified 9 May 2012 by Jim Ramsay
+#  Last modified Oct 19, 2012 by Spencer Graves
 
 #  Check LFDOBJ
 
@@ -139,6 +137,18 @@ eval.fd <- function(evalarg, fdobj, Lfdobj=0, returnMatrix=FALSE) {
   ndim  <- length(coefd)
   if (ndim <= 1) nrep <- 1 else nrep <- coefd[2]
   if (ndim <= 2) nvar <- 1 else nvar <- coefd[3]
+
+# check coef is conformable with evalarg
+  if(length(evaldim)>1){
+    if(evaldim[2]==1){
+      evalarg <- c(evalarg)
+    } else {
+      if(evaldim[2] != coefd[2]){
+        stop('evalarg has ', evaldim[2], ' columns;  does not match ',
+             ndim[2], ' = number of columns of ffdobj$coefs')
+      }
+    }
+  }
 
 #  Set up array for function values
 

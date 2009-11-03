@@ -1,5 +1,5 @@
 d41d8cd98f00b204e9800998ecf8427e *CHANGELOG
-4fa242a017c79c1c57d5b8cf02b56036 *DESCRIPTION
+956501fedfd0f5f7f64a7a372789e285 *DESCRIPTION
 661ce7a52a3c9a7b1333dbb04b4bd7e2 *NAMESPACE
 74ec074e643e44e06946c70603540c65 *NEWS
 39b6307f9bb0141798c3362d899c6ff5 *R/AmpPhaseDecomp.R
@@ -52,7 +52,7 @@ a96b22bc327f5c864735fb17d3590da7 *R/dirs.R
 0828709f4a3f87fe0b8ba71dfa243b44 *R/eigen.pda.R
 fe166d589574f540c1b458107e0ee770 *R/eval.basis.R
 5d2e698d2b40f41edf5f88c962a93f74 *R/eval.bifd.R
-147ff8c2a320ad808fa7e20f310199e8 *R/eval.fd.R
+a8d46b6ba7d4c97a4b42053d016a8bd9 *R/eval.fd.R
 dcb150edf11544f170c142ca36fcef18 *R/eval.monfd.R
 535466e1497938d94c16dbf164d24ac3 *R/eval.penalty.R
 2414df3d511acdee79842b246e818e5d *R/eval.posfd.R
@@ -216,7 +216,7 @@ c2fdf1040d09a9bf40b92520c75573c1 *demo/refinery.R
 0a3639015f482df392dc4689645c42d0 *demo/weatherstats.R
 e742ac5606b9bd42b36eddae69a3969e *inst/Matlab/README
 8d681a350aab8edadee22b6a6b47e5c8 *inst/README.txt
-6bb8b7e3d3907e0604af5c02708506f9 *inst/doc/FDAfuns.pdf
+2f8d6455ece06db0718f8a5afb673975 *inst/doc/FDAfuns.pdf
 85732e091077a21ca4ba0fba341e0c7c *inst/doc/fRegress-JSM2009/R/fRegress-JSM2009.R
 a4653259a763578444d974b7df3dc65f *inst/doc/fRegress-JSM2009/fRegress1.pdf
 a1d40bf4ac278fa8483a32a5c3326e58 *inst/doc/fRegress-JSM2009/fRegress1.tex
@@ -316,7 +316,7 @@ c6e22299bbeb8dce2026722574ebe738 *man/dirs.Rd
 c715456fd027f3819cdffd6bebb0ee12 *man/eigen.pda.rd
 759b0245ab77c499c1bf81720a96c262 *man/eval.basis.Rd
 068672a4e6bbcd29db052854343c995a *man/eval.bifd.Rd
-2ad20c754dfda181ae75420d3bcbb81e *man/eval.fd.Rd
+50ec721b236362039f89632e9abcfbfc *man/eval.fd.Rd
 99bb01fce591903115da4983e5e70a6f *man/eval.monfd.Rd
 a6a43b85622e9e82ee1c44dac4b86527 *man/eval.penalty.Rd
 5b5d781a288fe2fbc6ead6a8f4da3af1 *man/eval.posfd.Rd
@@ -388,7 +388,7 @@ defaa4153acf97291f1f032e9f9c3c40 *man/plot.pca.fd.Rd
 0ed0c2ffe84d5192d168fe97d4fa97c8 *man/plot.pda.fd.rd
 42a5646f8ad4d7f841405f287f037d98 *man/plotbeta.Rd
 a47c35ac2267bd9d87902c9623f6a6fc *man/plotfit.fd.Rd
-bb4df419f5e90738eb4a7576f608732d *man/plotreg.fd.rd
+bb2b0ba7ed3c164d88a49cce134d7f17 *man/plotreg.fd.rd
 7c73103c14baeedce08c87e1d4552737 *man/plotscores.Rd
 384b620598e6b1b575104cef13554c89 *man/polyg.Rd
 7351d0f46bbcc4c0ec36e6e67ef1784a *man/polygpen.Rd
@@ -407,7 +407,7 @@ d0fa956a84ed1aebff4df0c6314d1f31 *man/register.fd0.Rd
 10da39f7fe0273dcc7d650eae5e17af2 *man/resid.fRegress.Rd
 89194707cdcd110ce6e6ab291d60698a *man/sd.Rd
 39a0efe77a59c9633439a74d54aece72 *man/seabird.Rd
-7eb31986ad11b8b7faba8428405564c8 *man/smooth.basis.Rd
+e319a957b4f6b6cb1a3cccd33abd107c *man/smooth.basis.Rd
 39d1170fdcd4c20a0aba4603e36e3b13 *man/smooth.basisPar.Rd
 8de2513677857080c313966aad4b9668 *man/smooth.bibasis.Rd
 1696cf6bf25195486eda24347ebac888 *man/smooth.fd.Rd

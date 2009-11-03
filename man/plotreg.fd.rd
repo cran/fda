@@ -74,12 +74,13 @@ Warpfd    <- fd(matrix(0,nwbasis,nBoys),wbasis)
 WarpfdPar <- fdPar(Warpfd)
 #  carry out the continuous registration
 gaitreglist <- register.fd(D2gaitmeanfd, D2gaitfd[1:nBoys], WarpfdPar,
-                           periodic=TRUE)
+                           iterlim=4, periodic=TRUE)
+# set iterlim=4 to reduce the compute time;
+# this argument may not be needed in many applications.
 #  plot the results
 plotreg.fd(gaitreglist)
 #  display horizonal shift values
 print(round(gaitreglist$shift,1))
 }
-
 % docclass is function
 \keyword{smooth}

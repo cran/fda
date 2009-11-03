@@ -316,7 +316,8 @@ for (nbasis in 4:12) {
   xfd = ys$fd
   gcv = ys$gcv
   RMSE = sqrt(mean((eval.fd(argvals, xfd) - x)^2))
-  cat(paste(nbasis,round(RMSE,3),round(gcv,3),"\n"))
+# progress report:
+#  cat(paste(nbasis,round(RMSE,3),round(gcv,3),"\n"))
 }
 #  We got RMSE = 0.062 for 10 basis functions as optimal, but gcv liked
 #  almost the same thing, namely 9 basis functions.  Both RMSE and gcv
@@ -656,7 +657,7 @@ RMSED  = sqrt(mean((Dxhat  - Dx )^2))
 RMSED2 = sqrt(mean((D2xhat - D2x)^2))
 cat(round(c(df,RMSED,RMSED2,gcv),3),"\n")
 #  Four plots of the results row-wise: data fit, first derivative fit,
-#  second derivative fit, second versus first derivative fit
+#  second derivative fit, second vs. first derivative fit
 #  (phase-plane plot)
 par(mfrow=c(2,2))
 plotfit.fd(y, argvals, xfd)
@@ -702,8 +703,8 @@ bwtlist = vector("list", 2)
 bwtlist[[1]] = xcoef.fd
 bwtlist[[2]] = Dxcoef.fd
 Lfdobj = Lfd(nderiv=2, bwtlist=bwtlist)
-#  Now we use a much larger value of lambda to reflect our confidence in power
-#  of calculus to solve problems!
+#  Now we use a much larger value of lambda to reflect our confidence
+#  in power of calculus to solve problems!
 lambda = 10^(0)
 fdParobj = fdPar(fdobj=basisobj, Lfdobj=Lfdobj, lambda=lambda)
 smoothlist = smooth.basis(argvals, y, fdParobj)
@@ -716,7 +717,8 @@ RMSED  = sqrt(mean((Dxhat  - Dx )^2))
 RMSED2 = sqrt(mean((D2xhat - D2x)^2))
 cat(round(c(df,RMSED,RMSED2,gcv),3),"\n")
 #  Four plots of the results row-wise: data fit, first derivative fit,
-#  second derivative fit, second versus first derivative fit (phase-plane plot)
+#  second derivative fit, second versus first derivative fit
+#  (phase-plane plot)
 par(mfrow=c(2,2))
 plotfit.fd(y, argvals, xfd)
 plot(argvals, Dxhat, type="p", pch="o")
@@ -733,9 +735,9 @@ title("second against first derivative")
 #  degrees of freedom, which is close to what we would use for the ideal
 #  fourier series basis with the constant term dropped.
 #  Homework:
-#  These results depended on us knowing the right period, of course.  The data
-#  would certainly allow us to estimate the period 1/2 closely, but try various
-#  other periods by replacing 1/2 by other values.
+#  These results depended on us knowing the right period, of course.
+#  The data would certainly allow us to estimate the period 1/2 closely,
+#  but try various  other periods by replacing 1/2 by other values.
 #  Alternatively, change x by adding a small amount of, say, linear trend.
 #  How much trend do you have to add to seriously handicap the results?
 
@@ -824,7 +826,12 @@ smoothlist = smooth.basis(argvals, y, fdParobj)
 xfd = smoothlist$fd   #  the curve smoothing the data
 df  = smoothlist$df   #  the degrees of freedom in the smoothing curve
 gcv = smoothlist$gcv  #  the value of the gcv statistic
-RMSE = sqrt(mean((eval.fd(argvals, xfd) - x)^2))
+#RMSE = sqrt(mean((eval.fd(argvals, xfd) - x)^2))
+eval.x <- eval.fd(argvals, xfd)
+e.xfd <- (eval.x-x)
+mean.e2 <- mean(e.xfd^2)
+
+RMSE = sqrt(mean.e2)
 #  Display the results, note that a gcv value is returned for EACH
 #  curve, and therefore that a mean gcv result is reported
 cat(round(c(df,RMSE,mean(gcv)),3),"\n")
