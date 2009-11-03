@@ -53,7 +53,7 @@ fRegress <- function(y, xfdlist, betalist, wt=NULL,
 #    wt          ... weights for observations
 #    df          ... degrees of freedom for fit
 
-#  Last modified 29 October 2009 by Jim Ramsay
+#  Last modified 3 February 2010 by Jim Ramsay
 
 arglist <- fRegressArgCheck(y, xfdlist, betalist, wt)
 
@@ -88,6 +88,8 @@ if (inherits(yfdPar, "fdPar")) {
     ybasisobj <- yfdobj$basis
     rangeval  <- ybasisobj$rangeval
     ynbasis   <- ybasisobj$nbasis
+    onesbasis <- create.constant.basis(rangeval)
+    onesfd    <- fd(1,onesbasis)
 
     if (length(ycoefdim) > 2) stop("YFDOBJ from YFDPAR is not univariate.")
 
@@ -122,7 +124,7 @@ if (inherits(yfdPar, "fdPar")) {
             indexj <- mj1:mj2
             #  compute right side of equation DMAT
             xfdj <- xfdlist[[j]]
-            if (wtconstant) {
+            if (wtconst) {
                 xyfdj <- xfdj*yfdobj
             } else {           
                 xyfdj <- (xfdj*wt)*yfdobj
@@ -144,7 +146,7 @@ if (inherits(yfdPar, "fdPar")) {
                     indexk <- mk1:mk2
                     #  set up two weight functions
                     xfdk <- xfdlist[[k]]
-                    if (wtconstant) {
+                    if (wtconst) {
                         xxfdjk <- xfdj*xfdk
                     } else {           
                         xxfdjk <- (xfdj*wt)*xfdk
@@ -166,7 +168,7 @@ if (inherits(yfdPar, "fdPar")) {
         }
     }
 
-    Cmat    <- (Cmat+t(Cmat))/2
+    Cmat <- (Cmat+t(Cmat))/2
 
     #  check Cmat for singularity
 
@@ -221,7 +223,76 @@ if (inherits(yfdPar, "fdPar")) {
     #               if both y2cMap and SigmaE are supplied.
     #  -----------------------------------------------------------------------
 
- 
+    if (!(is.null(y2cMap) || is.null(SigmaE))) {
+
+        #  check dimensions of y2cMap and SigmaE
+
+        y2cdim = dim(y2cMap)
+        if (y2cdim[1] != ynbasis || y2cdim[2] != dim(SigmaE)[1]) {
+             stop("Dimensions of Y2CMAP not correct.")
+        }
+
+        ybasismat = eval.basis(tfine, ybasisobj)
+
+        deltat    = tfine[2] - tfine[1]
+
+        #  compute BASISPRODMAT
+
+        basisprodmat = matrix(0,ncoef,ynbasis*N)
+
+        mj2 = 0
+        for (j in 1:p) {
+            betafdParj = betalist[[j]]
+            betabasisj = betafdParj$fd$basis
+            ncoefj     = betabasisj$nbasis
+            bbasismatj = eval.basis(tfine, betabasisj)
+            xfdj       = xfdlist[[j]]
+            tempj      = eval.fd(tfine, xfdj)
+            #  row indices of BASISPRODMAT to fill
+            mj1    = mj2 + 1
+            mj2    = mj2 + ncoefj
+            indexj = mj1:mj2
+            #  inner products of beta basis and response basis
+            #    weighted by covariate basis functions
+            mk2 = 0
+            for (k in 1:ynbasis) {
+                #  row indices of BASISPRODMAT to fill
+                mk1    = mk2 + 1
+                mk2    = mk2 + N
+                indexk = mk1:mk2
+                tempk  = bbasismatj*ybasismat[,k]
+                basisprodmat[indexj,indexk] =
+                                 deltat*crossprod(tempk,tempj)
+            }
+        }
+
+        #  compute variances of regression coefficient function values
+
+        c2bMap    = solve(Cmat,basisprodmat)
+        VarCoef   = y2cMap %*% SigmaE %*% t(y2cMap)
+        CVariance = kronecker(VarCoef,diag(rep(1,N)))
+        bvar      = c2bMap %*% CVariance %*% t(c2bMap)
+        betastderrlist = vector("list", p)
+        mj2 = 0
+        for (j in 1:p) {
+            betafdParj = betalist[[j]]
+            betabasisj = betafdParj$fd$basis
+            ncoefj     = betabasisj$nbasis
+            mj1 	     = mj2 + 1
+            mj2 	     = mj2 + ncoefj
+            indexj     = mj1:mj2
+            bbasismat  = eval.basis(tfine, betabasisj)
+            bvarj      = bvar[indexj,indexj]
+            bstderrj   = sqrt(diag(bbasismat %*% bvarj %*% t(bbasismat)))
+            bstderrfdj = smooth.basis(tfine, bstderrj, betabasisj)$fd
+            betastderrlist[[j]] = bstderrfdj
+        }
+    } else {
+        betastderrlist = NULL
+        bvar           = NULL
+        c2bMap         = NULL
+    }
+
 
     #  -------------------------------------------------------------------
     #                       Set up output list object

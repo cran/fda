@@ -38,7 +38,7 @@ fd <- function (coef=NULL, basisobj=NULL, fdnames=NULL)
   #  Returns:
   #  FD ... a functional data object
 
-  #  Last modified 21 October 2009 by Jim Ramsay
+  #  Last modified 3 February 2010 by Jim Ramsay
 
 ##
 ## 1.  check coef and get its dimensions
@@ -256,29 +256,33 @@ plus.fd <- function(e1, e2, basisobj=NULL)
     #  and if (so, copy it as many times as there are replicates
     #  in the other function.
     if (coefd1[2] == 1 && coefd2[2] > 1) {
-      if      (ndim1 == 2) coef1 <- outer(coef1,rep(1,coefd2[2]))
-      else if (ndim1 == 3) {
-        temp <- array(0,coefd2)
-        for (j in 1:coefd1[3])
-          temp[,,j] <- outer(coef1[,1,j],rep(1,coefd2[2]))
-        coef1 <- temp
-      } else
-      stop("Dimensions of coefficient matrices not compatible.")
-      coefd1 <- dim(coef1)
+      if      (ndim1 == 2) {
+        coef1 <- outer(as.vector(coef1),rep(1,coefd2[2]))
+      } else if (ndim1 == 3) {
+          temp <- array(0,coefd2)
+          for (j in 1:coefd1[3]) {
+            temp[,,j] <- outer(as.vector(coef1[,1,j]),rep(1,coefd2[2]))
+          }
+          coef1 <- temp
+      } else {
+        stop("Dimensions of coefficient matrices not compatible.")
+      }
+      coefd1   <- dim(coef1)
       e1$coefs <- coef1
     }
     if (coefd1[2] >  1 && coefd2[2] == 1) {
-      if      (ndim2 == 2) coef2 <- outer(coef2,rep(1,coefd1[2]))
-      else if (ndim1 == 3) {
-#            temp <- zeros(coefd1)
-        temp <- array(0, dim=coefd1)
-        for (j in 1:coefd2[3])
-#                temp[,,j] <- squeeze(coef2[,1,j])*ones(1,coefd1[2])
-          temp[,,j] <- (coef2[, 1, j, drop=TRUE] %o% rep(1, coefd1[2]))
+      if      (ndim2 == 2) {
+        coef2 <- outer(as.vector(coef2),rep(1,coefd1[2]))
+      } else if (ndim1 == 3) {
+        temp <- array(0, coefd1)
+        for (j in 1:coefd2[3]) {
+          temp[,,j] <- outer(as.vector(coef2[,1,j]),rep(1, coefd1[2]))
+        }
         coef2 <- temp
-      } else
-      stop("Dimensions of coefficient matrices not compatible.")
-      coefd2 <- dim(coef2)
+      } else {
+        stop("Dimensions of coefficient matrices not compatible.")
+      }
+      coefd2   <- dim(coef2)
       e2$coefs <- coef2
     }
     #  check for equality of dimensions of coefficient matrices
@@ -293,7 +297,7 @@ plus.fd <- function(e1, e2, basisobj=NULL)
     basisobj2 <- e2$basis
     #  check for equality of two bases
     if (basisobj1 == basisobj2) {
-        #  if equal, just difference coefficient matrices
+        #  if equal, just add coefficient matrices
       fdnames <- e1$fdnames
       plusfd <- fd(coef1 + coef2, basisobj1, fdnames)
       return(plusfd)
@@ -306,8 +310,8 @@ plus.fd <- function(e1, e2, basisobj=NULL)
         stop("The ranges of the arguments are not equal.")
       neval     <- max(10*max(nbasis1+nbasis2) + 1, 201)
       evalarg   <- seq(rangeval1[1], rangeval2[2], len=neval)
-      fdarray1  <- eval.fd(e1, evalarg)
-      fdarray2  <- eval.fd(e2, evalarg)
+      fdarray1  <- eval.fd(evalarg, e1)
+      fdarray2  <- eval.fd(evalarg, e2)
       if ((ndim1 <= 2 && ndim2 <= 2) ||
           (ndim1 >  2 && ndim2 >  2))
         fdarray <- fdarray1 + fdarray2
@@ -321,7 +325,7 @@ plus.fd <- function(e1, e2, basisobj=NULL)
         for (ivar  in  1:coefd1[3])
           fdarray[,,ivar] <- fdarray1[,,ivar] + fdarray2
       }
-#  set up basis for sum
+      #  set up basis for sum
       coefsum  <- project.basis(fdarray, evalarg, basisobj, 1)
       fdnames1 <- e1$fdnames
       fdnames2 <- e2$fdnames
@@ -332,7 +336,6 @@ plus.fd <- function(e1, e2, basisobj=NULL)
     #  one argument is numeric and the other is functional
     if (!(is.numeric(e1) || is.numeric(e2)))
       stop("Neither argument for + is numeric.")
-#    if (is.numeric(e1) && isa_fd(e2)) {
     if (is.numeric(e1) && is.fd(e2)) {
       fac   <- e1
       fdobj <- e2
@@ -460,30 +463,34 @@ if (inherits(e1, "fd") && inherits(e2, "fd")) {
     #  and if (so, copy it as many times as there are replicates
     #  in the other function.
     if (coefd1[2] == 1 && coefd2[2] > 1) {
-        if      (ndim1 == 2) coef1 <- outer(coef1,rep(1,coefd2[2]))
-        else if (ndim1 == 3) {
-            temp <- array(0,coefd2)
-            for (j in 1:coefd1[3])
-                temp[,,j] <- outer(coef1[,1,j],rep(1,coefd2[2]))
-            coef1 <- temp
-        } else
-            stop("Dimensions of coefficient matrices not compatible.")
-        coefd1 <- dim(coef1)
-        e1$coefs <- coef1
+      if      (ndim1 == 2) {
+        coef1 <- outer(as.vector(coef1),rep(1,coefd2[2]))
+      } else if (ndim1 == 3) {
+          temp <- array(0,coefd2)
+          for (j in 1:coefd1[3]) {
+            temp[,,j] <- outer(as.vector(coef1[,1,j]),rep(1,coefd2[2]))
+          }
+          coef1 <- temp
+      } else {
+        stop("Dimensions of coefficient matrices not compatible.")
+      }
+      coefd1   <- dim(coef1)
+      e1$coefs <- coef1
     }
-    if (coefd1[2] >  1 && coefd2[2] == 1 ) {
-        if      (ndim2 == 2) coef2 <- outer(coef2,rep(1,coefd1[2]))
-        else if (ndim1 == 3) {
-#            temp <- zeros(coefd1)
-            temp <- array(0, dim=coefd1)
-            for (j in 1:coefd2[3])
-#                temp[,,j] <- squeeze(coef2[,1,j])*ones(1,coefd1[2])
-                temp[,,j] <- (coef2[,1,j, drop=TRUE] %o% rep(1,coefd1[2]))
-            coef2 <- temp
-        } else
-            stop("Dimensions of coefficient matrices not compatible.")
-        coefd2 <- dim(coef2)
-        e2$coefs <- coef2
+    if (coefd1[2] >  1 && coefd2[2] == 1) {
+      if      (ndim2 == 2) {
+        coef2 <- outer(as.vector(coef2),rep(1,coefd1[2]))
+      } else if (ndim1 == 3) {
+        temp <- array(0, coefd1)
+        for (j in 1:coefd2[3]) {
+          temp[,,j] <- outer(as.vector(coef2[,1,j]),rep(1, coefd1[2]))
+        }
+        coef2 <- temp
+      } else {
+        stop("Dimensions of coefficient matrices not compatible.")
+      }
+      coefd2   <- dim(coef2)
+      e2$coefs <- coef2
     }
     #  check for equality of dimensions of coefficient matrices
     if (coefd1[2] != coefd2[2])
