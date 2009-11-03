@@ -31,7 +31,7 @@ function basisobj = create_bspline_basis(rangeval, nbasis, norder, ...
 %  A B-spline basis may also be constructed using CREATE_EASY_BASIS
 %    CREATE_BASIS or MAKE_BASIS.
 
-%  last modified 3 January 2008
+%  last modified 11 Febuary 2008
 
 %  Default basis for missing arguments
 
@@ -101,24 +101,28 @@ if ~isempty(nbasis) && isempty(breaks)
     nbreaks = nbasis - norder + 2;
     breaks  = linspace(rangeval(1), rangeval(2), nbreaks);
 end
+
+%  Special argument configurations taken care of.  
+%  Now go ahead and set up the basis
+
 nbreaks = length(breaks);
 
 %  check the compatibility of NBASIS, NBREAKS and RANGEVAL
 
-if (nbreaks < 2)
+if nbreaks < 2
     error ('Number of values in BREAKS less than 2.');
 end
-if (nbasis < nbreaks-1)
+if nbasis < nbreaks-1
     error ('NBASIS is less than number of values=BREAKS.');
 end
-if (breaks(1) ~= rangeval(1))
+if breaks(1) ~= rangeval(1)
     error('Smallest value in BREAKS not equal to RANGEVAL(1).');
 end
-if (breaks(nbreaks) ~= rangeval(2))
+if breaks(nbreaks) ~= rangeval(2)
     error('Largest  value in BREAKS not equal to RANGEVAL(2).');
 end
 
-%  The PARAMS field contains only the interior knots
+%  The PARAMS field contains only the interior knots; drop end breaks
 
 if nbreaks > 2
     params   = breaks(2:(nbreaks-1));
@@ -145,12 +149,16 @@ if length(dropind) > 0
     end
 end
 
-%  construct basis object
+%  set up dummy objects for quadvals, values and basisvalues
 
-type        = 'bspline';
-quadvals    = [];
 values      = {};
 basisvalues = {};
 
+%  construct basis object
+
+type        = 'bspline';
+
 basisobj = basis(type, rangeval, nbasis, params, ...
-                 dropind, quadvals, values, basisvalues);
+                 dropind, [], values, basisvalues);
+             
+

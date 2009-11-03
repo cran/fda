@@ -87,11 +87,9 @@ Wfd0  <- fd(cvec0, wbasis)
 Lfdobj    <- 3          #  penalize curvature of acceleration
 lambda    <- 10^(-0.5)  #  smoothing parameter
 growfdPar <- fdPar(Wfd0, Lfdobj, lambda)
-#  Set up wgt vector
-wgt   <- rep(1,nage)
 #  Smooth the data for the first girl
-hgt1 = growth$hgtf[,1]
-result <- smooth.monotone(age, hgt1, growfdPar, wgt)
+hgt1 <- growth$hgtf[,1]
+result <- smooth.monotone(age, hgt1, growfdPar)
 #  Extract the functional data object and regression
 #  coefficients
 Wfd  <- result$Wfdobj

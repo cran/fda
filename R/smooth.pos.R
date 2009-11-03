@@ -98,7 +98,7 @@ coef0    <- Wfdobj$coefs
 
 #  check WTVEC
 
-wtvec = wtcheck(n, wtvec)
+wtvec = wtcheck(n, wtvec)$wtvec
 
 #  set up some arrays
 
@@ -358,14 +358,14 @@ for (ivar in 1:nvar) {
 PENSSEfun <- function(argvals, yi, basisobj, cveci, Kmat, wtvec) {
 	#  Computes the log likelihood and its derivative with
 	#    respect to the coefficients in CVEC
-   	N       <- length(argvals)
-   	nbasis  <- basisobj$nbasis
-   	phimat  <- getbasismatrix(argvals, basisobj)
+	N       <- length(argvals)
+	nbasis  <- basisobj$nbasis
+	phimat  <- getbasismatrix(argvals, basisobj)
 	Wvec    <- phimat %*% cveci
 	EWvec   <- exp(Wvec)
 	res     <- yi - EWvec
-   	PENSSE  <- mean(wtvec*res^2) + t(cveci) %*% Kmat %*% cveci
-  	DPENSSE <- -2*crossprod(phimat,wtvec*res*EWvec)/N + 2*Kmat %*% cveci
+	PENSSE  <- mean(wtvec*res^2) + t(cveci) %*% Kmat %*% cveci
+	DPENSSE <- -2*crossprod(phimat,wtvec*res*EWvec)/N + 2*Kmat %*% cveci
 	return( list(PENSSE, DPENSSE) )
 }
 

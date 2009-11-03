@@ -130,7 +130,7 @@ coef0    <- Wfdobj$coefs
 
 #  check WTVEC
 
-wtvec <- wtcheck(n, wtvec)
+wtvec <- wtcheck(n, wtvec)$wtvec
 
 #  check ZMAT
 
@@ -138,9 +138,9 @@ if (!is.null(zmat)) {
   zdim <- dim(zmat)
   if (zdim[1] != n) stop("First dimension of ZMAT not correct.")
   ncov   <- zdim[2]   #  number of covariates
-}
-else
+} else {
   ncov <- 1
+}
 
 #  set up some variables
 
@@ -417,11 +417,9 @@ for (ivar in 1:nvar) {
 
     if (ndim == 2) {
         coef[,icurve] <- cveci
-#        beta[,icurve] <- matrix(betai,2,1)
         beta[,icurve] <- betai
     } else {
         coef[,icurve,ivar] <- cveci
-#        beta[,icurve,ivar] <- matrix(betai,2,1)
         beta[,icurve,ivar] <- betai
     }
 
@@ -460,14 +458,13 @@ if (is.null(zmat)) {
   narg     <- 10*nbasis+1
   evalarg  <- seq(rangeval[1], rangeval[2], len=narg)
   hmat     <- eval.monfd(evalarg, Wfdobj)
-
   if (ndim == 2) {
     yhatmat <- matrix(0,narg,ncurve)
     for (icurve in 1:ncurve) {
       yhatmat[,icurve] <- beta[1,icurve] +
                           beta[2,icurve]*hmat[,icurve]
     }
-    yhatcoef <- project.basis(yhatmat, evalarg, basisobj)
+    yhatcoef <- project.basis(yhatmat, evalarg, basisobj) 
     yhatfd   <- fd(yhatcoef, basisobj)
   } else {
     yhatcoef <- array(0,c(nbasis,ncurve,nvar))
@@ -525,8 +522,11 @@ fngrad.smooth.monotone <- function(yi, argvals, zmat, wtvec, cveci, lambda,
   Wfdobj <- fd(cveci, basisobj)
   h      <- monfn(argvals, Wfdobj, basislist)
   Dyhat  <- mongrad(argvals, Wfdobj, basislist)
-  if (!is.null(zmat)) xmat <- cbind(zmat,h)
-  else                xmat <- cbind(matrix(1,n,1),h)
+  if (!is.null(zmat)) {
+    xmat <- cbind(zmat,h)
+  } else {
+    xmat <- cbind(matrix(1,n,1),h)
+  }
   Dxmat  <- array(0,c(n,ncovp1,nbasis))
   Dxmat[,ncovp1,] <- Dyhat
   wtroot <- sqrt(wtvec)
@@ -534,7 +534,7 @@ fngrad.smooth.monotone <- function(yi, argvals, zmat, wtvec, cveci, lambda,
   yroot  <- yi*wtroot
   xroot  <- xmat*wtrtmt
   #  compute regression coefs.
-  betai  <- lsfit(xmat, yi, wtvec, intercept=FALSE)$coef
+  betai  <- lsfit(xmat, yi, wt=as.vector(wtvec), intercept=FALSE)$coef
   #  update fitted values
   yhat   <- xmat %*% betai
   #  update residuals and function values

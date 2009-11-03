@@ -11,7 +11,7 @@ function monommat = monomial(evalarg, exponents, nderiv)
 %  A matrix with length(EVALARG) rows and NBASIS columns containing
 %    the values of the monomials or their derivatives
 
-%  last modified 3 January 2008
+%  last modified 17 June 2011
 
 % set default arguments
 
@@ -41,7 +41,7 @@ end
 
 % check if there are duplicate exponents
 
-if min(diff(sort(exponents))) <= 0
+if min(diff(sort(exponents))) == 0
     error('There are duplicate exponents.');
 end
 
@@ -52,10 +52,12 @@ if nderiv == 0
     for ibasis=1:nbasis, monommat(:,ibasis) = evalarg.^exponents(ibasis); end
 else
     for ibasis=1:nbasis
+        disp(ibasis)
         degree = exponents(ibasis);
         if nderiv <= degree 
             fac = degree;
             for ideriv=2:nderiv
+                disp(ideriv)
                 fac = fac*(degree-ideriv+1);
             end
             monommat(:,ibasis) = fac.*evalarg.^(degree-nderiv);

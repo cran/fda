@@ -69,8 +69,8 @@ daybasis65 <- create.fourier.basis(c(0, 365), nbasis=65, period=365)
 
 harmaccelLfd <- vec2Lfd(c(0,(2*pi/365)^2,0), c(0, 365))
 harmfdPar     <- fdPar(daybasis65, harmaccelLfd, lambda=1e5)
-daytempfd <- data2fd(CanadianWeather$dailyAv[,,"Temperature.C"],
-      day.5, daybasis65, argnames=list("Day", "Station", "Deg C"))
+daytempfd <- smooth.basis(day.5, CanadianWeather$dailyAv[,,"Temperature.C"],
+                   daybasis65, fdnames=list("Day", "Station", "Deg C"))$fd
 
 daytemppcaobj <- pca.fd(daytempfd, nharm=4, harmfdPar)
 daytemppcaVarmx <- varmx.pca.fd(daytemppcaobj)

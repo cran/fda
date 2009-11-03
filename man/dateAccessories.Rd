@@ -78,7 +78,7 @@
 \examples{
 daybasis65 <- create.fourier.basis(c(0, 365), 65)
 daytempfd <- with(CanadianWeather, smooth.basisPar(day.5,
-    dailyAv[,,"Temperature.C"]) )
+    dailyAv[,,"Temperature.C"], daybasis65)$fd )
 plot(daytempfd, axes=FALSE)
 axisIntervals(1)
 # axisIntervals by default uses

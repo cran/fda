@@ -95,7 +95,6 @@ bifd (coef=matrix(0,2,1), sbasisobj=create.bspline.basis(),
 
 \seealso{
   \code{\link{basisfd}}
-  \code{\link{data2fd}} 
   \code{\link{objAndNames}}
 }
 \examples{

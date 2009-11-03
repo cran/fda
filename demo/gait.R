@@ -200,6 +200,7 @@ title("Hip - Hip")
 # Smooth with lambda as determined above
 
 gaitfdPar  <- fdPar(gaitbasis, harmaccelLfd, lambda=1e-2)
+
 gaitpca.fd <- pca.fd(gaitfd, nharm=4, gaitfdPar)
 
 gaitpca.fd <- varmx.pca.fd(gaitpca.fd)

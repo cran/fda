@@ -60,9 +60,10 @@ norder <- nbasis - length(params)
 #  order of spline
 
 if (nderiv >= norder) {
-	cat(paste("Derivative of order", nderiv,
+  cat("\n")
+	cat(paste(" Derivative of order", nderiv,
                   "cannot be taken for B-spline of order", norder,"\n"))
-	cat("Probable cause is a value of the nbasis argument\n")
+	cat(" Probable cause is a value of the nbasis argument\n")
 	cat(" in function create.basis.fd that is too small.\n")
    	stop()
 }

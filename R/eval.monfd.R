@@ -76,7 +76,12 @@ eval.monfd <- function(evalarg, Wfdobj, Lfdobj=int2Lfd(0)) {
   #  The interval over which the integration takes places is defined in
   #  the basisfd object in WFD.
 
-
+  #  check Wfdobj
+  
+  if (!inherits(Wfdobj, "fd")) stop("Wfdobj is not a fd object.")
+  
+  #  extract number of variables and curves from coefficient matrix for Wfdobj
+  
   coef  <- Wfdobj$coefs
   if (is.vector(coef)) coef <- as.matrix(coef)
   coefd <- dim(coef)
@@ -109,7 +114,12 @@ eval.monfd <- function(evalarg, Wfdobj, Lfdobj=int2Lfd(0)) {
     for (icurve in 1:ncurve) {
 
   	if (nderiv == 0) {
-    	  if (ndim == 2) hmat[,icurve,ivar] <- monfn(evalarg, Wfdobj[icurve])
+    	  if (ndim == 2) 
+          if (ncurve == 1) {
+            hmat[,icurve,ivar] <- monfn(evalarg, Wfdobj)
+          } else {
+            hmat[,icurve,ivar] <- monfn(evalarg, Wfdobj[icurve])
+          }
         else           hmat[,icurve,ivar] <- monfn(evalarg, Wfdobj[icurve,ivar])
   	}
 

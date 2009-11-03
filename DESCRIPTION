@@ -1,12 +1,12 @@
 Package: fda
-Version: 2.2.6
-Date: 2010-06
+Version: 2.2.7
+Date: 2011-08
 Title: Functional Data Analysis
 Author: J. O. Ramsay <ramsay@psych.mcgill.ca>, Hadley Wickham
         <h.wickham@gmail.com>, Spencer Graves
         <spencer.graves@prodsyse.com>, Giles Hooker <gjh27@cornell.edu>
 Maintainer: J. O. Ramsay <ramsay@psych.mcgill.ca>
-Depends: R (>= 2.4.0), splines, zoo
+Depends: R (>= 2.10), splines, zoo
 Suggests: graphics, odesolve, R.matlab, quadprog, DierckxSpline, nlme,
         lattice
 Description: These functions were developed to support functional data
@@ -17,12 +17,27 @@ Description: These functions were developed to support functional data
         Graves, Spencer (2009) Functional Data Analysis with R and
         Matlab (Springer). The package includes data sets and script
         files working many examples including all but one of the 76
-        figures in this latter book.
+        figures in this latter book. The principal changes to version
+        2.2.6 are: 1.  Major enhancements to function smooth.basis as
+        well as the functions that call it.  New or revised arguments
+        are: "wtvec" may now be a positive symmetric matrix as well as
+        a vector "covariates" for inputting covariate matrices that
+        explain some fraction of the data to be smoothed (often called
+        "semiparametric smoothing") "method=qr" enables an algorithm
+        based on the qr- decomposition that will be more accurate than
+        the usual approach relying on the Choleski decomposition. It
+        will, however, be slower. 2.  Greatly expanded examples in the
+        smooth.basis.Rd file that show a wider range of uses of this
+        function. 3.  Function data2fd has been replaced by function
+        Data2fd for simple smoothing problems.  Data2fd is designed to
+        be invoked with various argument configurations. 4.  And the
+        usual fixes of reported bugs, especially in the registraton
+        functions, landmarkreg and register.fd.
 License: GPL (>= 2)
 URL: http://www.functionaldata.org
 LazyData: true
 Repository: CRAN
 Repository/R-Forge/Project: fda
-Repository/R-Forge/Revision: 522
-Date/Publication: 2011-04-07 10:19:35
-Packaged: 2011-03-27 20:52:28 UTC; rforge
+Repository/R-Forge/Revision: 548
+Date/Publication: 2011-08-30 05:36:29
+Packaged: 2011-08-26 21:09:51 UTC; rforge

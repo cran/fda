@@ -79,8 +79,9 @@ fd(coef=NULL, basisobj=NULL, fdnames=NULL)
     Functional Data Analysis}, Springer, New York
 }
 \seealso{
-  \code{\link{data2fd}}
   \code{\link{smooth.basis}}
+  \code{\link{smooth.basisPar}}
+  \code{\link{Data2fd}}
   \code{\link{density.fd}}
   \code{\link{create.bspline.basis}}
 }

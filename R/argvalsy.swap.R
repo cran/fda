@@ -6,7 +6,7 @@ argvalsy.swap = function(argvals=NULL, y=NULL, basisobj=NULL)
   if(is.null(y)){
     if(is.null(argvals))stop("'y' is missing with no default")
 #   Store argvals as y
-    warning("'y' is missing, using 'argvals'") 
+    cat("'y' is missing, using 'argvals'\n") 
     y <- argvals
     argvals <- NULL 
   }
@@ -39,8 +39,8 @@ argvalsy.swap = function(argvals=NULL, y=NULL, basisobj=NULL)
            'rangeval component.')
 #    
     n <- dimy[1]
-    warning("'argvals' is missing;  using seq(", a01[1],
-            ", ", a01[2], ", length=", n, ")")       
+    cat(paste("'argvals' is missing;  using seq(", a01[1],
+            ", ", a01[2], ", length=", n, ")\n"))       
     argvals <- seq(a01[1], a01[2], length=n)
     return(list(argvals=argvals, y=y, basisobj=basisobj))
   }
@@ -88,8 +88,8 @@ argvalsy.swap = function(argvals=NULL, y=NULL, basisobj=NULL)
 #
       yrng <- range(y)
       if((a01[1]<=yrng[1]) && (yrng[2]<=a01[2])){
-        warning("'argvals' is NOT contained in basisobj$rangeval",
-                ", but 'y' is;  swapping 'argvals' and 'y'.")
+        cat(paste("'argvals' is NOT contained in basisobj$rangeval",
+                ", but 'y' is;  swapping 'argvals' and 'y'.\n"))
         return(list(argvals=y, y=argvals, basisobj=basisobj)) 
       }
 #      
@@ -101,10 +101,10 @@ argvalsy.swap = function(argvals=NULL, y=NULL, basisobj=NULL)
 ## 4.  If(length(dimy) < length(dima)) swap ...
 ##
   if(length(dimy)<length(dima)){
-    warning("Swapping 'y' and 'argvals', because 'y' is ",
+    cat(paste("Swapping 'y' and 'argvals', because 'y' is ",
             "simpler,\n  and 'argvals' should be;  now ",
             "dim(argvals) = ", paste(dimy, collapse=" x "),
-            ";  dim(y) = ", paste(dima, collapse=" x ") ) 
+            ";  dim(y) = ", paste(dima, collapse=" x "),"\n" )) 
     y. <- argvals
     argvals <- y
     y <- y.

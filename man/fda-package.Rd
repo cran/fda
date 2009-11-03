@@ -44,7 +44,7 @@
 ##
 ## Simple smoothing
 ##
-girlGrowthSm <- with(growth, smooth.basisPar(argvals=age, y=hgtf))
+girlGrowthSm <- with(growth, smooth.basisPar(argvals=age, y=hgtf, lambda=0.1))
 plot(girlGrowthSm$fd, xlab="age", ylab="height (cm)",
          main="Girls in Berkeley Growth Study" )
 plot(deriv(girlGrowthSm$fd), xlab="age", ylab="growth rate (cm / year)",

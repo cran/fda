@@ -65,10 +65,12 @@ var.fd(fdobj1, fdobj2=fdobj1)
 ##
 daybasis3 <- create.fourier.basis(c(0, 365))
 daybasis5 <- create.fourier.basis(c(0, 365), 5)
-tempfd3 <- with(CanadianWeather, data2fd(dailyAv[,,"Temperature.C"], 
-       day.5, daybasis3, argnames=list("Day", "Station", "Deg C")) )
-precfd5 <- with(CanadianWeather, data2fd(dailyAv[,,"log10precip"],
-       day.5, daybasis5, argnames=list("Day", "Station", "Deg C")) )
+tempfd3 <- with(CanadianWeather, smooth.basis(day.5, 
+       dailyAv[,,"Temperature.C"], 
+       daybasis3, fdnames=list("Day", "Station", "Deg C"))$fd )
+precfd5 <- with(CanadianWeather, smooth.basis(day.5, 
+       dailyAv[,,"log10precip"],
+       daybasis5, fdnames=list("Day", "Station", "Deg C"))$fd )
 
 # Compare with structure described above under 'value':
 str(tempPrecVar3.5 <- var.fd(tempfd3, precfd5))
@@ -77,7 +79,7 @@ str(tempPrecVar3.5 <- var.fd(tempfd3, precfd5))
 ## Example with 2 variables, same bases
 ##
 gaitbasis3 <- create.fourier.basis(nbasis=3)
-str(gaitfd3 <- data2fd(gait, basisobj=gaitbasis3))
+str(gaitfd3 <- Data2fd(gait, basisobj=gaitbasis3))
 str(gaitVar.fd3 <- var.fd(gaitfd3))
 
 
@@ -108,8 +110,9 @@ dimnames(gaitVar.fd3$coefs)[[4]]
 
 daybasis65 <- create.fourier.basis(rangeval=c(0, 365), nbasis=65)
 
-daytempfd <- with(CanadianWeather, data2fd(dailyAv[,,"Temperature.C"],
-       day.5, daybasis65, argnames=list("Day", "Station", "Deg C")) )
+daytempfd <- with(CanadianWeather, smooth.basis(day.5, 
+       dailyAv[,,"Temperature.C"],
+       daybasis65, fdnames=list("Day", "Station", "Deg C"))$fd )
 str(tempvarbifd <- var.fd(daytempfd))
 
 str(tempvarmat  <- eval.bifd(weeks,weeks,tempvarbifd))

@@ -1,13 +1,12 @@
-function [bfdcell, afdcell, resfdcell] = ...
+function [bwtcell, awtcell, resfdcell] = ...
     pda_fd(xfdcell, bwtcell, awtcell, ufdcell, norder, nfine)
 
 %PDA_FD computes the basis function expansions of the
 %  estimates of the coefficient functions a_k(t) and b_j(t) 
 %  in the possibly nonhomogeneous linear differential operator
 %
-%    Lx(t) = a_1(t)u_1(t) + ... + a_k(t)u_K(t) + 
-%       b_0(t)x(t) + b_1(t)Dx(t) + ... + b_{m-1}D^{m-1}x(t) + D^m x(t)
-%
+%    Lx(t) = b_0(t)x(t) + b_1(t)Dx(t) + ... + b_{m-1}D^{m-1}x(t) + D^m x(t)
+%          - a_1(t)u_1(t) - ... - a_k(t)u_K(t) 
 %  of order m = NORDER that minimizes in a least squares sense the 
 %  residual functions f(t) = Lx(t).  
 %
@@ -58,18 +57,31 @@ function [bfdcell, afdcell, resfdcell] = ...
 %                 dimension J and K
 %  RESFDCELL ...  FD object for residual functions.
 
-%  last modified 2 December 2006
+%  last modified 2 November 2008
 
 if nargin < 2
     error('There are less than three arguments.');
 end
 
+%   set some default arguments
+
+if nargin < 6, nfine   = 501;  end
+if nargin < 4, ufdcell = {};   end
+if nargin < 3, awtcell = {};   end
+
+%  get and check NORDER
+
 if nargin < 5, 
     bwtdims = size(bwtcell);
-    norder  = bwtdims(length(bwtdims));   
+    if length(bwtdims) > 3
+        error('BWTCELL has more than three dimensions.');
+    end
+    if all(bwtdims) == 1 || length(bwtdims) == 2
+        norder = 1;
+    else
+        norder = bwtdims(3);
+    end
 end
-if nargin < 4, ufdcell = {};  end
-if nargin < 3, awtcell = {};  end
 
 norder = floor(norder);
 if norder < 0, error('NORDER is negative.');  end
@@ -224,7 +236,8 @@ if nvar == 1
     if nforce > 0
         uarray = zeros([nfine,ncurve,nforce]);
         for k=1:nforce
-            uarray(:,:,k) = eval_fd(tu, ufdcell{k});
+            temp = eval_fd(tu, ufdcell{k});
+            uarray(:,:,k) = temp;
         end
     end
     
@@ -361,7 +374,7 @@ if nvar == 1
             mi12 = mi12 + getnbasis(abasisk1);
             indexi1 = mi11:mi12;
             %  DMAT entry for u-variable
-            weightk1 = yuprod(:,k1,nordp1);
+            weightk1 = -yuprod(:,k1,nordp1);
             dmat(indexi1) = trapzmat(abasismatk1, onesn, deltax, ...
                                      weightk1);
             %  add terms corresponding to x-derivative weights
@@ -369,7 +382,7 @@ if nvar == 1
             for j=1:norder;
                 bfdParij   = bwtcell{j};
                 if ~getestimate(bfdParij)
-                    weightij = yuprod(:,k1,j);
+                    weightij = -yuprod(:,k1,j);
                     dmat(indexi1) = dmat(indexi1) + ...
                         trapzmat(abasismatk1, barray(:,j), deltax, ...
                                  weightij);
@@ -404,7 +417,7 @@ if nvar == 1
                 if getestimate(bfdParij2)
                     bbasisij2    = getbasis(getfd(bfdParij2));
                     bbasismatij2 = getbasismatrix(tx, bbasisij2);
-                    weightij12   = yuprod(:,k1,j2);
+                    weightij12   = -yuprod(:,k1,j2);
                     Cprod = ...
                         trapzmat(abasismatk1, bbasismatij2, deltax, ...
                                  weightij12);
@@ -458,7 +471,7 @@ if nvar == 1
                 if getestimate(afdPark2)
                     abasisk2    = getbasis(getfd(afdPark2));
                     abasismatk2 = getbasismatrix(tx, abasisk2);
-                    weightk2    = yuprod(:,k2,j1);
+                    weightk2    = -yuprod(:,k2,j1);
                     Cprod = ...
                         trapzmat(bbasismatij1, abasismatk2, deltax, ...
                                  weightk2);
@@ -511,10 +524,10 @@ if nvar == 1
             mi1 = mi2 + 1;
             mi2 = mi2 + getnbasis(getbasis(afdk));
             indexi = mi1:mi2;
-            afdcell{k} = ...
+            awtcell{k} = ...
                 putfd(afdPark, putcoef(afdk, dvec(indexi)));
         else
-            afdcell{k} = afdPark;
+            awtcell{k} = afdPark;
         end
     end
     
@@ -528,10 +541,10 @@ if nvar == 1
             mij1 = mij2 + 1;
             mij2 = mij2 + getnbasis(getbasis(bfdij));
             indexij = mij1:mij2;
-            bfdcell{j1} = ...
+            bwtcell{j1} = ...
                 putfd(bfdParij, putcoef(bfdij, dvec(indexij)));
         else
-            bfdcell{j1} = bfdParij;
+            bwtcell{j1} = bfdParij;
         end
     end
     
@@ -546,18 +559,18 @@ if nvar == 1
     resmat  = eval_fd(tx, xfdcell{1}, norder);
     %  add contributions from weighted u-functions
     for k=1:nforce
-        amati    = eval_fd(tu, getfd(afdcell{k}));
+        amati    = eval_fd(tu, getfd(awtcell{k}));
         umati    = eval_fd(tu, ufdcell{k});
-        resmat   = resmat + (amati*onesncurve).*umati;
+        resmat   = resmat - (amati*onesncurve).*umati;
     end
     %  add contributions from weighted x-function derivatives
     for j1=1:norder;
-        bmatij = eval_fd(tx, getfd(bfdcell{j1}))*onesncurve;
+        bmatij = eval_fd(tx, getfd(bwtcell{j1}))*onesncurve;
         xmatij = eval_fd(tx, xfdcell{1}, j1-1);
         resmat = resmat + bmatij.*xmatij;
     end
     %  set up the functional data object
-    resfdi = data2fd(resmat, tx, resbasis);
+    resfdi = smooth_basis(tx, resmat, resbasis);
     resfdi = putnames(resfdi, resfdnames);
     resfdcell{1} = resfdi;
 
@@ -688,7 +701,7 @@ else
                     if ~isa_fdPar(bfdPar12)
                         error(['BWTCELL{',num2str(ivar1), ', ', ...
                              num2str(ivar2), ', ',              ...
-                             num2str(k),                        ...
+                             num2str(j),                        ...
                              '} is not a functional parameter object.']);
                     end
                     bfd12  = getfd(bfdPar12);
@@ -880,7 +893,7 @@ else
         
         mi12 = 0;
         for k1 = 1:nforce
-            afdPark1   = awtcell{ivar1,k1};
+            afdPark1  = awtcell{ivar1,k1};
             if getestimate(afdPark1)
                 abasisk1    = getbasis(getfd(afdPark1));
                 abasismatk1 = getbasismatrix(tu, abasisk1);
@@ -888,7 +901,7 @@ else
                 mi12 = mi12 + getnbasis(abasisk1);
                 indexi1 = mi11:mi12;
                 %  DMAT entry for u-variable
-                weightk1 = yuprod(:,ivar1,k1,nordp1);
+                weightk1 = -yuprod(:,ivar1,k1,nordp1);
                 dmat(indexi1) = trapzmat(abasismatk1, onesn, deltax, ...
                                          weightk1);
                 %  add terms corresponding to x-derivative weights
@@ -902,7 +915,7 @@ else
                         bfdParij   = bwtcell{ivar1,i,j};
                     end
                     if ~getestimate(bfdParij)
-                        weightij = yuprod(:,ivar1,k1,j);
+                        weightij = -yuprod(:,ivar1,k1,j);
                         dmat(indexi1) = dmat(indexi1) + ...
                           trapzmat(abasismatk1, barray(:,ivar1,j), deltax, ...
                                    weightij);
@@ -935,21 +948,21 @@ else
                     i2 = mmat(m2,1);
                     j2 = mmat(m2,2);
                     if norder == 1
-                        bfdParij2   = bwtcell{ivar1,i2};
+                        bfdParij2 = bwtcell{ivar1,i2};
                     else
-                        bfdParij2   = bwtcell{ivar1,i2,j2};
+                        bfdParij2 = bwtcell{ivar1,i2,j2};
                     end
                     %  if estimation required, modify coefficient matrix
                     if getestimate(bfdParij2)
                         bbasisij2    = getbasis(getfd(bfdParij2));
                         bbasismatij2 = getbasismatrix(tx, bbasisij2);
-                        weightij12   = yuprod(:,ivar1,k1,j2);
+                        weightij12   = -yuprod(:,i2,k1,j2);
                         Cprod = ...
                             trapzmat(abasismatk1, bbasismatij2, deltax, ...
                                      weightij12);
                         mij21 = mij22 + 1;
                         mij22 = mij22 + getnbasis(bbasisij2);
-                        indexij2  = mij21:mij22;
+                        indexij2 = mij21:mij22;
                         cmat(indexi1,indexij2) = Cprod;
                     end
                 end
@@ -1004,7 +1017,7 @@ else
                     if getestimate(afdPark2)
                         abasisk2    = getbasis(getfd(afdPark2));
                         abasismatk2 = getbasismatrix(tx, abasisk2);
-                        weightk2    = yuprod(:,ivar1,k2,j1);
+                        weightk2    = -yuprod(:,i1,k2,j1);
                         Cprod = ...
                             trapzmat(bbasismatij1, abasismatk2, deltax, ...
                                      weightk2);
@@ -1063,10 +1076,10 @@ else
                 mi1 = mi2 + 1;
                 mi2 = mi2 + getnbasis(getbasis(afdk));
                 indexi = mi1:mi2;
-                afdcell{ivar1,k} = ...
+                awtcell{ivar1,k} = ...
                     putfd(afdPark, putcoef(afdk, dvec(indexi)));
             else
-                afdcell{ivar1,k} = afdPark;
+                awtcell{ivar1,k} = afdPark;
             end
         end
         
@@ -1082,10 +1095,10 @@ else
                 mij1 = mij2 + 1;
                 mij2 = mij2 + getnbasis(getbasis(bfdij));
                 indexij = mij1:mij2;
-                bfdcell{ivar1,i1,j1} = ...
+                bwtcell{ivar1,i1,j1} = ...
                     putfd(bfdParij, putcoef(bfdij, dvec(indexij)));
             else
-                bfdcell{ivar1,i1,j1} = bfdParij;
+                bwtcell{ivar1,i1,j1} = bfdParij;
             end
         end
         
@@ -1105,7 +1118,7 @@ else
         resmat  = eval_fd(tx, xfdcell{ivar1}, norder);
         %  add contributions from weighted u-functions
         for k=1:nforce
-            amati    = eval_fd(tu, getfd(afdcell{ivar1,k}));
+            amati    = eval_fd(tu, getfd(awtcell{ivar1,k}));
             umati    = eval_fd(tu, ufdcell{ivar1,k});
             resmat   = resmat + (amati*onesncurve).*umati;
         end
@@ -1113,13 +1126,13 @@ else
         for m1=1:nvar*norder;
             i1 = mmat(m1,1);
             j1 = mmat(m1,2);
-            bfdij  = getfd(bfdcell{ivar1,i1,j1});
+            bfdij  = getfd(bwtcell{ivar1,i1,j1});
             bmatij = eval_fd(tx, bfdij)*onesncurve;
             xmatij = eval_fd(tx, xfdcell{i1}, j1-1);
             resmat = resmat + bmatij.*xmatij;
         end
         %  set up the functional data object
-        resfdi = data2fd(resmat, tx, resbasis);
+        resfdi = smooth_basis(tx, resmat, resbasis);
         resfdi = putnames(resfdi, resfdnames);
         resfdcell{ivar1} = resfdi;
     end

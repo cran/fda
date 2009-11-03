@@ -188,10 +188,10 @@ plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
   \code{\link{plot.fdSmooth}},
   \code{\link{lines.fdSmooth}}
   \code{\link{par}}
-  \code{\link{data2fd}}
   \code{\link{smooth.fd}}
   \code{\link{smooth.basis}}
   \code{\link{smooth.basisPar}}
+  \code{\link{Data2fd}}
   \code{\link{checkDims3}}
 }
 \examples{
@@ -199,12 +199,11 @@ plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
 daybasis65 <- create.fourier.basis(c(0, 365), 65,
                     axes=list("axesIntervals"))
 #  smooth the average temperature data using function data2fd
-Daytempfd <- with(CanadianWeather, Data2fd(
-       dailyAv[,,"Temperature.C"], day.5,
-       daybasis65) )
-daytempfd <- with(CanadianWeather, data2fd(
-       dailyAv[,,"Temperature.C"], day.5,
-       daybasis65, argnames=list("Day", "Station", "Deg C")) )
+Daytempfd <- with(CanadianWeather, smooth.basis(day.5, 
+         dailyAv[,,"Temperature.C"], daybasis65)$fd )
+daytempfd <- with(CanadianWeather, smooth.basis(day.5,
+         dailyAv[,,"Temperature.C"], 
+         daybasis65, fdnames=list("Day", "Station", "Deg C"))$fd )
 #  Plot the temperature data along with the fit to the data for the first
 #  station, St. John's Newfoundland
 # If you want only the fitted functions, use plot(daytempfd)

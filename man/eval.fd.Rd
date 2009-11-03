@@ -80,8 +80,8 @@ daybasis <- create.fourier.basis(c(0, 365), nbasis=65)
 #  See analyses of weather data.
 #  Set up sampling points at mid days
 #  Convert the data to a functional data object
-tempfd <- data2fd(CanadianWeather$dailyAv[,,"Temperature.C"],
-                   day.5, daybasis)
+tempfd <- smooth.basis(day.5,  CanadianWeather$dailyAv[,,"Temperature.C"],
+                       daybasis)$fd
 #   set up the harmonic acceleration operator
 Lbasis  <- create.constant.basis(c(0, 365))
 Lcoef   <- matrix(c(0,(2*pi/365)^2,0),1,3)
@@ -124,18 +124,8 @@ all.equal(pred.2, pred.2.)
 ##
 ## predict.fdSmooth
 ##
-lipSm9 <- smooth.basisPar(liptime, lip, lambda=1e-9)
+lipSm9 <- smooth.basisPar(liptime, lip, lambda=1e-9)$fd
 plot(lipSm9)
-
-pred.lipSm9 <- predict(lipSm9)
-\dontshow{stopifnot(}
-all.equal(pred.lipSm9, fitted(lipSm9))
-\dontshow{)}
-
-resid.lipSm9 <- resid(lipSm9)
-\dontshow{stopifnot(}
-all.equal(resid.lipSm9, residuals(lipSm9))
-\dontshow{)}
 
 }
 % docclass is function

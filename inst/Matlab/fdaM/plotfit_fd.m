@@ -1,53 +1,57 @@
-function plotfit_fd(y, argvals, fdobj, casenames, varnames, residual, sortwrd, ...
-                    rng, index, nfine)
-%PLOTFIT plots discrete data along with a functional data object for fitting the
-%  data.  It is designed to be used after DATA2FD, SMOOTH.FD or SMOOTH.BASIS to
+function plotfit_fd(y, argvals, fdobj, residual, sortwrd, rng, index)
+%PLOTFIT plots discrete data along with a functional data object for 
+%  fitting the data.  It is designed to be used after SMOOTH.BASIS to
 %  check the fit of the data offered by the FD object.
+%  Note:  As of March 2, 2009, the arguments CASENAMES, VARNAMES and
+%  NFINE have been removed.
 %  Arguments:
 %  Y         ... the data used to generate the fit
 %  ARGVALS   ... discrete argument values associated with data
 %  FD        ... a functional data object for fitting the data
-%  CASENAMES ... a matrix of names for replicates
-%  VARNAMES  ... a matrix of names for functions
-%  RESIDUAL  ... if T, the residuals are plotted instead of the data plus curve
+%  RESIDUAL  ... if nonzero, the residuals are plotted instead of 
+%                the data plus curve
 %  SORTWRD   ... sort plots by mean square error
 %  RNG       ... a range of argument values to be plotted
-%  INDEX     ... an index for plotting subsets of the curves (either sorted or not)
+%  INDEX     ... an index for plotting subsets of the curves 
+%                (either sorted or not)
 %  NFINE     ... number of points to use for plotting curves
 
-%  Last modified 29 October 2007
+%  Last modified 3 July 2011
 
-if nargin < 10, nfine    = max([201,5*length(argvals)]); end
-if nargin <  7, sortwrd  = 0;   end
-if nargin <  6, residual = 0;   end
+if nargin < 5 || isempty(sortwrd),  sortwrd  = 0;   end
+if nargin < 4 || isempty(residual), residual = 0;   end
 
 if size(argvals,1) == 1; argvals = argvals';  end
 
-basis    = getbasis(fdobj);
-rangeval = getbasisrange(basis);
-if nargin < 8, rng = rangeval; end
+basisobj = getbasis(fdobj);
+rangeval = getbasisrange(basisobj);
+nbasis   = getnbasis(basisobj);
+
+if nargin < 8 || isempty(rng), rng = rangeval; end
 
 coef  = getcoef(fdobj);
 coefd = size(coef);
 ndim  = length(coefd);
 
-n  = size(y,1);
+n    = size(y,1);
 nrep = coefd(2);   
 casenum = 1:nrep;
 if ndim < 3, nvar = 1;  else nvar = coefd(3);  end
-if nargin < 9, index = 1:nrep; end
-y = reshape(y, n, nrep, nvar);
-if nargin < 4, casenames = []; end
 
-fdnames = getnames(fdobj);
-argname = fdnames{1};
-if nargin < 5 
-    if nvar > 1
-        varnames = []; 
-    else
-        varnames = fdnames{3}; 
-    end
-end
+if nargin < 6 || isempty(index), index = 1:nrep;  end
+
+y = reshape(y, n, nrep, nvar);
+
+%  set up number of points at which to evaluate the curves
+
+nfine = max([201, 10*nbasis+1]);
+
+%  set up labels for arguments, cases and variables.
+
+fdnames   = getnames(fdobj);
+argname   = fdnames{1};
+casenames = getfdlabels(fdnames{2});
+varnames  = getfdlabels(fdnames{3});
 
 %  compute fitted values for evalargs and fine mesh of values
 
@@ -83,10 +87,10 @@ end
 y     = y    (:,index,:);
 res   = res  (:,index,:);
 yfine = yfine(:,index,:);
-MSE = MSE  (:,index);
+MSE   = MSE  (:,index);
 if ~isempty(casenames), casenames = casenames(index,:); end
 casenum = casenum(index);
-nrep  = length(index);
+nrep    = length(index);
 
 %  select values in ARGVALS, Y, and YHAT within RNG
 
@@ -106,23 +110,24 @@ if residual
 	ylimit = [min(min(min(res))), max(max(max(res)))];
     for i = 1:nrep 
         for j = 1:nvar
+            subplot(nvar,1,j)
 	        plot(argvals, res(:,i,j), '.', [rng(1),rng(2)], [0,0], ':')
             axis([rng(1),rng(2),ylimit(1),ylimit(2)])
-	        xlabel(argname)
+	        xlabel(['\fontsize{12} ',argname])
             if isempty(varnames)
-                ylabel(['Residual for function ',num2str(j)])
+                ylabel(['\fontsize{12} Residual for function ',num2str(j)])
             else
-                ylabel(['Residual for ',varnames(j,:)])
+                ylabel(['\fontsize{12} Residual for ',varnames(j,:)])
             end
             if isempty(casenames)
-	            title(['Case ',num2str(casenum(i)), ...
+	            title(['\fontsize{13} Case ',num2str(casenum(i)), ...
 	                   '  RMS residual = ',num2str(sqrt(MSE(j,i)))])
             else
-	            title(['Case ',casenames(i,:), ...
+	            title(['\fontsize{13} Case ',casenames(i,:), ...
 	                   '  RMS residual = ',num2str(sqrt(MSE(j,i)))])
             end
-            if nrep > 1 || nvar > 1, pause;  end
-       end
+        end
+        pause
    end
  else
 	%  plot the data and fit
@@ -130,19 +135,20 @@ if residual
            max(max(max(max(y))),max(max(max(yfine))))];
     for i = 1:nrep 
         for j = 1:nvar
-	        plot(argvals, y(:,i,j), '.', xfine, yfine(:,i,j), '-')
+	        phdl = plot(argvals, y(:,i,j), '.', xfine, yfine(:,i,j), 'b-');
+            set(phdl, 'LineWidth', 1.5)
             axis([rng(1),rng(2),ylimit(1),ylimit(2)])
-	        xlabel(argname)
+	        xlabel(['\fontsize{12} ',argname])
             if isempty(varnames)
-                ylabel(['Function ',num2str(j),' ',fdnames{3}])
+                ylabel(['\fontsize{12} Function ',num2str(j),' ',fdnames{3}])
             else
-                ylabel(varnames(j,:))
+                ylabel(['\fontsize{12}', varnames(j,:)])
             end
             if isempty(casenames)
- 	            title(['Case ',num2str(casenum(i)), ...
+ 	            title(['\fontsize{13} Case ',num2str(casenum(i)), ...
 	                       '  RMS residual = ',num2str(sqrt(MSE(j,i)))])
             else
-	            title(['Case ',casenames(i,:), ...
+	            title(['\fontsize{13} Case ',casenames(i,:), ...
 	                   '  RMS residual = ',num2str(sqrt(MSE(j,i)))])
             end
             if nrep > 1 || nvar > 1, pause;  end

@@ -90,7 +90,7 @@ fdPar <- function(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
 #  check Lfdobj
 
   {
-    if(is.null(Lfdobj)){
+    if (is.null(Lfdobj)) {
       if(fdobj$basis$type=='fourier'){
         rng <- fdobj$basis$rangeval
         Lfdobj <- vec2Lfd(c(0,(2*pi/diff(rng))^2,0), rng)
@@ -98,10 +98,9 @@ fdPar <- function(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
 #                "operator on c(", rng[1], ', ', rng[2],
 #                ') = vec2Lfd(c(0,(2*pi/diff(rng))^2,0), rng);',
 #                '  [default prior to fda 2.1.0:  int2Lfd(0)].')
-      }
-      else{
+      } else {
         norder <- {
-          if(fdobj$basis$type=='bspline')norder.bspline(fdobj$basis)
+          if (fdobj$basis$type=='bspline') norder.bspline(fdobj$basis)
           else 2
         }
         Lfdobj <- int2Lfd(max(0, norder-2))

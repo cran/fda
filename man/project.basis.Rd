@@ -39,7 +39,7 @@ columns as there are curves, and if the data are multivariate, as many
 layers as there are functions.
 }
 \seealso{
-\code{\link{data2fd}}
+\code{\link{Data2fd}}
 }
 % docclass is function
 \keyword{smooth}

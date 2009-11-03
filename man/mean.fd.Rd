@@ -63,9 +63,9 @@ norder <- 6
 weatherBasis <- create.fourier.basis(dayrng, nbasis)
 
 weather.fd <- smooth.basis(day.5, CanadianWeather$dailyAv,
-            weatherBasis)
+                           weatherBasis)$fd
 
-str(weather.fd.mean <- mean.fd(weather.fd$fd))
+str(weather.fd.mean <- mean.fd(weather.fd))
 
 }
 % docclass is function

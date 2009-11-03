@@ -115,8 +115,8 @@ densY <- sapply(x, function(z){
         })
 
 argvals <- seq(from, to, len=nb) 
-fdobj   <- data2fd(densY, argvals, wbasis, 
-                   argnames = c("x", "samples", "density"))
+fdobj   <- smooth.basis(argvals, densY, wbasis, 
+                   fdnames = c("x", "samples", "density"))$fd
 
 regDens <- landmarkreg(fdobj, landmark, WfdPar=WfdPar, monwrd=TRUE)
 warpfdobj <- regDens$warpfd

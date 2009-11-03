@@ -68,16 +68,17 @@ if(require(DierckxSpline)){
 }
 
 # knots.fdSmooth 
-girlGrowthSm <- with(growth, smooth.basisPar(argvals=age, y=hgtf))
+girlGrowthSm <- with(growth, smooth.basisPar(argvals=age, y=hgtf, 
+                                             lambda=0.1)$fd)
 
-girlKnots.fdSm <- knots(girlGrowthSm) 
+girlKnots.fdSm  <- knots(girlGrowthSm) 
 girlKnots.fdSmA <- knots(girlGrowthSm, interior=FALSE)
 stopifnot(all.equal(girlKnots.fdSm, girlKnots.fdSmA[5:33]))
 
-girlKnots.fd <- knots(girlGrowthSm$fd) 
-girlKnots.fdA <- knots(girlGrowthSm$fd, interior=FALSE)
+girlKnots.fd  <- knots(girlGrowthSm) 
+girlKnots.fdA <- knots(girlGrowthSm, interior=FALSE)
 
-stopifnot(all.equal(girlKnots.fdSm, girlKnots.fd))
+stopifnot(all.equal(girlKnots.fdSm,  girlKnots.fd))
 stopifnot(all.equal(girlKnots.fdSmA, girlKnots.fdA))
 
 }

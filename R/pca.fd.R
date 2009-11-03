@@ -119,6 +119,8 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
 
   varprop <- eigvalc[1:nharm]/sum(eigvalc)
 
+  #  set up harmfd
+  
   if (nvar == 1) {
     harmcoef <- Lmatinv %*% eigvecc
     harmscr  <- t(ctemp) %*% t(Lmat) %*% eigvecc
@@ -140,6 +142,21 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
   if(length(coefd) == 3)
     harmnames <- list(coefnames[[1]], harmnames, coefnames[[3]])
   harmfd   <- fd(harmcoef, basisobj, harmnames)
+
+  #  set up harmscr
+  
+  if (nvar == 1) {
+    harmscr  <- inprod(fdobj, harmfd)
+  } else {
+    harmscr  <- array(0, c(nrep,   nharm, nvar))
+    coefarray <- fdobj$coefs
+    harmcoefarray <- harmfd$coefs
+    for (j in 1:nvar) {
+      fdobjj  <- fd(as.matrix(    coefarray[,,j]), basisobj)
+      harmfdj <- fd(as.matrix(harmcoefarray[,,j]), basisobj)
+      harmscr[,,j] <- inprod(fdobjj, harmfdj)
+    }
+  }
 
   #  set up the object pcafd of the pca.fd class containing the results
   

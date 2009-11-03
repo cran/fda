@@ -84,9 +84,9 @@ axesIntervals(side=1:2, atTick1=monthBegin.5, atTick2=monthEnd.5,
 \examples{
 daybasis65 <- create.fourier.basis(c(0, 365), 65)
 
-daytempfd <- with(CanadianWeather, data2fd(
-       dailyAv[,,"Temperature.C"], day.5,
-       daybasis65, argnames=list("Day", "Station", "Deg C")) )
+daytempfd <- with(CanadianWeather, smooth.basis(
+       day.5,  dailyAv[,,"Temperature.C"], 
+       daybasis65, fdnames=list("Day", "Station", "Deg C"))$fd )
 
 with(CanadianWeather, plotfit.fd(
       dailyAv[,,"Temperature.C"], argvals=day.5,

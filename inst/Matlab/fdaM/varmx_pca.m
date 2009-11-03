@@ -71,9 +71,16 @@ function  pcarotstr = varmx_pca(pcastr, nharm, nx)
 
   %  Compute rotated harmonic variances
   
-  propvar = sum(harmscr.^2);
-  propvar = propvar./sum(propvar);
-  propvar = propvar.*sum(varprop0);
+  propvar = squeeze(sum(harmscr.^2));
+  if ndim == 2
+      propvar = propvar./sum(propvar);
+      propvar = propvar.*sum(varprop0);
+  else
+      for j=1:coefd(3)
+          propvar(:,j) = propvar(:,j)./sum(propvar(:,j));
+          propvar(:,j) = propvar(:,j).*sum(varprop0);
+      end
+  end
   
   %  set up the output pca struct object
   

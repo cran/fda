@@ -41,9 +41,7 @@ plotfit.fd <- function(y, argvals, fdobj, rng = NULL,
 #  SORTWRD  ... sort plots by mean square error
 #  TITLES   ... vector of title strings for curves
 
-# Last modified 2011.01.07 by Spencer Graves
-# Last modified 2010.12.14 by Jim Ramsay
-# previously modified 2008.12.12 by Spencer Graves
+# Last modified 2011.08.08 by Jim Ramsay
 
 ##
 ## 1.  Basic checks
@@ -170,7 +168,7 @@ plotfit.fd <- function(y, argvals, fdobj, rng = NULL,
   nOnOne <- 1   #  only one plot is default
   # types of plots
   if (ask & ((nvar*nrepi/nOnOne) > 1))
-    cat('Multiple plots:  Click in the plot to advance to the next')
+    cat('Multiple plots:  Click in the plot to advance to the next plot\n')
   col <- rep(col, length=nOnOne)
   lty <- rep(lty, length=nOnOne)
   lwd <- rep(lwd, length=nOnOne)

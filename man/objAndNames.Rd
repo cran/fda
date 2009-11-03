@@ -38,7 +38,6 @@ objAndNames(object, preferred, default)
 \author{ Spencer Graves  }
 
 \seealso{
-  \code{\link{data2fd}}, 
   \code{\link{bifd}}
 }
 \examples{

@@ -159,10 +159,10 @@ wbasis.growth <- create.bspline.basis(rangeval=rng.growth,
 cvec0.growth <- matrix(0,nbasis.growth,1)
 Wfd0.growth  <- fd(cvec0.growth, wbasis.growth)
 growfdPar2.3 <- fdPar(Wfd0.growth, Lfdobj.growth, lambda.gr2.3)
-hgtmfd.all   <- with(growth, smooth.basis(age, hgtm, growfdPar2.3))
+hgtmfd.all   <- with(growth, smooth.basis(age, hgtm, growfdPar2.3)$fd)
 # Register the growth velocity rather than the
 # growth curves directly
-smBv <- deriv(hgtmfd.all$fd, 1)
+smBv <- deriv(hgtmfd.all, 1)
 ##
 ## 2.  Register the first 10 Berkeley boys using the default basis
 ##     for the warping function

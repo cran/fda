@@ -30,7 +30,7 @@ a functional data object.
 }
 \seealso{
 \code{\link{smooth.basis}}, 
-\code{\link{data2fd}}
+\code{\link{Data2fd}}
 }
 \examples{
 

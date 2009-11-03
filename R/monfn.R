@@ -15,6 +15,11 @@ monfn <- function(argvals, Wfdobj, basislist=vector("list",JMAX)) {
 
 #  Last modified 24 April 2009
 
+  #  check Wfdobj
+  
+  if (!inherits(Wfdobj, "fd")) stop("Wfdobj is not a fd object.")
+
+
   JMAX <- 15
   JMIN <- 11
   EPS  <- 1E-5

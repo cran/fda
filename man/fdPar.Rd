@@ -147,7 +147,7 @@ tempfdPar  <- fdPar(fdobj=daybasis65, Lfdobj=harmaccelLfd,
                     lambda=templambda)
 
 #FIXME
-#tempfd <- smooth.basis(CanadianWeather$tempav, daytime, tempfdPar)
+#tempfd <- smooth.basis(CanadianWeather$tempav, daytime, tempfdPar)$fd
 #  Set up the harmonic acceleration operator
 Lbasis  <- create.constant.basis(dayrange);
 Lcoef   <- matrix(c(0,(2*pi/365)^2,0),1,3)

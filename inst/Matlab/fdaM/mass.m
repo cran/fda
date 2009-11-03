@@ -47,7 +47,7 @@ if order ==2
     K0 = sparse(nnod,nnod);
     for el=1:nele
         ind = nodeindex(el,:);
-        K0(ind,ind) = K0(ind,ind) + K0M*Jvec(el);
+        K0(ind,ind) = K0(ind,ind) + K0M.*Jvec(el);
     end;
     
 elseif order == 1
@@ -63,7 +63,7 @@ elseif order == 1
     K0 = sparse(nnod,nnod);
     for el=1:nele
         ind = nodeindex(el,:);
-        K0(ind,ind) = K0(ind,ind) + K0M*Jvec(el);
+        K0(ind,ind) = K0(ind,ind) + K0M.*Jvec(el);
     end;
     
 else

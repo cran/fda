@@ -6,15 +6,24 @@
 \description{
   This function converts an array \code{y} of function values plus an
   array \code{argvals} of argument values into a functional data object.
-  This function tries to do as much for the user as possible.  NOTE:
-  Interpolation with data2fd(...) can be shockingly bad, as illustrated
-  in one of the examples.
+  This function tries to do as much for the user as possible in setting
+  up a call to function \code{smooth.basis}.  Be warned that the result
+  may not be a satisfactory smooth of the data, and consequently that it
+  may be necessary to use function \code{smooth.basis} instead, the help
+  file for which provides a great deal more information than is provided
+  here.  
+  Also, function \code{Data2fd} can swap the first two arguments, 
+  \code{argvals} and \code{y} if it appears that they have been included 
+  in reverse order.  A warning message is returned if this swap takes place.
+  Any such automatic decision, though, has the possibility of being wrong,
+  and the results should be carefully checked.  Preferably, the order of
+  the arguments should be respected: \code{argvals} comes first and 
+  \code{y} comes second.
 }
 \usage{
 Data2fd(argvals=NULL, y=NULL, basisobj=NULL, nderiv=NULL,
-        lambda=3e-8/diff(range(argvals)), fdnames=NULL)
-%       lambda=NULL here
-% explain:  default = 1e-9*sd(y)/diff(range(argvals)) below
+        lambda=3e-8/diff(range(argvals)), fdnames=NULL, covariates=NULL, 
+                         method="chol", dfscale=1)
 }
 \arguments{
   \item{argvals}{
@@ -102,6 +111,40 @@ Data2fd(argvals=NULL, y=NULL, basisobj=NULL, nderiv=NULL,
     If fdnames is a list, the components provide labels for the levels
     of the corresponding dimension of \code{y}.
   }
+  \item{covariates}{
+    the observed values in \code{y} are assumed to be primarily determined
+    the the height of the curve being estimates, but from time to time
+    certain values can also be influenced by other known variables.  For
+    example, multi-year sets of climate variables may be also determined by
+    the presence of absence of an El Nino event, or a volcanic eruption.
+    One or more of these covariates can be supplied as an \code{n} by
+    \code{p} matrix, where \code{p} is the number of such covariates.  When
+    such covariates are available, the smoothing is called "semi-parametric."
+    Matrices or arrays of regression coefficients are then estimated that
+    define the impacts of each of these covariates for each cueve and each
+    variable.
+  }
+  \item{method}{
+    by default the function uses the usual textbook equations for computing
+    the coefficients of the basis function expansions.  But, as in regression
+    analysis, a price is paid in terms of rounding error for such
+    computations since they involved cross-products of  basis function
+    values.  Optionally, if \code{method} is set equal to the string "qr",
+    the computation uses an algorithm based on the qr-decomposition which
+    is more accurate, but will require substantially more computing time
+    when \code{n} is large, meaning more than 500 or so.  The default
+    is "chol", referring the Choleski decomposition of a symmetric positive
+    definite matrix.
+  }
+  \item{dfscale}{
+    the generalized cross-validation or "gcv" criterion that is often used
+    to determine the size of the smoothing parameter involves the
+    subtraction of an measue of degrees of freedom from \code{n}.  Chong
+    Gu has argued that multiplying this degrees of freedom measure by
+    a constant slightly greater than 1, such as 1.2, can produce better
+    decisions about the level of smoothing to be used.  The default value
+    is, however, 1.0.
+  }
 }
 \details{
   This function tends to be used in rather simple applications where
@@ -142,39 +185,44 @@ Data2fd(argvals=NULL, y=NULL, basisobj=NULL, nderiv=NULL,
 }
 \examples{
 ##
-## Simplest possible example:  step function
+## Simplest possible example:  constant function
 ##
+# 1 basis, order 1 = degree 0 = constant function 
 b1.1 <- create.bspline.basis(nbasis=1, norder=1)
-# 1 basis, order 1 = degree 0 = step function
-
+# data values: 1 and 2, with a mean of 1.5
 y12 <- 1:2
+# smooth data, giving a constant function with value 1.5
 fd1.1 <- Data2fd(y12, basisobj=b1.1)
 plot(fd1.1)
-# fd1.1 = mean(y12) = 1.5
-
+# now repeat the analysis with some smoothing, which moves the
+# toward 0.
 fd1.1.5 <- Data2fd(y12, basisobj=b1.1, lambda=0.5)
-eval.fd(seq(0, 1, .2), fd1.1.5)
+#  values of the smooth:
 # fd1.1.5 = sum(y12)/(n+lambda*integral(over arg=0 to 1 of 1))
 #         = 3 / (2+0.5) = 1.2
+eval.fd(seq(0, 1, .2), fd1.1.5)
 
 ##
-## 3 step functions
+## step function smoothing
 ##
+# 2 step basis functions: order 1 = degree 0 = step functions
 b1.2 <- create.bspline.basis(nbasis=2, norder=1)
-# 2 bases, order 1 = degree 0 = step functions
+#  fit the data without smoothing
 fd1.2 <- Data2fd(1:2, basisobj=b1.2)
-
+# plot the result:  A step function:  1 to 0.5, then 2
 op <- par(mfrow=c(2,1))
 plot(b1.2, main='bases')
 plot(fd1.2, main='fit')
 par(op)
-# A step function:  1 to 0.5, then 2
 
 ##
 ## Simple oversmoothing
 ##
+# 3 step basis functions: order 1 = degree 0 = step functions
 b1.3 <- create.bspline.basis(nbasis=3, norder=1)
+#  smooth the data with smoothing
 fd1.3.5 <- Data2fd(y12, basisobj=b1.3, lambda=0.5)
+#  plot the fit along with the points
 plot(0:1, c(0, 2), type='n')
 points(0:1, y12)
 lines(fd1.3.5)
@@ -193,115 +241,63 @@ lines(fd1.3.5)
 ##
 ## linear spline fit
 ##
+# 3 bases, order 2 = degree 1
 b2.3 <- create.bspline.basis(norder=2, breaks=c(0, .5, 1))
-# 3 bases, order 2 = degree 1 =
-# continuous, bounded, locally linear
-
-fd2.3 <- Data2fd(0:1, basisobj=b2.3, lambda=0)
+# interpolate the values 0, 2, 1
+fd2.3 <- Data2fd(c(0,2,1), basisobj=b2.3, lambda=0)
+#  display the coefficients
 round(fd2.3$coefs, 4)
-# (0, 0, 1),
-# though (0, a, 1) is also a solution for any 'a'
+# plot the results
 op <- par(mfrow=c(2,1))
 plot(b2.3, main='bases')
 plot(fd2.3, main='fit')
 par(op)
-
-# smoothing?
-fd2.3. <- Data2fd(0:1, basisobj=b2.3, lambda=1)
-\dontshow{stopifnot(}
-all.equal(as.vector(round(fd2.3.$coefs, 4)),
-          c(0.0159, -0.2222, 0.8730) )
-\dontshow{)}
-# The default smoothing with spline of order 2, degree 1
-# has nderiv = max(0, norder-2) = 0.
-# Direct computations confirm that the optimal B-spline
-# weights in this case are the numbers given above.
-
+# apply some smoothing
+fd2.3. <- Data2fd(c(0,2,1), basisobj=b2.3, lambda=1)
 op <- par(mfrow=c(2,1))
 plot(b2.3, main='bases')
-plot(fd2.3., main='fit')
+plot(fd2.3., main='fit', ylim=c(0,2))
 par(op)
 
 ##
 ## quadratic spline fit
 ##
+# 4 bases, order 3 = degree 2 = continuous, bounded, locally quadratic
 b3.4 <- create.bspline.basis(norder=3, breaks=c(0, .5, 1))
-# 4 bases, order 3 = degree 2 =
-# continuous, bounded, locally quadratic
-
-fd3.4 <- Data2fd(0:1, basisobj=b3.4, lambda=0)
+# fit values c(0,4,2,3) without interpolation
+fd3.4 <- Data2fd(c(0,4,2,3), basisobj=b3.4, lambda=0)
 round(fd3.4$coefs, 4)
-# (0, 0, 0, 1),
-# but (0, a, b, 1) is also a solution for any 'a' and 'b'
 op <- par(mfrow=c(2,1))
 plot(b3.4)
 plot(fd3.4)
+points(c(0,1/3,2/3,1), c(0,4,2,3))
 par(op)
-
-#  try smoothing?
-fd3.4. <- Data2fd(0:1, basisobj=b3.4, lambda=1)
+#  try smoothing
+fd3.4. <- Data2fd(c(0,4,2,3), basisobj=b3.4, lambda=1)
 round(fd3.4.$coef, 4)
-
 op <- par(mfrow=c(2,1))
 plot(b3.4)
-plot(fd3.4.)
+plot(fd3.4., ylim=c(0,4))
+points(seq(0,1,len=4), c(0,4,2,3))
 par(op)
 
 ##
-##  A simple Fourier example
+##  Two simple Fourier examples
 ##
-gaitbasis3 <- create.fourier.basis(nbasis=3)
-# note:  'names' for 3 bases
-gaitfd3 <- Data2fd(gait, basisobj=gaitbasis3)
-# Note: dimanes for 'coefs' + basis[['names']]
-# + 'fdnames'
-
+gaitbasis3 <- create.fourier.basis(nbasis=5)
+gaitfd3    <- Data2fd(gait, basisobj=gaitbasis3)
+plotfit.fd(gait, seq(0,1,len=20), gaitfd3)
 #    set up the fourier basis
 daybasis <- create.fourier.basis(c(0, 365), nbasis=65)
 #  Make temperature fd object
 #  Temperature data are in 12 by 365 matrix tempav
 #    See analyses of weather data.
-
-#  Convert the data to a functional data object
 tempfd <- Data2fd(CanadianWeather$dailyAv[,,"Temperature.C"],
                   day.5, daybasis)
 #  plot the temperature curves
+par(mfrow=c(1,1))
 plot(tempfd)
 
-##
-## Terrifying interpolation
-##
-hgtbasis <- with(growth, create.bspline.basis(range(age),
-                                              breaks=age, norder=6))
-girl.data2fd <- with(growth, Data2fd(hgtf, age, hgtbasis, lambda=0))
-age2 <- with(growth, sort(c(age, (age[-1]+age[-length(age)])/2)))
-girlPred <- eval.fd(age2, girl.data2fd)
-range(growth$hgtf)
-range(growth$hgtf-girlPred[seq(1, by=2, length=31),])
-# 5.5e-6 0.028 <
-# The predictions are consistently too small
-# but by less than 0.05 percent
-
-matplot(age2, girlPred, type="l")
-with(growth, matpoints(age, hgtf))
-# girl.data2fd fits the data fine but goes berzerk
-# between points
-
-# Smooth
-girl.data2fd1 <- with(growth, Data2fd(age, hgtf, hgtbasis))
-girlPred1 <- eval.fd(age2, girl.data2fd1)
-
-matplot(age2, girlPred1, type="l")
-with(growth, matpoints(age, hgtf))
-
-# problems splikes disappear with the default lambda
-
-##
-## multivariate argvals
-##
-ageMat <- with(growth, array(age, dim(hgtf)))
-
-girl.data2fd2 <- Data2fd(ageMat, growth$hgtf, hgtbasis)
 }
 
 % docclass is function

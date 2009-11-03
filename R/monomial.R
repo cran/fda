@@ -1,4 +1,4 @@
-monomial <- function(evalarg, exponents=1:nbasis, nderiv=0)
+monomial <- function(evalarg, exponents=1, nderiv=0)
 {
 #  MONOMIAL Values of monomials, or their derivatives.
 #  The powers of EVALARG are the NBASIS nonnegative integers in EXPONENTS.
@@ -12,10 +12,11 @@ monomial <- function(evalarg, exponents=1:nbasis, nderiv=0)
 #  A matrix with length(EVALARG) rows and NBASIS columns containing
 #    the values of the monomials or their derivatives
 
-#  last modified 2008.08.23 by Spencer Graves;
-#  previously modified 17 September 2005
+#  last modified 17 June 2011 by Jim Ramsay
+#  previously modified 2008.08.23 by Spencer Graves
+
 	evalarg <- as.vector(evalarg)
-	n       <- length(evalarg)
+  n       <- length(evalarg)    
 
 	nbasis <- length(exponents)
 
@@ -32,7 +33,7 @@ monomial <- function(evalarg, exponents=1:nbasis, nderiv=0)
 
 	# check if there are duplicate exponents
 
-        if((length(exponents)>1) && (min(diff(sort(exponents))) <= 0))
+  if((length(exponents)>1) && (min(diff(sort(exponents))) == 0))
           stop("There are duplicate exponents.")
 
 	monommat <- matrix(0,n,nbasis)
@@ -47,9 +48,11 @@ monomial <- function(evalarg, exponents=1:nbasis, nderiv=0)
         	degree <- exponents[ibasis]
         	if (nderiv <= degree) {
             	fac <- degree
-            	for (ideriv in 2:nderiv) {
-                	fac <- fac*(degree-ideriv+1)
-           	 }
+            	if (nderiv >= 2) {
+            	    for (ideriv in 2:nderiv) {
+                	    fac <- fac*(degree-ideriv+1)
+           	      }
+           	  }
             	monommat[,ibasis] <- fac*evalarg^(degree-nderiv)
         	}
     	}
