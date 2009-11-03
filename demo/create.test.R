@@ -7,7 +7,7 @@ nbasis   = 5
 
 library("splines")
 
-remove(basisobj)
+if(exists('basisobj'))remove(basisobj)
 basisobj = create.bspline.basis()
 basisobj
 
@@ -25,7 +25,8 @@ basisobj = create.bspline.basis(rangeval, nbasis, norder)
 basisobj
 
 remove(basisobj)
-basisobj = create.bspline.basis(rangeval, nbasis, 3, 
+nbasis = 8
+basisobj = create.bspline.basis(rangeval, nbasis, 3,
                        c(0, 0.2, 0.45, 0.5, 0.55, 0.8, 1))
 basisobj
 
@@ -37,7 +38,7 @@ plot(basisobj)
 eval.penalty(basisobj, 2)
 
 remove(basisobj)
-basisobj = create.bspline.basis(rangeval, nbasis, 
+basisobj = create.bspline.basis(rangeval, nbasis,
                                 dropind=c(1,nbasis))
 
 eval.penalty(basisobj, 2)
@@ -45,9 +46,6 @@ eval.penalty(basisobj, 2)
 remove(basisobj)
 basisobj = create.bspline.basis(rangeval, nbasis)
 basisobj
-
-basisobj$basisvalues <- vector("list",1)
-length(basisobj$basisvalues)
 
 evalarg = seq(0,1,0.1)
 basismat = eval.basis(evalarg, basisobj)
@@ -80,11 +78,12 @@ basisobj = create.exponential.basis(rangeval)
 basisobj
 
 remove(basisobj)
+nbasis = 5
 basisobj = create.exponential.basis(rangeval, nbasis)
 basisobj
 
 remove(basisobj)
-basisobj = create.exponential.basis(rangeval, nbasis, 
+basisobj = create.exponential.basis(rangeval, nbasis,
                                     (-2:2))
 basisobj
 
@@ -93,7 +92,7 @@ plot(basisobj)
 eval.penalty(basisobj, 2)
 
 remove(basisobj)
-basisobj = create.exponential.basis(rangeval, nbasis, 
+basisobj = create.exponential.basis(rangeval, nbasis,
                                     (-2:2), 3)
 
 eval.penalty(basisobj, 2)
@@ -163,7 +162,7 @@ basisobj = create.polygonal.basis(rangeval)
 basisobj
 
 remove(basisobj)
-basisobj = create.polygonal.basis(rangeval, 0.5)
+basisobj = create.polygonal.basis(rangeval, c(0, 0.5, 1))
 basisobj
 
 plot(basisobj)
@@ -172,11 +171,11 @@ eval.penalty(basisobj, 0)
 eval.penalty(basisobj, 1)
 
 remove(basisobj)
-basisobj = create.polygonal.basis(rangeval, c(0.25,0.5,0.75))
+basisobj = create.polygonal.basis(rangeval, c(0,0.25,0.5,0.75,1))
 basisobj
 
-clear basisobj
-basisobj = create.polygonal.basis(rangeval, c(0.25,0.5,0.75), c(1,5))
+remove(basisobj)
+basisobj = create.polygonal.basis(rangeval, c(0,0.25,0.5,0.75,1), c(1,5))
 basisobj
 
 eval.penalty(basisobj, 0)
@@ -209,9 +208,5 @@ basisobj
 plot(basisobj)
 
 eval.penalty(basisobj, 2)
-
-
-
-
 
 

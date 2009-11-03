@@ -202,9 +202,7 @@ smooth.basis(argvals=1:n, y, fdParobj, wtvec=NULL, fdnames=NULL,
   The "qr" algorithm option defined by the "method" parameter will
   not normally be needed, but if a warning of a near singularity in
   the coefficient calculations appears, this choice may be a cure.
-
 }
-
 \value{
   an object of class \code{fdSmooth}, which is a named list of length 8
   with the following components:
@@ -253,7 +251,6 @@ smooth.basis(argvals=1:n, y, fdParobj, wtvec=NULL, fdnames=NULL,
   \code{\link{smooth.basisPar}}
   \code{\link{Data2fd}},
 }
-
 \examples{
 ##
 ######## Simulated data example 1: a simple regression smooth  ########
@@ -287,7 +284,18 @@ plot(basisobj)
 #  Smooth the data, outputting only the functional data object for the
 #  fitted curve.  Note that in this simple case we can supply the basis
 #  object as the "fdParobj" parameter
-xfd = smooth.basis(argvals=argvals, y=y, fdParobj=basisobj)$fd
+ys = smooth.basis(argvals=argvals, y=y, fdParobj=basisobj)
+Ys = smooth.basis(argvals=argvals, y=y, fdParobj=basisobj,
+                  returnMatrix=TRUE)
+# Ys[[7]] = Ys$y2cMap is sparse;  everything else is the same
+
+\dontshow{stopifnot(}
+all.equal(ys[-7], Ys[-7])
+\dontshow{)}
+
+xfd = ys$fd
+Xfd = Ys$fd
+
 #  Plot the curve along with the data
 plotfit.fd(y, argvals, xfd)
 #  Compute the root-mean-squared-error (RMSE) of the fit relative to the
@@ -304,8 +312,9 @@ print(RMSE)  #  We obtained 0.069
 #  likes.
 for (nbasis in 4:12) {
   basisobj = create.bspline.basis(c(0,1),nbasis)
-  xfd = smooth.basis(argvals, y, basisobj)$fd
-  gcv = smooth.basis(argvals, y, basisobj)$gcv
+  ys = smooth.basis(argvals, y, basisobj)
+  xfd = ys$fd
+  gcv = ys$gcv
   RMSE = sqrt(mean((eval.fd(argvals, xfd) - x)^2))
   cat(paste(nbasis,round(RMSE,3),round(gcv,3),"\n"))
 }
@@ -330,40 +339,41 @@ points(argvals,x, pch="*")
 #  A roughness penalty approach is more flexible, allowing continuous
 #  control over smoothness and degrees of freedom, can be adapted to
 #  known features in the curve, and will generally provide better RMSE
-#  for given degrees of freedom.  It does require a bit more effort,
-#  though. First, we define a little display function for showing how
-#  df, gcv and RMSE depend on the log10 smoothing parameter
+#  for given degrees of freedom.
 
+#  It does require a bit more effort, though.
+#  First, we define a little display function for showing how
+#  df, gcv and RMSE depend on the log10 smoothing parameter
 plotGCVRMSE.fd = function(lamlow, lamhi, lamdel, x, argvals, y,
             fdParobj, wtvec=NULL, fdnames=NULL, covariates=NULL)  {
-loglamvec = seq(lamlow, lamhi, lamdel)
-loglamout = matrix(0,length(loglamvec),4)
-m = 0
-for (loglambda in loglamvec) {
-  m = m + 1
-  loglamout[m,1] = loglambda
-  fdParobj$lambda = 10^(loglambda)
-  smoothlist = smooth.basis(argvals, y, fdParobj, wtvec=wtvec,
+  loglamvec = seq(lamlow, lamhi, lamdel)
+  loglamout = matrix(0,length(loglamvec),4)
+  m = 0
+  for (loglambda in loglamvec) {
+    m = m + 1
+    loglamout[m,1] = loglambda
+    fdParobj$lambda = 10^(loglambda)
+    smoothlist = smooth.basis(argvals, y, fdParobj, wtvec=wtvec,
              fdnames=fdnames, covariates=covariates)
-  xfd = smoothlist$fd   #  the curve smoothing the data
-  loglamout[m,2] = smoothlist$df
-#  degrees of freedom in the smoothing curve
-  loglamout[m,3] = sqrt(mean((eval.fd(argvals, xfd) - x)^2))
-  loglamout[m,4] = mean(smoothlist$gcv)  #  the mean of the N gcv values
-}
-cat("log10 lambda, deg. freedom, RMSE, gcv\n")
-for (i in 1:m) {
-  cat(format(round(loglamout[i,],3)))
-  cat("\n")
-}
-par(mfrow=c(3,1))
-plot(loglamvec, loglamout[,2], type="b")
-title("Degrees of freedom")
-plot(loglamvec, loglamout[,3], type="b")
-title("RMSE")
-plot(loglamvec, loglamout[,4], type="b")
-title("Mean gcv")
-return(loglamout)
+    xfd = smoothlist$fd   #  the curve smoothing the data
+    loglamout[m,2] = smoothlist$df
+    #  degrees of freedom in the smoothing curve
+    loglamout[m,3] = sqrt(mean((eval.fd(argvals, xfd) - x)^2))
+    loglamout[m,4] = mean(smoothlist$gcv)  #  the mean of the N gcv values
+  }
+  cat("log10 lambda, deg. freedom, RMSE, gcv\n")
+  for (i in 1:m) {
+    cat(format(round(loglamout[i,],3)))
+    cat("\n")
+  }
+  par(mfrow=c(3,1))
+  plot(loglamvec, loglamout[,2], type="b")
+  title("Degrees of freedom")
+  plot(loglamvec, loglamout[,3], type="b")
+  title("RMSE")
+  plot(loglamvec, loglamout[,4], type="b")
+  title("Mean gcv")
+  return(loglamout)
 }
 
 #  Use the data that you used in Example 1, or run the following code:
@@ -397,7 +407,9 @@ plotfit.fd(y, argvals, xfd)
 points(argvals,x, pch="*")
 #  Repeat these analyses for a range of log10(lambda) values by running
 #  the function plotGCVRMSE that we defined above.
+
 loglamout = plotGCVRMSE.fd(-6, -3, 0.25, x, argvals, y, fdParobj)
+
 #  When we ran this example, the optimal RMSE was 0.073, and was achieved
 #  for log10(lambda) = -4.25 or lambda = 0.000056.  At this level of
 #  smoothing, the degrees of freedom index was 10.6, a value close to
@@ -420,7 +432,7 @@ loglamout = plotGCVRMSE.fd(-6, -3, 0.25, x, argvals, y, fdParobj)
 ##                       Simulated data example 3:
 ##           a roughness-penalized smooth of a sample of curves
 ##
-n = 51   #  number of observations per curve
+n =  51   #  number of observations per curve
 N = 100   #  number of curves
 argvals = seq(0,1,len=n)
 #  The true curve values are linear combinations of fourier function
@@ -486,6 +498,7 @@ loglamout = plotGCVRMSE.fd(-6, -3, 0.25, x, argvals, y, fdParobj)
 #  are small relative to the range of the observations.  Compare
 #  regression and roughness penalty smoothing in these situations.
 
+if(!CRAN()){
 ##
 ####### Simulated data example 4: a roughness-penalized smooth  ########
 ##                           with correlated error
@@ -833,18 +846,20 @@ gaitfdPar <- fdPar(gaitbasis, harmaccelLfd, lambda)
 gaitSmooth <- smooth.basis(gaittime, gait, gaitfdPar)
 gaitfd <- gaitSmooth$fd
 \dontrun{
-# by default creates multiple plots, asking for a click between plots
-plotfit.fd(gait, gaittime, gaitfd)
+  # by default creates multiple plots, asking for a click between plots
+  plotfit.fd(gait, gaittime, gaitfd)
 }
 
 \dontshow{
-# Check to make sure that it works with N=1e5
-N <- 1e5
-Bsp <- create.bspline.basis(N, 9)
-set.seed(1) # to ensure the same results across platforms
-system.time(fit <- smooth.basis(1:N, runif(N), Bsp))
-}
+  # Check to make sure that it works with N=1e5
+  N <- 1e5
+  Bsp <- create.bspline.basis(N, 9)
+  set.seed(1) # to ensure the same results across platforms
+  system.time(fit <- smooth.basis(1:N, runif(N), Bsp))
 }
 
-% docclass is function
+}
+#  end of if (!CRAN)
+
+}
 \keyword{smooth}

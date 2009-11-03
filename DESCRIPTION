@@ -1,12 +1,12 @@
 Package: fda
-Version: 2.2.8
+Version: 2.3.1
 Date: 2012-04
 Title: Functional Data Analysis
 Author: J. O. Ramsay <ramsay@psych.mcgill.ca>, Hadley Wickham
         <h.wickham@gmail.com>, Spencer Graves
         <spencer.graves@prodsyse.com>, Giles Hooker <gjh27@cornell.edu>
 Maintainer: J. O. Ramsay <ramsay@psych.mcgill.ca>
-Depends: R (>= 2.10.0), splines, zoo, Matrix
+Depends: R (>= 2.10.0), splines, zoo, Matrix, RCurl
 Imports: Matrix
 Suggests: graphics, odesolve, R.matlab, quadprog, DierckxSpline, nlme,
         lattice
@@ -18,16 +18,27 @@ Description: These functions were developed to support functional data
         Graves, Spencer (2009) Functional Data Analysis with R and
         Matlab (Springer). The package includes data sets and script
         files working many examples including all but one of the 76
-        figures in this latter book.  The principal changes to version
-        2.2.8 are: 1.  The use of sparse matrix representation for
-        spline basis functions and in function smooth.basis.  2.  The
-        correction of a bug in function pca.fd.  Analyses using the
-        earlier version should be redone.
+        figures in this latter book.  As of this release, the R-Project
+        is no longer distributing the Matlab versions of the functional
+        data analysis functions and sample analyses through the CRAN
+        distribution system.  This is due to the pressure placed on
+        storage required in the many CRAN sites by the rapidly
+        increasing number of R packages, of which the fda package is
+        one.  The three of us involved in this package have agreed to
+        help out this situation by switching to distributing the Matlab
+        functions and analyses through Jim Ramsay's ftp site at McGill
+        University.  To obtain these Matlab files, go to this site
+        using an ftp utility:
+        http://www.psych.mcgill.ca/misc/fda/downloads/FDAfuns/ There
+        you find a set of .zip files containing the functions and
+        sample analyses, as well as two .txt files giving instructions
+        for installation and some additional information.
 License: GPL (>= 2)
 URL: http://www.functionaldata.org
 LazyData: true
 Repository: CRAN
 Repository/R-Forge/Project: fda
-Repository/R-Forge/Revision: 589
-Packaged: 2012-05-15 02:15:11 UTC; rforge
-Date/Publication: 2012-05-15 06:38:02
+Repository/R-Forge/Revision: 663
+Repository/R-Forge/DateTimeStamp: 2012-09-23 06:03:29
+Date/Publication: 2012-10-10 10:58:47
+Packaged: 2012-09-23 06:19:29 UTC; rforge

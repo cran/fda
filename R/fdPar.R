@@ -43,8 +43,7 @@ fdPar <- function(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
 #  Return:
 #  FDPAROBJ ... A functional parameter object
 
-#  Last modified 2008.12.14 by Spencer Graves
-#  Previosly modified 6 January 2008 by Jim Ramsay
+#  Last modified 2012.07.05 by Spencer Graves
 
 #  ----------------------------------------------------------------------
 #                            Default fdPar objects
@@ -79,7 +78,8 @@ fdPar <- function(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
 #    }
       else if(is.numeric(fdobj))fdobj <- fd(fdobj)
 
-      else stop("First argument is neither a functional data object nor a basis object.")
+      else stop("First argument is neither a functional data object ",
+                "nor a basis object.")
     }
   }
 

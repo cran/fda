@@ -24,13 +24,21 @@ operator is defined
 a linear differential operator object
 }
 \seealso{
-\code{\link{int2Lfd}}, 
+\code{\link{int2Lfd}},
 \code{\link{Lfd}}
 }
 \examples{
 #  define the harmonic acceleration operator used in the
 #  analysis of the daily temperature data
-harmaccelLfd <- vec2Lfd(c(0,(2*pi/365)^2,0), c(0,365))
+Lcoef <- c(0,(2*pi/365)^2,0)
+harmaccelLfd <- vec2Lfd(Lcoef, c(0,365))
+
+hmat <- vec2Lfd(matrix(Lcoef, 1), c(0, 365))
+
+\dontshow{stopifnot(}
+all.equal(harmaccelLfd, hmat)
+\dontshow{)}
+
 }
 % docclass is function
 \keyword{smooth}

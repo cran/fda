@@ -170,12 +170,12 @@ hgtmfd.all   <- with(growth, smooth.basis(age, hgtm, growfdPar2.3)$fd)
 # growth curves directly
 smBv <- deriv(hgtmfd.all, 1)
 ##
-## 2.  Register the first 10 Berkeley boys using the default basis
+## 2.  Register the first 2 Berkeley boys using the default basis
 ##     for the warping function
 ##
-# register.fd takes time, so use only 10 curves as an illustration
+# register.fd takes time, so use only 2 curves as an illustration
 # to minimize compute time in these examples
-nBoys <- 10
+nBoys <- 2
 #  Define the target function as the mean of the first nBoys records
 smBv0 = mean.fd(smBv[1:nBoys])
 #  Register these curves.  The default choice for the functional
@@ -195,7 +195,8 @@ plotreg.fd(smB.reg.0)
 ##
 ## 3.  Define a more flexible basis for the warping functions
 ##
-Wnbasis   <- 5
+if(!CRAN()){
+Wnbasis   <- 4
 Wbasis    <- create.bspline.basis(rng.growth, Wnbasis)
 Wfd0      <- fd(matrix(0,Wnbasis,1),Wbasis)
 #  set up the functional parameter object using only
@@ -253,12 +254,13 @@ D2gaitfd$fdnames[[3]] <- c("Hip", "Knee")
 D2gaitmeanfd  <- mean.fd(D2gaitfd)
 names(D2gaitmeanfd$fdnames)[[3]] <- "Mean angular acceleration"
 D2gaitmeanfd$fdnames[[3]] <- c("Hip", "Knee")
-#  register the functions for the first 10 boys
+
+#  register the functions for the first 2 boys
 #  argument periodic = TRUE causes register.fd to estimate a horizontal shift
 #  for each curve, which is a possibility when the data are periodic
-nBoys <- 10
+
 #  set up the basis for the warping functions
-nwbasis   <- 7
+nwbasis   <- 4
 wbasis    <- create.bspline.basis(gaitrange,nwbasis,3)
 Warpfd    <- fd(matrix(0,nwbasis,nBoys),wbasis)
 WarpfdPar <- fdPar(Warpfd)
@@ -270,6 +272,6 @@ plotreg.fd(gaitreglist)
 #  display horizonal shift values
 print(round(gaitreglist$shift,1))
 }
-
+}
 % docclass is function
 \keyword{smooth}

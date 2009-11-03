@@ -1,16 +1,22 @@
-predict.basisfd <- function(object, newdata=NULL, Lfdobj=0, 
+predict.basisfd <- function(object, newdata=NULL, Lfdobj=0,
                             returnMatrix=FALSE, ...){
+##
+## 1.  newdata?
+##
   if(is.null(newdata)){
     type <- object$type
     if(length(type) != 1)
       stop('length(object$type) must be 1;  is ',
            length(type) )
     newdata <- {
-      if(type=='bspline')
+      if(type=='bspline') {
         unique(knots(object, interior=FALSE))
-      else object$rangeval
+      } else object$rangeval
     }
   }
+##
+## 2.  eval.basis
+##
   eval.basis(newdata, object, Lfdobj, returnMatrix)
 }
 
@@ -22,11 +28,11 @@ eval.basis <- function(evalarg, basisobj, Lfdobj=0, returnMatrix=FALSE) {
 #    LFD is 0, and the basis functions are simply evaluated at argument
 #    values in EVALARG.
 #
-#  If LFD is a functional data object with m + 1 functions c_1, ... c_{m+1}, 
-#   then it is assumed to define the order m HOMOGENEOUS linear differential 
+#  If LFD is a functional data object with m + 1 functions c_1, ... c_{m+1},
+#   then it is assumed to define the order m HOMOGENEOUS linear differential
 #   operator
 #
-#            Lx(t) = c_1(t) + c_2(t)x(t) + c_3(t)Dx(t) + ... + 
+#            Lx(t) = c_1(t) + c_2(t)x(t) + c_3(t)Dx(t) + ... +
 #                    c_{m+1}D^{m-1}x(t) + D^m x(t).
 #
 #  If the basis type is either polygonal or constant, LFD is ignored.
@@ -47,74 +53,95 @@ eval.basis <- function(evalarg, basisobj, Lfdobj=0, returnMatrix=FALSE) {
 
 #  Note that the first two arguments may be interchanged.
 
-#  Last modified 7 May 2012 by Jim Ramsay
+#  Last modified July 8, 2012 by Spencer Graves
+#    to add dimnames
+##
+## 1.  check
+##
+#   Exchange the first two arguments if the first is a BASIS.FD object
+#     and the second numeric
 
-#  Exchange the first two arguments if the first is an BASIS.FD object
-#    and the second numeric
-
-if (is.numeric(basisobj) && inherits(evalarg, "basisfd")) {
+  if (is.numeric(basisobj) && inherits(evalarg, "basisfd")) {
     temp     <- basisobj
     basisobj <- evalarg
     evalarg  <- temp
-}
+  }
 
 #  check EVALARG
 
-if (!(is.numeric(evalarg))) stop("Argument EVALARG is not numeric.")
-
-if (!is.vector(evalarg))    stop("Argument EVALARG is not a vector.")
+#  if (!(is.numeric(evalarg))){# stop("Argument EVALARG is not numeric.")
+# turn off warnings in checking if argvals can be converted to numeric.
+  if(is.numeric(evalarg)){
+    if(!is.vector(evalarg))stop("Argument 'evalarg' is not a vector.")
+    Evalarg <- evalarg
+  } else {
+    op <- options(warn=-1)
+    Evalarg <- as.numeric(evalarg)
+    options(op)
+    nNA <- sum(is.na(Evalarg))
+    if(nNA>0)
+      stop('as.numeric(evalarg) contains ', nNA,
+           ' NA', c('', 's')[1+(nNA>1)],
+           ';  class(evalarg) = ', class(evalarg))
+#  if(!is.vector(Evalarg))
+#      stop("Argument EVALARG is not a vector.")
+  }
 
 #  check basisobj
 
-if (!(inherits(basisobj, "basisfd"))) stop(
+  if (!(inherits(basisobj, "basisfd"))) stop(
     "Second argument is not a basis object.")
 
 #  check LFDOBJ
 
-Lfdobj <- int2Lfd(Lfdobj)
-
+  Lfdobj <- int2Lfd(Lfdobj)
+##
+## 2.  set up
+##
 #  determine the highest order of derivative NDERIV required
 
-nderiv <- Lfdobj$nderiv
+  nderiv <- Lfdobj$nderiv
 
 #  get weight coefficient functions
 
-bwtlist <- Lfdobj$bwtlist
-
+  bwtlist <- Lfdobj$bwtlist
+##
+## 3.  Do
+##
 #  get highest order of basis matrix
 
-basismat <- getbasismatrix(evalarg, basisobj, nderiv, returnMatrix)
-nbasis   <- dim(basismat)[2]
-oneb     <- matrix(1,1,nbasis)
+  basismat <- getbasismatrix(evalarg, basisobj, nderiv, returnMatrix)
+  nbasis   <- dim(basismat)[2]
+  oneb     <- matrix(1,1,nbasis)
 
 #  Compute the weighted combination of derivatives is
 #  evaluated here if the operator is not defined by an
 #  integer and the order of derivative is positive.
 
-if (nderiv > 0) {
-	nonintwrd <- FALSE
-	for (j in 1:nderiv) {
-		bfd    <- bwtlist[[j]]
-		bbasis <- bfd$basis
-		if (bbasis$type != "constant" || bfd$coefs != 0) nonintwrd <- TRUE
-	}
-	if (nonintwrd) {
-        for (j in 1:nderiv) {
-            bfd   <- bwtlist[[j]]
-            if (!all(c(bfd$coefs) == 0.0)) {
-                wjarray   <- eval.fd(evalarg, bfd, 0, returnMatrix)
-                Dbasismat <- getbasismatrix(evalarg, basisobj, j-1, 
-                                             returnMatrix)
-                basismat  <- basismat + (wjarray %*% oneb)*Dbasismat
-            }
-        }
+  if (nderiv > 0) {
+    nonintwrd <- FALSE
+    for (j in 1:nderiv) {
+        bfd    <- bwtlist[[j]]
+        bbasis <- bfd$basis
+        if (bbasis$type != "constant" || bfd$coefs != 0) nonintwrd <- TRUE
     }
-}
+    if (nonintwrd) {
+      for (j in 1:nderiv) {
+        bfd   <- bwtlist[[j]]
+        if (!all(c(bfd$coefs) == 0.0)) {
+            wjarray   <- eval.fd(evalarg, bfd, 0, returnMatrix)
+            Dbasismat <- getbasismatrix(evalarg, basisobj, j-1,
+                                        returnMatrix)
+            basismat  <- basismat + (wjarray %*% oneb)*Dbasismat
+        }
+      }
+    }
+  }
 
-if((!returnMatrix) && (length(dim(basismat)) == 2)){
-    return(as.matrix(basismat))
-}
-return(basismat)
+  if((!returnMatrix) && (length(dim(basismat)) == 2)){
+      return(as.matrix(basismat))
+  }
+  return(basismat)
 
 }
 

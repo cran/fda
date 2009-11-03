@@ -5,8 +5,8 @@
 }
 \description{
   Performs a stability analysis of the result of \code{pda.fd}, returning
-  the real and imaginary parts of the eigenfunctions associated with the linear
-  differential operator.
+  the real and imaginary parts of the eigenfunctions associated with the
+  linear differential operator.
 }
 \usage{
 eigen.pda(pdaList,plotresult=TRUE,npts=501,...)
@@ -48,13 +48,16 @@ eigen.pda(pdaList,plotresult=TRUE,npts=501,...)
 
 #  A pda analysis of the handwriting data
 
-fdaarray = handwrit
-fdatime  <- seq(0, 2.3, len=1401)
+# reduce the size to reduce the compute time for the example
+ni <- 281
+indx <- seq(1, 1401, length=ni)
+fdaarray = handwrit[indx,,]
+fdatime  <- seq(0, 2.3, len=ni)
 
 #  basis for coordinates
 
 fdarange <- c(0, 2.3)
-breaks = seq(0,2.3,length.out=501)
+breaks = seq(0,2.3,length.out=116)
 norder = 6
 fdabasis = create.bspline.basis(fdarange,norder=norder,breaks=breaks)
 
@@ -71,7 +74,7 @@ xfdlist = list(Xfd, Yfd)
 
 #  basis and parameter object for weight functions
 
-fdabasis2 = create.bspline.basis(fdarange,norder=norder,nbasis=51)
+fdabasis2 = create.bspline.basis(fdarange,norder=norder,nbasis=31)
 pdaPar = fdPar(fdabasis2,1,1e-8)
 
 pdaParlist = list(pdaPar, pdaPar)

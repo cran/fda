@@ -14,7 +14,14 @@
   criterion.
 }
 \usage{
-fRegress.CV(y, xfdlist, betalist, wt=NULL, CVobs=1:N,
+#fRegress.CV(y, xfdlist, betalist, wt=NULL, CVobs=1:N,
+#            returnMatrix=FALSE, ...)
+
+#NOTE:  The following is required by CRAN rules that
+# function names like "as.numeric" must follow the documentation
+# standards for S3 generics, even when they are not.
+# Please ignore the following line:
+\method{fRegress}{CV}(y, xfdlist, betalist, wt=NULL, CVobs=1:N,
             returnMatrix=FALSE, ...)
 }
 \arguments{

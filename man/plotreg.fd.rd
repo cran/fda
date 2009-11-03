@@ -66,7 +66,7 @@ D2gaitmeanfd$fdnames[[3]] <- c("Hip", "Knee")
 #  register the functions for the first 10 boys
 #  argument periodic = TRUE causes register.fd to estimate a horizontal shift
 #  for each curve, which is a possibility when the data are periodic
-nBoys <- 10
+nBoys <- 2 # use only 2 boys to save test time.
 #  set up the basis for the warping functions
 nwbasis   <- 7
 wbasis    <- create.bspline.basis(gaitrange,nwbasis,3)

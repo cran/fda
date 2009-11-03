@@ -11,7 +11,8 @@
 }
 \usage{
 eval.basis(evalarg, basisobj, Lfdobj=0, returnMatrix=FALSE)
-\method{predict}{basisfd}(object, newdata=NULL, Lfdobj=0, returnMatrix=FALSE, ...)
+\method{predict}{basisfd}(object, newdata=NULL, Lfdobj=0,
+                          returnMatrix=FALSE, ...)
 }
 \arguments{
   \item{evalarg, newdata}{
@@ -71,6 +72,13 @@ eval.basis(evalarg, basisobj, Lfdobj=0, returnMatrix=FALSE)
 bspl1.1 <- create.bspline.basis(norder=1, breaks=0:1)
 eval.bspl1.1 <- eval.basis(seq(0, 1, .2), bspl1.1)
 
+# check
+eval.bspl1.1. <- matrix(rep(1, 6), 6,
+       dimnames=list(NULL, 'bspl') )
+\dontshow{stopifnot(}
+all.equal(eval.bspl1.1, eval.bspl1.1.)
+\dontshow{)}
+
 # The second simplest basis:
 # 2 step functions, [0, .5], [.5, 1]
 bspl1.2 <- create.bspline.basis(norder=1, breaks=c(0,.5, 1))
@@ -124,6 +132,29 @@ basisMat. <- predict(weatherBasis, day.5)
 \dontshow{stopifnot(}
 all.equal(basisMat, basisMat.)
 \dontshow{)}
+
+##
+## 4.  Date and POSIXct
+##
+# Date
+July4.1776 <- as.Date('1776-07-04')
+Apr30.1789 <- as.Date('1789-04-30')
+AmRev <- c(July4.1776, Apr30.1789)
+BspRevolution <- create.bspline.basis(AmRev)
+AmRevYears <- seq(July4.1776, Apr30.1789, length.out=14)
+AmRevBases <- predict(BspRevolution, AmRevYears)
+matplot(AmRevYears, AmRevBases, type='b')
+# Image is correct, but
+# matplot does not recogize the Date class of x
+
+# POSIXct
+AmRev.ct <- as.POSIXct1970(c('1776-07-04', '1789-04-30'))
+BspRev.ct <- create.bspline.basis(AmRev.ct)
+AmRevYrs.ct <- seq(AmRev.ct[1], AmRev.ct[2], length.out=14)
+AmRevBas.ct <- predict(BspRev.ct, AmRevYrs.ct)
+matplot(AmRevYrs.ct, AmRevBas.ct, type='b')
+# Image is correct, but
+# matplot does not recognize the POSIXct class of x
 
 }
 % docclass is function

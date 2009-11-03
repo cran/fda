@@ -56,7 +56,7 @@ landmarkreg <- function(fdobj, ximarks, x0marks=xmeanmarks,
 
   #  check landmarks
 
-  if (is.vector(ximarks)) ximarks = as.matrix(ximarks)
+  if (is.vector(ximarks) | is.data.frame(ximarks) ) ximarks = as.matrix(ximarks)
   ximarksd <- dim(ximarks)
   if (ximarksd[1] != ncurve) stop(
      "Number of rows of XIMARKS is incorrect.")

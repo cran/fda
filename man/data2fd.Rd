@@ -22,8 +22,9 @@
 }
 \usage{
 Data2fd(argvals=NULL, y=NULL, basisobj=NULL, nderiv=NULL,
-        lambda=3e-8/diff(range(argvals)), fdnames=NULL, covariates=NULL,
-                         method="chol", dfscale=1)
+        lambda=3e-8/diff(as.numeric(range(argvals))),
+        fdnames=NULL, covariates=NULL, method="chol",
+        dfscale=1)
 }
 \arguments{
   \item{argvals}{
@@ -300,6 +301,26 @@ tempfd <- Data2fd(CanadianWeather$dailyAv[,,"Temperature.C"],
 #  plot the temperature curves
 par(mfrow=c(1,1))
 plot(tempfd)
+
+##
+## argvals of class Date and POSIXct
+##
+#  Date
+invasion1 <- as.Date('1775-09-04')
+invasion2 <- as.Date('1812-07-12')
+earlyUS.Canada <- c(invasion1, invasion2)
+BspInvasion <- create.bspline.basis(earlyUS.Canada)
+
+earlyYears <- seq(invasion1, invasion2, length.out=7)
+(earlyQuad <- (as.numeric(earlyYears-invasion1)/365.24)^2)
+fitQuad <- Data2fd(earlyYears, earlyQuad, BspInvasion)
+
+# POSIXct
+AmRev.ct <- as.POSIXct1970(c('1776-07-04', '1789-04-30'))
+BspRev.ct <- create.bspline.basis(AmRev.ct)
+AmRevYrs.ct <- seq(AmRev.ct[1], AmRev.ct[2], length.out=14)
+(AmRevLin.ct <- as.numeric(AmRevYrs.ct-AmRev.ct[1]))
+fitLin.ct <- Data2fd(AmRevYrs.ct, AmRevLin.ct, BspRev.ct)
 
 }
 

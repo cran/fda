@@ -23,7 +23,7 @@
 #       inevitably can imply slightly different results and graphical
 #       displays
 #    -- we may have changed our minds about variable names.  For example,
-#       we now prefer "yearRng" to "yearRng" for the weather data.
+#       we now prefer "dayrange" to "yearRng" for the weather data.
 #    -- three of us wrote the book, and the person preparing these scripts
 #       might not be the person who wrote the text
 #  Moreover, we expect to augment and modify these command scripts from time
@@ -237,8 +237,8 @@ temp.fd$fdnames = list("Day (July 2 to June 30)",
 ccafdPar = fdPar(daybasis, 2, 5e6)
 ccalist  = cca.fd(temp.fd, logprec.fd, 3, ccafdPar, ccafdPar)
 
-ccawt.temp    = ccalist$ccwtfd1
-ccawt.logprec = ccalist$ccwtfd2
+ccawt.temp    = ccalist$ccawtfd1
+ccawt.logprec = ccalist$ccawtfd2
 corrs         = ccalist$ccacorr
 
 print(corrs[1:3])
@@ -253,7 +253,7 @@ plot(day.5, ccawtmat.temp[,1], type='l', lwd=2, cex=2,
      xlab="Day (July 1 to June 30)",
      ylab="Canonical Weight Functions")
 lines(day.5, ccawtmat.logprec[,1], lty=2, lwd=2)
-lines(yearRng, c(0, 0), lty=3)
+lines(dayrange, c(0, 0), lty=3)
 legend("bottomleft", c("Temp.", "Log Prec."), lty=c(1,2))
 
 #  Figure 7.9

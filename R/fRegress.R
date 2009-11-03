@@ -1,5 +1,5 @@
-fRegress <- function(y, xfdlist, betalist, wt=NULL, 
-                     y2cMap=NULL, SigmaE=NULL, returnMatrix=FALSE) 
+fRegress <- function(y, xfdlist, betalist, wt=NULL,
+                     y2cMap=NULL, SigmaE=NULL, returnMatrix=FALSE)
 {
 
 #  FREGRESS  Fits a functional linear model using multiple
@@ -25,7 +25,7 @@ fRegress <- function(y, xfdlist, betalist, wt=NULL,
 #  BETALIST ... a list object of length p with each list
 #               containing a functional parameter object for
 #               the corresponding regression function.  If any of
-#               these objects is a functional data object, it is 
+#               these objects is a functional data object, it is
 #               converted to the default functional parameter object.
 #               if BETALIST is a functional parameter object
 #               it is converted to a list of length 1.
@@ -63,7 +63,7 @@ arglist <- fRegressArgCheck(y, xfdlist, betalist, wt)
 yfdPar   <- arglist$yfdPar
 xfdlist  <- arglist$xfdlist
 betalist <- arglist$betalist
-wt       <- arglist$wt 
+wt       <- arglist$wt
 
 p <- length(xfdlist)
 N <- dim(xfdlist[[1]]$coef)[1]
@@ -71,11 +71,11 @@ N <- dim(xfdlist[[1]]$coef)[1]
 wtconst <- var(wt) == 0
 
 #  --------------------------------------------------------------------------
-#  branch depending on whether the dependent variable is functional or scalar 
+#  branch depending on whether the dependent variable is functional or scalar
 #  --------------------------------------------------------------------------
 
 if (inherits(yfdPar, "fdPar")) {
-	
+
     #  ----------------------------------------------------------------
     #           YFDPAR is a functional parameter object
     #  ----------------------------------------------------------------
@@ -129,7 +129,7 @@ if (inherits(yfdPar, "fdPar")) {
             xfdj <- xfdlist[[j]]
             if (wtconst) {
                 xyfdj <- xfdj*yfdobj
-            } else {           
+            } else {
                 xyfdj <- (xfdj*wt)*yfdobj
             }
             wtfdj <- sum(xyfdj)
@@ -151,22 +151,26 @@ if (inherits(yfdPar, "fdPar")) {
                     xfdk <- xfdlist[[k]]
                     if (wtconst) {
                         xxfdjk <- xfdj*xfdk
-                    } else {           
+                    } else {
                         xxfdjk <- (xfdj*wt)*xfdk
                     }
                     wtfdjk <- sum(xxfdjk)
-                    Cmatjk <- inprod(betabasisj, betabasisk, 0, 0, rangeval, 
-                                     wtfdjk)
+                    Cmatjk <- inprod(betabasisj, betabasisk, 0, 0,
+                                     rangeval, wtfdjk)
                     Cmat[indexj,indexk] <- Cmatjk
                     Cmat[indexk,indexj] <- t(Cmatjk)
                 }
             }
             #  attach penalty term to diagonal block
-            lambda <- betafdParj$lambda
-            if (lambda > 0) {
-                Lfdj  <- betafdParj$Lfd
-                Rmatj <- eval.penalty(betafdParj$fd$basis, Lfdj)
-                Cmat[indexj,indexj] <- Cmat[indexj,indexj] + lambda*Rmatj
+            lambdaj <- betafdParj$lambda
+            if (lambdaj > 0) {
+                Rmatj <- betafdParj$penmat
+                if (is.null(Rmatj)) {
+                    Lfdj  <- betafdParj$Lfd
+                    Rmatj <- eval.penalty(betabasisj, Lfdj)
+                }
+                Cmat[indexj,indexj] <- Cmat[indexj,indexj] +
+                                       lambdaj*Rmatj
             }
         }
     }
@@ -177,13 +181,14 @@ if (inherits(yfdPar, "fdPar")) {
 
     eigchk(Cmat)
 
+
     #  solve for coefficients defining BETA
 
     Lmat    <- chol(Cmat)
     Lmatinv <- solve(Lmat)
     Cmatinv <- Lmatinv %*% t(Lmatinv)
 
-    betacoef <- Cmatinv %*% Dmat	
+    betacoef <- Cmatinv %*% Dmat
 
     #  set up fdPar objects for reg. fns. in BETAESTLIST
 
@@ -220,7 +225,7 @@ if (inherits(yfdPar, "fdPar")) {
     yhatfdobj <- smooth.basis(tfine, yhatmat, ybasisobj)$fd
 
     df <- NA
-    
+
     #  -----------------------------------------------------------------------
     #        Compute pointwise standard errors of regression coefficients
     #               if both y2cMap and SigmaE are supplied.
@@ -344,7 +349,7 @@ if (inherits(yfdPar, "fdPar")) {
         bnbasis    <- bbasis$nbasis
         pjvec[j]   <- bnbasis
         Jpsithetaj <- inprod(xbasis,bbasis)
-        Zmat       <- cbind(Zmat,crossprod(xcoef,Jpsithetaj)) 
+        Zmat       <- cbind(Zmat,crossprod(xcoef,Jpsithetaj))
         if (betafdParj$estimate) {
             lambdaj    <- betafdParj$lambda
             if (lambdaj > 0) {
@@ -384,7 +389,7 @@ if (inherits(yfdPar, "fdPar")) {
     eigchk(Cmat)
 
     Cmatinv  <- solve(Cmat)
-	 
+
     betacoef <- Cmatinv %*% Dmat
 
 
@@ -445,7 +450,7 @@ if (inherits(yfdPar, "fdPar")) {
     #  -----------------------------------------------------------------------
 
     if (!(is.null(y2cMap) || is.null(SigmaE))) {
-    
+
         #  check dimensions of y2cMap and SigmaE
 
         y2cdim <- dim(y2cMap)
@@ -482,7 +487,7 @@ if (inherits(yfdPar, "fdPar")) {
         bvar           = NULL
         c2bMap         = NULL
     }
-                         
+
     #  -----------------------------------------------------------------------
     #                  Set up output list object
     #  -----------------------------------------------------------------------
@@ -512,7 +517,7 @@ if (inherits(yfdPar, "fdPar")) {
 #  ------------------------------------------------------------------------
 
 eigchk <- function(Cmat) {
-	
+
     #  check Cmat for singularity
 
     eigval <- eigen(Cmat)$values

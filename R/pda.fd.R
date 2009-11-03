@@ -1,7 +1,7 @@
 pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
                      nfine=501, returnMatrix=FALSE)
 {
-#PDA computes the basis function expansions of the
+#  PDA_FD computes the basis function expansions of the
 #  estimates of the coefficient functions a_k(t) and b_j(t)
 #  in the possibly nonhomogeneous linear differential operator
 #
@@ -88,7 +88,7 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
 #               from a call to function BsplineS.  See this function for
 #               enabling this option.
 
-#  last modified 9 May 2012 by Jim Ramsay
+#  last modified 1 August 2012 by Jim Ramsay
 
 #  check dimensions of the lists
 
@@ -150,16 +150,15 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
       }
     }
 
-#  check to see if there is anything to estimate
+    #  check to see if there is anything to estimate
 
     if (difeorder == 0 && nforce == 0)
       stop("There are no coefficient functions to estimate.")
 
-    ncurve     <- dim(xcoef)[2]
-
+    ncurve  <- dim(xcoef)[2]
     nbasmax <- xbasis$nbasis
 
-#  check UFDLIST and AWTLIST
+    #  check UFDLIST and AWTLIST
 
     if (nforce > 0) {
       errorwrd <- FALSE
@@ -171,8 +170,8 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
         } else {
           ufdi   <- ufdlist[[iu]]
           urange <- ufdi$basis$rangeval
-        #  check that urange is equal to xrange
-	  if (any(urange != xrange)) {
+          #  check that urange is equal to xrange
+	    if (any(urange != xrange)) {
             print(paste(
              "XRANGE and URANGE are not identical for UFDLIST[[",
                         iu,"]].",sep=""))
@@ -188,20 +187,21 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
             errorwrd <- TRUE
         } else {
           basisi <- afdi$basis
-    	  if (any(basisi$rangeval != urange)) {
+    	    if (any(basisi$rangeval != urange)) {
               print(paste("Ranges are incompatible for AWTLIST[[",
                           iu,"]].",sep=""))
               errorwrd <- TRUE
           }
-    	  nbasmax <- max(c(nbasmax,basisi$nbasis))
+    	    nbasmax <- max(c(nbasmax,basisi$nbasis))
         }
       }
       if (errorwrd) stop("")
     }
 
-#  check BWTLIST
+    #  check BWTLIST
 
-#  convert to a single-layer list of necessary
+    #  convert to a single-layer list if necessary
+
     if (inherits(bwtlist[[1]],"list")) {
       temp <- vector("list",difeorder)
       for (j in 1:nvar) {
@@ -212,7 +212,8 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
       }
       bwtlist <- temp
     }
-#  check the components
+
+    #  check the components
     errorwrd <- FALSE
     for (j in 1:difeorder) {
       if (!is.null(bwtlist[[j]])) {
@@ -239,21 +240,21 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
     }
     if (errorwrd) stop("")
 
-#  Set up sampling values to be used in numerical integration
-#    and set up matrix of basis values.  The number of sampling
-#  NFINE is here set to a usually workable value if too small.
+    #  Set up sampling values to be used in numerical integration
+    #    and set up matrix of basis values.  The number of sampling
+    #  NFINE is here set to a usually workable value if too small.
 
     if (nfine < 5*nbasmax) nfine <- 5*nbasmax
 
     deltax <- (xrange[2]-xrange[1])/(nfine-1)
     tx     <- seq(xrange[1],xrange[2],deltax)
 
-#  set up  YARRAY to hold values of x functions and their derivatives
+    #  set up  YARRAY to hold values of x functions and their derivatives
 
     yarray <- array(0,c(nfine,ncurve,difeordp1))
     for (j in 1:difeordp1) yarray[,,j] <- eval.fd(tx, xfdobj, j-1, returnMatrix)
 
-#  set up  UARRAY to hold values of u functions
+    #  set up  UARRAY to hold values of u functions
 
     if (nforce > 0) {
         uarray <- array(0,c(nfine,ncurve,nforce))
@@ -261,7 +262,7 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
             uarray[,,iu] <- eval.fd(tx, ufdlist[[iu]], returnMatrix=returnMatrix)
     }
 
-#  set up array YPROD to hold mean of products of values in YARRAY
+    #  set up array YPROD to hold mean of products of values in YARRAY
 
     yprod <- array(0,c(nfine,difeordp1,difeordp1))
     for (j1 in 1:difeordp1) for (j2 in 1:j1) {
@@ -271,8 +272,8 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
         yprod[,j2,j1] <- yprodval
     }
 
-#  set up array YUPROD to hold mean of u-variables u times
-#    x functions and their derivatives
+    #  set up array YUPROD to hold mean of u-variables u times
+    #    x functions and their derivatives
 
     if (nforce > 0) {
         yuprod <- array(0,c(nfine, nforce, difeordp1))
@@ -288,7 +289,7 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
         }
     }
 
-#  set up array UPROD to hold mean of products of u-variables u
+    #  set up array UPROD to hold mean of products of u-variables u
 
     if (nforce > 0) {
         uprod <- array(0,c(nfine, nforce, nforce))
@@ -300,22 +301,22 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
         }
     }
 
-#  set up an index array and some arrays of 1's
+    #  set up an index array and some arrays of 1's
 
     onesn <- rep(1,nfine)
 
-#  set up array to hold coefficients for basis expansions
+    #  set up array to hold coefficients for basis expansions
 
     if (nforce > 0) aarray <- matrix(0,nfine,nforce)
     else            aarray <- NULL
 
     barray <- matrix(0,nfine,difeorder)
 
-#  --------------  beginning of loop through variables  -------------------
+    #  --------------  beginning of loop through variables  -------------------
 
-#  get number of coefficients to be estimated for this equation
+    #  get number of coefficients to be estimated for this equation
 
-# loop through u-variables
+    # loop through u-variables
 
     neqns  <- 0
 
@@ -329,7 +330,7 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
 	}
     }
 
-# loop through x functions and their derivatives
+    # loop through x functions and their derivatives
 
     for (j1 in 1:difeorder) {
         if (!is.null(bwtlist[[j1]])) {
@@ -342,12 +343,12 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
     if (neqns < 1) stop(
                         "Number of equations to solve is not positive.")
 
-#  set up coefficient array and right side array for linear equation
+    #  set up coefficient array and right side array for linear equation
 
     cmat   <- matrix(0,neqns, neqns)
     dmat   <- matrix(0,neqns, 1)
 
-#  evaluate default weight functions for this variable
+    #  evaluate default weight functions for this variable
 
     if (nforce > 0) {
         for (iu in 1:nforce) {
@@ -365,10 +366,10 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
         }
     }
 
-#  loop through equations,
-#    corresponding to rows for CMAT and DMAT
+    #  loop through equations,
+    #    corresponding to rows for CMAT and DMAT
 
-#  loop through equations for u-variables
+    #  loop through equations for u-variables
 
     mi12 <- 0
     if (nforce > 0) {
@@ -451,7 +452,7 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
         }
     }
 
-#  loop through equations for x-derivatives
+    #  loop through equations for x-derivatives
 
     mij12 <- mi12
     for (j1 in 1:difeorder) {
@@ -464,12 +465,12 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
                 mij11 <- mij12 + 1
                 mij12 <- mij12 + bbasisij1$nbasis
                 indexij1 <- mij11:mij12
-      #  DMAT entry for u-variable -- x-derivative pair
+                #  DMAT entry for u-variable -- x-derivative pair
                 weightij1 <- yprod[,j1,difeordp1]
                 dmat[indexij1] <-
                     trapzmat(bbasismatij1,onesn,deltax,weightij1)
-      #  add terms corresponding to forcing functions
-      #  with unestimated coefficients
+                #  add terms corresponding to forcing functions
+                #  with unestimated coefficients
                 if (nforce > 0) {
                   for (iu in 1:nforce) {
                     if (!is.null(awtlist[[iu]])) {
@@ -482,9 +483,9 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
                     }
                   }
                 }
-              }
-          }
-  #  first columns of CMAT: u-variable entries
+            }
+        }
+        #  first columns of CMAT: u-variable entries
         mi22 <- 0
         if (nforce > 0) {
           for (iu2 in 1:nforce) {
@@ -504,7 +505,7 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
             }
           }
         }
-  #  remaining columns: x-derivative pairs
+        #  remaining columns: x-derivative pairs
         mij22 <- mi22
         for (j2 in 1:difeorder) {
           if (!is.null(bwtlist[[j2]])) {
@@ -522,7 +523,7 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
             }
           }
         }
-    # add roughness penalty matrix to diagonal entries
+        # add roughness penalty matrix to diagonal entries
         lambdaj1 <- bfdParj1$lambda
         if (lambdaj1 > 0) {
           Lfdobj <- bfdParj1$Lfd
@@ -531,13 +532,13 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
         }
     }
 
-#  --------------  end of loop through variables  -------------------
+    #  --------------  end of loop through variables  -------------------
 
-# solve for coefficients of basis expansions
+    # solve for coefficients of basis expansions
 
     dvec <- -symsolve(cmat,dmat)
 
-#  set up u-function weight functions
+    #  set up u-function weight functions
 
     mi2 <- 0
     if (nforce > 0) {
@@ -555,7 +556,7 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
         }
     }
 
-#  set up X-function derivative weight functions
+    #  set up X-function derivative weight functions
 
     mij2 <- mi2
     for (j in 1:difeorder) {
@@ -571,11 +572,11 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
       }
     }
 
-#  set up residual list RESFDLIST
+    #  set up residual list RESFDLIST
 
-#  initialize with highest order derivative for this variable
+    #  initialize with highest order derivative for this variable
     resmat  <- eval.fd(tx, xfdobj, difeorder, returnMatrix)
-#  add contributions from weighted u-functions
+    #  add contributions from weighted u-functions
     if (nforce > 0) {
       onesncurve <- rep(1,ncurve)
       for (iu in 1:nforce) {
@@ -589,7 +590,7 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
         }
       }
     }
-#  add contributions from weighted x-function derivatives
+    #  add contributions from weighted x-function derivatives
     for (j in 1:difeorder) {
         if (!is.null(bwtlist[[j]])) {
             bfdParj <- bwtlist[[j]]
@@ -599,7 +600,7 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
             resmat  <- resmat + bmatij*xmatij
         }
     }
-#  set up the functional data object
+    #  set up the functional data object
     resbasis <- xbasis
     resfd    <- smooth.basis(tx, resmat, resbasis)$fd
     resfdnames      <- xfdobj$fdnames
@@ -608,90 +609,90 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
     resfd$fdnames   <- resfdnames
     resfdlist       <- list(resfd)
 
-#  ----------------------------------------------------------------
-#                   End of single variable case
-#  ----------------------------------------------------------------
+    #  ----------------------------------------------------------------
+    #                   End of single variable case
+    #  ----------------------------------------------------------------
 
   } else {
 
-#  ----------------------------------------------------------------
-#                   Multiple variable case
-#  ----------------------------------------------------------------
+    #  ----------------------------------------------------------------
+    #                   Multiple variable case
+    #  ----------------------------------------------------------------
 
-#  check the dimensions of UFDLIST and AWTLIST
+    #  check the dimensions of UFDLIST and AWTLIST
 
-      if (is.null(ufdlist) || is.null(awtlist)) {
-        awtlist <- NULL
-      } else {
-        if (length(ufdlist) != nvar)
-          stop(paste("The length of UFDLIST",
-                     " does not match that of XFDLIST."))
-        errorwrd = FALSE
-        for (j in 1:nvar) {
-          if (!is.null(ufdlist[[j]])) {
-            nforce <- length(ufdlist[[j]])
-            if (length(awtlist[[j]]) != nforce) {
-              print(paste("The length of AWTLIST[[",j,
-                          "]] is incorrect.",sep=""))
-              errorwrd = TRUE
-            }
+    if (is.null(ufdlist) || is.null(awtlist)) {
+      awtlist <- NULL
+    } else {
+      if (length(ufdlist) != nvar)
+        stop(paste("The length of UFDLIST",
+                   " does not match that of XFDLIST."))
+      errorwrd = FALSE
+      for (j in 1:nvar) {
+        if (!is.null(ufdlist[[j]])) {
+          nforce <- length(ufdlist[[j]])
+          if (length(awtlist[[j]]) != nforce) {
+            print(paste("The length of AWTLIST[[",j,
+                        "]] is incorrect.",sep=""))
+            errorwrd = TRUE
           }
         }
-        if (errorwrd) stop("")
       }
+      if (errorwrd) stop("")
+    }
 
-#  check the dimensions of BWTLIST
+    #  check the dimensions of BWTLIST
 
-      if (length(bwtlist) != nvar) stop("Length of BWTLIST is incorrect.")
-      errorwrd = FALSE
-      for (ivar in 1:nvar) {
-        if (length(bwtlist[[ivar]]) != nvar) {
+    if (length(bwtlist) != nvar) stop("Length of BWTLIST is incorrect.")
+    errorwrd = FALSE
+    for (ivar in 1:nvar) {
+      if (length(bwtlist[[ivar]]) != nvar) {
           print(paste("The length of BWTLIST[[",ivar,
                       "]] is incorrect.",sep=""))
           errorwrd = TRUE
-        }
       }
-      if (errorwrd) stop("")
+    }
+    if (errorwrd) stop("")
 
-#  check XFDLIST and extract NCURVE and XRANGE
+    #  check XFDLIST and extract NCURVE and XRANGE
 
-      xfd1       <- xfdlist[[1]]
-      xcoef1     <- xfd1$coefs
-      xbasis1    <- xfd1$basis
-      xrange1    <- xbasis1$rangeval
-      ncurve     <- dim(xcoef1)[2]
-      resfdnames <- xfd1$fdnames
+    xfd1       <- xfdlist[[1]]
+    xcoef1     <- xfd1$coefs
+    xbasis1    <- xfd1$basis
+    xrange1    <- xbasis1$rangeval
+    ncurve     <- dim(xcoef1)[2]
+    resfdnames <- xfd1$fdnames
 
-      errorwrd = FALSE
-      for (ivar in 1:nvar) {
-        xfdi    <- xfdlist[[ivar]]
-        xcoefi  <- xfdi$coefs
-        xbasisi <- xfdi$basis
-        xrangei <- xbasisi$rangeval
-        ncurvei <- dim(xcoefi)[2]
-        if (!inherits(xfdi, "fd")) {
-          print(paste("XFDLIST[[",ivar,
-                      "]] is not a functional data object.",sep=""))
+    errorwrd = FALSE
+    for (ivar in 1:nvar) {
+      xfdi    <- xfdlist[[ivar]]
+      xcoefi  <- xfdi$coefs
+      xbasisi <- xfdi$basis
+      xrangei <- xbasisi$rangeval
+      ncurvei <- dim(xcoefi)[2]
+      if (!inherits(xfdi, "fd")) {
+        print(paste("XFDLIST[[",ivar,
+                    "]] is not a functional data object.",sep=""))
+        errorwrd = TRUE
+      } else {
+        if (any(xrangei != xrange1)) {
+          print("Ranges are incompatible for XFDLIST.")
           errorwrd = TRUE
-        } else {
-          if (any(xrangei != xrange1)) {
-            print("Ranges are incompatible for XFDLIST.")
+        }
+        if (ncurvei != ncurve) {
+            print("Number of curves is incompatible for XFDLIST.")
             errorwrd = TRUE
-          }
-          if (ncurvei != ncurve) {
-              print("Number of curves is incompatible for XFDLIST.")
-              errorwrd = TRUE
-          }
         }
       }
-      if (errorwrd) stop("")
+    }
+    if (errorwrd) stop("")
 
-      nbasmax <- xbasis1$nbasis
-#  This will be the maximum number of basis functions
+    nbasmax <- xbasis1$nbasis
+    #  This will be the maximum number of basis functions
 
-#  check compatibility of UFDLIST and AWTLIST
+    #  check compatibility of UFDLIST and AWTLIST
 
-      if (!(is.null(ufdlist) || is.null(awtlist))) {
+    if (!(is.null(ufdlist) || is.null(awtlist))) {
         urange <- ufdlist[[1]]$basis$rangeval
         errorwrd <- FALSE
         for (ivar in 1:nvar) {
@@ -725,12 +726,12 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
             if (errorwrd) stop("")
           }
         }
-      }
+    }
 
-#  check BWTLIST
+    #  check BWTLIST
 
-      errorwrd <- FALSE
-      for (ivar1 in 1:nvar) {
+    errorwrd <- FALSE
+    for (ivar1 in 1:nvar) {
         for (ivar2 in 1:nvar) {
           difeorder <- length(bwtlist[[ivar1]][[ivar2]])
           for (j in 1:difeorder) {
@@ -752,34 +753,34 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
             }
           }
         }
-      }
-      if (errorwrd) stop("")
+    }
+    if (errorwrd) stop("")
 
-#  set up sampling values to be used in numerical integration
-#    and set up matrix of basis values.  The number of sampling
-#  NFINE is here set to a usually workable value if too small.
+    #  set up sampling values to be used in numerical integration
+    #    and set up matrix of basis values.  The number of sampling
+    #  NFINE is here set to a usually workable value if too small.
 
-      if (nfine < 5*nbasmax) nfine <- 5*nbasmax
+    if (nfine < 5*nbasmax) nfine <- 5*nbasmax
 
-      deltax <- (xrange1[2]-xrange1[1])/(nfine-1)
-      tx     <- seq(xrange1[1],xrange1[2],deltax)
+    deltax <- (xrange1[2]-xrange1[1])/(nfine-1)
+    tx     <- seq(xrange1[1],xrange1[2],deltax)
 
-#  set up  YARRAY to hold values of x functions and their derivatives
+    #  set up  YARRAY to hold values of x functions and their derivatives
 
-      yarray <- vector("list", 0)
-      for (ivar in 1:nvar) {
+    yarray <- vector("list", 0)
+    for (ivar in 1:nvar) {
         difeorder <- length(bwtlist[[ivar]][[ivar]])
         difeordp1 <- difeorder + 1
         yarray[[ivar]] <- array(0,c(nfine,ncurve,difeordp1))
         for (j in 1:difeordp1){
-            yj <- eval.fd(tx, xfdlist[[ivar]], j-1, returnMatrix)
+            yj <- eval.fd(tx, xfdlist[[ivar]], j-1, returnMatrix=returnMatrix)
             yarray[[ivar]][,,j] <- as.matrix(yj)
         }
-      }
+    }
 
-#  set up  UARRAY to hold values of u functions
+    #  set up  UARRAY to hold values of u functions
 
-      if (!is.null(ufdlist)) {
+    if (!is.null(ufdlist)) {
         uarray <- vector("list", nvar)
         for (ivar in 1:nvar) {
             if (is.null(ufdlist[[ivar]])) {
@@ -790,8 +791,8 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
                 for (iu in 1:nforce)
                     uarray[[ivar]][[iu]] <- matrix(0,nfine,ncurve)
             }
-        }
-        for (ivar in 1:nvar) {
+      }
+      for (ivar in 1:nvar) {
             if (!is.null(ufdlist[[ivar]])) {
               nforce <- length(ufdlist[[ivar]])
               for (iu in 1:nforce)
@@ -801,7 +802,7 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
         }
       }
 
-#  set up array YPROD to hold mean of products of values in YARRAY
+      #  set up array YPROD to hold mean of products of values in YARRAY
 
       yprod <- vector("list", nvar)
       for (i1 in 1:nvar) yprod[[i1]] <- vector("list", nvar)
@@ -830,8 +831,8 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
         }
       }
 
-#  set up array YUPROD to hold mean of u-variables u times
-#    x functions and their derivatives
+      #  set up array YUPROD to hold mean of u-variables u times
+      #    x functions and their derivatives
 
       if (!is.null(ufdlist)) {
         yuprod <- vector("list", nvar)
@@ -869,7 +870,7 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
         }
       }
 
-#  set up array UPROD to hold mean of products of u-variables u
+      #  set up array UPROD to hold mean of products of u-variables u
 
       if (!is.null(ufdlist)) {
         uprod <- vector("list", nvar)

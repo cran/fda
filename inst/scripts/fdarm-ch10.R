@@ -5,19 +5,19 @@
 
 #  Remarks and disclaimers
 
-#  These R commands are either those in this book, or designed to 
+#  These R commands are either those in this book, or designed to
 #  otherwise illustrate how R can be used in the analysis of functional
-#  data.  
-#  We do not claim to reproduce the results in the book exactly by these 
+#  data.
+#  We do not claim to reproduce the results in the book exactly by these
 #  commands for various reasons, including:
 #    -- the analyses used to produce the book may not have been
 #       entirely correct, possibly due to coding and accuracy issues
-#       in the functions themselves 
-#    -- we may have changed our minds about how these analyses should be 
+#       in the functions themselves
+#    -- we may have changed our minds about how these analyses should be
 #       done since, and we want to suggest better ways
 #    -- the R language changes with each release of the base system, and
 #       certainly the functional data analysis functions change as well
-#    -- we might choose to offer new analyses from time to time by 
+#    -- we might choose to offer new analyses from time to time by
 #       augmenting those in the book
 #    -- many illustrations in the book were produced using Matlab, which
 #       inevitably can imply slightly different results and graphical
@@ -155,12 +155,12 @@ logCounts = log10(meanCounts[selYear,])
 yearObs  = as.numeric(rownames(logCounts))
 yearCode = (1:20)[selYear]
 
-# Figure 10.2
-
 shellfishindex = c(1,2,5,6,12,13)
 fishindex      = (1:13)[-shellfishindex]
-ylim = range(logCounts)
 
+# Figure 10.2
+
+ylim = range(logCounts)
 op = par(mfrow=c(2,1), mar=c(2, 4, 4, 1)+.1)
 
 matplot(yearObs, logCounts[, shellfishindex], xlab='', ylab='',
@@ -257,8 +257,8 @@ birdfd3 = birdfd2
 birdfd3$coefs = cbind(birdfd3$coefs, matrix(0,19,2))
 
 Zmat = rbind(Zmat0, matrix(0,2,15))
-Zmat[27,shellfishindex+2]  = 1
-Zmat[28,fishindex+2] = 1
+Zmat[27,shellfishindex+2] = 1
+Zmat[28,     fishindex+2] = 1
 
 p = 15
 xfdlist = vector("list",p)
@@ -270,8 +270,10 @@ for (j in 1:p) xfdlist[[j]] = Zmat[,j]
 #  use cubic b-spline basis for intercept and food coefficients
 
 betabasis1 = create.bspline.basis(c(1,20),21,4,yearCode)
-lambda = 10
-betafdPar1 = fdPar(betabasis1,2,lambda)
+Lfdobj1    = int2Lfd(2);
+Rmat1      = eval.penalty(betabasis1, Lfdobj1)
+lambda1    = 10
+betafdPar1 = fdPar(betabasis1,Lfdobj1,lambda1,TRUE,Rmat1)
 betalist[[1]] = betafdPar1
 betalist[[2]] = betafdPar1
 betabasis2 = create.constant.basis(c(1,20))
@@ -299,9 +301,6 @@ par(op)
 #  Choose the level of smoothing by minimizing cross-validated
 #  error sums of squares.
 
-#  This analysis took about 22 minutes on the author's notebook computer
-#  that was purchased in 2008.
-
 loglam = seq(-2,4,0.25)
 SSE.CV = rep(0,length(loglam))
 betafdPari = betafdPar1
@@ -310,7 +309,7 @@ for(i in 1:length(loglam)){
     betafdPari$lambda = 10^loglam[i]
     betalisti = betalist
     for (j in 1:2) betalisti[[j]] = betafdPari
-    CVi = fRegress.CV(birdfd3, xfdlist, betalisti,CVobs=1:26)
+    CVi = fRegress.CV(birdfd3, xfdlist, betalisti, CVobs=1:26)
     SSE.CV[i] = CVi$SSE.CV
 }
 
@@ -324,6 +323,11 @@ plot(loglam,SSE.CV,type='b',cex.lab=1.5,cex.axis=1.5,lwd=2,
 
 betafdPar1$lambda = 10^0.5
 for (j in 1:2) betalist[[j]] = betafdPar1
+
+y = birdfd3
+wt = NULL
+CVobs = 1:26
+returnMatrix=FALSE
 
 #  carry out the functional regression analysis
 
@@ -411,9 +415,9 @@ plot(gaitSmoothStats[, c(1, 3)], type='b')
 #  allowing for larger fonts
 
 op = par(mfrow=c(2,1))
+par(op)
 plot(gaitSmoothStats[, c(1, 3)], type="b", log="y")
 plot(gaitSmoothStats[, 1:2], type="b", log="y")
-par(op)
 
 #    GCV is minimized with lambda = 10^(-1.5).
 
@@ -540,8 +544,11 @@ abline(v=c(7.5, 14.7), lty='dashed')
 kneeAccel.pred = predict(gaitAccelRegr$yhatfd$fd, gaitt3)
 kneeAccel.     = predict(kneefd.accel, gaitt3)
 
-MS.pred = sd(t(kneeAccel.pred))^2
-MS.accelfd = sd(t(kneeAccel.))^2
+#MS.pred0 = sd(t(kneeAccel.pred))^2
+# warning: sd(matrix) depricated;  use apply(*.2, sd)
+MS.pred = apply(kneeAccel.pred, 1, var)
+#MS.accelfd0 = sd(t(kneeAccel.))^2
+MS.accelfd = apply(kneeAccel., 1, var)
 kneeAccel.R2 = (MS.pred / MS.accelfd)
 
 lines(gaitt3, kneeAccel.R2, lty='dashed', lwd=2)
@@ -555,20 +562,20 @@ lines(gaitt3, kneeAccel.R2, lty='dashed', lwd=2)
 ## Section 10.4 A Functional Linear Model for Swedish Mortality
 ##
 
-#  The Swedish mortality data are proprietary, and therefore we do not
-#  provide them with the fda package.  In order to use the following
-#  code for their analysis, you must first obtain the data.  The following
-#  details are provided to help you to obtain them.
+#  The Swedish mortality data are proprietary, so these data are not
+#  included in the fda package.  To use the following code, you must
+#  first obtain the data.  The following details are provided to help
+#  you to obtain these data.
 
-#  Mortality data for 37 countries can be obtained from the 
-#  Human Mortality Database (http://www.mortality.org/). 
-#  For example, the Swedish mortality data can be found at 
+#  Mortality data for 37 countries can be obtained from the
+#  Human Mortality Database (http://www.mortality.org/).
+#  For example, the Swedish mortality data can be found at
 #  (http://www.mortality.org/cgi-bin/hmd/country.php?cntr=SWE&level=1).
 
 #  Citation:
 
-#  Human Mortality Database. University of California, Berkeley (USA), 
-#  and Max Planck Institute for Demographic Research (Germany). 
+#  Human Mortality Database. University of California, Berkeley (USA),
+#  and Max Planck Institute for Demographic Research (Germany).
 
 #   Two data objects are required for these analyses:
 
@@ -577,95 +584,92 @@ lines(gaitt3, kneeAccel.R2, lty='dashed', lwd=2)
 #             and years 1751 through 1884
 #  Swede1920: a vector object containing log hazard values for 1914
 
-#  Han Lin Shang at Monash University in Australia has kindly provided
-#  the following R function to assist you.  It requires a username and
-#  password for accessing the data, which you must obtain from the above
-#  web site.
 
-read.hmd <- function(country,sex,file="Mx_1x1.txt",username,password)
-{
-    require(RCurl)
-    path <- paste("http://www.mortality.org/hmd/",country,"/STATS/",file,sep="")
-    userpwd <- paste(username,":",password,sep="")
-    txt <- getURL(path,userpwd=userpwd)
-    con <- textConnection(txt)
-    hmd <- read.table(con,skip=2,header=T,na.strings=".")
-    close(con)
-    j <- hmd[,"Year"]==hmd[1,"Year"]
-    x <- as.numeric(gsub("\\+","",as.character(hmd[j,"Age"])))
-    col <- match(tolower(sex),tolower(colnames(hmd)))
-    y <- matrix(as.numeric(hmd[,col]),nrow=length(x))
-    colnames(y) <- unique(hmd[,"Year"])
-    rownames(y) <- as.character(hmd[j,"Age"])
-    if(substr(file,1,2)=="Mx")
-        yname <- "Mortality rate"
-    else
-        yname <- "Unknown"
-    return(structure(list(x=x,y=y,time=sort(unique(hmd[,"Year"])),
-        xname="Age",yname=yname),class=c("fts","fds")))
-}
+## The function readHMD will download and reformat entries in the databases
+# lifetables for you which we can then use. Note that this function requires
+# the packages RCurl which has sometimes been unavailable on Windows computers.
+# If this is the case, the desired entries can be found in the third column
+# ('qx') of the Swedish Female Lifetable (file fltcoh_1x1.txt) which must then
+# be reformatted to a matrix giving age (rows) and year of birth (columns).
 
-SwedeLogHazard = as.matrix(SwedeMat)
+if(FALSE){
 
-dimnames(SwedeLogHazard)[[2]] <- paste('b', 1751:1894, sep='')
+# Enter here your USERNAME and PASSWORD
+# for www.mortality.org
+  USERNAME <- 'jillUser'
+  PASSWORD <- 'JUpw123!'
+
+  Sweden = readHMD(USERNAME,PASSWORD,'SWE',ltCol='q')
+
+  SwedeMat = log(Sweden$y[1:81,])
+
+  Swede1920 = SwedeMat[,164]
+  SwedeLogHazard = SwedeMat[,1:44]
+
+# SwedeLogHazard = as.matrix(SwedeMat)
+
+  dimnames(SwedeLogHazard)[[2]] <- paste('b', 1751:1894, sep='')
 
 # Figure 10.10
 
-Fig10.10data = cbind(SwedeLogHazard[, c('b1751', 'b1810', 'b1860')], Swede1920)
+  Fig10.10data = cbind(SwedeLogHazard[, c('b1751', 'b1810', 'b1860')],
+                       Swede1920)
 
-SwedeTime = 0:80;
-SwedeRng = c(0,80);
+  SwedeTime = 0:80;
+  SwedeRng = c(0,80);
 
-matplot(SwedeTime, Fig10.10data,
-        type='l',lwd=2,xlab='age',ylab='log Hazard',col=1,
-        cex.lab=1.5,cex.axis=1.5)
+  matplot(SwedeTime, Fig10.10data,
+          type='l',lwd=2,xlab='age',ylab='log Hazard',col=1,
+          cex.lab=1.5,cex.axis=1.5)
 
 #  smooth the log hazard observations
 
-nbasis = 85
-norder = 6
-SwedeBasis = create.bspline.basis(SwedeRng, nbasis, norder)
+  nbasis = 85
+  norder = 6
+  SwedeBasis = create.bspline.basis(SwedeRng, nbasis, norder)
 
-D2fdPar = fdPar(SwedeBasis, lambda=1e-7)
+  D2fdPar = fdPar(SwedeBasis, lambda=1e-7)
 
-SwedeLogHazfd = smooth.basis(SwedeTime, SwedeLogHazard, D2fdPar)$fd
+  SwedeLogHazfd = smooth.basis(SwedeTime, SwedeLogHazard, D2fdPar)$fd
 
 # The following requires manually clicking on the plot
 # for each of 144 birth year cohorts
 
-plotfit.fd(SwedeLogHazard,SwedeTime,SwedeLogHazfd)
+  plotfit.fd(SwedeLogHazard,SwedeTime,SwedeLogHazfd)
 
 # Set up for the list of regression coefficient fdPar objects
 
-nbasis     = 23
-SwedeRng   = c(0,80)
-SwedeBetaBasis = create.bspline.basis(SwedeRng,nbasis)
+  nbasis     = 23
+  SwedeRng   = c(0,80)
+  SwedeBetaBasis = create.bspline.basis(SwedeRng,nbasis)
 
-SwedeBeta0Par = fdPar(SwedeBetaBasis, 2, 1e-5)
+  SwedeBeta0Par = fdPar(SwedeBetaBasis, 2, 1e-5)
 
-SwedeBeta1fd  = bifd(matrix(0,23,23), SwedeBetaBasis, SwedeBetaBasis)
+  SwedeBeta1fd  = bifd(matrix(0,23,23), SwedeBetaBasis, SwedeBetaBasis)
 
-SwedeBeta1Par = bifdPar(SwedeBeta1fd, 2, 2, 1e3, 1e3)
+  SwedeBeta1Par = bifdPar(SwedeBeta1fd, 2, 2, 1e3, 1e3)
 
-SwedeBetaList = list(SwedeBeta0Par, SwedeBeta1Par)
+  SwedeBetaList = list(SwedeBeta0Par, SwedeBeta1Par)
 
 #  Define the dependent and independent variable objects
 
-NextYear = SwedeLogHazfd[2:144]
-LastYear = SwedeLogHazfd[1:143]
+  NextYear = SwedeLogHazfd[2:144]
+  LastYear = SwedeLogHazfd[1:143]
 
 #  Do the regression analysis
 
-Swede.linmod = linmod(NextYear, LastYear, SwedeBetaList)
+  Swede.linmod = linmod(NextYear, LastYear, SwedeBetaList)
 
-Swede.ages = seq(0, 80, 2)
-Swede.beta1mat = eval.bifd(Swede.ages, Swede.ages, Swede.linmod$beta1estbifd)
+  Swede.ages = seq(0, 80, 2)
+  Swede.beta1mat = eval.bifd(Swede.ages, Swede.ages, Swede.linmod$beta1estbifd)
 
 # Figure 10.11
 
-persp(Swede.ages, Swede.ages, Swede.beta1mat, 
-      xlab="age", ylab="age",zlab="beta(s,t)",
-      cex.lab=1.5,cex.axis=1.5)
+  persp(Swede.ages, Swede.ages, Swede.beta1mat,
+        xlab="age", ylab="age",zlab="beta(s,t)",
+        cex.lab=1.5,cex.axis=1.5)
+}
+# End Sweden example
 
 ##
 ## Section 10.5 Permutation Tests of Functional Hypotheses
@@ -698,7 +702,7 @@ tres = tperm.fd(hgtffd$fd,hgtmfd$fd)
 # Section 10.5.2 Functional F-Tests
 
 #  ---------------  Testing for no effect of climate zone  ----------------
-  
+
 # temp36fd, regionList, betaList from Section 10.1.1 above
 
 F.res = Fperm.fd(temp36fd, regionList, betaList)
@@ -711,7 +715,8 @@ with(F.res,{
            ylims = c(min(c(Fvals, qval, qvals.pts)), max(c(Fobs,
                 qval)))
             plot(argvals, Fvals, type = "l", ylim = ylims, col = 1,
-                lwd = 2, xlab = "day", ylab = "F-statistic", cex.lab=1.5,cex.axis=1.5)
+                 lwd = 2, xlab = "day", ylab = "F-statistic",
+                 cex.lab=1.5,cex.axis=1.5)
             lines(argvals, qvals.pts, lty = 3, col = 1, lwd = 2)
             abline(h = qval, lty = 2, col = 1, lwd = 2)
             legendstr = c("Observed Statistic", paste("pointwise",

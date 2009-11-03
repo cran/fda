@@ -6,7 +6,7 @@
 \alias{Varfnden}
 \alias{Varfninten}
 \alias{[.fd}
-\alias{^.fd}
+%\alias{^.fd}
 \alias{c.fd}
 \alias{derivchk}
 \alias{derivs}

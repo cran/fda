@@ -134,6 +134,28 @@ all.equal(pred.2, pred.2.)
 lipSm9 <- smooth.basisPar(liptime, lip, lambda=1e-9)$fd
 plot(lipSm9)
 
+##
+## with evalarg of class Date and POSIXct
+##
+# Date
+July4.1776 <- as.Date('1776-07-04')
+Apr30.1789 <- as.Date('1789-04-30')
+AmRev <- c(July4.1776, Apr30.1789)
+BspRevolution <- create.bspline.basis(AmRev)
+
+AmRevYears <- seq(July4.1776, Apr30.1789, length.out=14)
+(AmRevLinear <- as.numeric(AmRevYears-July4.1776))
+fitLin <- smooth.basis(AmRevYears, AmRevLinear, BspRevolution)
+AmPred <- predict(fitLin, AmRevYears)
+
+# POSIXct
+AmRev.ct <- as.POSIXct1970(c('1776-07-04', '1789-04-30'))
+BspRev.ct <- create.bspline.basis(AmRev.ct)
+AmRevYrs.ct <- seq(AmRev.ct[1], AmRev.ct[2], length.out=14)
+(AmRevLin.ct <- as.numeric(AmRevYrs.ct-AmRev.ct[2]))
+fitLin.ct <- smooth.basis(AmRevYrs.ct, AmRevLin.ct, BspRev.ct)
+AmPred.ct <- predict(fitLin.ct, AmRevYrs.ct)
+
 }
 % docclass is function
 \keyword{smooth}

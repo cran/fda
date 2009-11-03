@@ -81,7 +81,7 @@ nbasis  <- basisobj$nbasis
 if(length(dropind) > 0){
     index <- 1:nbasis
     for (i in 1:length(dropind))   index <- index(index != dropind[i])
-    penaltymat <- penaltymat(index,index)
+    penaltymat <- penaltymat[index,index]
 }
 
 #  Make matrix symmetric since small rounding errors can

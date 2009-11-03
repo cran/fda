@@ -508,7 +508,7 @@ return(basisequal)
 
 #  Of course the ranges must also match.
 
-#  Last modified 2012.06.12 by Spencer Graves
+#  Last modified 2012.07.17 by Spencer Graves
 
 #  check the ranges
 
@@ -597,7 +597,7 @@ return(basisequal)
     #  if they do not, default to the basis below.
     period1 <- basisobj1$params
     period2 <- basisobj2$params
-    nbasis  <- nbasis1 + nbasis2
+    nbasis  <- nbasis1 + nbasis2-1
     if (period1 == period2) {
       prodbasisobj <- create.fourier.basis(range1, nbasis, period1)
       return(prodbasisobj)

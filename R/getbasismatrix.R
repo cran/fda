@@ -15,44 +15,57 @@ getbasismatrix <- function(evalarg, basisobj, nderiv=0, returnMatrix=FALSE) {
 #  If the basis type is either polygonal or constant, LFD is ignored.
 #
 #  Arguments:
-#  EVALARG ... Either a vector of values at which all functions are to evaluated,
-#              or a matrix of values, with number of columns corresponding to
-#              number of functions in argument FD.  If the number of evaluation
-#              values varies from curve to curve, pad out unwanted positions in
-#              each column with NA.  The number of rows is equal to the maximum
-#              of number of evaluation points.
-#  BASISOBJ ... A basis object
-#  NDERIV   ... A nonnegative integer indicating a derivative to be evaluated.
-#  RETURNMATRIX ... If False, a matrix in sparse storage model can be returned
-#               from a call to function BsplineS.  See this function for
-#               enabling this option.
-   
+#  EVALARG...Either a vector of values at which all functions are to evaluated,
+#            or a matrix of values, with number of columns corresponding to
+#            number of functions in argument FD.  If the number of evaluation
+#            values varies from curve to curve, pad out unwanted positions in
+#            each column with NA.  The number of rows is equal to the maximum
+#            of number of evaluation points.
+#  BASISOBJ...A basis object
+#  NDERIV ... A nonnegative integer indicating a derivative to be evaluated.
+#  RETURNMATRIX...If False, a matrix in sparse storage model can be returned
+#             from a call to function BsplineS.  See this function for
+#             enabling this option.
+
 #
 #  Note that the first two arguments may be interchanged.
 #
-#  Last modified 7 May 2012 by Jim Ramsay
+#  Last modified July 8, 2012 by Spencer Graves
+#    to add column names
 
-#  Exchange the first two arguments if the first is an BASIS.FD object
-#    and the second numeric
-
-if (is.numeric(basisobj) && inherits(evalarg, "basisfd")) {
+##
+##  Exchange the first two arguments if the first is an BASIS.FD object
+##    and the second numeric
+##
+  if (is.numeric(basisobj) && inherits(evalarg, "basisfd")) {
     temp     <- basisobj
     basisobj <- evalarg
     evalarg  <- temp
-}
-
-#  check EVALARG
-
-if (!(is.numeric(evalarg)))  stop("Argument EVALARG is not numeric.")
+  }
+##
+##  check EVALARG
+##
+#  if (!(is.numeric(evalarg)))  stop("Argument EVALARG is not numeric.")
+  if(is.null(evalarg)) stop('evalarg required;  is NULL.')
+  Evalarg <- evalarg
+# turn off warnings in checking if argvals can be converted to numeric
+  op <- options(warn=-1)
+  evalarg <- as.numeric(Evalarg)
+  options(op)
+  nNA <- sum(is.na(evalarg))
+  if(nNA>0)
+    stop('as.numeric(evalarg) contains ', nNA,
+         ' NA', c('', 's')[1+(nNA>1)],
+         ';  class(evalarg) = ', class(Evalarg))
 
 #  check basisobj
 
-if (!(inherits(basisobj, "basisfd"))) stop(
-    "Second argument is not a basis object.")
+  if (!(inherits(basisobj, "basisfd")))
+      stop("Second argument is not a basis object.")
 
 #  search for stored basis matrix
 
-if (!(length(basisobj$basisvalues) == 0 || is.null(basisobj$basisvalues))) {
+  if (!(length(basisobj$basisvalues) == 0 || is.null(basisobj$basisvalues))) {
     #  one or more stored basis matrices found,
     #  check that requested derivative is available
     if (!is.vector(basisvalues)) stop("BASISVALUES is not a vector.")
@@ -62,37 +75,40 @@ if (!(length(basisobj$basisvalues) == 0 || is.null(basisobj$basisvalues))) {
     N  <- length(evalarg)
     OK <- FALSE
     for (ivalues in 1:nvalues) {
-        basisvaluesi <- basisvalues[ivalues]
-        if (!is.list(basisvaluesi)) stop("BASISVALUES does not contain lists.")
-        argvals <- basisvaluesi[[1]]
-        if (!length(basisvaluesi) < nderiv+2) {
-            if (N == length(argvals)) {
-                if (all(argvals == evalarg)) {
-                    basismat <- basisvaluesi[[nderiv+2]]
-                    OK <- TRUE
-                }
-            }
-        }
+      basisvaluesi <- basisvalues[ivalues]
+      if (!is.list(basisvaluesi)) stop("BASISVALUES does not contain lists.")
+      argvals <- basisvaluesi[[1]]
+      if (!length(basisvaluesi) < nderiv+2) {
+          if (N == length(argvals)) {
+              if (all(argvals == evalarg)) {
+                  basismat <- basisvaluesi[[nderiv+2]]
+                  OK <- TRUE
+              }
+          }
+      }
     }
+#   dimnames
+    dimnames(basismat) <- list(NULL, basisobj$names)
+
     if (OK){
         if((!returnMatrix) && (length(dim(basismat)) == 2)){
             return(as.matrix(basismat))
         }
         return(basismat)
     }
-}
+  }
 
 #  Extract information about the basis
 
-type     <- basisobj$type
-nbasis   <- basisobj$nbasis
-params   <- basisobj$params
-rangeval <- basisobj$rangeval
-dropind  <- basisobj$dropind
+  type     <- basisobj$type
+  nbasis   <- basisobj$nbasis
+  params   <- basisobj$params
+  rangeval <- basisobj$rangeval
+  dropind  <- basisobj$dropind
 
 #  -----------------------------  B-spline basis  -------------------
 
-if (type == "bspline") {
+  if (type == "bspline") {
       if (length(params) == 0) {
           breaks   <- c(rangeval[1], rangeval[2])
       } else {
@@ -103,58 +119,60 @@ if (type == "bspline") {
 
 #  -----------------------------  Constant basis  --------------------
 
-} else if (type == "const") {
+  } else if (type == "const") {
    	basismat  <- matrix(1,length(evalarg),1)
 
 #  -----------------------------  Exponential basis  -------------------
 
-} else if (type == "expon") {
+  } else if (type == "expon") {
    	basismat  <- expon(evalarg, params, nderiv)
 
 #  -------------------------------  Fourier basis  -------------------
 
-} else if (type == "fourier") {
+  } else if (type == "fourier") {
    	period   <- params[1]
    	basismat <- fourier(evalarg, nbasis, period, nderiv)
 
 #  -----------------------------  Monomial basis  -------------------
 
-} else if (type == "monom") {
+  } else if (type == "monom") {
    	basismat  <- monomial(evalarg, params, nderiv)
 
 #  -----------------------------  Polygonal basis  -------------------
 
-} else if (type == "polyg") {
+  } else if (type == "polyg") {
     basismat  <- polyg(evalarg, params)
 
 #  -----------------------------  Polynomial basis  -------------------
 
-} else if (type == "polynom") {
+  } else if (type == "polynom") {
    	norder   <- nbasis
    	ctr      <- params[1]
    	basismat <- polynom(evalarg, norder, nderiv, ctr)
 
 #  -----------------------------  Power basis  -------------------
 
-} else if (type == "power") {
+  } else if (type == "power") {
     basismat  <- powerbasis(evalarg, params, nderiv)
 
 #  -----------------------  Unrecognizable basis  --------------------
 
-} else {
+  } else {
    	stop("Basis type not recognizable")
-}
+  }
+#  dimnames
+  dimnames(basismat) <- list(NULL, basisobj$names)
 
 #  remove columns for bases to be dropped
 
-if (length(dropind) > 0) basismat <- basismat[,-dropind]
+  if (length(dropind) > 0) basismat <- basismat[,-dropind]
 
-if((!returnMatrix) && (length(dim(basismat)) == 2)){
+  if((!returnMatrix) && (length(dim(basismat)) == 2)){
     #  coerce basismat to be nonsparse
-    return(as.matrix(basismat))
-} else {
+      return(as.matrix(basismat))
+  } else {
     #  allow basismat to be sparse if it already is
-    return(basismat)
-}
+      return(as.matrix(basismat))
+  }
 
 }

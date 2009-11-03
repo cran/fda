@@ -46,7 +46,14 @@
 
 }
 \seealso{
-\code{\link{basisfd}}
+  \code{\link{basisfd}}
+}
+\examples{
+  f1 <- create.fourier.basis()
+  f1.2 <- f1*f1
+  \dontshow{stopifnot(}
+  all.equal(f1.2, create.fourier.basis(nbasis=5))
+  \dontshow{)}
 }
 % docclass is function
 \keyword{smooth}

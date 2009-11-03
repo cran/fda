@@ -163,6 +163,11 @@ lambda   <- 0.01  #  minimum GCV estimate
 #  plot the temperature curves
 #plot(tempfd)
 
+##
+## with rangeval of class Date and POSIXct
+##
+
+
 }
 
 % docclass is function

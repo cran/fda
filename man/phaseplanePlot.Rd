@@ -84,7 +84,7 @@ phaseplanePlot(evalarg, fdobj, Lfdobj1=1, Lfdobj2=2,
 }
 \examples{
 goodsbasis <- create.bspline.basis(rangeval=c(1919,2000),
-                                   nbasis=979, norder=8)
+                                   nbasis=161, norder=8)
 LfdobjNonDur <- int2Lfd(4)
 
 library(zoo)

@@ -85,6 +85,7 @@ fd(coef=NULL, basisobj=NULL, fdnames=NULL)
   \code{\link{Data2fd}}
   \code{\link{density.fd}}
   \code{\link{create.bspline.basis}}
+  \code{\link{arithmetic.fd}}
 }
 \examples{
 ##
@@ -120,6 +121,16 @@ plot(bspl4)
 parab4.5 <- fd(c(3, -1, -1, 3)/3, bspl4)
 # = 4*(x-.5)^2
 plot(parab4.5)
+
+##
+## Fourier basis
+##
+f3 <- fd(c(0,0,1), create.fourier.basis())
+plot(f3)
+# range over +/-sqrt(2), because
+# integral from 0 to 1 of cos^2 = 1/2
+# so multiply by sqrt(2) to get
+# its square to integrate to 1.
 
 }
 % docclass is function

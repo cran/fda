@@ -64,6 +64,23 @@ yearbasis3 <- create.fourier.basis(c(0,365),
 #  plot the basis
 plot(yearbasis3)
 
+##
+## 3.  With Date and POSIXct rangeval
+##
+# Date
+July4.1776 <- as.Date('1776-07-04')
+Apr30.1789 <- as.Date('1789-04-30')
+AmRev <- c(July4.1776, Apr30.1789)
+BspRevolution <- create.bspline.basis(AmRev)
+plot(BspRevolution)
+
+# POSIXct
+July4.1776ct <- as.POSIXct1970('1776-07-04')
+Apr30.1789ct <- as.POSIXct1970('1789-04-30')
+AmRev.ct <- c(July4.1776ct, Apr30.1789ct)
+BspRev.ct <- create.bspline.basis(AmRev.ct)
+plot(BspRev.ct)
+
 }
 % docclass is function
 \keyword{smooth}

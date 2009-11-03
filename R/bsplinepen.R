@@ -1,4 +1,4 @@
-bsplinepen <- function(basisobj, Lfdobj=2, rng=basisobj$rangeval, 
+bsplinepen <- function(basisobj, Lfdobj=2, rng=basisobj$rangeval,
                        returnMatrix=FALSE)
 {
 
@@ -13,109 +13,135 @@ bsplinepen <- function(basisobj, Lfdobj=2, rng=basisobj$rangeval,
 
 #  Returns the penalty matrix.
 
-#  Last modified 9 May by Jim Ramsay
+#  Last modified July 6, 2012 by Spencer Graves
+#    for rng, rangeval, and params of class Date and POSIXct
+#  Previously modified 9 May by Jim Ramsay
 
 #  check BASISOBJ
 
-if (!(inherits(basisobj, "basisfd"))) stop(
+  if (!(inherits(basisobj, "basisfd"))) stop(
     "First argument is not a basis.fd object.")
 
 #  check basis type
 
-type <- basisobj$type
-if (type != "bspline") stop("basisobj not of type bspline")
+  type <- basisobj$type
+  if (type != "bspline") stop("basisobj not of type bspline")
 
 #  check LFDOBJ
 
-Lfdobj <- int2Lfd(Lfdobj)
+  Lfdobj <- int2Lfd(Lfdobj)
 
 #  get basis information
 
-nbasis <- basisobj$nbasis
-params <- basisobj$params
+  nbasis <- basisobj$nbasis
+  Params <- basisobj$params
 
 #  if there are no internal knots, use the monomial penalty
 
-if (length(params) == 0) {
+  if (length(Params) == 0) {
     basisobj      <- create.monomial.basis(rng, nbasis, 0:(nbasis-1))
     penaltymatrix <- monomialpen(basisobj, Lfdobj, rng)
     return(penaltymatrix)
-}
+  }
 
 #  normal case:  PARAMS is not empty
 
-rangeval  <- basisobj$rangeval
-breaks    <- c(rangeval[1],params,rangeval[2])  #  break points
-nbreaks   <- length(breaks)
-ninterval <- nbreaks - 1    #  number of intervals defined by breaks
+# as.numeric
+  Rangeval  <- basisobj$rangeval
+  Rng <- rng
+  op <- options(warn=-1)
+  rng <- as.numeric(Rng)
+  rangeval <- as.numeric(Rangeval)
+  params <- as.numeric(Params)
+  options(op)
+# check
+  nNA <- sum(is.na(rng))
+  if(nNA>0)
+    stop('as.numeric(rng) contains ', nNA,
+         ' NA', c('', 's')[1+(nNA>1)],
+         ';  class(rng) = ', class(Rng))
+  nNAr <- sum(is.na(rangeval))
+  if(nNAr>0)
+    stop('as.numeric(rangeval) contains ', nNAr,
+         ' NA', c('', 's')[1+(nNAr>1)],
+         ';  class(rangeval) = ', class(Rangeval))
+  nNAp <- sum(is.na(params))
+  if(nNAp>0)
+    stop('as.numeric(params) contains ', nNAp,
+         ' NA', c('', 's')[1+(nNAp>1)],
+         ';  class(params) = ', class(Params))
+
+  breaks    <- c(rangeval[1],params,rangeval[2])  #  break points
+  nbreaks   <- length(breaks)
+  ninterval <- nbreaks - 1    #  number of intervals defined by breaks
 
 #  check break values
 
-if (length(breaks) < 2)
+  if (length(breaks) < 2)
     stop("The length of argument breaks is less than 2.")
 
 #  Find the highest order derivative in LFD
 
-nderiv <- Lfdobj$nderiv
+  nderiv <- Lfdobj$nderiv
 
-norder <- nbasis - length(params)
+  norder <- nbasis - length(params)
 
 #  check for order of derivative being equal or greater than
 #  order of spline
 
-if (nderiv >= norder) {
-  cat("\n")
-	cat(paste(" Derivative of order", nderiv,
-                  "cannot be taken for B-spline of order", norder,"\n"))
-	cat(" Probable cause is a value of the nbasis argument\n")
-	cat(" in function create.basis.fd that is too small.\n")
-   	stop()
+  if (nderiv >= norder) {
+    cat("\n")
+    cat(paste(" Derivative of order", nderiv,
+              "cannot be taken for B-spline of order", norder,"\n"))
+    cat(" Probable cause is a value of the nbasis argument\n")
+    cat(" in function create.basis.fd that is too small.\n")
+    stop()
 }
 
 #  check for order of derivative being equal to order of spline
 #  minus one, in which case following code won't work.
 
-if (nderiv > 0 && nderiv == norder - 1)
+  if (nderiv > 0 && nderiv == norder - 1)
     stop(paste("Penalty matrix cannot be evaluated for derivative of order ",
                nderiv, " for B-splines of order ", norder))
 
 #  special case where LFD is D^NDERIV and NDERIV = NORDER - 1
 
-bwtlist <- Lfdobj$bwtlist
-isintLfd <- TRUE
-if (nderiv > 0) {
-	for (ideriv in 1:nderiv) {
-		fdj <- bwtlist[[ideriv]]
-		if (!is.null(fdj)) {
-			if (any(fdj$coefs != 0)) {
-				isintLfd <- FALSE
-				break
-			}
-		}
-	}
-}
+  bwtlist <- Lfdobj$bwtlist
+  isintLfd <- TRUE
+  if (nderiv > 0) {
+    for (ideriv in 1:nderiv) {
+      fdj <- bwtlist[[ideriv]]
+      if (!is.null(fdj)) {
+        if (any(fdj$coefs != 0)) {
+            isintLfd <- FALSE
+            break
+        }
+      }
+    }
+  }
 
-if (isintLfd && nderiv == norder - 1) {
+  if (isintLfd && nderiv == norder - 1) {
     #  special case of nderiv = norder - 1
     halfseq    <- (breaks[2:nbreaks] + breaks[1:(nbreaks-1)])/2
     halfmat    <- bsplineS(halfseq, breaks, norder, nderiv, returnMatrix)
     brwidth    <- diff(breaks)
     penaltymat <- (t(halfmat) %*% diag(brwidth) %*% halfmat)
     return(penaltymat)
-}
+  }
 
 #  look for knot multiplicities within the range
 
-intbreaks    <- c(rng[1], params, rng[2])
-index        <- intbreaks >= rng[1] & intbreaks <= rng[2]
-intbreaks    <- intbreaks[index]
-nintbreaks   <- length(intbreaks)
-uniquebreaks <- min(diff(intbreaks)) > 0
+  intbreaks    <- c(rng[1], params, rng[2])
+  index        <- intbreaks >= rng[1] & intbreaks <= rng[2]
+  intbreaks    <- intbreaks[index]
+  nintbreaks   <- length(intbreaks)
+  uniquebreaks <- min(diff(intbreaks)) > 0
 
 #  if LFD is D^NDERIV, and there are no break multiplicities,
 #  use exact computation
 
-if (isintLfd && rng[1] == rangeval[1] &&
+  if (isintLfd && rng[1] == rangeval[1] &&
     uniquebreaks      && rng[2] == rangeval[2]) {
 
     #  Set up the knot sequence
@@ -167,7 +193,7 @@ if (isintLfd && rng[1] == rangeval[1] &&
                 convmat[,,i+1        ] <-
                     outer(Coeff[ind,          ], Coeff[i-ind+2,      ])
                 convmat[,,prodorder-i] <-
-                    outer(Coeff[ndegree-ind+2,], Coeff[ndegree-i+ind,])	
+                    outer(Coeff[ndegree-ind+2,], Coeff[ndegree-i+ind,])
             } else {
                 convmat[,,i+1        ] <-
                     crossprod(Coeff[ind,          ], Coeff[i-ind+2,      ])
@@ -194,7 +220,7 @@ if (isintLfd && rng[1] == rangeval[1] &&
 
      penaltymat <- prodmat
 
-} else {
+  } else {
 
     #  set iter
 
@@ -228,7 +254,7 @@ if (isintLfd && rng[1] == rangeval[1] &&
     }
 
     penaltymat <- prodmat
-}
+  }
 
     return( penaltymat )
 }

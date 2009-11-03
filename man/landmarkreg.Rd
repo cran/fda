@@ -97,10 +97,16 @@ landmarkreg(fdobj, ximarks, x0marks=xmeanmarks,
 library(lattice)
 data(landmark.reg.expData) ## containg an simple object called sampleData
 
-eps <- .Machine$double.eps
+# Preferred:
+# eps <- .Machine$double.eps
+# to reduce compute time:
+eps <- 1000*.Machine$double.eps
 from <- -1.0187
 to <- 9.4551
-nb <- 201
+# Preferred:
+# nb <- 201
+# to reduce compute time:
+nb <- 31
 nbreaks <- 11
 ## assign landmarks
 landmark <- matrix(c(0.4999, 0.657, 0.8141, 0.5523, 0.5523,
@@ -111,7 +117,9 @@ wbasis <- create.bspline.basis(rangeval=c(from, to),
 WfdPar <- fdPar(wbasis, 1, 1e-4)
 ## get the density of the data
 x <- split(sampleData, factor(sampleData$which))
-densY <- sapply(x, function(z){
+# to save time, reduce the number of curves from 5 to 3
+k <- 3
+densY <- sapply(x[1:k], function(z){
             r <- range(z[, 1])
             z <- z[, 1]
             z <- z[z>r[1]+eps & z<r[2]-eps]
@@ -122,7 +130,8 @@ argvals <- seq(from, to, len=nb)
 fdobj   <- smooth.basis(argvals, densY, wbasis,
                    fdnames = c("x", "samples", "density"))$fd
 
-regDens   <- landmarkreg(fdobj, landmark, WfdPar=WfdPar, monwrd=TRUE)
+regDens   <- landmarkreg(fdobj, landmark[1:k,], WfdPar=WfdPar, monwrd=TRUE)
+
 warpfdobj <- regDens$warpfd
 warpedX   <- as.matrix(eval.fd(warpfdobj, argvals))
 funs      <- apply(warpedX, 2, approxfun, argvals)

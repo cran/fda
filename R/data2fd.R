@@ -1,6 +1,7 @@
 Data2fd <- function(argvals=NULL, y=NULL, basisobj=NULL, nderiv=NULL,
-                    lambda=3e-8/diff(range(argvals)), fdnames=NULL,
-                    covariates=NULL, method="chol", dfscale=1)
+                    lambda=3e-8/diff(as.numeric(range(argvals))),
+                    fdnames=NULL, covariates=NULL, method="chol",
+                    dfscale=1)
 {
 ## Change proposed by Spencer Graves 2011.01.10:
 ## Default lambda = NULL here,

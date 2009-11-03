@@ -141,10 +141,10 @@ Fperm.fd(yfdPar, xfdlist, betalist, wt=NULL, nperm=200,
 annualprec <- log10(apply(
     CanadianWeather$dailyAv[,,"Precipitation.mm"], 2,sum))
 
-#  set up a smaller basis using only 65 Fourier basis functions
+#  set up a smaller basis using only 40 Fourier basis functions
 #  to save some computation time
 
-smallnbasis <- 65
+smallnbasis <- 40
 smallbasis  <- create.fourier.basis(c(0, 365), smallnbasis)
 tempfd      <- smooth.basis(day.5, CanadianWeather$dailyAv[,,"Temperature.C"],
                        smallbasis)$fd
@@ -170,7 +170,9 @@ harmaccelLfd365 <- vec2Lfd(c(0,(2*pi/365)^2,0), c(0, 365))
 betafdPar2    <- fdPar(betafd2, harmaccelLfd365, lambda)
 betalist[[2]] <- betafdPar2
 
-F.res2 = Fperm.fd(annualprec, xfdlist, betalist,nperm=20)
+# Should use the default nperm = 200
+# but use 10 to save test time for illustration
+F.res2 = Fperm.fd(annualprec, xfdlist, betalist,nperm=10)
 
 ##
 ## 2.  yfdpar = Functional data object (class fd)
@@ -210,7 +212,9 @@ xfdlist = list(constfd,maleindfd)
 
 betalist = list(fdPar(hgtbasis,2,1e-6),fdPar(hgtbasis,2,1e-6))
 
-Fres = Fperm.fd(hgtfd,xfdlist,betalist,nperm=20)
+# Should use nperm = 200 or so,
+# but use 10 to save test time
+Fres = Fperm.fd(hgtfd,xfdlist,betalist,nperm=10)
 
 }
 \keyword{smooth}

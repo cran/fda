@@ -40,8 +40,9 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
   #    must be set up before calling plot by using something such as
   #    par(mfrow=c(1,nvar),pty="s")
 
-
-# Last modified 2 May 2012 by Jim Ramsay
+# last modified July 6, 2012 by Spencer Graves
+#   for argvals of class Date and POSIXct
+# Prevously modified 2 May 2012 by Jim Ramsay
 ##
 ## 1.  Basic checks
 ##
@@ -112,24 +113,32 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
 
   basisobj <- fdobj$basis
   rangex   <- basisobj$rangeval
-  if (is.null(xlim)) xlim<- rangex
   #  set up a set of argument values for the plot
 
   if (missing(y)) {
     y <- nx
   } else {
-    y <- as.vector(y)
+    if(is.numeric(y)) y <- as.vector(y)
   }
 
+  Y <- y
   if (length(y) == 1) {
     if (y >= 1) {
-      y <- seq(rangex[1],rangex[2],len=floor(y))
+      y <- seq(rangex[1],rangex[2],len=round(y))
     } else {
       stop("'y' a single number less than one.")
     }
   }
   if (min(y) < rangex[1] || max(y) > rangex[2])
     stop("Values in Y are outside the basis range.")
+  if (is.null(xlim)){
+      xlim <- rangex
+  } else {
+      rangex[1] <- max(rangex[1], xlim[1])
+      rangex[2] <- min(rangex[2], xlim[2])
+      if(length(Y)==1)
+          y <- seq(rangex[1],rangex[2],len=round(Y))
+  }
 
   #  evaluate LFDOBJ(FDOBJ) at the argument values
 

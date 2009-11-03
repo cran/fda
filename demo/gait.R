@@ -122,6 +122,7 @@ par(op)
 plotfit.fd(gait, gaittime, gaitfd, cex=1.2, ask=FALSE)
 
 #  plot the residuals, sorting cases by residual sum of squares
+#  this produces 39 plots for each of knee and hip angle
 
 plotfit.fd(gait, gaittime, gaitfd, residual=TRUE, sort=TRUE, cex=1.2)
 
@@ -240,7 +241,7 @@ kneeresmat = gaitsmtharray[,,2] - outer(kneemeanvec,rep(1,39))
 hipvar  = mean( hipresmat^2)
 kneevar = mean(kneeresmat^2)
 
-print(paste("Variances of fits by the means:", 
+print(paste("Variances of fits by the means:",
             round(c(hipvar, kneevar),1)))
 
 #  compute the fits to the residual from the mean achieved by the PCA
@@ -248,7 +249,7 @@ print(paste("Variances of fits by the means:",
 hipfitarray  = array(NA, c(nrow(hipharmmat ),nrow(gaitscores),ncol(gaitscores)))
 kneefitarray = array(NA, c(nrow(kneeharmmat),nrow(gaitscores),ncol(gaitscores)))
 for (isc in 1:2) {
-               hipfitarray[,,isc]  = hipharmmat  %*% t(gaitscores[,,isc]) 
+               hipfitarray[,,isc]  = hipharmmat  %*% t(gaitscores[,,isc])
                kneefitarray[,,isc] = kneeharmmat %*% t(gaitscores[,,isc])
 }
 
@@ -273,7 +274,7 @@ for (isc in 2) {
                                            kneefitvar[isc]))
 }
 
-print(paste("Percentages of fits for the PCA:", 
+print(paste("Percentages of fits for the PCA:",
             round(100*c(hippropvar1, kneepropvar1),1)))
 
 #  compute percentages relative to the total mean fit variance
@@ -287,7 +288,7 @@ for (isc in 1:2) {
             kneepropvar2 = c(kneepropvar2, kneefitvar[isc]/(hipvar+kneevar))
 }
 
-print((paste("Percentages of fits for the PCA:", 
+print((paste("Percentages of fits for the PCA:",
              round(100*c(hippropvar2, kneepropvar2),1))))
 
 #  --------------------------------------------------------------
@@ -341,7 +342,7 @@ gaitreglist <- register.fd(D2gaitmeanfd, D2gaitfd[1:5,], WarpfdPar, periodic=TRU
 plotreg.fd(gaitreglist)
 
 #  display horizonal shift values
-print(round(gaitreglist$shift,1)))
+print(round(gaitreglist$shift,1))
 
 #  histogram of horizontal shift values
 par(mfrow=c(1,1))

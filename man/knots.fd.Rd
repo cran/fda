@@ -6,7 +6,7 @@
 \title{Extract the knots from a function basis or data object}
 \description{
   Extract either all or only the interior knots from an object of class
-  \code{basisfd}, \code{fd}, or \code{fdSmooth}.  
+  \code{basisfd}, \code{fd}, or \code{fdSmooth}.
 }
 \usage{
 \method{knots}{fd}(Fn, interior=TRUE, ...)
@@ -16,33 +16,31 @@
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{Fn}{
-    an object of class \code{basisfd} or containing such an object 
+    an object of class \code{basisfd} or containing such an object
   }
   \item{interior}{
     logical:
 
-    if TRUE, the first Fn[["k"]]+1 of Fn[["knots"]] are dropped, and the
-    next Fn[["g"]] are returned.
+    if TRUE, Fn[["params"]] are returned.
 
-    Otherwise, the first Fn[["n"]] of Fn[["knots"]] are returned.  
+    Else, nord <- norder(Fn); rng <- Fn[['rangeval']]; return
+    c(rep(rng[1], nord), Fn[["params"]], rep(rng[2], nord))
   }
-  \item{\dots}{ignored} 
+  \item{\dots}{ignored}
 }
 \details{
   The interior knots of a \code{bspline} basis are stored in the
   \code{params} component.  The remaining knots are in the
-  \code{rangeval} component, with mulltiplicity norder(Fn).  
+  \code{rangeval} component, with mulltiplicity norder(Fn).
 }
 \value{
   Numeric vector.  If 'interior' is TRUE, this is the \code{params}
   component of the \code{bspline} basis.  Otherwise, \code{params} is
-  bracketed by rep(rangeval, norder(basisfd).  
+  bracketed by rep(rangeval, norder(basisfd).
 }
-\references{  
+\references{
   Dierckx, P. (1991) \emph{Curve and Surface Fitting with Splines},
   Oxford Science Publications.
-
-  
 }
 \author{Spencer Graves }
 \seealso{
@@ -67,15 +65,15 @@ if(require(DierckxSpline)){
    stopifnot(all.equal(knots1All, fdaKnotsA))
 }
 
-# knots.fdSmooth 
-girlGrowthSm <- with(growth, smooth.basisPar(argvals=age, y=hgtf, 
+# knots.fdSmooth
+girlGrowthSm <- with(growth, smooth.basisPar(argvals=age, y=hgtf,
                                              lambda=0.1)$fd)
 
-girlKnots.fdSm  <- knots(girlGrowthSm) 
+girlKnots.fdSm  <- knots(girlGrowthSm)
 girlKnots.fdSmA <- knots(girlGrowthSm, interior=FALSE)
 stopifnot(all.equal(girlKnots.fdSm, girlKnots.fdSmA[5:33]))
 
-girlKnots.fd  <- knots(girlGrowthSm) 
+girlKnots.fd  <- knots(girlGrowthSm)
 girlKnots.fdA <- knots(girlGrowthSm, interior=FALSE)
 
 stopifnot(all.equal(girlKnots.fdSm,  girlKnots.fd))

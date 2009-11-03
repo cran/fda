@@ -161,6 +161,27 @@ plot(fd3.4s0$fd)
 
 # same plot via plot.fdSmooth
 plot(fd3.4s0)
+##
+## with Date and POSIXct argvals
+##
+# Date
+invasion1 <- as.Date('1775-09-04')
+invasion2 <- as.Date('1812-07-12')
+earlyUS.Canada <- c(invasion1, invasion2)
+BspInvasion <- create.bspline.basis(earlyUS.Canada)
+
+earlyUSyears <- seq(invasion1, invasion2, length.out=7)
+(earlyUScubic <- (as.numeric(earlyUSyears-invasion1)/365.24)^3)
+fitCubic <- smooth.basis(earlyUSyears, earlyUScubic, BspInvasion)
+plot(fitCubic)
+
+# POSIXct
+AmRev.ct <- as.POSIXct1970(c('1776-07-04', '1789-04-30'))
+BspRev.ct <- create.bspline.basis(AmRev.ct)
+AmRevYrs.ct <- seq(AmRev.ct[1], AmRev.ct[2], length.out=14)
+(AmRevLin.ct <- as.numeric(AmRevYrs.ct-AmRev.ct[2]))
+fitLin.ct <- smooth.basis(AmRevYrs.ct, AmRevLin.ct, BspRev.ct)
+plot(fitLin.ct)
 
 }
 % docclass is function

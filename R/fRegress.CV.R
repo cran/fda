@@ -7,7 +7,9 @@ fRegress.CV <- function(y, xfdlist, betalist, wt=NULL, CVobs=1:N,
 # generalized cross validation scores are now returned by fRegress
 # when scalar responses are used.
 
-# last modified 8 May 2012 by Jim Ramsay
+# last modified 28 July 2012 by Jim Ramsay
+
+#  check the arguments
 
 argList  <- fRegressArgCheck(y, xfdlist, betalist, wt)
 yfdPar   <- argList$yfdPar
@@ -15,18 +17,25 @@ xfdlist  <- argList$xfdlist
 betalist <- argList$betalist
 wt       <- argList$wt
 
+# extract dimensions of the data and analysis
+
 p <- length(xfdlist)
 N <- dim(xfdlist[[1]]$coef)[2]
-
 M <- length(CVobs)
 
+#  branch to either scalar or functional dependent variable
+
 if (inherits(yfdPar, "numeric"))  {
+
+    #  scalar dependent variable case
 
     yvec   <- yfdPar
     SSE.CV <- 0
     errfd  <- c()
     for (m in 1:M) {
       i        <- CVobs[m]
+      #  eliminate case i from the weights
+      wti <- wt[-i]
       xfdlisti <- vector("list",p)
       for (j in 1:p) {
         xfdj          <- xfdlist[[j]]
@@ -45,7 +54,6 @@ if (inherits(yfdPar, "numeric"))  {
         xfdlisti[[j]] <- fd(coefj,basisj)
       }
       yveci         <- yvec[-i]
-      wti           <- wt[-i]
       fRegressListi <- fRegress(yveci, xfdlisti, betalist, wti)
       betaestlisti  <- fRegressListi$betaestlist
       yhati <- 0
@@ -68,26 +76,47 @@ if (inherits(yfdPar, "numeric"))  {
       SSE.CV <- SSE.CV + errfd[i]^2
     }
  } else {
+
+    #  functional dependent variable case
+
     yfd      <- yfdPar$fd
     SSE.CV   <- 0
     errcoefs <- c()
-    for(m in 1:N){
-#        cat(m, " ")
+    for(m in 1:length(CVobs)){
+      # index of case to eliminate
       i <-  CVobs[m]
+      # eliminate case i from the weights
+      wti <- wt[-i]
+      # eliminate case i from covariates
       txfdlist <- xfdlist
       for(k in 1:p){
         txfdlist[[k]] <- xfdlist[[k]][-i]
       }
-      wti = wt[-i]
-      tres <- fRegress(yfd[-i],txfdlist,betalist,wti)
-      yhat <- 0
+      # eliminate case i from dependent variable
+      yfdi <- yfd[-i]
+      # carry out the functional regression analysis
+      tres <- fRegress(yfdi,txfdlist,betalist,wti)
+      #  extract the regression coefficient functions
+      betaestlisti <- tres$betaestlist
+      #  compute the fit to the data for case i
+      yhatfdi <- 0
       for(k in 1:p){
-        yhat <- yhat + xfdlist[[k]][i]*tres$betaestlist[[k]]$fd
+        betafdPark = betaestlisti[[k]]
+        betafdk    = betafdPark$fd
+        xfdk       = xfdlist[[k]]
+        xfdik      = xfdk[i]
+        tempfd     = xfdik*betafdk
+        yhatfdi <- yhatfdi + tempfd
       }
-      errfdi   <- yfd[i] - yhat
+      #  compute the residual function
+      errfdi   <- yfd[i] - yhatfdi
+      #  increment the error sum of squares by the integral of the
+      #  square of the residual function
       SSE.CV   <- SSE.CV + inprod(errfdi,errfdi)
+      #  add the coefficients for the residual function
       errcoefs <- cbind(errcoefs,errfdi$coefs)
     }
+    #  set up the functional data object for the residual fns
     errfd <- fd(errcoefs,errfdi$basis)
     names(errfd$fdnames)[[3]] <- "Xval Errors"
 }

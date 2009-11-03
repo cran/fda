@@ -3,9 +3,51 @@
 ### Ramsey, Hooker & Graves (2009)
 ### Functional Data Analysis with R and Matlab (Springer)
 ###
+
+#  Remarks and disclaimers
+
+#  These R commands are either those in this book, or designed to 
+#  otherwise illustrate how R can be used in the analysis of functional
+#  data.  
+#  We do not claim to reproduce the results in the book exactly by these 
+#  commands for various reasons, including:
+#    -- the analyses used to produce the book may not have been
+#       entirely correct, possibly due to coding and accuracy issues
+#       in the functions themselves 
+#    -- we may have changed our minds about how these analyses should be 
+#       done since, and we want to suggest better ways
+#    -- the R language changes with each release of the base system, and
+#       certainly the functional data analysis functions change as well
+#    -- we might choose to offer new analyses from time to time by 
+#       augmenting those in the book
+#    -- many illustrations in the book were produced using Matlab, which
+#       inevitably can imply slightly different results and graphical
+#       displays
+#    -- we may have changed our minds about variable names.  For example,
+#       we now prefer "yearRng" to "yearRng" for the weather data.
+#    -- three of us wrote the book, and the person preparing these scripts
+#       might not be the person who wrote the text
+#  Moreover, we expect to augment and modify these command scripts from time
+#  to time as we get new data illustrating new things, add functionality
+#  to the package, or just for fun.
+
+
 ### ch. 11  Functional Models and Dynamics
 ###
+
+#  load the fda package
+
 library(fda)
+
+#  display the data files associated with the fda package
+
+data(package='fda')
+
+#  start the HTML help system if you are connected to the Internet, in
+#  order to open the R-Project documentation index page in order to obtain
+#  information about R or the fda package.
+
+help.start()
 
 ##
 ## Section 11.1  Introduction to Dynamics
@@ -40,7 +82,9 @@ par(op)
 ##
 ## Section 11.3 Principal Differential Analysis of the Lip Data
 ##
+
 # Figure 11.2
+
 matplot(liptime, lip, type = 'l',
         xlab='Normalized Time', ylab='lip position (mm)')
 
@@ -79,11 +123,14 @@ par(op)
 
 # Figure 11.4
 
+op = par(mfrow=c(1,1))
 pda.overlay(pdaList)
+par(op)
 
 ##
 ## Section 11.4 PDA of the Handwriting Data
 ##
+
 fdabasis= create.bspline.basis(norder=7, breaks=handwritTime)
 
 fdafd0 = fd(array(0, c(fdabasis$nbasis, dim(handwrit)[-1])), fdabasis)
@@ -108,11 +155,9 @@ pdaParlist= list(pdaPar, pdaPar)
 bwtlist   = list( list(pdaParlist,pdaParlist),
                   list(pdaParlist,pdaParlist) )
 
-# This can take some time to compute, so time it:
-pdaTime   = system.time({
-pdaList   = pda.fd(xfdlist, bwtlist)} )
-pdaTime/60
-# 20 minutes on a dual core;  2009.03.21
+# This can take some time to compute:
+
+pdaList = pda.fd(xfdlist, bwtlist)
 
 # Figure 11.5
 
@@ -122,31 +167,40 @@ eigenres = eigen.pda(pdaList)
 ## Section 11.5 Registration and PDA
 ##
 
+
 WfdPar = fdPar(lipfd$basis,2,1e-16)
-lipmeanmarks= mean(lipmarks)
+lipmeanmarks = colMeans(lipmarks)
 
 lipreglist  = landmarkreg(lipfd, as.matrix(lipmarks),
                          lipmeanmarks, WfdPar)
+
 Dlipregfd   = register.newfd(deriv.fd(lipfd,1),
                          lipreglist$warpfd, type='direct')
+
 D2lipregfd  = register.newfd(deriv.fd(lipfd,2),
                          lipreglist$warpfd, type='direct')
+
 xfdlist2     = list(-Dlipregfd,-lipreglist$regfd)
-lipregpda   = fRegress(D2lipregfd, xfdlist2, bwtlist)
 
-pdalist3 = pda.fd(lipreglist$regfd,bwtlist)
+lipbasis  = lipfd$basis
+bwtlist   = list(fdPar(lipbasis,2,0),fdPar(lipbasis,2,0))
 
-bwtestlist2 = lipregpda$betaestlist
+lipregpda  = fRegress(D2lipregfd, xfdlist2, bwtlist)
+bwtestlist = lipregpda$betaestlist
+
+lippdalist3 = pda.fd(lipreglist$regfd,bwtlist)
+bwtestlist3 = lippdalist3$bwtlist
+
 
 # Figure 11.6
 
 op = par(mfrow=c(2,1))
 plot(bwtestlist[[1]]$fd,lwd=2,cex.lab=1.5,cex.axis=1.5,
      ylim=c(-200, 1300))
-lines(pdalist3$bwtlist[[1]]$fd,lwd=2,lty=3)
+lines(bwtestlist3[[1]]$fd,lwd=2,lty=3)
 
 plot(bwtestlist[[2]]$fd,lwd=2,cex.lab=1.5,cex.axis=1.5)
-lines(pdalist3$bwtlist[[2]]$fd,lwd=2,lty=3)
+lines(bwtestlist3[[2]]$fd,lwd=2,lty=3)
 par(op)
 
 ##

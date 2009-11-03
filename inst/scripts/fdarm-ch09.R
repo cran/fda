@@ -5,19 +5,19 @@
 
 #  Remarks and disclaimers
 
-#  These R commands are either those in this book, or designed to 
+#  These R commands are either those in this book, or designed to
 #  otherwise illustrate how R can be used in the analysis of functional
-#  data.  
-#  We do not claim to reproduce the results in the book exactly by these 
+#  data.
+#  We do not claim to reproduce the results in the book exactly by these
 #  commands for various reasons, including:
 #    -- the analyses used to produce the book may not have been
 #       entirely correct, possibly due to coding and accuracy issues
-#       in the functions themselves 
-#    -- we may have changed our minds about how these analyses should be 
+#       in the functions themselves
+#    -- we may have changed our minds about how these analyses should be
 #       done since, and we want to suggest better ways
 #    -- the R language changes with each release of the base system, and
 #       certainly the functional data analysis functions change as well
-#    -- we might choose to offer new analyses from time to time by 
+#    -- we might choose to offer new analyses from time to time by
 #       augmenting those in the book
 #    -- many illustrations in the book were produced using Matlab, which
 #       inevitably can imply slightly different results and graphical
@@ -229,8 +229,9 @@ betavar  = coefvar[2]*harmonics[1]^2 + coefvar[3]*harmonics[2]^2 +
 
 plot(betafd, xlab="Day", ylab="Regression Coef.",
      ylim=c(-6e-4,1.2e-03), lwd=2)
-lines(betafd+2*sqrt(betavar), lty=2, lwd=1)
-lines(betafd-2*sqrt(betavar), lty=2, lwd=1)
+s.betavar.2 <- 2*sqrt(betavar)
+lines(betafd+s.betavar.2, lty=2, lwd=1)
+lines(betafd-s.betavar.2, lty=2, lwd=1)
 
 ##
 ## Section 9.5 Statistical Tests

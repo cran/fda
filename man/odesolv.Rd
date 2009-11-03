@@ -4,9 +4,9 @@
   Numerical Solution mth Order Differential Equation System
 }
 \description{
-The system of differential equations is linear, with
-possibly time-varying coefficient functions.
-The numerical solution is computed with the Runge-Kutta method.
+  The system of differential equations is linear, with possibly
+  time-varying coefficient functions.  The numerical solution is
+  computed with the Runge-Kutta method.
 }
 \usage{
 odesolv(bwtlist, ystart=diag(rep(1,norder)),
@@ -15,14 +15,12 @@ odesolv(bwtlist, ystart=diag(rep(1,norder)),
 }
 \arguments{
 \item{bwtlist}{
-a list whose members are functional parameter objects
-defining the weight functions for the linear differential
-equation.
+  a list whose members are functional parameter objects defining the
+  weight functions for the linear differential equation.
 }
 \item{ystart}{
-a vector of initial values for the equations.  These
-are the values at time 0 of the solution and its first
-m - 1 derivatives.
+  a vector of initial values for the equations.  These are the values at
+  time 0 of the solution and its first m - 1 derivatives.
 }
 \item{h0}{
 a positive initial step size.
@@ -57,7 +55,13 @@ to the data that solves the equation.  Such a fit will be a
 linear combinations of m independent solutions.
 }
 \seealso{
-\code{\link{pda.fd}}, 
+  \code{\link{pda.fd}}.  For new applications, users are encouraged to
+  consider \code{\link[deSolve]{deSolve}}.  The \code{deSolve} package
+  provides general solvers for ordinary and partial differential
+  equations, as well as differential algebraic equations and delay
+  differential equations.  It extends \code{\link[odesolve]{lsoda}};  the
+  \code{odesolve} package is deprecated and scheduled to disapper from
+  CRAN by the end of 2012.
 }
 \examples{
 #See the analyses of the lip data.
