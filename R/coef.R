@@ -1,3 +1,5 @@
+coefficients <- function(object, ...)UseMethod('coef')
+
 coef.fd <- function(object, ...) object$coef
 coefficients.fd <- function(object, ...) object$coef
 

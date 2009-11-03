@@ -43,7 +43,7 @@ fdPar <- function(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
 #  Return:
 #  FDPAROBJ ... A functional parameter object
 
-#  Last modified 2012.07.05 by Spencer Graves
+#  Last modified 22 December 2012 by Jim Ramsay
 
 #  ----------------------------------------------------------------------
 #                            Default fdPar objects
@@ -55,27 +55,24 @@ fdPar <- function(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
       fdobj = fd()
     }  else {
       if (inherits(fdobj, "basisfd")) {
-       #  if the first argument is a basis object, convert it to
-       #  a default FD object with an empty coefficient matrix.
+        #  if the first argument is a basis object, convert it to
+        #  a default FD object with an empty coefficient matrix.
         nbasis  <- fdobj$nbasis
         dropind <- fdobj$dropind
         coefs   <- matrix(0,nbasis-length(dropind),1)
         fdnames <- list('time', 'reps 1', 'values')
         if(!is.null(fdobj$names)){
-          nms <- {
-            if(length(dropind)>1)
+          basisnames <- {
+            if(length(dropind)>0)
               fdobj$names[-dropind]
             else
               fdobj$names
           }
-          dimnames(coefs) <- list(nms, NULL)
-          fdnames[[1]] <- nms
+          dimnames(coefs) <- list(basisnames, NULL)
+          fdnames[[1]] <- basisnames
         }
-        fdobj   <- fd(coefs, fdobj)
+        fdobj <- fd(coefs, fdobj, fdnames)
       }
-#    else if (inherits(fdobj,"fd")) {
-#      #  if the first object is a FD object, do nothing
-#    }
       else if(is.numeric(fdobj))fdobj <- fd(fdobj)
 
       else stop("First argument is neither a functional data object ",

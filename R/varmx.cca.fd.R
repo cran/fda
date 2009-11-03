@@ -11,10 +11,11 @@ varmx.cca.fd <- function(ccafd, nx=201)
 #  CCAVAR2  ... Canonical variate scores for second set of functions.
 #  Return:  Arguments after rotation.
 
-#  last modified 20 November 2005
+#  last modified 6 December 2012
 
   ccawtfd1 <- ccafd[[1]]
   ccawtfd2 <- ccafd[[2]]
+  ccacorr  <- ccafd[[3]]
   ccavar1  <- ccafd[[4]]
   ccavar2  <- ccafd[[5]]
 
@@ -44,11 +45,12 @@ varmx.cca.fd <- function(ccafd, nx=201)
   canvarvalues[,,1] <- ccavar1
   canvarvalues[,,2] <- ccavar2
 
-  ccavarmxlist <- list(ccawtfd1, ccawtfd2, canvarvalues, rotmat)
-  names(ccavarmxlist) <- c("weight function 1", "weight function 2",
-                           "variates", "rotation matrix")
-  #
-#  class(ccavarmxlist) <- "cca.fd"
+  ccavarmxlist <- list(ccawtfd1, ccawtfd2, ccacorr, canvarvalues, rotmat)
+  names(ccavarmxlist) <- c("ccawtfd1", "ccawtfd2", "ccacorr",
+                           "ccavar1",  "ccavar2")
+  
+  class(ccavarmxlist) <- "cca.fd"
+  
   return(ccavarmxlist)
 
 }

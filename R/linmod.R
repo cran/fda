@@ -223,7 +223,7 @@ betafd = bifd(t(betacoef), betasbasis, betatbasis, betafdnames)
 
 #  functional data structure for the yhat functions
 
-xbetacoef = betacoef %*% t(Hmat)
+xbetacoef = t(Hmat %*% betacoef)   
 xbetafd   = fd(xbetacoef, betatbasis)
 yhatmat   = eval.fd(tfine, alphafd) %*% matrix(1,1,ncurves) + 
             eval.fd(tfine, xbetafd)

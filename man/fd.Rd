@@ -1,5 +1,6 @@
 \name{fd}
 \alias{fd}
+\alias{[.fd}
 \title{
   Define a Functional Data Object
 }
@@ -131,6 +132,13 @@ plot(f3)
 # integral from 0 to 1 of cos^2 = 1/2
 # so multiply by sqrt(2) to get
 # its square to integrate to 1.
+
+##
+## subset of an fd object
+##
+gaitbasis3 <- create.fourier.basis(nbasis=5)
+gaitfd3    <- Data2fd(gait, basisobj=gaitbasis3)
+gaitfd3[1]
 
 }
 % docclass is function

@@ -11,7 +11,7 @@ norder.default <- function(x, ...){
   } )
   xB <- which(xB.)
 #
-  {    
+  {
     if(length(xB)<1)
       stop("input is not a 'basisfd' object and does not have ",
            "a 'basisfd' component.")
@@ -22,14 +22,14 @@ norder.default <- function(x, ...){
 
 norder.bspline <- function(x, ...){
   if(!('type' %in% names(x))){
-    xName <- substring(deparse(substitute(x)), 1, 33) 
+    xName <- substring(deparse(substitute(x)), 1, 33)
     stop('object ', xName, " does NOT have a 'type' component, ",
          "and therefore can NOT be a functional data object")
   }
   if(x$type != 'bspline'){
-    xName <- substring(deparse(substitute(x)), 1, 33) 
+    xName <- substring(deparse(substitute(x)), 1, 33)
     stop('object ', xName, " is of type = ", x$type,
          ";  'norder' is only defined for type = 'bsline'")
   }
-  with(x, nbasis - length(params)) 
+  with(x, nbasis - length(params))
 }

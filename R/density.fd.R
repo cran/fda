@@ -1,3 +1,5 @@
+density <- function(x, ...)UseMethod('density')
+
 density.fd <- function(x, WfdParobj, conv=0.0001, iterlim=20,
                       active=2:nbasis, dbglev=1, returnMatrix=FALSE, ...) {
 # DENSITYFD estimates the density of a sample of scalar observations.
@@ -167,7 +169,7 @@ density.fd <- function(x, WfdParobj, conv=0.0001, iterlim=20,
     	Flist     <- Foldstr
     	iterhist <- iterhist[1,]
     	C        <- normden.phi(basisobj, cvec0, returnMatrix=returnMatrix)
-    	return( list(Wfdobj=Wfdobj, C=C, Flist=Flist, iternum=iternum, 
+    	return( list(Wfdobj=Wfdobj, C=C, Flist=Flist, iternum=iternum,
                    iterhist=iterhist) )
 	} else {
 		gvec <- gvec0
@@ -339,7 +341,7 @@ loglfnden <- function(x, f, basisobj, cvec, returnMatrix=FALSE) {
    	phimat  <- getbasismatrix(x, basisobj)
    	cval    <- normden.phi(basisobj, cvec, , returnMatrix=returnMatrix)
    	logl    <- sum((phimat %*% cvec) * f - fsum*log(cval)/N)
-   	EDW     <- outer(rep(1,nobs),expectden.phi(basisobj, cvec, 
+   	EDW     <- outer(rep(1,nobs),expectden.phi(basisobj, cvec,
                                                returnMatrix=returnMatrix))
    	Dlogl   <- apply((phimat - EDW)*fmat,2,sum)
 	return( list(logl, Dlogl) )
@@ -515,7 +517,7 @@ expectden.phi <- function(basisobj, cvec, Cval=1, nderiv=0,
 #  -----------------------------------------------------------------------------
 
 expectden.phiphit <- function(basisobj, cvec, Cval=1, nderiv1=0, nderiv2=0,
-                              JMAX=15, EPS=1e-7, 
+                              JMAX=15, EPS=1e-7,
                               returnMatrix=FALSE) {
 
 #  Computes expectations of cross product of basis functions with

@@ -4,7 +4,8 @@ TaylorSpline <- function(object, ...) {
 
 TaylorSpline.dierckx <- function(object, ...) {
   if(require(DierckxSpline)){
-    fdo <- dierckx2fd(object)
+#    fdo <- dierckx2fd(object)
+    fdo <- as.fd(object)
     return(TaylorSpline(fdo, ...))
   }
   else

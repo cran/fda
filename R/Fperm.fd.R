@@ -1,4 +1,4 @@
-Fperm.fd <- function(yfdPar, xfdlist, betalist,wt=NULL,
+Fperm.fd <- function(yfdPar, xfdlist, betalist, wt=NULL,
             nperm=200,argvals=NULL,q=0.05,plotres=TRUE,...)
 {
 # yfdpar, xfdList, betalist, wt = standard inputs to fRegress

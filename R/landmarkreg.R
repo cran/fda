@@ -8,7 +8,10 @@ landmarkreg <- function(fdobj, ximarks, x0marks=xmeanmarks,
 #                 each observed curve
 #  XOMARKS ... vector of length NL of times of interior landmarks for
 #                 target curve
-#  WFDPAR  ... a functional parameter object defining a warping function
+#  WFDPAR  ... a functional parameter object defining a warping function.  
+#                 If NULL, registration is done using linear interpolation
+#                 of lamdmark times in XIMARKS plotted against corresponding 
+#                 target times in X0MARKS.
 #  MONWRD  ... If TRUE, warping functions are estimated by monotone smoothing,
 #                 otherwise by regular smoothing.  The latter is faster, but
 #                 not guaranteed to produce a strictly monotone warping
@@ -29,7 +32,7 @@ landmarkreg <- function(fdobj, ximarks, x0marks=xmeanmarks,
 #               from a call to function BsplineS.  See this function for
 #               enabling this option.
 
- #  Last modified 8 May 2012 by Jim Ramsay
+ #  Last modified 14 November 2012 by Jim Ramsay
 
   #  check FDOBJ
 
@@ -48,11 +51,10 @@ landmarkreg <- function(fdobj, ximarks, x0marks=xmeanmarks,
       nvar <- 1
   }
 
-  basisobj <- fdobj$basis
-  type     <- basisobj$type
-  nbasis   <- basisobj$nbasis
-  rangeval <- basisobj$rangeval
-  fdParobj <- fdPar(basisobj, 2, ylambda)
+  basisobj  <- fdobj$basis
+  nbasis    <- basisobj$nbasis
+  rangeval  <- basisobj$rangeval
+  fdParobj  <- fdPar(basisobj, 2, ylambda)
 
   #  check landmarks
 
@@ -127,9 +129,8 @@ landmarkreg <- function(fdobj, ximarks, x0marks=xmeanmarks,
     #  smooth relation between this curve"s values and target"s values
     if (monwrd) {
        #  use monotone smoother
-#       Wfd       <- smooth.morph(xval, yval, WfdPar)$Wfdobj
-       Wfds       <- smooth.morph(xval, yval, WfdPar)
-       Wfd <- Wfds$Wfdobj
+       Wfds      <- smooth.morph(xval, yval, WfdPar)
+       Wfd       <- Wfds$Wfdobj
        h         <- monfn(x, Wfd, returnMatrix=returnMatrix)
        b         <- (rangeval[2]-rangeval[1])/(h[n]-h[1])
        a         <- rangeval[1] - b*h[1]

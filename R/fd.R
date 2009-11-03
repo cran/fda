@@ -38,7 +38,7 @@ fd <- function (coef=NULL, basisobj=NULL, fdnames=NULL)
 #  Returns:
 #  FD ... a functional data object
 
-#  Last modified 3 February 2010 by Jim Ramsay
+#  Last modified 24 December 2012 by Jim Ramsay
 
 ##
 ## 1.  check coef and get its dimensions
@@ -91,22 +91,12 @@ fd <- function (coef=NULL, basisobj=NULL, fdnames=NULL)
         stop("Argument basis must be of basis class")
   }
 
-  nbasis = basisobj$nbasis
-  if (coefd[1] != nbasis)
-    stop("First dim. of 'coef' not equal to 'nbasis'.")
+  nbasis   <- basisobj$nbasis
+  dropind  <- basisobj$dropind
+  ndropind <- length(basisobj$dropind)
+  if (coefd[1] != nbasis - ndropind)
+    stop("First dim. of 'coef' not equal to 'nbasis - ndropind'.")
 
-  dropind <- basisobj$dropind
-# coefd[1] should equal basisobj$nbasis - length(dropind)
-# However, fd is not yet programmed for dropind.
-# Therefore, trap it:
-  if(length(dropind)>0)
-    stop("'fd' not yet programmed to handle 'dropind'")
-
-# If dropind is not trapped earlier, it will generate the following
-# cryptic error message:
-  if (coefd[1] != basisobj$nbasis)
-    stop("Number of coefficients does not match ",
-         "the number of basis functions.")
 
 #  setup number of replicates and number of variables
 
@@ -127,7 +117,6 @@ fd <- function (coef=NULL, basisobj=NULL, fdnames=NULL)
 
     names(fdnames) <- c("args", "reps", "funs")
   }
-
   if(is.null(dimnames(coef))){
     dimc <- dim(coef)
     ndim <- length(dimc)
@@ -149,7 +138,6 @@ fd <- function (coef=NULL, basisobj=NULL, fdnames=NULL)
 
   fdobj <- list(coefs=coef, basis=basisobj, fdnames=fdnames)
     oldClass(fdobj) <- "fd"
-
     fdobj
 }
 
@@ -819,6 +807,13 @@ times.fd <- function(e1, e2, basisobj=NULL)
 
 # see exponentiate.fd
 
+# http://r.789695.n4.nabble.com/warning-creating-an-as-array-method-in-a-package-td3080309.html
+#
+# need the following to eliminate a goofy warning in R CMD check
+#    Warning:  found an S4 version of 'mean'
+#    so it has not been imported correctly
+mean <- function(x, ...)UseMethod('mean')
+
 #  ----------------------------------------------------------------
 #       mean for fd class
 #  ----------------------------------------------------------------
@@ -833,8 +828,10 @@ mean.fd <- function(x, ...)
   ndim      <- length(coefd)
   basisobj  <- x$basis
   nbasis    <- basisobj$nbasis
+  dropind   <- basisobj$dropind
+  ndropind  <- length(dropind)
   if (ndim == 2) {
-    coefmean  <- matrix(apply(coef,1,mean),nbasis,1)
+    coefmean  <- matrix(apply(coef,1,mean),nbasis-ndropind,1)
     coefnames <- list(dimnames(coef)[[1]],"Mean")
   } else {
     nvar <- coefd[3]
@@ -858,7 +855,7 @@ sum.fd <- function(..., na.rm=FALSE)
 {
   #  Compute sum function for functional observations
 
-  #  Last modified 5 March 2007
+  #  Last modified 15 January 2013
 
   fd <- list(...)[[1]]
 
@@ -870,8 +867,10 @@ sum.fd <- function(..., na.rm=FALSE)
   ndim   <- length(coefd)
   basis  <- fd$basis
   nbasis <- basis$nbasis
+  dropind   <- basis$dropind
+  ndropind  <- length(dropind)
   if (ndim == 2) {
-    coefsum   <- matrix(apply(coef,1,sum),nbasis,1)
+    coefsum   <- matrix(apply(coef,1,sum),nbasis-ndropind,1)
     coefnames <- list(dimnames(coef)[[1]],"Sum")
   } else {
     nvar <- coefd[3]

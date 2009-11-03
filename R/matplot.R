@@ -2,6 +2,14 @@ matplot <- function(x, ...) {
     UseMethod('matplot')
 }
 
+matplot.matrix <- function(x, ...){
+    fda:::matplot.default(x, ...)
+}
+
+matplot.numeric <- function(x, ...){
+    fda:::matplot.default(x, ...)
+}
+
 matplot.default <- function(x, y, type = "p", lty = 1:5, lwd = 1,
     lend = par("lend"), pch = NULL, col = 1:6, cex = NULL, bg = NA,
     xlab = NULL, ylab = NULL, xlim = NULL, ylim = NULL, ..., add = FALSE,

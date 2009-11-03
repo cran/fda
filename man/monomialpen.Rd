@@ -31,7 +31,6 @@ a symmetric matrix of order equal to the number of
 monomial basis functions.
 }
 \seealso{
-\code{\link{polynompen}},
 \code{\link{exponpen}},
 \code{\link{fourierpen}},
 \code{\link{bsplinepen}},

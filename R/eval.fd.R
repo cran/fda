@@ -139,6 +139,7 @@ eval.fd <- function(evalarg, fdobj, Lfdobj=0, returnMatrix=FALSE) {
   if (ndim <= 2) nvar <- 1 else nvar <- coefd[3]
 
 # check coef is conformable with evalarg
+
   if(length(evaldim)>1){
     if(evaldim[2]==1){
       evalarg <- c(evalarg)

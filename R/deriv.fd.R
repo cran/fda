@@ -1,3 +1,5 @@
+deriv <- function(expr, ...)UseMethod('deriv')
+
 deriv.fd <- function(expr, Lfdobj=int2Lfd(1), returnMatrix=FALSE, ...)
 {
   #  Applies linear differential operator LFD to functional data object FD
@@ -8,7 +10,7 @@ deriv.fd <- function(expr, Lfdobj=int2Lfd(1), returnMatrix=FALSE, ...)
   fdobj <- expr
   if (!inherits(fdobj, "fd")) stop(
 		"Argument  FD not a functional data object.")
-		
+
   Lfdobj   <- int2Lfd(Lfdobj)
 
   basisobj <- fdobj$basis

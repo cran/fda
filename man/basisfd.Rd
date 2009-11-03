@@ -132,7 +132,7 @@ basisfd(type, rangeval, nbasis, params,
 
   It is comparatively simple to add new basis types.  The code in
   the following functions needs to be estended to allow for the new
-  type: \code{\link{basisfd}}, \code{\link{use.proper.basis}},
+  type: \code{\link{basisfd}}, 
   \code{\link{getbasismatrix}} and \code{\link{getbasispenalty}}.
   In addition, a new "create" function should be written for the
   new type, as well as functions analogous to \code{\link{fourier}} and

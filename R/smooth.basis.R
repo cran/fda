@@ -76,9 +76,8 @@ smooth.basis <- function(argvals=1:n, y, fdParobj,
 #               from a call to function BsplineS.  See this function for
 #               enabling this option.
 
-# last modified July 4, 2012 by Spencer Graves
-#    to allow argvals to have class Date or POSIXct
-# previously modified 8 May 2012 by Jim Ramsay
+# last modified 28 December 2012
+
 ##
 ##  check y
 ##
@@ -90,9 +89,9 @@ smooth.basis <- function(argvals=1:n, y, fdParobj,
 ##
 ##  check argvals
 ##
-  if(is.null(argvals))stop('argvals required;  is NULL.')
+  if (is.null(argvals)) stop('argvals required;  is NULL.')
 #
-  if(is.numeric(argvals)){
+  if (is.numeric(argvals)) {
     if(is.vector(argvals))argvals <- as.matrix(argvals)
     Argvals <- argvals
   } else {
@@ -117,35 +116,48 @@ smooth.basis <- function(argvals=1:n, y, fdParobj,
 ##  are all dimensions of argvals equal to the first nda of those of y?
 ##
   if (nda < 3 ) {
+    #  argvals is a matrix
     if (dima[2] == 1) {
-
+      #  argvals is a matrix with a single column, the usual case
+      #  the base version smooth.basis1 is called directly
+      #  see separate file smooth.basis1.R for this function
+      #  ---------------------------------------------------
       sb2 <- smooth.basis1(argvals, y, fdParobj,
                            wtvec=wtvec,   fdnames=fdnames,
                            covariates=covariates,
                            method=method, dfscale=dfscale,
                            returnMatrix=returnMatrix)
+      #  ---------------------------------------------------
       sb2$argvals <- Argvals
-# With class(argvals) == Date or POSIXct,
-# argvals can NOT be a matrix or 3-d array.
     } else {
-
+      # With class(argvals) == Date or POSIXct,
+      # argvals can NOT be a matrix or 3-d array.
+      #  smooth.basis2 is called, which in turn calls smooth.basis1 in a loop
+      #  see below for smooth.basis2
+      #  ---------------------------------------------------
       sb2 <- smooth.basis2(argvals, y=y, fdParobj=fdParobj,
                            wtvec=wtvec,   fdnames=fdnames,
                            covariates=covariates,
                            method=method, dfscale=dfscale,
                            returnMatrix=returnMatrix)
-
+      #  ---------------------------------------------------
     }
     return(sb2)
   }
-# end if(nda<3)
+  # end if(nda<3)
 
   if (nda < 4) {
-    return(smooth.basis3(argvals, y=y, fdParobj=fdParobj,
+      #  argvals is an array, call smooth.basis3 which calls smooth.basis2
+      #  inside a loop.  see below for smooth.basis3
+      return(
+               #  ---------------------------------------------------
+               smooth.basis3(argvals, y=y, fdParobj=fdParobj,
                        wtvec=wtvec,   fdnames=fdnames,
                        covariates=covariates,
                        method=method, dfscale=dfscale,
-                       returnMatrix=returnMatrix) )
+                       returnMatrix=returnMatrix) 
+               #  ---------------------------------------------------
+             )
   } else {
       #  dimensions of argval inconsistent with those of y, throw error
       cat("dim(argvals) =", paste(dima, collapse=", "), "\n")
@@ -153,104 +165,6 @@ smooth.basis <- function(argvals=1:n, y, fdParobj,
       stop("Dimensions of argvals do not match those of y")
       return()
   }
-
-}
-
-############################################################################
-
-smooth.basis3 <- function(argvals=array(1:n,c(n,N,M)), y, fdParobj,
-                          wtvec=NULL,   fdnames=NULL, covariates=NULL,
-                          method="chol", dfscale=1, returnMatrix=FALSE)
-{
-##
-## 1.  check dimensions of argval and y
-##
-
-dimy <- dim(y)
-ndy <- length(dimy)
-n   <- dimy[1]
-N   <- dimy[2]
-M   <- dimy[3]
-if (ndy < 3)stop("length(dim(y)) must be 3  is ", ndy)
-if (any(dima != dimy)) {
-    stop("dim(argvals) = ", paste(dima, collapse=", "),
-         " != dim(y) = ", paste(dimy, collapse=", "))
-}
-
-dima <- dim(argvals)
-nda  <- length(dima)
-if (nda < 3) stop("length(dim(argvals)) must be 3  is ", nda)
-
-##
-## 2.  Call smooth.basis2 repeatedly
-##
-#  2.1.  argvals[, , 1]
-sb1 <- smooth.basis2(argvals[, , 1], y=y[, , 1], fdParobj=fdParobj,
-                     wtvec=wtvec,   fdnames=fdnames,
-                     covariates=covariates,
-                     method=method, dfscale=dfscale,
-                     returnMatrix=returnMatrix)
-#  2.2.  set up output object
-coef1 <- sb1$fd$coefs
-dimc1 <- dim(coef1)
-dimc  <- c(dimc1[1], dimy[-1])
-coefs <- array(NA, dim=dimc)
-argNames <- dimnames(argvals)
-yNames   <- dimnames(y)
-c1Names  <- dimnames(coef1)
-cNames   <- vector("list", 3)
-if (!is.null(c1Names[[1]])) cNames[[1]] <- c1Names[[1]]
-if (!is.null(yNames[[2]]))  cNames[[2]] <- yNames[[2]]
-if (!is.null(yNames[[3]]))  cNames[[3]] <- yNames[[3]]
-dimnames(coefs) <- cNames
-if (!is.null(covariates)) {
-  q <- dim(covariates)[2]
-  beta. <- array(0,c(q,dimy[2],dimy[3]))
-  beta.[,,1] <- sb1$beta
-} else {
-  beta. <- NULL
-}
-#
-for (i in seq(2, length=dimy[3]-1)) {
-    sbi <- smooth.basis2(argvals[,,i], y=y[,,i], fdParobj=fdParobj,
-                         wtvec=wtvec,   fdnames=fdnames,
-                         covariates=covariates,
-                         method=method, dfscale=dfscale,
-                         returnMatrix=returnMatrix)
-    coefs[,,i] <- sbi$fd$coefs
-    if (!is.null(covariates)) {
-      beta.[,,i] <- sbi$beta
-    }
-}
-if (is.null(fdnames)) {
-    fdnames <- list(time=NULL, reps=NULL, values=NULL)
-    if (!is.null(yNames[[1]])) {
-        fdnames[[1]] <- yNames[[1]]
-    } else {
-      if (!is.null(argNames[[1]]))
-        fdnames[[1]] <- argNames[[1]]
-    }
-    if (!is.null(yNames[[2]])) {
-        fdnames[[2]] <- yNames[[2]]
-    } else {
-      if (!is.null(argNames[[2]]))
-        fdnames[[2]] <- argNames[[2]]
-    }
-    if (!is.null(yNames[[3]])) {
-        fdnames[[3]] <- yNames[[3]]
-    } else {
-      if (!is.null(argNames[[3]]))
-        fdnames[[3]] <- argNames[[3]]
-    }
-}
-##
-## 3.  done
-##
-sb <- sb1
-sb$fd$coefs   <- coefs
-sb$fd$fdnames <- fdnames
-sb$beta       <- beta.
-sb
 
 }
 
@@ -395,3 +309,103 @@ sb$fd$fdnames <- fdnames
 sb
 
 }
+
+############################################################################
+
+smooth.basis3 <- function(argvals=array(1:n,c(n,N,M)), y, fdParobj,
+                          wtvec=NULL,   fdnames=NULL, covariates=NULL,
+                          method="chol", dfscale=1, returnMatrix=FALSE)
+{
+##
+## 1.  check dimensions of argval and y
+##
+
+dimy <- dim(y)
+ndy <- length(dimy)
+n   <- dimy[1]
+N   <- dimy[2]
+M   <- dimy[3]
+if (ndy < 3)stop("length(dim(y)) must be 3  is ", ndy)
+if (any(dima != dimy)) {
+    stop("dim(argvals) = ", paste(dima, collapse=", "),
+         " != dim(y) = ", paste(dimy, collapse=", "))
+}
+
+dima <- dim(argvals)
+nda  <- length(dima)
+if (nda < 3) stop("length(dim(argvals)) must be 3  is ", nda)
+
+##
+## 2.  Call smooth.basis2 repeatedly
+##
+#  2.1.  argvals[, , 1]
+sb1 <- smooth.basis2(argvals[, , 1], y=y[, , 1], fdParobj=fdParobj,
+                     wtvec=wtvec,   fdnames=fdnames,
+                     covariates=covariates,
+                     method=method, dfscale=dfscale,
+                     returnMatrix=returnMatrix)
+#  2.2.  set up output object
+coef1 <- sb1$fd$coefs
+dimc1 <- dim(coef1)
+dimc  <- c(dimc1[1], dimy[-1])
+coefs <- array(NA, dim=dimc)
+argNames <- dimnames(argvals)
+yNames   <- dimnames(y)
+c1Names  <- dimnames(coef1)
+cNames   <- vector("list", 3)
+if (!is.null(c1Names[[1]])) cNames[[1]] <- c1Names[[1]]
+if (!is.null(yNames[[2]]))  cNames[[2]] <- yNames[[2]]
+if (!is.null(yNames[[3]]))  cNames[[3]] <- yNames[[3]]
+dimnames(coefs) <- cNames
+if (!is.null(covariates)) {
+  q <- dim(covariates)[2]
+  beta. <- array(0,c(q,dimy[2],dimy[3]))
+  beta.[,,1] <- sb1$beta
+} else {
+  beta. <- NULL
+}
+#
+for (i in seq(2, length=dimy[3]-1)) {
+    sbi <- smooth.basis2(argvals[,,i], y=y[,,i], fdParobj=fdParobj,
+                         wtvec=wtvec,   fdnames=fdnames,
+                         covariates=covariates,
+                         method=method, dfscale=dfscale,
+                         returnMatrix=returnMatrix)
+    coefs[,,i] <- sbi$fd$coefs
+    if (!is.null(covariates)) {
+      beta.[,,i] <- sbi$beta
+    }
+}
+if (is.null(fdnames)) {
+    fdnames <- list(time=NULL, reps=NULL, values=NULL)
+    if (!is.null(yNames[[1]])) {
+        fdnames[[1]] <- yNames[[1]]
+    } else {
+      if (!is.null(argNames[[1]]))
+        fdnames[[1]] <- argNames[[1]]
+    }
+    if (!is.null(yNames[[2]])) {
+        fdnames[[2]] <- yNames[[2]]
+    } else {
+      if (!is.null(argNames[[2]]))
+        fdnames[[2]] <- argNames[[2]]
+    }
+    if (!is.null(yNames[[3]])) {
+        fdnames[[3]] <- yNames[[3]]
+    } else {
+      if (!is.null(argNames[[3]]))
+        fdnames[[3]] <- argNames[[3]]
+    }
+}
+##
+## 3.  done
+##
+sb <- sb1
+sb$fd$coefs   <- coefs
+sb$fd$fdnames <- fdnames
+sb$beta       <- beta.
+sb
+
+}
+
+

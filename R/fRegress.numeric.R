@@ -148,9 +148,15 @@ fRegress.numeric <- function(y, xfdlist, betalist, wt=NULL,
       }
       xfdlist[[j]] <- fd(matrix(xfdj,1,N), onebasis)
     }
-    if(!(inherits(xfdlist[[j]], "fd") || is.numeric(xfdlist[[j]]))){
+    if (!(
+           inherits(xfdlist[[j]], "fd") || 
+           is.numeric(xfdlist[[j]])
+         ) ) {
       print(paste("XFDLIST[[", j,
                   "]] is neither an FD object nor numeric."))
+      print(class(xfdlist[[j]]))
+      print(names(xfdlist[[j]]))
+      print(xfdlist[[j]])
       xerror = TRUE
     }
   }

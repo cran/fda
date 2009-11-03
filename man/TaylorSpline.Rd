@@ -104,8 +104,11 @@ TaylorSpline(parab4.5)
 ##
 data(titanium)
 #  Cubic spline with 5 interior knots (6 segments)
-titan10 <- with(titanium, curfit.free.knot(x, y))
-(titan10T <- TaylorSpline(titan10) )
+# do not run this example on CRAN to save test time
+#if(!CRAN()){
+#titan10 <- with(titanium, curfit.free.knot(x, y))
+#(titan10T <- TaylorSpline(titan10) )
+#}
 
 }
 \keyword{ smooth }

@@ -53,8 +53,7 @@ eval.basis <- function(evalarg, basisobj, Lfdobj=0, returnMatrix=FALSE) {
 
 #  Note that the first two arguments may be interchanged.
 
-#  Last modified July 8, 2012 by Spencer Graves
-#    to add dimnames
+#  Last modified 24 December 2012
 ##
 ## 1.  check
 ##
@@ -111,14 +110,14 @@ eval.basis <- function(evalarg, basisobj, Lfdobj=0, returnMatrix=FALSE) {
 #  get highest order of basis matrix
 
   basismat <- getbasismatrix(evalarg, basisobj, nderiv, returnMatrix)
-  nbasis   <- dim(basismat)[2]
-  oneb     <- matrix(1,1,nbasis)
 
 #  Compute the weighted combination of derivatives is
 #  evaluated here if the operator is not defined by an
 #  integer and the order of derivative is positive.
 
   if (nderiv > 0) {
+    nbasis    <- dim(basismat)[2]
+    oneb      <- matrix(1,1,nbasis)
     nonintwrd <- FALSE
     for (j in 1:nderiv) {
         bfd    <- bwtlist[[j]]
@@ -140,8 +139,9 @@ eval.basis <- function(evalarg, basisobj, Lfdobj=0, returnMatrix=FALSE) {
 
   if((!returnMatrix) && (length(dim(basismat)) == 2)){
       return(as.matrix(basismat))
+  } else {
+      return(basismat)
   }
-  return(basismat)
 
 }
 

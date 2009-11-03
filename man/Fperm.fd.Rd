@@ -172,7 +172,7 @@ betalist[[2]] <- betafdPar2
 
 # Should use the default nperm = 200
 # but use 10 to save test time for illustration
-F.res2 = Fperm.fd(annualprec, xfdlist, betalist,nperm=10)
+F.res2 = Fperm.fd(annualprec, xfdlist, betalist, nperm=10)
 
 ##
 ## 2.  yfdpar = Functional data object (class fd)
@@ -181,6 +181,9 @@ F.res2 = Fperm.fd(annualprec, xfdlist, betalist,nperm=10)
 # t-test on the growth data.
 
 # First set up a basis system to hold the smooths
+
+# cut this example to reduce test time on CRAN
+if(!CRAN()){
 
 Knots  <- growth$age
 norder <- 6
@@ -215,6 +218,7 @@ betalist = list(fdPar(hgtbasis,2,1e-6),fdPar(hgtbasis,2,1e-6))
 # Should use nperm = 200 or so,
 # but use 10 to save test time
 Fres = Fperm.fd(hgtfd,xfdlist,betalist,nperm=10)
+}
 
 }
 \keyword{smooth}

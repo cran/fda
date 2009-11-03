@@ -1,7 +1,7 @@
 \name{readHMD}
 \alias{readHMD}
 \title{
-  Downlaod data from the Human Mortality Database (HMD)
+  Download data from the Human Mortality Database (HMD)
 }
 \description{
   Obtain data from the Human Mortality Database (HMD) maintained at the
@@ -101,7 +101,7 @@ readHMD(username, password,
     other arguments.
   }
   \item{...}{
-    options arguments for \code{\link{getURL}}
+    options arguments for \code{\link[RCurl]{getURL}}
   }
 }
 \details{
@@ -132,7 +132,7 @@ readHMD(username, password,
     the url that was constructed after noting that it was missing.
   }
   \item{getURL}{
-    object returned by \code{\link{getURL}}.
+    object returned by \code{\link[RCurl]{getURL}}.
   }
   \item{readLines}{
     object returned by readLines(getURL(...)).
@@ -170,7 +170,7 @@ readHMD(username, password,
   Han Lin Shang, Monash University in Australia, and Spencer Graves
 }
 \seealso{
-  \code{\link{getURL}}
+  \code{\link[RCurl]{getURL}}
   \code{\link[demography]{hmd.mx}}
 }
 \examples{

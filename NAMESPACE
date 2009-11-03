@@ -1,6 +1,220 @@
-exportPattern("^[^\\.]")
+#exportPattern("^[^\\.]")
 
 ## Quick and dirty: {just to confirm that it is sufficient}
-import(Matrix)
 
+export(AmpPhaseDecomp,
+       argvalsy.swap,
+       plus.fd, minus.fd, times.fd,
+       as.array3,
+       as.fd,
+       as.POSIXct1970,
+       axisIntervals, axesIntervals,
+       bifd,
+       bifdPar,
+       bsplinepen,
+       bsplineS,
+       cca.fd,
+       center.fd,
+       checkDim3, checkDims3,
+       checkLogical, checkNumeric, checkLogicalInteger,
+       constraintCheck, lmWinsor1, lmWinsor2,
+       cor.fd,
+       CRAN,
+       create.bspline.basis, create.bspline.irregular,
+       create.constant.basis,
+       create.exponential.basis,
+       create.fourier.basis,
+       create.monomial.basis,
+       create.polygonal.basis,
+       create.polynomial.basis,
+       create.power.basis,
+       CSTR2in, CSTR2, CSTRfitLS, CSTRfn, CSTRres, CSTRsse,
+       cycleplot.fd,
+       Data2fd,
+       density.fd,
+       deriv.fd,
+       df2lambda,
+       dirs,
+       Eigen,
+       eigen.pda,
+       eval.basis,
+       eval.bifd,
+       eval.fd,
+       eval.monfd,
+       eval.penalty,
+       eval.posfd,
+       evaldiag.bifd,
+       expon,
+       exponentiate.fd,
+       exponpen,
+       fd, fbplot,
+       fd2list,
+       fdaMatlabPath,
+       fdlabels,
+       fdPar,
+       file.copy2,
+       fourier,
+       fourierpen,
+       Fperm.fd,
+       fRegress,
+       fRegress.CV,
+       fRegress.numeric,
+       fRegress.stderr,
+       Fstat.fd,
+       geigen,
+       getbasismatrix,
+       getbasispenalty,
+       getbasisrange,
+       inprod,
+       inprod.bspline,
+       int2Lfd,
+       intensity.fd,
+       is.basis,
+       is.fd,
+       is.fdPar,
+       is.fdSmooth,
+       is.Lfd,
+       knots.fd, knots.fdSmooth, knots.basisfd,
+       lambda2df,
+       lambda2gcv,
+       landmarkreg,
+       Lfd,
+       lines.fdSmooth,
+       linmod,
+       lmeWinsor,
+       lmWinsor,
+       matplot,
+       mean.fd,
+       monfn,
+       monomial,
+       monomialpen,
+       norder, norder.bspline,
+       objAndNames,
+       odesolv,
+       pca.fd,
+       pda.fd,
+       pda.overlay,
+       phaseplanePlot,
+       plot.cca.fd,
+       plot.fd,
+       plot.pca.fd,
+       plotbeta,
+       plotfit.fd, plotfit.fdSmooth,
+       plotreg.fd,
+       plotscores,
+       polyg,
+       polygpen,
+       powerbasis,
+       powerpen,
+       ppBspline,
+       project.basis,
+       quadset,
+       readHMD,
+       register.fd,
+       register.fd0,
+       register.newfd,
+       sd.fd, std.fd, stdev.fd, stddev.fd,
+       smooth.basis,
+       smooth.basisPar,
+       smooth.bibasis,
+       smooth.fd,
+       smooth.fdPar,
+       smooth.monotone,
+       smooth.morph,
+       smooth.pos,
+       svd2,
+       symsolve,
+       "[.fd",
+       TaylorSpline,
+       tperm.fd,
+       var.fd,
+       varmx,
+       varmx.cca.fd,
+       varmx.pca.fd,
+       vec2Lfd,
+       wtcheck,
+       zerofind )
+
+#importFrom(base, mean, coefficients)
+
+#import(DierckxSpline)
+#import(zoo)
+import(Matrix)
+#import(zoo)
+#import(rpart)
+
+S3method("==", basisfd)
+S3method('+', fd)
+S3method('-', fd)
+S3method('*', fd)
+S3method('*', basisfd)
+S3method('[', fd)
+S3method('^', fd)
+S3method(as.fd, fdSmooth)
+S3method(as.fd, dierckx)
+S3method(as.fd, 'function')
+S3method(as.fd, smooth.spline)
+S3method(coef, fd)
+S3method(coef, fdPar)
+S3method(coef, fdSmooth)
+S3method(coef, Taylor)
+S3method(coefficients, fd)
+S3method(coefficients, fdPar)
+S3method(coefficients, fdSmooth)
+S3method(coefficients, Taylor)
+S3method(density, fd)
+S3method(deriv, fd)
+S3method(df.residual, fRegress)
+S3method(fitted, fdSmooth)
+S3method(fitted, monfd)
+S3method(fitted, posfd)
+S3method(fRegress, formula)
+S3method(fRegress, character)
+S3method(fRegress, fd)
+S3method(fRegress, fdPar)
+S3method(fRegress, numeric)
+S3method(knots, basisfd)
+S3method(knots, fd)
+S3method(knots, fdSmooth)
+S3method(lines, fd)
+S3method(lines, fdSmooth)
+S3method(matplot, Date)
+S3method(matplot, default)
+S3method(matplot, POSIXct)
+S3method(matplot, numeric)
+S3method(mean, fd)
+S3method(norder, default)
+S3method(norder, fd)
+S3method(norder, basisfd)
+S3method(plot, basisfd)
+S3method(plot, fd)
+S3method(plot, fdPar)
+S3method(plot, fdSmooth)
+S3method(plot, Lfd)
+S3method(plot, lmWinsor)
+S3method(plot, pda.fd)
+S3method(predict, fRegress)
+S3method(predict, lmeWinsor)
+S3method(predict, lmWinsor)
+S3method(predict, basisfd)
+S3method(predict, fd)
+S3method(predict, fdPar)
+S3method(predict, fdSmooth)
+S3method(predict, monfd)
+S3method(predict, posfd)
+S3method(residuals, posfd)
+S3method(residuals, fdSmooth)
+S3method(residuals, monfd)
+S3method(residuals, fRegress)
+S3method(sqrt, fd)
+S3method(sum, fd)
+S3method(summary, basisfd)
+S3method(summary, bifd)
+S3method(summary, fd)
+S3method(summary, fdPar)
+S3method(summary, Lfd)
+S3method(TaylorSpline, fd)
+S3method(TaylorSpline, fdPar)
+S3method(TaylorSpline, fdSmooth)
+S3method(TaylorSpline, dierckx)
 

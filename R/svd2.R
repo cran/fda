@@ -15,28 +15,32 @@ svd2 <- function(x, nu = min(n, p), nv = min(n, p), LINPACK = FALSE){
                      "; sum(abs(x)==Inf) = ", nInf,
                      ".  'x stored in .svd.x.NA.Inf'",
                      sep="")
-        assign('.svd.x.NA.Inf', x, envir = .GlobalEnv)
+#        svd2Env <- new.env()
+#        assign('.svd.x.NA.Inf', x, envir = svd2Env)
         stop(msg)
       }
-      attr(x, "n") <- n
-      attr(x, "p") <- p
-      attr(x, "LINPACK") <- LINPACK
-      .x2 <- c('.svd.LAPACK.error.matrix',
-              '.svd.LINPACK.error.matrix')
-      .x <- .x2[1+LINPACK]
-      assign(.x, x, envir = .GlobalEnv)
+#      attr(x, "n") <- n
+#      attr(x, "p") <- p
+#      attr(x, "LINPACK") <- LINPACK
+#      .x2 <- c('.svd.LAPACK.error.matrix',
+#              '.svd.LINPACK.error.matrix')
+#      .x <- .x2[1+LINPACK]
+#      assign(.x, x, envir = .GlobalEnv)
+      tf <- tempfile('svd.LINPACK.error.matrix',
+                     tmpdir=getwd(), fileext='.rda')
+      save(x, nu, nv, LINPACK, svd.x, file=tf)
       msg <- paste('svd failed using LINPACK = ', LINPACK,
                    " with n = ", n, ' and p = ', p,
-                   ";  x stored in '", .x, "'",
+                   ";  x stored in '", tf, "'",
                    sep="")
       warning(msg)
 #
       svd.x <- try(svd(x, nu, nv, !LINPACK))
       if(class(svd.x)=="try-error"){
-        .xc <- .x2[1+!LINPACK]
-        assign(.xc, x, envir=.GlobalEnv)
+#        .xc <- .x2[1+!LINPACK]
+#        assign(.xc, x, envir=.GlobalEnv)
         stop("svd also failed using LINPACK = ", !LINPACK,
-             ";  x stored in '", .xc, "'")
+             ";  x stored in '", tf, "'")
       }
     }
     svd.x

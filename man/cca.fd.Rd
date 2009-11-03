@@ -10,8 +10,8 @@ canonical variables.
 }
 \usage{
 cca.fd(fdobj1, fdobj2=fdobj1, ncan = 2,
-       ccafdParobj1=fdPar(basisobj1, 2, 1e-10),
-       ccafdParobj2=ccafdParobj1, centerfns=TRUE)
+       ccafdPar1=fdPar(basisobj1, 2, 1e-10),
+       ccafdPar2=ccafdPar1, centerfns=TRUE)
 }
 \arguments{
 \item{fdobj1}{
@@ -26,14 +26,14 @@ object.
 the number of canonical variables and weight functions to be
 computed.  The default is 2.
 }
-\item{ccafdParobj1}{
+\item{ccafdPar1}{
 a functional parameter object defining the first set of canonical
 weight functions.  The object may contain specifications for a
 roughness penalty. The default is defined using the same basis
 as that used for \code{ fdobj1 } with a slight penalty on its
 second derivative.
 }
-\item{ccafdParobj2}{
+\item{ccafdPar2}{
 a functional parameter object defining the second set of canonical
 weight functions.  The object may contain specifications for a
 roughness penalty. The default is \code{ ccafdParobj1 }.
@@ -65,8 +65,8 @@ a matrix of scores on the second canonical variable.
 }
 }
 \seealso{
-\code{\link{plot.cca.fd}}, 
-\code{\link{varmx.cca.fd}}, 
+\code{\link{plot.cca.fd}},
+\code{\link{varmx.cca.fd}},
 \code{\link{pca.fd}}
 }
 \examples{
@@ -83,15 +83,12 @@ gaitfd <- smooth.basis(gaittime, gait, gaitfdPar)$fd
 
 ccafdPar <- fdPar(gaitfd, harmaccelLfd, 1e-8)
 ccafd0    <- cca.fd(gaitfd[,1], gaitfd[,2], ncan=3, ccafdPar, ccafdPar)
+#  display the canonical correlations
+round(ccafd0$ccacorr[1:6],3)
 #  compute a VARIMAX rotation of the canonical variables
 ccafd <- varmx.cca.fd(ccafd0)
 #  plot the canonical weight functions
-op <- par(mfrow=c(2,1))
-#plot.cca.fd(ccafd, cex=1.2, ask=TRUE)
-#plot.cca.fd(ccafd, cex=1.2)
-#  display the canonical correlations
-#round(ccafd$ccacorr[1:6],3)
-par(op)
+plot.cca.fd(ccafd)
 }
 % docclass is function
 \keyword{smooth}

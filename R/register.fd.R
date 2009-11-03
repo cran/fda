@@ -34,7 +34,10 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=NULL,
 #              The periodic option should ONLY be used with a Fourier
 #              basis for the target function Y0FD, the functions to be
 #              registered, YFD.
-#  CRIT    ... If 1 least squares, if 2 log eigenvalue ratio.  Default is 1.
+#  CRIT    ... if 1 least squares,
+#              if 2 log eigenvalue ratio,
+#              if 3 least squares using residual y0 - yi*dhdt
+#              Default is 2.
 #  RETURNMATRIX ... If False, a matrix in sparse storage model can be returned
 #               from a call to function BsplineS.  See this function for
 #               enabling this option.
@@ -50,7 +53,7 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=NULL,
 #    REGLIST$Y0FD   ... Argument Y0FD
 #    REGLIST$YFD    ... Argument YFD
 
-#  Last modified 8 May 2012 by Jim Ramsay
+#  Last modified 14 November 2012 by Jim Ramsay
 
 ##
 ## 1.  Check y0fd and yfd
@@ -617,7 +620,7 @@ regfngrad <- function(xfine, y0fine, Dhwrtc, yregfd, Wfd,
       res  <- y0ivar - ywrthi
       Fval <- Fval + aa - 2*bb + cc
       gvec <- gvec - 2*crossprod(Dywrtc, res)/nfine
-    } else {
+    } else if (crit == 2) {
       ee   <- aa + cc
       ff   <- aa - cc
       dd   <- sqrt(ff^2 + 4*bb^2)
@@ -626,6 +629,14 @@ regfngrad <- function(xfine, y0fine, Dhwrtc, yregfd, Wfd,
       Dcc  <- 2.0 * crossprod(Dywrtc, ywrthi)/nfine
       Ddd  <- (4*bb*Dbb - ff*Dcc)/dd
       gvec <- gvec + (Dcc - Ddd)
+      # } else if (crit == 3) {
+        #  least squares with root Dh weighting criterion
+        #  dhdt not defined here ... fix later
+      # res  = y0ivar - ywrthi*sqrt(dhdt)
+      # Fval = Fval + mean(res^2)
+      # gvec = gvec - 2*crossprod(Dywrtc, res)/nfine
+    } else {
+      stop("Invalid value for fitting criterion CRIT.")
     }
   }
   if (!is.null(Kmat)) {

@@ -32,7 +32,7 @@ inprod <- function(fdobj1, fdobj2=NULL, Lfdobj1=int2Lfd(0), Lfdobj2=int2Lfd(0),
 #  A matrix of NREP1 by NREP2 of inner products for each possible pair
 #  of functions.
 
-#  Last modified 8 May 2012 by Jim Ramsay
+#  Last modified 24 December 2012 by Jim Ramsay
 
 #  Check FDOBJ1 and get no. replications and basis object
 
@@ -84,11 +84,16 @@ if (rng[1] < range1[1] || rng[2] > range1[2]) stop(
 #  (5) there is no weight function
 #  (6) RNG is equal to the range of the two bases.
 
-if (inherits(fdobj1,"fd")       && inherits(fdobj2,"fd")   &&
-    type1 == "bspline"          && type2 == "bspline"      &&
-    is.eqbasis(basisobj1, basisobj2)                       &&
-    is.integer(Lfdobj1)         && is.integer(Lfdobj2)      &&
-    wtfd == 0                   && all(rng == range1)) {
+if (inherits(fdobj1,"fd")            && 
+    inherits(fdobj2,"fd")            &&
+    type1 == "bspline"               && 
+    type2 == "bspline"               &&
+    is.eqbasis(basisobj1, basisobj2) &&
+    is.integer(Lfdobj1)              && 
+    is.integer(Lfdobj2)              &&
+    length(basisobj1$dropind) == 0   &&
+    length(basisobj1$dropind) == 0   &&
+    wtfd == 0                        && all(rng == range1)) {
 
     inprodmat <- inprod.bspline(fdobj1, fdobj2,
                      Lfdobj1$nderiv, Lfdobj2$nderiv)
@@ -260,10 +265,10 @@ fdchk <- function(fdobj) {
 
     if (inherits(fdobj, "fd")) coef  <- fdobj$coefs
     else
-	    if (inherits(fdobj, "basisfd")) {
-    	    coef  <- diag(rep(1,fdobj$nbasis))
+	  if (inherits(fdobj, "basisfd")) {
+    	    coef  <- diag(rep(1,fdobj$nbasis - length(fdobj$dropind)))
     	    fdobj <- fd(coef, fdobj)
-	    }
+	  }
     else stop("FDOBJ is not an FD object.")
 
     #  extract the number of replications and basis object

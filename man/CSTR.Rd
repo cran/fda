@@ -5,7 +5,6 @@
 \alias{CSTRfn}
 \alias{CSTRfitLS}
 \alias{CSTRres}
-\alias{CSTRres0}
 \alias{CSTRsse}
 \title{
   Continuously Stirred Tank Reactor
@@ -17,9 +16,9 @@
   obtained via lsoda(y, Time, CSTR2, parms);  CSTR2 calls CSTR2in.  When
   metrology error can not be ignored, use CSTRfn (which calls
   CSTRfitLS).  To estimate parameters in the CSTR differential equation
-  system (kref, EoverR, a, and / or b), pass either CSTRres or CSTRres0
-  to nls.  If nls fails to converge, first use optim or nlminb with
-  CSTRsse, then pass the estimates to nls.
+  system (kref, EoverR, a, and / or b), pass CSTRres to nls.  If nls
+  fails to converge, first use optim or nlminb with CSTRsse, then pass
+  the estimates to nls.
 }
 \usage{
 CSTR2in(Time, condition =
@@ -33,7 +32,6 @@ CSTRfitLS(coef, datstruct, fitstruct, lambda, gradwrd=FALSE)
 CSTRfn(parvec, datstruct, fitstruct, CSTRbasis, lambda, gradwrd=TRUE)
 CSTRres(kref=NULL, EoverR=NULL, a=NULL, b=NULL,
         datstruct, fitstruct, CSTRbasis, lambda, gradwrd=FALSE)
-CSTRres0(kref=NULL, EoverR=NULL, a=NULL, b=NULL, gradwrd=FALSE)
 CSTRsse(par, datstruct, fitstruct, CSTRbasis, lambda)
 
 }
@@ -241,8 +239,8 @@ CSTRsse(par, datstruct, fitstruct, CSTRbasis, lambda)
   CSTSRitLS and CSTRfn are used to estimate parameters to fit this
   differential equation system to noisy data.  These solutions are
   conditioned on specified values for kref, EoverR, a, and b.  The other
-  two functions CSTRres and CSTRres0 support estimation of these
-  parameters using 'nls'.
+  function, CSTRres, support estimation of these parameters using
+  'nls'.
 
   CSTR2in translates a character string 'condition' into a data.frame
   containing system inputs for which the reaction of the system is
@@ -267,29 +265,13 @@ CSTRsse(par, datstruct, fitstruct, CSTRbasis, lambda)
   of CSTRbasis to minimize the weighted sum of squares of residuals
   returned by CSTRfitLS.
 
-  CSTRres and CSTRres0 provide alternative interfaces between 'nls' and
-  'CSTRfn'.  Both get the parameters to be estimated via their official
-  function arguments, kref, EoverR, a, and / or b.  The subset of these
-  paramters to estimate must be specified both directly in the function
-  call to 'nls' and indirectly via fitstruct[["estimate"]].  CSTRres
-  gets the other CSTRfn arguments (datstruct, fitstruct, CSTRbasis, and
-  lambda) via the 'data' argument of 'nls'.  (The version of 'nls' in
-  the 'stats' package in R 2.5.0 required 'data' to be a data.frame, not
-  merely a list.  The version of 'nls' in 'fda' does not require this.)
-  By contrast, CSTRres0 uses 'get' to obtain these other arguments as
-  .datstruct, .fitstruct, .CSTRbasis and .lambda.  Thus, before calling
-  nls(~CSTRres0(...), ...), the values of these arguments must be
-  assigned to .datstruct, .fitstruct, .CSTRbasis and .lambda.  If 'nls'
-  is called from the global environment, it will look for these objects
-  in the global environment.
-
-  CSTRres0 has one feature absent from CSTRres:  If a variable
-  .CSTRres0.trace is available, it is assumed to be a matrix with columns
-  kref, EoverR, a, b, SSE, plus all residuals.  These numbers are
-  rbinded as an additional row of this matrix.  This is provided to help
-  diagnose a problem were 'nls' was terminating with "step factor
-  ... reduced below 'minFactor'", facilitating the comparison between R
-  and Matlab for the precise sets of parameter values tested by 'nls'.
+  CSTRres provides an interface between 'nls' and 'CSTRfn'.  It gets the
+  parameters to be estimated via the official function arguments, kref,
+  EoverR, a, and / or b.  The subset of these paramters to estimate must
+  be specified both directly in the function call to 'nls' and
+  indirectly via fitstruct[["estimate"]].  CSTRres gets the other CSTRfn
+  arguments (datstruct, fitstruct, CSTRbasis, and lambda) via the 'data'
+  argument of 'nls'.
 
   CSTRsse computes sum of squares of residuals for use with optim or
   nlminb.
@@ -380,7 +362,7 @@ CSTRsse(par, datstruct, fitstruct, CSTRbasis, lambda)
       }
     }
   }
-  \item{CSTRres, CSTRres0}{
+  \item{CSTRres}{
     the 'res' component of CSTRfd(...) as a column vector.  This allows
     us to use 'nls' with the CSTR model.  This can be especially useful
     as 'nls' has several helper functions to facilitate evaluating

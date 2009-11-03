@@ -86,7 +86,7 @@ create.bspline.basis <- function (rangeval=NULL, nbasis=NULL,
 #               basisobj$basisvalues <- vector("list",1)
 #               basisobj$basisvalues[[1]] <-
 #                               list(args=evalargs, values=basismat)
-#  NAMES ...  Either a character vector of length NABASIS
+#  BASISFNNAMES ... Either a character vector of length NABASIS
 #             or a single character string to which NORDER, "." and
 #             1:NBASIS are appended by the command
 #                paste(names, norder, ".", 1:nbreaks, sep="").
@@ -95,8 +95,7 @@ create.bspline.basis <- function (rangeval=NULL, nbasis=NULL,
 #  Returns
 #  BASISFD ...a functional data basis object
 
-#  Last modified July 1, 2012 by Spencer Graves to allow nonnumeric rangeval
-#  Last modified  7 May 2012 by Jim Ramsay
+#  Last modified  28 December 2012 by Jim Ramsay
 
 #  -------------------------------------------------------------------------
 #  Default basis for missing arguments:  A B-spline basis over [0,1] of
@@ -294,55 +293,29 @@ create.bspline.basis <- function (rangeval=NULL, nbasis=NULL,
     params <- NULL
   }
 ##
-## 6.  check DROPIND
-##
-  if (length(dropind) == 0) dropind <- NULL
-  if (length(dropind) > 0) {
-#    if (!is.integer(nbasis)) stop("Argument 'DROPIND' is not integer-valued.")
-    if(!is.numeric(dropind))
-      stop('dropind must be numeric;  is ', class(dropind))
-    doops <- which((dropind%%1)>0)
-    if(length(doops)>0)
-      stop('dropind must be integer;  element ', doops[1],
-           " = ", dropind[doops[1]], '; fractional part = ',
-           dropind[doops[1]] %%1)
-#
-    doops0 <- which(dropind<=0)
-    if(length(doops0)>0)
-      stop('dropind must be positive integers;  element ',
-           doops0[1], ' = ', dropind[doops0[1]], ' is not.')
-    doops2 <- which(dropind>nbasis)
-    if(length(doops2)>0)
-        stop("dropind must not exceed nbasis = ", nbasis,
-             ';  dropind[', doops2[1], '] = ', dropind[doops2[1]])
-#
-    dropind <- sort(dropind)
-    if(length(dropind) > 1) {
-      if(min(diff(dropind)) == 0)
-        stop("Multiple index values in DROPIND.")
-    }
-  }
-##
-## 7.  set up basis object
+## 6.  set up basis object
 ##
   basisobj <- basisfd(type=type, rangeval=rangeval, nbasis=nbasis,
                   params=params, dropind=dropind,   quadvals=quadvals,
                   values=values, basisvalues=basisvalues)
 ##
-## 8.  names
+## 7.  names
 ##
   {
+    ndropind = length(dropind)
     if(length(names) == nbasis)
       basisobj$names <- names
     else {
-      if(length(names)>1)
+      if(length(names) > 1)
         stop('length(names) = ', length(names), ';  must be either ',
              '1 or nbasis = ', nbasis)
-      basisobj$names <- paste(names, norder, ".", 1:nbasis, sep="")
+      basisind = 1:nbasis
+      names   = paste(names, norder, ".",as.character(basisind), sep="")
+      basisobj$names <- names
     }
   }
 ##
-## 9.  Done
+## 8.  Done
 ##
 ##  if(!is.null(axes))basisobj$axes <- axes
   basisobj

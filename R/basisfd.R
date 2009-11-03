@@ -7,87 +7,87 @@ basisfd <- function(type, rangeval, nbasis, params, dropind=vector("list",0),
 {
 #  BASISFD  generator function of "basisfd" class.
 #  Arguments:
-#  TYPE     ... a string indicating the type of basisobj.
-#               This may be one of:
-#               "Bspline", "bspline", "Bsp", "bsp",
-#               "con", "const", "constant"
-#               "exp", "exponen", "exponential"
-#               "Fourier", "fourier", "Fou", "fou",
-#               "mon", "monom", "monomial",
-#               "polyg", "polygon", "polygonal"
-#               "power" "pow"
-#  RANGEVAL ... an array of length 2 containing the lower and upper
-#               boundaries for (the rangeval of argument values
-#  NBASIS   ... the number of basis functions
-#  PARAMS   ... If the basis is "fourier", this is a single number indicating
-#                 the period.  That is, the basis functions are periodic on
-#                 the interval (0,PARAMS) or any translation of it.
-#               If the basis is "bspline", the values are interior points at
-#                 which the piecewise polynomials join.
-#                 Note that the number of basis functions NBASIS is equal
-#                 to the order of the Bspline functions plus the number of
-#                 interior knots, that is the length of PARAMS.
-#               This means that NBASIS must be at least 1 larger than the
-#                 length of PARAMS.
-#  DROPIND ... A set of indices in 1:NBASIS of basis functions to drop when
-#                basis objects are arguments.  Default is vector("list",0)
-#                Note that argument NBASIS is reduced by the number of
-#                indices, and the derivative matrices in VALUES are also clipped.
-#  QUADVALS .. A NQUAD by 2 matrix.  The firs t column contains quadrature
-#                points to be used in a fixed point quadrature.  The second
-#                contains quadrature weights.  For example, for (Simpson"s
-#                rule for (NQUAD = 7, the points are equally spaced and the
-#                weights are delta.*[1, 4, 2, 4, 2, 4, 1]/3.  DELTA is the
-#                spacing between quadrature points.  The default is
-#                matrix("numeric",0,0).
-#  VALUES  ... A list, with entries containing the values of
-#                the basis function derivatives starting with 0 and
-#                going up to the highest derivative needed.  The values
-#                correspond to quadrature points in QUADVALS and it is
-#                up to the user to decide whether or not to multiply
-#                the derivative values by the square roots of the
-#                quadrature weights so as to make numerical integration
-#                a simple matrix multiplication.
-#                Values are checked against QUADVALS to ensure the correct
-#                number of rows, and against NBASIS to ensure the correct
-#                number of columns.
-#                The default value of is VALUES is vector("list",0).
-#                VALUES contains values of basis functions and derivatives at
-#                quadrature points weighted by square root of quadrature weights.
-#                These values are only generated as required, and only if slot
-#                QUADVALS is not matrix("numeric",0,0).
-#  BASISVALUES ... A vector of lists, allocated by code such as
-#                vector("list",1).
-#                This field is designed to avoid evaluation of a
-#                basis system repeatedly at a set of argument values.
-#                Each list within the vector corresponds to a specific set
-#                of argument values, and must have at least two components,
-#                which may be tagged as you wish.
-#                The first component in an element of the list vector contains the
-#                argument values.
-#                The second component in an element of the list vector
-#                contains a matrix of values of the basis functions evaluated
-#                at the arguments in the first component.
-#                The third and subsequent components, if present, contain
-#                matrices of values their derivatives up to a maximum
-#                derivative order.
-#                Whenever function getbasismatrix is called, it checks
-#                the first list in each row to see, first, if the number of
-#                argument values corresponds to the size of the first dimension,
-#                and if this test succeeds, checks that all of the argument
-#                values match.  This takes time, of course, but is much
-#                faster than re-evaluation of the basis system.  Even this
-#                time can be avoided by direct retrieval of the desired
-#                array.
-#                For example, you might set up a vector of argument values
-#                called "evalargs" along with a matrix of basis function
-#                values for these argument values called "basismat".
-#                You might want too use tags like "args" and "values",
-#                respectively for these.  You would then assign them
-#                to BASISVALUES with code such as
-#                  basisobj$basisvalues <- vector("list",1)
-#                  basisobj$basisvalues[[1]] <-
-#                               list(args=evalargs, values=basismat)
+#  TYPE    ...a string indicating the type of basisobj.
+#             This may be one of:
+#             "Bspline", "bspline", "Bsp", "bsp",
+#             "con", "const", "constant"
+#             "exp", "exponen", "exponential"
+#             "Fourier", "fourier", "Fou", "fou",
+#             "mon", "monom", "monomial",
+#             "polyg", "polygon", "polygonal"
+#             "power" "pow"
+#  RANGEVAL...an array of length 2 containing the lower and upper
+#             boundaries for (the rangeval of argument values
+#  NBASIS ... the number of basis functions
+#  PARAMS ... If the basis is "fourier", this is a single number indicating
+#               the period.  That is, the basis functions are periodic on
+#               the interval (0,PARAMS) or any translation of it.
+#             If the basis is "bspline", the values are interior points at
+#               which the piecewise polynomials join.
+#               Note that the number of basis functions NBASIS is equal
+#               to the order of the Bspline functions plus the number of
+#               interior knots, that is the length of PARAMS.
+#             This means that NBASIS must be at least 1 larger than the
+#               length of PARAMS.
+#  DROPIND...A set of indices in 1:NBASIS of basis functions to drop when
+#              basis objects are arguments.  Default is vector("list",0)
+#              Note that argument NBASIS is reduced by the number of
+#              indices, and the derivative matrices in VALUES are also clipped.
+#  QUADVALS...A NQUAD by 2 matrix.  The firs t column contains quadrature
+#              points to be used in a fixed point quadrature.  The second
+#              contains quadrature weights.  For example, for (Simpson"s
+#              rule for (NQUAD = 7, the points are equally spaced and the
+#              weights are delta.*[1, 4, 2, 4, 2, 4, 1]/3.  DELTA is the
+#              spacing between quadrature points.  The default is
+#              matrix("numeric",0,0).
+#  VALUES ...A list, with entries containing the values of
+#              the basis function derivatives starting with 0 and
+#              going up to the highest derivative needed.  The values
+#              correspond to quadrature points in QUADVALS and it is
+#              up to the user to decide whether or not to multiply
+#              the derivative values by the square roots of the
+#              quadrature weights so as to make numerical integration
+#              a simple matrix multiplication.
+#              Values are checked against QUADVALS to ensure the correct
+#              number of rows, and against NBASIS to ensure the correct
+#              number of columns.
+#              The default value of is VALUES is vector("list",0).
+#              VALUES contains values of basis functions and derivatives at
+#              quadrature points weighted by square root of quadrature weights.
+#              These values are only generated as required, and only if slot
+#              QUADVALS is not matrix("numeric",0,0).
+#  BASISVALUES...A vector of lists, allocated by code such as
+#              vector("list",1).
+#              This field is designed to avoid evaluation of a
+#              basis system repeatedly at a set of argument values.
+#              Each list within the vector corresponds to a specific set
+#              of argument values, and must have at least two components,
+#              which may be tagged as you wish.
+#              The first component in an element of the list vector contains the
+#              argument values.
+#              The second component in an element of the list vector
+#              contains a matrix of values of the basis functions evaluated
+#              at the arguments in the first component.
+#              The third and subsequent components, if present, contain
+#              matrices of values their derivatives up to a maximum
+#              derivative order.
+#              Whenever function getbasismatrix is called, it checks
+#              the first list in each row to see, first, if the number of
+#              argument values corresponds to the size of the first dimension,
+#              and if this test succeeds, checks that all of the argument
+#              values match.  This takes time, of course, but is much
+#              faster than re-evaluation of the basis system.  Even this
+#              time can be avoided by direct retrieval of the desired
+#              array.
+#              For example, you might set up a vector of argument values
+#              called "evalargs" along with a matrix of basis function
+#              values for these argument values called "basismat".
+#              You might want too use tags like "args" and "values",
+#              respectively for these.  You would then assign them
+#              to BASISVALUES with code such as
+#                basisobj$basisvalues <- vector("list",1)
+#                basisobj$basisvalues[[1]] <-
+#                             list(args=evalargs, values=basismat)
 #
 #  Returns
 #  BASISOBJ  ... a basisfd object with slots
@@ -116,8 +116,8 @@ basisfd <- function(type, rangeval, nbasis, params, dropind=vector("list",0),
 #  CREATE_POLYNOMIAL_BASIS  ...  creates a polynomial basis
 #  CREATE_POWER_BASIS       ...  creates a monomial basis
 
-#  Last modified 19 August 2010 by Jim Ramsay
-
+#  Last modified 28 December 2012 by Jim Ramsay
+# value -> values 2012.12.27 by spencer graves
 #  Set up default basis if there are no arguments:
 #     order 2 monomial basis over [0,1]
 
@@ -246,10 +246,31 @@ if(!(length(basisvalues) == 0 || missing(basisvalues) || !is.null(basisvalues)))
 }
 else basisvalues <- vector("list",0)
 
-
 #  check if DROPIND is present, and set to default if not
 
 if(missing(dropind)) dropind <- vector("list",0)
+
+if (length(dropind) > 0) {
+    #  check DROPIND
+    ndrop = length(dropind)
+    if (ndrop >= nbasis) stop('Too many index values in DROPIND.')
+    dropind = sort(dropind)
+    if (ndrop > 1 && any(diff(dropind)) == 0)
+        stop('Multiple index values in DROPIND.')
+    for (i in 1:ndrop) {
+        if (dropind[i] < 1 || dropind[i] > nbasis)
+                stop('A DROPIND index value is out of range.')
+    }
+    #  drop columns from VALUES cells if present
+    nvalues = length(values)
+    if (nvalues > 0 && length(values[[1]] > 0)) {
+        for (ivalue in 1:nvalues) {
+            derivvals = values[[ivalue]]
+            derivvals = derivvals[,-dropind]
+            values[[ivalue]] = derivvals
+        }
+    }
+}
 
 #  select the appropriate type and process
 
@@ -294,9 +315,9 @@ obj.call <- match.call()
 
 #  S4 definition
 
-# basisobj <- new("basisfd", call=obj.call, type=type, rangeval=rangeval, nbasis=nbasis,
-#                 params=params, dropind=dropind, quadvals=quadvals,
-#                 values=values, basisvalues=basisvalues)
+# basisobj <- new("basisfd", call=obj.call, type=type, rangeval=rangeval,
+#                 nbasis=nbasis,  params=params, dropind=dropind,
+#                 quadvals=quadvals, values=values, basisvalues=basisvalues)
 
 #  S3 definition
 
@@ -589,7 +610,6 @@ return(basisequal)
       create.bspline.basis(range1, nbasis, norder, allbreaks)
     return(prodbasisobj)
   }
-#  end if(type1 & type2 == 'bspline')
 
   if (type1 == "fourier" && type2 == "fourier") {
     #  both bases Fourier
@@ -644,10 +664,10 @@ return(basisequal)
 {
   #  select subsets of basis functions in a basis object
 
-    dropind = vector("numeric", 0);
+    dropind = vector("numeric", 0)
     nbasis <- basisobj$nbasis
     for (i in 1:nbasis) {
-        if (!any(subs==i)) dropind = c(dropind, i);
+        if (!any(subs==i)) dropind = c(dropind, i)
     }
     basisobj$dropind <- dropind
     return(basisobj)

@@ -56,7 +56,7 @@ fRegress <- function(y, xfdlist, betalist, wt=NULL,
 #    wt          ... weights for observations
 #    df          ... degrees of freedom for fit
 
-#  Last modified 8 May 2012 by Jim Ramsay
+#  Last modified 28 December 2012 by Jim Ramsay
 
 arglist <- fRegressArgCheck(y, xfdlist, betalist, wt)
 
@@ -74,7 +74,8 @@ wtconst <- var(wt) == 0
 #  branch depending on whether the dependent variable is functional or scalar
 #  --------------------------------------------------------------------------
 
-if (inherits(yfdPar, "fdPar")) {
+if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
+    if (inherits(yfdPar, "fd")) yfdPar = fdPar(yfdPar)
 
     #  ----------------------------------------------------------------
     #           YFDPAR is a functional parameter object

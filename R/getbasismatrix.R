@@ -30,8 +30,7 @@ getbasismatrix <- function(evalarg, basisobj, nderiv=0, returnMatrix=FALSE) {
 #
 #  Note that the first two arguments may be interchanged.
 #
-#  Last modified July 8, 2012 by Spencer Graves
-#    to add column names
+#  Last modified 24 December 2012
 
 ##
 ##  Exchange the first two arguments if the first is an BASIS.FD object
@@ -166,6 +165,10 @@ getbasismatrix <- function(evalarg, basisobj, nderiv=0, returnMatrix=FALSE) {
 #  remove columns for bases to be dropped
 
   if (length(dropind) > 0) basismat <- basismat[,-dropind]
+  if (length(evalarg) == 1) {
+    basismat = matrix(basismat,1,length(basismat))
+  }
+    
 
   if((!returnMatrix) && (length(dim(basismat)) == 2)){
     #  coerce basismat to be nonsparse

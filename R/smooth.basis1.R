@@ -63,8 +63,7 @@ smooth.basis1 <- function (argvals=1:n, y, fdParobj,
 #   PENMAT  the penalty matrix.
 #   Y2CMAP  the matrix mapping the data to the coefficients.
 #
-# last modified 2012.07.04 by Spencer Graves
-#    for argvals of class Date and POSIXct
+# last modified 16 January 2013 by Jim Ramsay
 
 #  This version of smooth.basis, introduced in March 2011, permits ARGVALS
 #  to be a matrix, with the same dimensions as the first two dimensions of Y
@@ -80,6 +79,9 @@ smooth.basis1 <- function (argvals=1:n, y, fdParobj,
 
 #  check Y  and set nrep, nvar and ndim
 
+#  set up matrix or array for coefficients of basis expansion,
+#  as well as names for replications and, if needed, variables 
+ 
   if (is.vector(y))y <- matrix(y,length(y),1)
   dimy <- dim(y)
   n    <- dimy[1]
@@ -100,6 +102,7 @@ smooth.basis1 <- function (argvals=1:n, y, fdParobj,
 #  check fdParobj
 
   fdParobj <- fdParcheck(fdParobj)
+
   fdobj    <- fdParobj$fd
   lambda   <- fdParobj$lambda
   Lfdobj   <- fdParobj$Lfd
@@ -121,37 +124,38 @@ smooth.basis1 <- function (argvals=1:n, y, fdParobj,
 
 # if (matwt) wtmat <- wtvec #  else wtmat <- diag(as.vector(wtvec))
 
-#  extract information from fdParobj
-
-  nderiv   <- Lfdobj$nderiv
-  basisobj <- fdobj$basis
-  nbasis   <- basisobj$nbasis
-  onebasis <- rep(1,nbasis)
-
 #  set up names for first dimension of y
 
   tnames <- dimnames(y)[[1]]
   if (is.null(tnames)) tnames <- 1:n
 
+#  extract information from fdParobj
+
+  nderiv   <- Lfdobj$nderiv
+  basisobj <- fdobj$basis
+  dropind  <- basisobj$dropind
+  ndropind <- length(dropind)
+  nbasis   <- basisobj$nbasis - ndropind 
+
 #  get names for basis functions
 
-  bnames <- fdParobj$fd$basis$names
-
-#  set up matrix or array for coefficients of basis expansion,
-#  as well as names for replications and, if needed, variables
-
+  names <- basisobj$names
+  if (ndropind > 0) {
+    names <- names[-dropind]
+  }
+  
   if (ndim == 2)  {
     coef   <- matrix(0,nbasis,nrep)
     ynames <- dimnames(y)[[2]]
     vnames <- "value"
-    dimnames(coef) <- list(bnames, ynames)
+    dimnames(coef) <- list(names, ynames)
   }
 
   if (ndim == 3)  {
     coef <- array(0,c(nbasis,nrep,nvar))
     ynames <- dimnames(y)[[2]]
     vnames <- dimnames(y)[[3]]
-    dimnames(coef) <- list(bnames, ynames, vnames)
+    dimnames(coef) <- list(names, ynames, vnames)
   }
 
 #  check COVARIATES and set value for q, the number of covariates
@@ -170,6 +174,11 @@ smooth.basis1 <- function (argvals=1:n, y, fdParobj,
     q <- 0
     beta. <- NULL
   }
+
+#  set up names for first dimension of y
+
+  tnames <- dimnames(y)[[1]]
+  if (is.null(tnames)) tnames <- 1:n
 
 #  ----------------------------------------------------------------
 #                set up the linear equations for smoothing
@@ -212,14 +221,12 @@ smooth.basis1 <- function (argvals=1:n, y, fdParobj,
 
     #  the weighted crossproduct of the basis matrix
       Bmat  <- t(basisw) %*% basismat
-    #  Bmat  <- crossprod(basisw,basismat)
       Bmat0 <- Bmat
 
     #  set up right side of normal equations
 
       if (ndim < 3) {
         Dmat <- t(basisw) %*% y
-        # Dmat <- crossprod(basisw,y)
       } else {
         Dmat <- array(0, c(nbasis+q, nrep, nvar))
         for (ivar in 1:nvar) {
@@ -466,7 +473,6 @@ smooth.basis1 <- function (argvals=1:n, y, fdParobj,
     }
 
   }
-
 #  ----------------------------------------------------------------
 #            compute SSE, yhat, GCV and other fit summaries
 #  ----------------------------------------------------------------
@@ -487,7 +493,7 @@ smooth.basis1 <- function (argvals=1:n, y, fdParobj,
     } else {
         temp <- t(basismat) %*% (as.vector(wtvec)*basismat)
     }
-#
+
     if  (lambda > 0) {
         temp <- temp + lambda*penmat
     }
@@ -535,7 +541,7 @@ smooth.basis1 <- function (argvals=1:n, y, fdParobj,
         SSEi <- sum((y[1:n,i] - yhat[,i])^2)
         gcv[i] <- (SSEi/n)/((n - df.)/n)^2
       }
-      if (ndim>1)names(gcv) <- ynames
+      if (ndim > 1) names(gcv) <- ynames
     } else {
       gcv <- matrix(0,nrep,nvar)
       for (ivar in 1:nvar) {

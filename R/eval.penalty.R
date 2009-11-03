@@ -32,7 +32,7 @@ eval.penalty  <- function(basisobj, Lfdobj=int2Lfd(0),
 #                 so be careful about calling CHOL or otherwise
 #                 assuming the range is N - NDERIV.
 
-#  last modified 26 October 2005
+#  last modified 21 December 2012
 
 #  check BASISOBJ
 
@@ -78,9 +78,9 @@ else stop("Basis type not recognizable, can not find penalty matrix")
 dropind <- basisobj$dropind
 nbasis  <- basisobj$nbasis
 
-if(length(dropind) > 0){
+if (length(dropind) > 0) {
     index <- 1:nbasis
-    for (i in 1:length(dropind))   index <- index(index != dropind[i])
+    index <- index[-dropind]
     penaltymat <- penaltymat[index,index]
 }
 

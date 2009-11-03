@@ -205,6 +205,10 @@ hgt1 = growth$hgtf[,1]
 
 # conv=0.1 to reduce the compute time,
 # required to reduce the test time on CRAN
+
+# delete the test on CRAN because it takes too long
+
+if(!CRAN()){
 result <- smooth.monotone(age, hgt1, growfdPar, wgt,
                           conv=0.1)
 #  Extract the functional data object and regression
@@ -222,6 +226,7 @@ accfine <- beta[2]*eval.monfd(agefine, Wfd, 2)
 #  Plot the acceleration curve
 plot(agefine, accfine, type="l")
 lines(c(1,18),c(0,0),lty=4)
+}
 
 }
 % docclass is function
