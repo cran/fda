@@ -1,5 +1,5 @@
-evaldiag.bifd <- function(evalarg, bifdobj,
-                          sLfd=int2Lfd(0), tLfd=int2Lfd(0))
+evaldiag.bifd <- function(evalarg, bifdobj, sLfd=int2Lfd(0), tLfd=int2Lfd(0), 
+                            returnMatrix=FALSE)
 {
 #  EVALDIAG_BIFD  evaluates a bi-functional data object BIFD
 #  with both argument values in array EVALARG.
@@ -9,6 +9,11 @@ evaldiag.bifd <- function(evalarg, bifdobj,
 
 #  last modified 2008(?) replacing Matlab subscripts with R style
 # in lines 70, 77, 78;  previously modified 26 October 2005
+#  RETURNMATRIX ... If False, a matrix in sparse storage model can be returned
+#               from a call to function BsplineS.  See this function for
+#               enabling this option.
+
+#  Last modified 8 May 2012 by Jim Ramsay
 
 #  exchange order if BIFD is the first argument
 if (inherits(evalarg, "bifd")) {
@@ -48,12 +53,12 @@ tLfd <- int2Lfd(tLfd)
 #  compute the basis matrix for SBASISOBJ
 
 snderiv   <- sLfd$nderiv
-sbasismat <- eval.basis(evalarg, sbasisobj, sLfd)
+sbasismat <- eval.basis(evalarg, sbasisobj, sLfd, returnMatrix)
 
 #  compute the basis matrix for tBASISOBJ
 
 tnderiv   <- tLfd$nderiv
-tbasismat <- eval.basis(evalarg, tbasisobj, tLfd)
+tbasismat <- eval.basis(evalarg, tbasisobj, tLfd, returnMatrix)
 
 #  Extract the coefficient matrix
 

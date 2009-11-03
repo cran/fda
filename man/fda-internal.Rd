@@ -70,12 +70,17 @@
 \alias{trapz}
 \alias{ycheck}
 \alias{moreNames}
-\alias{aprops} 
-\alias{BD2} 
-\alias{BD3} 
-\alias{combinat} 
-\alias{estaEntre} 
+\alias{aprops}
+\alias{BD2}
+\alias{BD3}
+\alias{combinat}
+\alias{estaEntre}
 \alias{MBD}
+\alias{expect.phi}
+\alias{expectden.phi}
+\alias{expectden.phiphit}
+\alias{normden.phi}
+\alias{normint.phi}
 
 % docclass is function
 \keyword{internal}

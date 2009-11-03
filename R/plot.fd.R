@@ -41,8 +41,7 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
   #    par(mfrow=c(1,nvar),pty="s")
 
 
-# Last modified 2008.12.18 by Spencer Graves
-# previously modified 25 August 2008 by Jim Ramsay
+# Last modified 2 May 2012 by Jim Ramsay
 ##
 ## 1.  Basic checks
 ##
@@ -104,7 +103,7 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
   ndim   <- length(coefd)
   # Number of basis functions
   nbasis    <- coefd[1]
-  if(is.null(nx)) nx <- 10*nbasis + 1
+  if(is.null(nx)) nx <- max(c(501,10*nbasis + 1))
   # Number of functional observations
   nrep   <- coefd[2]
   if (ndim > 2) nvar <- coefd[3] else nvar <- 1
@@ -135,7 +134,7 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
   #  evaluate LFDOBJ(FDOBJ) at the argument values
 
   fdmat    <- eval.fd(y, fdobj, Lfdobj)
-  rangey   <- range(c(fdmat))
+  rangey   <- range(fdmat)
   if (is.null(ylim)) ylim <- rangey
 
   #  set up axis labels and,

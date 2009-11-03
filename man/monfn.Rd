@@ -3,13 +3,17 @@
 \title{Evaluates a monotone function}
 \description{Evaluates a monotone function}
 \usage{
-  monfn(argvals, Wfdobj, basislist=vector("list", JMAX))
+  monfn(argvals, Wfdobj, basislist=vector("list", JMAX), returnMatrix=FALSE)
 }
 \arguments{
   \item{argvals}{A numerical vector at which function and derivative are
                  evaluated.}
   \item{Wfdobj}{A functional data object.}
   \item{basislist}{A list containing values of basis functions.}
+  \item{returnMatrix}{
+    logical:  If TRUE,  a two-dimensional is returned using a
+    special class from the Matrix package.
+  }
 }
 \value{
   A numerical vector or matrix containing the values the warping function h.

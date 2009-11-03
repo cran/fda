@@ -23,7 +23,7 @@ function pcastr = pca_fd(fdobj, nharm, harmfdPar, centerfns)
 %
 %  If NHARM = 0, all fields except MEANFD are empty.
 
-%  Last modified:  9 November 2010 by Jim Ramsay
+%  Last modified:  24 April 2012 by Jim Ramsay
 
 %  check FDOBJ
 
@@ -31,7 +31,7 @@ if ~isa_fd(fdobj)
     error ('First argument is not a functional data object.');
 end
 
-%  get basis information
+%  get basis information for functional data
 
 fdbasis  = getbasis(fdobj);
 
@@ -85,9 +85,9 @@ if centerfns ~= 0
 end
 
 %  set up HARMBASIS
-%  currently, this is forced to be the same as FDBASIS
 
-harmbasis = fdbasis;
+harmbasis = getbasis(getfd(harmfdPar));
+nhbasis = getnbasis(harmbasis);
 
 %  set up LFDOBJ
 
@@ -124,42 +124,41 @@ else
     ctemp = coef;
 end
 
-%  set up cross product and penalty matrices
+%  set up cross product Lmat for harmonic basis, 
+%  roughness penalty matrix Rmat, and
+%  penalized cross product matrix Lmat.
 
-Cmat = ctemp*ctemp'./nrep;
-Jmat = eval_penalty(harmbasis, int2Lfd(0));
+Lmat = eval_penalty(harmbasis, int2Lfd(0));
 if lambda > 0
-    Kmat = eval_penalty(harmbasis, Lfdobj);
-    Wmat = Jmat + lambda .* Kmat;
-else
-    Wmat = Jmat;
+    Rmat = eval_penalty(harmbasis, Lfdobj);
+    Lmat = Lmat + lambda .* Rmat;
 end
-Wmat = (Wmat + Wmat')/2;
+Lmat = (Lmat + Lmat')/2;
 
-%  compute the Choleski factor of Wmat
+%  Choleski factor Mmat of Lmat = Mmat'*Mmat
 
-Lmat    = chol(Wmat);
-Lmatinv = inv(Lmat);
-JLinv = Jmat/Lmatinv;
+Mmat    = chol(Lmat);
+Mmatinv = inv(Mmat);
 
-%  set up matrix for eigenanalysis
+%  coefficient cross product matrix for covariance operator
+
+Wmat = ctemp*ctemp'./nrep;
+
+%  set up matrix for eigenanalysis depending on whether
+%  a special basis was supplied for the eigenfunctions or not
+
+Jmat = inprod(harmbasis, fdbasis);
+MIJW = Mmatinv'*Jmat;
 
 if nvar == 1
-    if lambda > 0
-        Cmat = JLinv' * Cmat * JLinv;
-    else
-        Cmat = Lmat * Cmat * Lmat';
-    end
+    Cmat = MIJW*Wmat*MIJW';
 else
+    Cmat = zeros(nvar*nhbasis);
     for i = 1:nvar
         indexi =   (1:nbasis) + (i-1)*nbasis;
         for j = 1:nvar
             indexj = (1:nbasis) + (j-1)*nbasis;
-            if lambda > 0
-                Cmat(indexi,indexj) = JLinv * Cmat(indexi,indexj) * JLinv;
-            else
-                Cmat(indexi,indexj) = Lmat * Cmat(indexi,indexj) * Lmat';
-            end
+            Cmat(indexi,indexj) = MIJW*Wmat(indexi,indexj)*MIJW';
         end
     end
 end
@@ -170,7 +169,7 @@ Cmat = (Cmat + Cmat')./2;
 [eigvecs, eigvals] = eig(Cmat);
 [eigvals, indsrt ] = sort(diag(eigvals));
 eigvecs = eigvecs(:,indsrt);
-neig    = nvar*nbasis;
+neig    = nvar*getnbasis(harmbasis);
 indx    = neig + 1 - (1:nharm);
 eigvals = eigvals(neig + 1 - (1:neig));
 eigvecs = eigvecs(:,indx);
@@ -184,7 +183,7 @@ varprop = eigvals(1:nharm)./sum(eigvals);
 harmnames = getnames(fdobj);
 %  Name and labels for harmonics
 harmlabels = ['I   '; 'II  '; 'III '; 'IV  '; 'V   '; ...
-    'VI  '; 'VII '; 'VIII'; 'IX  '; 'X   '];
+              'VI  '; 'VII '; 'VIII'; 'IX  '; 'X   '];
 if nharm <= 10
     harmnames2    = cell(1,2);
     harmnames2{1} = 'Harmonics';
@@ -196,11 +195,11 @@ end
 %  Name and labels for variables
 if iscell(harmnames{3})
     harmnames3    = harmnames{3};
-    harmnames3{1} = ['Harmonics for',harmnames3{1}];
+    harmnames3{1} = ['Harmonics for ',harmnames3{1}];
     harmnames{3}  = harmnames3;
 else
     if ischar(harmnames{3}) && size(harmnames{3},1) == 1
-        harmnames{3} = ['Harmonics for',harmnames{3}];
+        harmnames{3} = ['Harmonics for ',harmnames{3}];
     else
         harmnames{3} = 'Harmonics';
     end
@@ -218,22 +217,23 @@ else
         harmcoef(:,:,j) = Lmat\eigvecsj;
     end
 end
-% harmfd = fd(harmcoef, fdbasis, harmnames);
-harmfd = fd(harmcoef, fdbasis);
+
+harmfd = fd(harmcoef, harmbasis, harmnames);
+% harmfd = fd(harmcoef, fdbasis);
 
 %  set up harmscr
 
 if nvar == 1
     harmscr = inprod(fdobj, harmfd);
 else
-    harmscr = zeros(nrep, nharm, nvar);
-    coefarray = getcoef(fdobj);
+    harmscr       = zeros(nrep, nharm, nvar);
+    coefarray     = getcoef(fdobj);
     harmcoefarray = getcoef(harmfd);
     for j=1:nvar
-        coefj = squeeze(coefarray(:,:,j));
+        coefj     = squeeze(coefarray(:,:,j));
         harmcoefj = squeeze(harmcoefarray(:,:,j));
-        fdobjj = fd(coefj, fdbasis);
-        harmfdj = fd(harmcoefj, fdbasis);
+        fdobjj    = fd(coefj, fdbasis);
+        harmfdj   = fd(harmcoefj, fdbasis);
         harmscr(:,:,j) = inprod(fdobjj,harmfdj);
     end
 end
@@ -248,7 +248,7 @@ else
         fdhatcoef(:,:,j) = harmcoef(:,:,j)*harmscr(:,:,j)';
     end
 end
-fdhatfd = fd(fdhatcoef, fdbasis);
+fdhatfd = fd(fdhatcoef, harmbasis);
 
 %  set up structure object PCASTR
 

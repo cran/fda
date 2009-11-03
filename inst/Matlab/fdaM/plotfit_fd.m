@@ -16,7 +16,7 @@ function plotfit_fd(y, argvals, fdobj, residual, sortwrd, rng, index)
 %                (either sorted or not)
 %  NFINE     ... number of points to use for plotting curves
 
-%  Last modified 3 July 2011
+%  Last modified 24 December 2011
 
 if nargin < 5 || isempty(sortwrd),  sortwrd  = 0;   end
 if nargin < 4 || isempty(residual), residual = 0;   end
@@ -50,8 +50,8 @@ nfine = max([201, 10*nbasis+1]);
 
 fdnames   = getnames(fdobj);
 argname   = fdnames{1};
-casenames = getfdlabels(fdnames{2});
-varnames  = getfdlabels(fdnames{3});
+casenames = fdnames{2};
+varnames  = fdnames{3};
 
 %  compute fitted values for evalargs and fine mesh of values
 
@@ -88,8 +88,8 @@ y     = y    (:,index,:);
 res   = res  (:,index,:);
 yfine = yfine(:,index,:);
 MSE   = MSE  (:,index);
-if ~isempty(casenames), casenames = casenames(index,:); end
-casenum = casenum(index);
+% if ~isempty(casenames), casenames = casenames(index,:); end
+% casenum = casenum(index);
 nrep    = length(index);
 
 %  select values in ARGVALS, Y, and YHAT within RNG
@@ -114,17 +114,25 @@ if residual
 	        plot(argvals, res(:,i,j), '.', [rng(1),rng(2)], [0,0], ':')
             axis([rng(1),rng(2),ylimit(1),ylimit(2)])
 	        xlabel(['\fontsize{12} ',argname])
-            if isempty(varnames)
-                ylabel(['\fontsize{12} Residual for function ',num2str(j)])
+            if iscell(varnames)
+                ylabel(['\fontsize{12} ', varnames{2}(j,:), ' residual'])
             else
-                ylabel(['\fontsize{12} Residual for ',varnames(j,:)])
+                ylabel(['\fontsize{12} ', varnames, ' residual'])
             end
-            if isempty(casenames)
-	            title(['\fontsize{13} Case ',num2str(casenum(i)), ...
-	                   '  RMS residual = ',num2str(sqrt(MSE(j,i)))])
+            if nrep > 1
+                if iscell(casenames)
+                    title(['\fontsize{12} ', casenames{2}(j,:), ...
+                        '  RMS residual = ',num2str(sqrt(MSE(j,i)))])
+                else
+                    title(['\fontsize{12} Case ', num2str(i), ...
+                        '  RMS residual = ',num2str(sqrt(MSE(j,i)))])
+                end
             else
-	            title(['\fontsize{13} Case ',casenames(i,:), ...
-	                   '  RMS residual = ',num2str(sqrt(MSE(j,i)))])
+                if iscell(casenames)
+                    title(['\fontsize{12} RMS residual = ',num2str(sqrt(MSE(j,i)))])
+                else
+                    title(['\fontsize{12} RMS residual = ',num2str(sqrt(MSE(j,i)))])
+                end
             end
         end
         pause
@@ -139,17 +147,25 @@ if residual
             set(phdl, 'LineWidth', 1.5)
             axis([rng(1),rng(2),ylimit(1),ylimit(2)])
 	        xlabel(['\fontsize{12} ',argname])
-            if isempty(varnames)
-                ylabel(['\fontsize{12} Function ',num2str(j),' ',fdnames{3}])
+            if iscell(varnames)
+                ylabel(['\fontsize{12} ', varnames{2}(j,:)])
             else
-                ylabel(['\fontsize{12}', varnames(j,:)])
+                ylabel(['\fontsize{12} ', varnames])
             end
-            if isempty(casenames)
- 	            title(['\fontsize{13} Case ',num2str(casenum(i)), ...
-	                       '  RMS residual = ',num2str(sqrt(MSE(j,i)))])
+            if nrep > 1
+                if iscell(casenames)
+                    title(['\fontsize{12} ', casenames{2}(j,:), ...
+                        '  RMS residual = ',num2str(sqrt(MSE(j,i)))])
+                else
+                    title(['\fontsize{12} Case ', num2str(i), ...
+                        '  RMS residual = ',num2str(sqrt(MSE(j,i)))])
+                end
             else
-	            title(['\fontsize{13} Case ',casenames(i,:), ...
-	                   '  RMS residual = ',num2str(sqrt(MSE(j,i)))])
+                if iscell(casenames)
+                    title(['\fontsize{12} RMS residual = ',num2str(sqrt(MSE(j,i)))])
+                else
+                    title(['\fontsize{12} RMS residual = ',num2str(sqrt(MSE(j,i)))])
+                end
             end
             if nrep > 1 || nvar > 1, pause;  end
         end

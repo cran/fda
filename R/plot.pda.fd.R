@@ -126,7 +126,8 @@ plot.pda.fd = function(x, whichdim=1,npts=501,...)
     }
     else{
       for(j in 1:m){
-        X11()
+        #X11()
+        dev.new()
         par(mfrow=c(m,d))
         for(i in 1:m){
           for(k in 1:d){

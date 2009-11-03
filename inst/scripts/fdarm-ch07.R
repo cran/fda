@@ -5,19 +5,19 @@
 
 #  Remarks and disclaimers
 
-#  These R commands are either those in this book, or designed to 
+#  These R commands are either those in this book, or designed to
 #  otherwise illustrate how R can be used in the analysis of functional
-#  data.  
-#  We do not claim to reproduce the results in the book exactly by these 
+#  data.
+#  We do not claim to reproduce the results in the book exactly by these
 #  commands for various reasons, including:
 #    -- the analyses used to produce the book may not have been
 #       entirely correct, possibly due to coding and accuracy issues
-#       in the functions themselves 
-#    -- we may have changed our minds about how these analyses should be 
+#       in the functions themselves
+#    -- we may have changed our minds about how these analyses should be
 #       done since, and we want to suggest better ways
 #    -- the R language changes with each release of the base system, and
 #       certainly the functional data analysis functions change as well
-#    -- we might choose to offer new analyses from time to time by 
+#    -- we might choose to offer new analyses from time to time by
 #       augmenting those in the book
 #    -- many illustrations in the book were produced using Matlab, which
 #       inevitably can imply slightly different results and graphical
@@ -86,8 +86,8 @@ print(logprec.pcalist$values[1:4])
 
 plot.pca.fd(logprec.pcalist)
 
-%  The expansion supplied by the function is too large,
-%  and here we supply a smaller value, 0.5
+#  The expansion supplied by the function is too large,
+#  and here we supply a smaller value, 0.5
 
 plot(logprec.pcalist, expand=.5)
 
@@ -181,7 +181,7 @@ plot(1:neig, log10(fdaeig[1:neig]), "b",
 lines(1:neig, c[1]+ c[2]*(1:neig), lty=2)
 par(op)
 
-# Figure 7.7 varimax rotation 
+# Figure 7.7 varimax rotation
 
 #  set up mean function
 
@@ -227,7 +227,7 @@ j=2
 tempav = CanadianWeather$dailyAv[
               dayOfYearShifted, , 'Temperature.C']
 
-lambda   = 1e2 
+lambda   = 1e2
 fdParobj = fdPar(daybasis, harmaccelLfd, lambda)
 temp.fd  = smooth.basis(day.5, tempav, fdParobj)$fd
 temp.fd$fdnames = list("Day (July 2 to June 30)",
@@ -265,9 +265,9 @@ placeindex = c(35,30,31,19,33,25,24,17,16,8,14,12,15,10,27,6,1,29)
 
 plot(ccascr.temp[,1], ccascr.logprec[,1], type="p", pch="*", cex=2,
      xlim=c(-40,80),
-     xlab="Temperature Canonical Weight", 
+     xlab="Temperature Canonical Weight",
      ylab="Log Precipitation Canonical Weight")
-text(ccascr.temp[placeindex,1]+10, ccascr.logprec[placeindex,1], 
+text(ccascr.temp[placeindex,1]+10, ccascr.logprec[placeindex,1],
      CanadianWeather$place[placeindex])
 
 ##

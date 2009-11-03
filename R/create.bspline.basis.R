@@ -1,8 +1,8 @@
 create.bspline.basis <- function (rangeval=NULL, nbasis=NULL,
-                                  norder=4,        breaks=NULL,
-                                  dropind=NULL,    quadvals=NULL,
-                                  values=NULL,     basisvalues=NULL,
-                                  names="bspl", axes=NULL)
+                                  norder=4,      breaks=NULL,
+                                  dropind=NULL,  quadvals=NULL,
+                                  values=NULL,   basisvalues=NULL,
+                                  names="bspl")
 {
 #  This function creates a bspline functional data basis.
 #  Arguments
@@ -95,8 +95,7 @@ create.bspline.basis <- function (rangeval=NULL, nbasis=NULL,
 #  Returns
 #  BASISFD  ... a functional data basis object
 
-#  Last modified        1 November  2008 by Spencer Graves
-#  Previously modified 28 October   2008 by Jim Ramsay
+#  Last modified  7 May 2012 by Jim Ramsay
 
 #  -----------------------------------------------------------------------------
 #  Default basis for missing arguments:  A B-spline basis over [0,1] of
@@ -120,7 +119,7 @@ create.bspline.basis <- function (rangeval=NULL, nbasis=NULL,
 #    nbasis      <- 2
 #    params      <- NULL
 #    dropind     <- NULL
-#   quadvals    <- NULL
+#    quadvals    <- NULL
 #    values      <- NULL
 #    basisvalues <- NULL
 #    basisobj  <- list(type=type, rangeval=rangeval, nbasis=nbasis,
@@ -190,12 +189,6 @@ create.bspline.basis <- function (rangeval=NULL, nbasis=NULL,
     stop('rangeval[1] must be less than rangeval[2];  instead ',
          'rangeval[1] = ', rangeval[1], c('==', '>')[diff(rangeval)<0],
          ' rangeval[2] = ', rangeval[2])
-#
-#  if(!is.null(nbasis))
-#    stop('length(rangeval)>2 and nbasis can not both be provided; ',
-#             ' length(rangeval) = ', length(rangeval),
-#             ' and nbasis = ', nbasis)
-#  }
 ##
 ## 2.  Check norder
 ##
@@ -243,7 +236,6 @@ create.bspline.basis <- function (rangeval=NULL, nbasis=NULL,
 #  of NBASIS and NORDER via the equation
 #        NBASIS = NORDER + NBREAKS - 2
       if(!is.null(breaks)){
-#       if (nbreaks > 0) {
         if (nbreaks < 2)
           stop("Number of values in argument 'breaks' less than 2.")
         if(breaks[1] != rangeval[1] || breaks[nbreaks] != rangeval[2])
@@ -331,7 +323,7 @@ create.bspline.basis <- function (rangeval=NULL, nbasis=NULL,
 ##
 ## 9.  Done
 ##
-  if(!is.null(axes))basisobj$axes <- axes
+##  if(!is.null(axes))basisobj$axes <- axes
   basisobj
 
 }

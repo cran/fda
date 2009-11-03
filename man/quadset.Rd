@@ -1,19 +1,19 @@
 \name{quadset}
 \alias{quadset}
 \title{
-  Quadrature points and weights for Simpson's rule 
+  Quadrature points and weights for Simpson's rule
 }
 \description{
-  Set up quadrature points and weights for Simpson's rule.  
+  Set up quadrature points and weights for Simpson's rule.
 }
 \usage{
-quadset(nquad=5, basisobj=NULL, breaks) 
+quadset(nquad=5, basisobj=NULL, breaks, returnMatrix=FALSE)
 }
 \arguments{
   \item{nquad}{
     an odd integer at least 5 giving the number of evenly spaced
     Simpson's rule quadrature points to use over each interval
-    (breaks[i], breaks[i+1]). 
+    (breaks[i], breaks[i+1]).
   }
   \item{basisobj}{
     the basis object that will contain the quadrature points and weights
@@ -24,6 +24,10 @@ quadset(nquad=5, basisobj=NULL, breaks)
     defined, and the final value must be the end point.  If this is not
     supplied, and 'basisobj' is of type 'bspline', the knots are used as
     these values.
+  }
+  \item{returnMatrix}{
+    logical:  If TRUE,  a two-dimensional is returned using a
+    special class from the Matrix package.
   }
 }
 \details{
@@ -41,14 +45,14 @@ quadset(nquad=5, basisobj=NULL, breaks)
 \value{
   If is.null(basisobj), quadset returns a 'quadvals' matrix with columns
   quadpts and quadwts.  Otherwise, it returns basisobj with the
-  two components set as follows:   
+  two components set as follows:
 
   \item{quadvals}{
-    cbind(quadpts=quadpts, quadwts=quadwts)    
+    cbind(quadpts=quadpts, quadwts=quadwts)
   }
   \item{value}{
     a list with two components containing eval.basis(quadpts, basisobj,
-    ival-1) for ival=1, 2.  
+    ival-1) for ival=1, 2.
   }
 
 }
@@ -60,7 +64,7 @@ quadset(nquad=5, basisobj=NULL, breaks)
 \examples{
 (qs7.1 <- quadset(nquad=7, breaks=c(0, .3, 1)))
 # cbind(quadpts=c(seq(0, 0.3, length=7),
-#              seq(0.3, 1, length=7)), 
+#              seq(0.3, 1, length=7)),
 #    quadwts=c((0.3/18)*c(1, 4, 2, 4, 2, 4, 1),
 #              (0.7/18)*c(1, 4, 2, 4, 2, 4, 1) ) )
 
@@ -73,15 +77,15 @@ bspl2.2a$quadvals
 #       quadwts=rep(c(1,4,2,4,1)/24, 2) )
 bspl2.2a$values
 # a list of length 2
-# [[1]] = matrix of dimension c(10, 3) with the 3 basis 
+# [[1]] = matrix of dimension c(10, 3) with the 3 basis
 #      functions evaluated at the 10 quadrature points:
 # values[[1]][, 1] = c(1, .75, .5, .25, rep(0, 6))
 # values[[1]][, 2] = c(0, .25, .5, .75, 1, .75, .5, .25, 0)
 # values[[1]][, 3] = values[10:1, 1]
 #
 # values[[2]] = matrix of dimension c(10, 3) with the
-#     first derivative of values[[1]], being either 
-#    -2, 0, or 2.  
+#     first derivative of values[[1]], being either
+#    -2, 0, or 2.
 }
 % docclass is function
 \keyword{smooth}

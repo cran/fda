@@ -11,18 +11,18 @@
   may not be a satisfactory smooth of the data, and consequently that it
   may be necessary to use function \code{smooth.basis} instead, the help
   file for which provides a great deal more information than is provided
-  here.  
-  Also, function \code{Data2fd} can swap the first two arguments, 
-  \code{argvals} and \code{y} if it appears that they have been included 
+  here.
+  Also, function \code{Data2fd} can swap the first two arguments,
+  \code{argvals} and \code{y} if it appears that they have been included
   in reverse order.  A warning message is returned if this swap takes place.
   Any such automatic decision, though, has the possibility of being wrong,
   and the results should be carefully checked.  Preferably, the order of
-  the arguments should be respected: \code{argvals} comes first and 
+  the arguments should be respected: \code{argvals} comes first and
   \code{y} comes second.
 }
 \usage{
 Data2fd(argvals=NULL, y=NULL, basisobj=NULL, nderiv=NULL,
-        lambda=3e-8/diff(range(argvals)), fdnames=NULL, covariates=NULL, 
+        lambda=3e-8/diff(range(argvals)), fdnames=NULL, covariates=NULL,
                          method="chol", dfscale=1)
 }
 \arguments{
@@ -187,7 +187,7 @@ Data2fd(argvals=NULL, y=NULL, basisobj=NULL, nderiv=NULL,
 ##
 ## Simplest possible example:  constant function
 ##
-# 1 basis, order 1 = degree 0 = constant function 
+# 1 basis, order 1 = degree 0 = constant function
 b1.1 <- create.bspline.basis(nbasis=1, norder=1)
 # data values: 1 and 2, with a mean of 1.5
 y12 <- 1:2
@@ -205,6 +205,9 @@ eval.fd(seq(0, 1, .2), fd1.1.5)
 ##
 ## step function smoothing
 ##
+sessionInfo()
+find("crossprod")
+
 # 2 step basis functions: order 1 = degree 0 = step functions
 b1.2 <- create.bspline.basis(nbasis=2, norder=1)
 #  fit the data without smoothing

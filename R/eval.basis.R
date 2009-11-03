@@ -1,4 +1,5 @@
-predict.basisfd <- function(object, newdata=NULL, Lfdobj=0, ...){
+predict.basisfd <- function(object, newdata=NULL, Lfdobj=0, 
+                            returnMatrix=FALSE, ...){
   if(is.null(newdata)){
     type <- object$type
     if(length(type) != 1)
@@ -10,10 +11,10 @@ predict.basisfd <- function(object, newdata=NULL, Lfdobj=0, ...){
       else object$rangeval
     }
   }
-  eval.basis(newdata, object, Lfdobj)
+  eval.basis(newdata, object, Lfdobj, returnMatrix)
 }
 
-eval.basis <- function(evalarg, basisobj, Lfdobj=0) {
+eval.basis <- function(evalarg, basisobj, Lfdobj=0, returnMatrix=FALSE) {
 #  Computes the basis matrix evaluated at arguments in EVALARG associated
 #    with basis.fd object BASISOBJ.  The basis matrix contains the values
 #    at argument value vector EVALARG of applying the nonhomogeneous
@@ -21,14 +22,17 @@ eval.basis <- function(evalarg, basisobj, Lfdobj=0) {
 #    LFD is 0, and the basis functions are simply evaluated at argument
 #    values in EVALARG.
 #
-#  If LFD is a functional data object with m + 1 functions c_1, ... c_{m+1}, then it
-#    is assumed to define the order m HOMOGENEOUS linear differential operator
-#  Lx(t) = c_1(t) + c_2(t)x(t) + c_3(t)Dx(t) + ... + c_{m+1}D^{m-1}x(t) + D^m x(t).
+#  If LFD is a functional data object with m + 1 functions c_1, ... c_{m+1}, 
+#   then it is assumed to define the order m HOMOGENEOUS linear differential 
+#   operator
+#
+#            Lx(t) = c_1(t) + c_2(t)x(t) + c_3(t)Dx(t) + ... + 
+#                    c_{m+1}D^{m-1}x(t) + D^m x(t).
 #
 #  If the basis type is either polygonal or constant, LFD is ignored.
 #
 #  Arguments:
-#  EVALARG ... Either a vector of values at which all functions are to evaluated,
+#  EVALARG ... Either a vector of values at which all functions are evaluated,
 #              or a matrix of values, with number of columns corresponding to
 #              number of functions in argument FD.  If the number of evaluation
 #              values varies from curve to curve, pad out unwanted positions in
@@ -37,10 +41,13 @@ eval.basis <- function(evalarg, basisobj, Lfdobj=0) {
 #  BASISOBJ ... A basis object
 #  LFDOBJ   ... A linear differential operator object
 #               applied to the basis functions before they are to be evaluated.
+#  RETURNMATRIX ... If False, a matrix in sparse storage model can be returned
+#               from a call to function BsplineS.  See this function for
+#               enabling this option.
 
 #  Note that the first two arguments may be interchanged.
 
-#  Last modified 22 December 2007
+#  Last modified 7 May 2012 by Jim Ramsay
 
 #  Exchange the first two arguments if the first is an BASIS.FD object
 #    and the second numeric
@@ -76,14 +83,13 @@ bwtlist <- Lfdobj$bwtlist
 
 #  get highest order of basis matrix
 
-evalarray <- as.matrix(getbasismatrix(evalarg, basisobj, nderiv))
-nbasis    <- dim(evalarray)[2]
-oneb      <- matrix(1,1,nbasis)
+basismat <- getbasismatrix(evalarg, basisobj, nderiv, returnMatrix)
+nbasis   <- dim(basismat)[2]
+oneb     <- matrix(1,1,nbasis)
 
 #  Compute the weighted combination of derivatives is
 #  evaluated here if the operator is not defined by an
 #  integer and the order of derivative is positive.
-
 
 if (nderiv > 0) {
 	nonintwrd <- FALSE
@@ -96,15 +102,19 @@ if (nderiv > 0) {
         for (j in 1:nderiv) {
             bfd   <- bwtlist[[j]]
             if (!all(c(bfd$coefs) == 0.0)) {
-                wjarray   <- eval.fd(evalarg, bfd)
-                Dbasismat <- getbasismatrix(evalarg, basisobj, j-1)
-                evalarray <- evalarray + (wjarray %*% oneb)*Dbasismat
+                wjarray   <- eval.fd(evalarg, bfd, 0, returnMatrix)
+                Dbasismat <- getbasismatrix(evalarg, basisobj, j-1, 
+                                             returnMatrix)
+                basismat  <- basismat + (wjarray %*% oneb)*Dbasismat
             }
         }
     }
 }
 
-return(evalarray)
+if((!returnMatrix) && (length(dim(basismat)) == 2)){
+    return(as.matrix(basismat))
+}
+return(basismat)
 
 }
 

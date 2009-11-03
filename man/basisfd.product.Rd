@@ -2,17 +2,17 @@
 \alias{basisfd.product}
 \alias{*.basisfd}
 \title{
-  Product of two basisfd objects 
+  Product of two basisfd objects
 }
 \description{
    pointwise multiplication method for basisfd class
 }
 \usage{
-"*.basisfd"(basisobj1, basisobj2)
+\method{*}{basisfd}(basisobj1, basisobj2)
 }
 \arguments{
 \item{basisobj1, basisobj2}{
-  objects of class basisfd 
+  objects of class basisfd
 }
 }
 \details{
@@ -26,15 +26,15 @@
        of the multiplicities of the value in the two break sequences.
        That is, no knot in the product knot sequence will have a
        multiplicity greater than the multiplicities of this value
-       in the two knot sequences.  
+       in the two knot sequences.
        The rationale this rule is that order of differentiability
        of the product at eachy value will be controlled  by
-       whichever knot sequence has the greater multiplicity.  
+       whichever knot sequence has the greater multiplicity.
        In the case where one of the splines is order 1, or a step
        function, the problem is dealt with by replacing the
        original knot values by multiple values at that location
        to give a discontinuous derivative.
-   (2) if both bases are Fourier bases, AND the periods are the 
+   (2) if both bases are Fourier bases, AND the periods are the
        the same, the product is a Fourier basis with number of
        basis functions the sum of the two numbers of basis fns.
    (3) if only one of the bases is B-spline, the product basis
@@ -42,7 +42,7 @@
        higher.
    (4) in all other cases, the product is a B-spline basis with
        number of basis functions equal to the sum of the two
-       numbers of bases and equally spaced knots.  
+       numbers of bases and equally spaced knots.
 
 }
 \seealso{

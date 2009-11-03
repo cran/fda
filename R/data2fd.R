@@ -1,5 +1,5 @@
 Data2fd <- function(argvals=NULL, y=NULL, basisobj=NULL, nderiv=NULL,
-                    lambda=3e-8/diff(range(argvals)), fdnames=NULL, 
+                    lambda=3e-8/diff(range(argvals)), fdnames=NULL,
                     covariates=NULL, method="chol", dfscale=1)
 {
 ## Change proposed by Spencer Graves 2011.01.10:
@@ -24,9 +24,9 @@ Data2fd <- function(argvals=NULL, y=NULL, basisobj=NULL, nderiv=NULL,
 #  All functional objects have a one-dimensional argument.  In the above
 #    examples, this argument is time measured in months or days.
 #
-#  It is now possible to call data2fd with an argument sequence
+#  It is now possible to call Data2fd with an argument sequence
 #  that permits a penalization of the dim of a derivative that
-#  can be specified.  That is, this gives data2fd some of the
+#  can be specified.  That is, this gives Data2fd some of the
 #  capability of smooth.basis, except for the possibility of
 #  linear differential operators other than D^m.
 #
@@ -165,7 +165,7 @@ Data2fd <- function(argvals=NULL, y=NULL, basisobj=NULL, nderiv=NULL,
 #
   smBasis <- with(argChk, smooth.basisPar(argvals=argvals, y=y,
                 fdobj=basisobj, Lfdobj=nderiv, lambda=lambda,
-                fdnames=fdnames, 
+                fdnames=fdnames,
                 covariates=covariates, method="chol", dfscale=dfscale) )
 #
   smBasis$fd

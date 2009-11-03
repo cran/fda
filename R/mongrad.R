@@ -1,6 +1,7 @@
 #  --------------------------------------------------------------------------
 
-mongrad <- function(x, Wfdobj, basislist=vector("list",JMAX)) {
+mongrad <- function(x, Wfdobj, basislist=vector("list",JMAX), 
+                    returnMatrix=FALSE) {
 #  Evaluates the gradient with respect to the coefficients in Wfdobj
 #     of a monotone function of the form
 #            h(x) = [D^{-1} exp Wfdobj](x)
@@ -13,9 +14,11 @@ mongrad <- function(x, Wfdobj, basislist=vector("list",JMAX)) {
 #  BASISLIST ... a list containing values of basis functions
 #  Returns:
 #  GVAL   ... value of gradient at input values in X.
+#  RETURNMATRIX ... If False, a matrix in sparse storage model can be returned
+#               from a call to function BsplineS.  See this function for
+#               enabling this option.
 
-#  modified 21 October 2008 by Jim Ramsay
-#  last modifed 24 April 2009 by C.J. Wong
+#  Last modified 9 May 2012 by Jim Ramsay
 
   JMAX <- 15
   JMIN <- 11
@@ -47,32 +50,31 @@ mongrad <- function(x, Wfdobj, basislist=vector("list",JMAX)) {
   j   <- 1
   tval <- rangeval
   if (is.null(basislist[[j]])) {
-      bmat <- getbasismatrix(tval, basisfd)
+      bmat <- getbasismatrix(tval, basisfd, 0, returnMatrix)
       basislist[[j]] <- bmat
   } else {
       bmat <- basislist[[j]]
   }
-  fx   <- exp(bmat %*% coef)
-  fval <- outer(c(fx),onebas)*bmat
+  fx   <- as.matrix(exp(bmat %*% coef))
+  fval <- as.matrix(outer(c(fx),onebas)*bmat)
   smat[1,]  <- width*apply(fval,2,sum)/2
   tnm <- 0.5
 
   #  now iterate to convergence
   for (iter in 2:JMAX) {
     tnm  <- tnm*2
-    del  <- width/tnm
-   
+    del  <- width/tnm  
     flag <- ifelse(rangeval[1]+del/2 >= rangeval[2]-del/2, -1, 1)
     tj   <- seq(rangeval[1]+del/2, rangeval[2]-del/2, by=flag*abs(del))
     tval <- c(tval, tj)
     if (is.null(basislist[[iter]])) {
-        bmat <- getbasismatrix(tj, basisfd)
+        bmat <- getbasismatrix(tj, basisfd, 0, returnMatrix)
         basislist[[iter]] <- bmat
     } else {
         bmat <- basislist[[iter]]
     }
-    fx   <- exp(bmat %*% coef)
-    gval <- outer(c(fx),onebas)*bmat
+    fx   <- as.matrix(exp(bmat %*% coef))
+    gval <- as.matrix(outer(c(fx),onebas)*bmat)
     fval <- rbind(fval,gval)
     smat[iter,] <- (smat[iter-1,] + width*apply(fval,2,sum)/tnm)/2
     if (iter >= max(c(5,JMIN))) {

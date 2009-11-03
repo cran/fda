@@ -1,12 +1,11 @@
-#  Last modified 2009.03.14 by Spencer Graves
-#  previously  modified 2008.11.22 by Spencer Graves
+predict.monfd <- function(object, newdata=NULL, Lfdobj=0,
+                            returnMatrix=FALSE, ...) {
 
-predict.monfd <- function(object, newdata=NULL, Lfdobj=0, ...){
   if(is.null(newdata))newdata <- object$argvals
 ##
 ## 1.  eval.monfd
 ##
-  evalMon <- eval.monfd(newdata, object$Wfdobj, Lfdobj)
+  evalMon <- eval.monfd(newdata, object$Wfdobj, Lfdobj, returnMatrix)
 ##
 ## 2.  beta
 ##
@@ -58,7 +57,7 @@ residuals.monfd <- function(object, ...){
   object$y-pred
 }
 
-eval.monfd <- function(evalarg, Wfdobj, Lfdobj=int2Lfd(0)) {
+eval.monfd <- function(evalarg, Wfdobj, Lfdobj=int2Lfd(0), returnMatrix=FALSE) {
   #  Evaluates a monotone functional data observation, or the value of a linear
   #  differential operator LFD applied to the object,
   #  at argument values in an array EVALARGS.
@@ -76,12 +75,17 @@ eval.monfd <- function(evalarg, Wfdobj, Lfdobj=int2Lfd(0)) {
   #  The interval over which the integration takes places is defined in
   #  the basisfd object in WFD.
 
+  #  RETURNMATRIX ... If False, a matrix in sparse storage model can be returned
+  #               from a call to function BsplineS.  See this function for
+  #               enabling this option.
+
+  #  Last modified 9 May 2012  by Jim Ramsay
   #  check Wfdobj
-  
+
   if (!inherits(Wfdobj, "fd")) stop("Wfdobj is not a fd object.")
-  
+
   #  extract number of variables and curves from coefficient matrix for Wfdobj
-  
+
   coef  <- Wfdobj$coefs
   if (is.vector(coef)) coef <- as.matrix(coef)
   coefd <- dim(coef)
@@ -107,46 +111,65 @@ eval.monfd <- function(evalarg, Wfdobj, Lfdobj=int2Lfd(0)) {
 
   hmat <- array(0,c(n,ncurve,nvar))
 
-  if (nderiv >= 2) Dwmat  <- getbasismatrix(evalarg, Wfdobj$basis, 1)
-  if (nderiv == 3) D2wmat <- getbasismatrix(evalarg, Wfdobj$basis, 2)
-
+  if (nderiv >= 2) Dwmat  <- getbasismatrix(evalarg, Wfdobj$basis, 1,
+                                            returnMatrix)
+  if (nderiv == 3) D2wmat <- getbasismatrix(evalarg, Wfdobj$basis, 2,
+                                            returnMatrix)
+  basislist = vector("list", 15)
+  
   for (ivar in 1:nvar) {
     for (icurve in 1:ncurve) {
 
   	if (nderiv == 0) {
-    	  if (ndim == 2) 
+    	  if (ndim == 2) {
           if (ncurve == 1) {
-            hmat[,icurve,ivar] <- monfn(evalarg, Wfdobj)
+            hmat[,icurve,ivar] <- monfn(evalarg, Wfdobj, basislist, 
+                                        returnMatrix)
           } else {
-            hmat[,icurve,ivar] <- monfn(evalarg, Wfdobj[icurve])
+            hmat[,icurve,ivar] <- monfn(evalarg, Wfdobj[icurve], basislist, 
+                                        returnMatrix)
           }
-        else           hmat[,icurve,ivar] <- monfn(evalarg, Wfdobj[icurve,ivar])
+        } else {
+            hmat[,icurve,ivar] <- monfn(evalarg, Wfdobj[icurve,ivar], basislist,
+                                        returnMatrix)
+        }
   	}
 
   	if (nderiv == 1) {
-    	  if (ndim == 2) hmat[,icurve,ivar] <- exp(eval.fd(evalarg, Wfdobj[icurve]))
-        else           hmat[,icurve,ivar] <- exp(eval.fd(evalarg, Wfdobj[icurve,ivar]))
+    	  if (ndim == 2) {
+            hmat[,icurve,ivar] <- exp(eval.fd(evalarg, Wfdobj[icurve], 0,
+                                            returnMatrix))
+        } else {
+            hmat[,icurve,ivar] <- exp(eval.fd(evalarg, Wfdobj[icurve,ivar], 0,
+                                            returnMatrix))
+        }
   	}
 
   	if (nderiv == 2) {
         if (ndim == 2) {
-    	    hmat[,icurve,ivar] <- (Dwmat %*% coef[,icurve])*
-                                 exp(eval.fd(evalarg, Wfdobj[icurve]))
+          temp = (Dwmat %*% coef[,icurve])*
+                                 exp(eval.fd(evalarg, Wfdobj[icurve],  0,
+                                            returnMatrix))
+    	    hmat[,icurve,ivar] <- as.vector(temp)
         } else {
-    	    hmat[,icurve,ivar] <- (Dwmat %*% coef[,icurve,ivar])*
-                                 exp(eval.fd(evalarg, Wfdobj[icurve,ivar]))
+          temp = (Dwmat %*% coef[,icurve])*
+                                 exp(eval.fd(evalarg, Wfdobj[icurve,ivar], 0,
+                                            returnMatrix))
+    	    hmat[,icurve,ivar] <- as.vector(temp)
         }
   	}
 
   	if (nderiv == 3) {
         if (ndim == 2) {
-    	    hmat[,icurve,ivar] <- ((D2wmat %*% coef[,icurve]) +
+    	    hmat[,icurve,ivar] <- as.vector(((D2wmat %*% coef[,icurve]) +
                                  (Dwmat  %*% coef[,icurve])^2)*
-                                  exp(eval.fd(evalarg, Wfdobj[icurve]))
+                                  exp(eval.fd(evalarg, Wfdobj[icurve], 0,
+                                            returnMatrix)))
         } else {
-    	    hmat[,icurve,ivar] <- ((D2wmat %*% coef[,icurve,ivar]) +
+    	    hmat[,icurve,ivar] <- as.vector(((D2wmat %*% coef[,icurve,ivar]) +
                                  (Dwmat  %*% coef[,icurve,ivar])^2)*
-                                  exp(eval.fd(evalarg, Wfdobj[icurve,ivar]))
+                                  exp(eval.fd(evalarg, Wfdobj[icurve,ivar],
+                                            0, returnMatrix)))
         }
   	}
 
@@ -157,6 +180,9 @@ eval.monfd <- function(evalarg, Wfdobj, Lfdobj=int2Lfd(0)) {
 
   if (nvar == 1) hmat <- as.matrix(hmat[,,1])
 
+  if((!returnMatrix) && (length(dim(hmat)) == 2)){
+    return(as.matrix(hmat))
+  }
   return(hmat)
 
 }

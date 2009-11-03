@@ -23,12 +23,30 @@ function fdobj = fd(coef, basisobj, fdnames)
 %               If this argument is missing, a B-spline basis is created
 %               with the number of basis functions equal to the size
 %               of the first dimension of coef.
-%  FDNAMES  ... A cell of length 3 with members containing
+%  FDNAMES  ... A cell array of length 3 with members containing
 %               1. a name for the argument domain, such as 'Time'
 %               2. a name for the replications or cases
 %               3. a name for the function
 %               If this argument is not supplied, the strings
 %               'arguments', 'replications' and 'functions' are used
+%               Each of the cells may itself be a cell array of length 2
+%               in which case the first cell contains the name as above
+%               for the dimension of the data, and the second cell 
+%               contains a character matrix of names for each index
+%               value.  Note that the rows must be of the same length,
+%               so that variable-length names must be padded out with
+%               blanks as required
+%               For example, here is the setup for the multivariate
+%               juggling data where the variables have names 
+%               'X', 'Y', and 'Z':
+%               jugglenames = cell(1,3);
+%               jugglenames{1} = 'Seconds';
+%               jugglenames{2} = 'Record';
+%               varnames = cell(1,2);
+%               varnames{1} = 'Coordinate';
+%               varnames{2} = ['X'; 'Y'; 'Z'];
+%               jugglenames{3} = varnames;
+
 %
 %  An alternative argument list:
 %  The argument COEF can be dropped, so that BASISOBJ is the
@@ -40,9 +58,7 @@ function fdobj = fd(coef, basisobj, fdnames)
 %  Returns:
 %  FD ... a functional data object
 
-%  last modified 25 May 2010
-
-superiorto('double', 'struct', 'cell', 'char', 'inline', 'basis');
+%  last modified 24 December 2011
 
 %  Set default FDNAMES
 
@@ -101,7 +117,7 @@ end
 
 nbasis  = getnbasis(basisobj);
 
-if ~isempty(coef)
+if ~isempty(coef) && ~strcmp(getbasistype(basisobj),'fdVariance')
     if coefd(1) ~= nbasis
         error(['First dimension of coefficient array is ', ...
                 'not equal to number of basis functions.']);

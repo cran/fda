@@ -51,6 +51,8 @@ function [fdobj, df, gcv, beta, SSE, penmat, y2cMap, argvals, y] = ...
 %                     to be applied to the data values, or
 %                     a symmetric positive definite matrix of order n
 %                     also w, wt, wgt, weights
+%                     See note below about a change in the roughness 
+%                     penalty related to using weights
 %     fdnames         A cell array of length 3 with names for
 %                       1. argument domain, such as 'Time'
 %                       2. replications or cases
@@ -105,7 +107,16 @@ function [fdobj, df, gcv, beta, SSE, penmat, y2cMap, argvals, y] = ...
 %  ARGVALS ... the input set of argument values.
 %  Y       ... the input array containing values of curves
 
-%  Last modified 18 August 2011 by Jim Ramsay
+%  Last modified 23 March 2012 by Jim Ramsay
+
+%  Note: (21 December 2011) The factor sum(wtvec)/n for matwt == 0
+%  or trace(wtvec)/n if matwt ~= 0 has been added to the multiplier
+%  of the roughness penalty so as to make the total penalized least
+%  squares homogeneous with respect to a scalar multiplier of the
+%  weights.  That is, if wtvec is multiplied by constant C, then so
+%  is the roughness penalty, and the PLS therefore by C as well.
+%  This important because otherwise the amount of smoothing would
+%  vary if the weights were changed by a scale factor.
 
 %  ---------------------------------------------------------------------
 %                      Check argments
@@ -331,10 +342,19 @@ if strcmp(method, 'chol')
                 penmat = [penmat,          zeros(nbasis,q); ...
                           zeros(q,nbasis), zeros(q,q)];
             end
-            Bmat = Bmat + lambda .* penmat;
+            if onewt
+                smoothfac = lambda;
+            else
+                if matwt
+                    smoothfac = trace(wtvec)*lambda/n;
+                else
+                    smoothfac =   sum(wtvec)*lambda/n;
+                end
+            end
+            Bmat = Bmat + smoothfac .* penmat;
         else
             penmat = zeros(nbasis);
-            Bmat = Bmat0;
+            Bmat   = Bmat0;
         end
         
         %  compute Choleski factor of Bmat
@@ -429,7 +449,16 @@ elseif strcmp(method, 'qr')
             indeig = 1:eiglow;
             penfac = Vsort(:,indeig)*diag(sqrt(Dsort(indeig)));
             %  Augment basismat by sqrt(lambda).*penfac'
-            basismat_aug = [basismat; sqrt(lambda).*penfac'];
+            if onewt
+                smoothfac = sqrt(lambda);
+            else
+                if matwt
+                    smoothfac = sqrt(trace(wtvec)*lambda/n);
+                else
+                    smoothfac = sqrt(  sum(wtvec)*lambda/n);
+                end                    
+            end
+            basismat_aug = [basismat; smoothfac.*penfac'];
             %  Augment data vector by n - nderiv 0's
             if ndim < 3
                 y = [y; zeros(nbasis-nderiv,ncurve)];
@@ -541,7 +570,7 @@ if onewt
     y2cMap = L\MapFac;
 else
     if ~matwt
-        wtmat  = diag(wtvec);
+        wtmat  = sparse(diag(wtvec));
     end
     temp   = basismat'*wtmat*basismat;
     if ~isempty(penmat)
@@ -554,8 +583,7 @@ end
 
 %  compute degrees of freedom of smooth
 
-A  = basismat*y2cMap;
-df = trace(A);
+df = trace(y2cMap*basismat);
 
 %  compute error sum of squares
 

@@ -2,7 +2,7 @@ function [regfd, warpfd, Wfd, shift, Fstr, iternum] = ...
               register_fd(y0fd, yfd, Wfd0Par, periodic, ...
                          crit, conv, iterlim, dbglev)
 %REGISTERFD registers a set of curves YFD to a target function Y0FD.
-
+%
 %  Arguments are:
 %  Y0FD    ... Functional data object for target function.  It may be
 %              either a single curve, or have the same dimensions as YFD.
@@ -295,9 +295,11 @@ for icurve = 1:ncurve
          khi = min(nbasis,j+norder-1);
          for k=j:khi
              m = m + 1;
-             d2hdc2(:,m) = width.*(2.*ffine.*dfdcmax(j).*dfdcmax(k)      ...
-                - fmax.*(dfdcfine(:,j).*dfdcmax(k) + dfdcfine(:,k).*dfdcmax(j)) ...
-                + fmax.^2.*d2hdc2(:,m) - ffine.*fmax.*D2fmax(m))./fmax.^3;
+             d2hdc2(:,m) = width.*(2.*ffine.*dfdcmax(j).*dfdcmax(k)  - ...
+                                   fmax.*(dfdcfine(:,j).*dfdcmax(k)  + ...
+                                          dfdcfine(:,k).*dfdcmax(j)) + ...
+                                   fmax.^2.*d2hdc2(:,m)              - ...
+                                   ffine.*fmax.*D2fmax(m))./fmax.^3;
         end
      end
   else
@@ -629,24 +631,17 @@ function hessmat = reghess(xfine, y0fine, dhdc, d2hdc2, yregfd, ...
   onenbaspr = ones(1,nbaspr);
    
   if periodic
-     dhdc(:,1) = 1;
+      dhdc(:,1) = 1;
+      d2hdc2(:,1) = 0;
+      for j=2:norder,  d2hdc2(:,j) = dhdc(:,j);  end
   else
-     dhdc(:,1) = 0;  
+      dhdc(:,1) = 0;
+      d2hdc2(:,1) = 1;
+      for j=2:norder,  d2hdc2(:,j) = 0;  end
   end
-  yregmat  = squeeze(eval_fd(xfine, yregfd));
-  Dyregmat = squeeze(eval_fd(xfine, yregfd, 1));
-  
-  if crit == 2 
-     D2yregmat = squeeze(eval_fd(xfine, yregfd, 2));
-     %  set values corresponding to first and inactive basis function
-     if periodic
-        d2hdc2(:,1) = 0;
-        for j=2:norder,  d2hdc2(:,j) = dhdc(:,j); end
-     else
-        d2hdc2(:,1) = 1;
-        for j=2:norder,  d2hdc2(:,j) = 0;           end
-     end   
-  end
+  yregmat   = squeeze(eval_fd(xfine, yregfd));
+  Dyregmat  = squeeze(eval_fd(xfine, yregfd, 1));
+  D2yregmat = squeeze(eval_fd(xfine, yregfd, 2));
 
   hessmat = zeros(nbasis);
   for ivar = 1:nvar

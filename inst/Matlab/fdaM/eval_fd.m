@@ -1,4 +1,4 @@
-function evalarray = eval_fd(evalarg, fdobj, Lfdobj)
+function [evalarray, basisobj] = eval_fd(evalarg, fdobj, Lfdobj)
 %  EVAL_FD evaluates a functional data observation at argument
 %  values EVALARG.
 %
@@ -19,7 +19,7 @@ function evalarray = eval_fd(evalarg, fdobj, Lfdobj)
 %  Returns:  An array of function values corresponding
 %              to the evaluation arguments in EVALARG
 
-%  Last modified 25 May 2010
+%  Last modified 27 September 2011
 
 %  Check arguments
 
@@ -29,6 +29,7 @@ end
 
 %  Set default arguments
 
+nderiv = 0;
 if nargin < 3, Lfdobj = int2Lfd(0); end
 
 %  check LFDOBJ and convert an integer to Lfd if needed.
@@ -77,7 +78,25 @@ rangeval = getbasisrange(basisobj);
 
 %  check that arguments are within range
 
-if ~strcmp(type, 'FEM')
+if strcmp(type, 'FEM')
+    
+    if nderiv ~= 0
+        error('Derivative values cannot be evaluated for FEM objects.');
+    end
+    X = evalarg(:,1);
+    Y = evalarg(:,2);
+    evalarray = eval_FEM_fd(X,Y,fdobj);   
+    
+elseif strcmp(type, 'fdVariance')
+
+    if nargout == 1
+        evalarray = eval_fdVar_fd(evalarg, fdobj); 
+    else
+        [evalarray, basisobj] = eval_fdVar_fd(evalarg, fdobj);
+    end
+
+else
+    
     evaldim = size(evalarg);
     temp    = reshape(evalarg,prod(evaldim),1);
     temp    = temp(~(isnan(temp)));
@@ -138,15 +157,6 @@ if ~strcmp(type, 'FEM')
             evalarray(:,:,ivar) = full(basismat*coef(:,:,ivar));
         end
     end
-    
-else
-    
-    if nderiv ~= 0
-        error('Derivative values cannot be evaluated for FEM objects.');
-    end
-    X = evalarg(:,1);
-    Y = evalarg(:,2);
-    evalarray = eval_FEM_fd(X,Y,fdobj);   
     
 end
 

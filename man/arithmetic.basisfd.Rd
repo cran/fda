@@ -8,7 +8,7 @@
   Arithmatic on functional basis objects
 }
 \usage{
-"==.basisfd"(basis1, basis2)
+\method{==}{basisfd}(basis1, basis2)
 }
 \arguments{
   \item{basis1, basis2}{

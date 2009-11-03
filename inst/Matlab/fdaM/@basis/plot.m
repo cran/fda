@@ -1,7 +1,7 @@
 function plot(basisobj, nx)
 %  Plot a basis object.
 
-%  last modified 15 June 2010
+%  Last modified 27 March 2012 by Jim Ramsay
 
 typex   = getbasistype(basisobj);
 nbasisx = getnbasis(basisobj);
@@ -23,18 +23,6 @@ if ~strcmp(typex, 'FEM')
     phdl = plot (x, basismat, '-');
     set(phdl, 'LineWidth', 1);
     
-    %  if the basis is of spline type, plot the knots
-    
-    if strcmp(typex, 'bspline')
-        knots = getbasispar(basisobj);
-        hold on
-        for k=1:length(knots)
-            lhdl = plot([knots(k), knots(k)], [0,1]);
-            set(lhdl, 'LineWidth', 1, 'LineStyle', ':', 'color', 'r');
-        end
-        hold off
-    end
-    
     %  set plotting range
     
     if strcmp(typex, 'bspline')
@@ -53,6 +41,19 @@ if ~strcmp(typex, 'FEM')
             maxval = maxval + 0.05*minval;
         end
     end
+    
+    %  if the basis is of spline type, plot the knots
+    
+    if strcmp(typex, 'bspline') || strcmp(typex, 'nspline')
+        knots = getbasispar(basisobj);
+        hold on
+        for k=1:length(knots)
+            lhdl = plot([knots(k), knots(k)], [0,1]);
+            set(lhdl, 'LineWidth', 1, 'LineStyle', ':', 'color', 'r');
+        end
+        hold off
+    end
+    
     xlabel('\fontsize{13} t')
     ylabel('\fontsize{13} \phi(t)')
     titstr = ['\fontsize{16} ', typex, ' basis', ...
@@ -60,6 +61,9 @@ if ~strcmp(typex, 'FEM')
         num2str(nbasisx)];
     if strcmp(typex, 'bspline')
         norderx = nbasisx - length(knots);
+        titstr = [titstr, ',  order = ', num2str(norderx)];
+    elseif  strcmp(typex, 'nspline')
+        norderx = nbasisx - length(knots)+2;
         titstr = [titstr, ',  order = ', num2str(norderx)];
     end
     title(titstr);
@@ -79,7 +83,7 @@ else
         xlabel('\fontsize{13} X')
         ylabel('\fontsize{13} Y')
         title('\fontsize{13} nodes at open o, vertices at filled o')
-%         pdemesh(params.p', params.e', params.t')  
+        pdemesh(params.p', params.e', params.t')  
     else
         figure(1)
         pdegplot(dl) %  plot the decomposed geometry

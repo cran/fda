@@ -18,8 +18,8 @@ function K0 = mass(nodeStruct)
 %        computed.  Then that value is the 
 %        (NODEINDEX(i,j),NODEINDEX(i,k))'th entry of the i'th elemental 
 %        mass matrix.
-
-% Last modified on August 19, 2010 by Jim.
+%
+% Last modified on 27 September 2011 by Jim.
 
 %  retrieve arrays from nodeStruct
 

@@ -7,8 +7,14 @@ function basisobj = create_fd_basis(fdobj)
 %         containing eigenfunctions arising from a functional PCA.
 %  Returns
 %  BASISOBJ  ... a functional data basis object
+%
+%  See also BASIS, CREATE_BSPLINE_BASIS,  CREATE_CONSTANT_BASIS, 
+%  CREATE_EXPONENTIAL_BASIS, CREATE_FDVARIANCE_BASIS, CREATE_FOURIER_BASIS, 
+%  CREATE_MONOMIAL_BASIS, CREATE_POLYGONAL_BASIS, CREATE_POLYNOMIAL_BASIS, 
+%  CREATE_POWER_BASIS, CREATE_POLYGONAL_BASIS, CREATE_FEM_BASIS, 
+%  CREATE_PRODUCT_BASIS, CREATE_TP_BASIS
 
-%  last modified 6 April 2010
+%  Last modified 3 October 2011
 
 %  Default basis for missing arguments: a flat line and a line with slope 1
 

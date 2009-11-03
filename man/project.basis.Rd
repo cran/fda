@@ -7,13 +7,13 @@
 A vector or matrix of discrete data is projected into the space
 spanned by the values of a set of basis functions.  This amounts to
 a least squares regression of the data on to the values of the basis
-functions.  A small penalty can be applied to deal with stiautions in
+functions.  A small penalty can be applied to deal with situations in
 which the number of basis functions exceeds the number of basis points.
 This function is used with function \code{data2fd}, and is not
 normally used directly in a functional data analysis.
 }
 \usage{
-project.basis(y, argvals, basisobj, penalize=FALSE)
+project.basis(y, argvals, basisobj, penalize=FALSE, returnMatrix=FALSE)
 }
 \arguments{
 \item{y}{
@@ -30,6 +30,10 @@ a basis object.
 a logical variable.  If TRUE, a small roughness penalty is applied
 to ensure that the linear equations defining the least squares
 solution are linearly independent or nonsingular.
+}
+\item{returnMatrix}{
+logical:  If TRUE,  a two-dimensional is returned using a
+special class from the Matrix package.
 }
 }
 \value{

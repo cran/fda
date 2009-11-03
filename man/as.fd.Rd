@@ -134,7 +134,7 @@ as.fd(x, ...)
 ##
 ## as.fd.fdSmooth
 ##
-girlGrowthSm <- with(growth, smooth.basisPar(argvals=age, y=hgtf, 
+girlGrowthSm <- with(growth, smooth.basisPar(argvals=age, y=hgtf,
                                              lambda=0.1))
 girlGrowth.fd <- as.fd(girlGrowthSm)
 
@@ -164,22 +164,6 @@ all.equal(knots(curfit.xy, FALSE), knots(curfit.fd, FALSE))
 all.equal(coef(curfit.xy), as.vector(coef(curfit.fd)))
 \dontshow{)}
 
-
-%curfit2 <- fd2dierckx(curfit.fd)
-%pred.y2 <- predict(curfit2, x.)
-%sum(abs(pred.y-pred.y2))/(sum(abs(pred.y)+abs(pred.y2))/2)
-%# 2.7e-7
-%all.equal(knots(curfit.xy, FALSE), knots(curfit2, FALSE))
-%# TRUE
-%all.equal(coef(curfit.xy), coef(curfit2))
-%# "Mean relative  difference: 6.026638e-07"
-
-%preserved <- c("from", "to", "n", "g", "periodic", "xlim","ylim")
-%all.equal(curfit.xy[preserved], curfit2[preserved])
-%# TRUE
-%# Other components are NOT preserved in translation
-%# and so can NOT be restored.
-
 ##
 ## as.fd.function(splinefun(...), ...)
 ##
@@ -190,7 +174,12 @@ fd. <- as.fd(f)
 x. <- seq(1, 7, .02)
 fx. <- f(x.)
 fdx. <- eval.fd(x., fd.)
-plot(range(x2), range(y2, fx., fdx.), type='n')
+
+# range(y2, fx., fdx.) generates an error 2012.04.22
+
+rfdx <- range(fdx.)
+
+plot(range(x2), range(y2, fx., rfdx), type='n')
 points(x2, y2)
 lines(x., sin((x.-0.5)*pi), lty='dashed')
 lines(x., f(x.), col='blue')

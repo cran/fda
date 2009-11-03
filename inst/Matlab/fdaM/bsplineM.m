@@ -11,7 +11,7 @@ function bsplinemat = bsplineM(x, breaks, norder, nderiv, sparsewrd)
 %  BSPLINEMAT ... length(X) times number of basis functions matrix
 %                 of Bspline values
 
-%  last modified 2 January 2007
+%  last modified 27 October 2008
 
 %  check dimensions of X and set up as a row vector
 
@@ -43,8 +43,8 @@ if nbreaks < 2, error('Number of knots less than 2.'); end
 
 %  check norder
 
-if norder  < 1 || norder > 19
-    error ('Order of basis out of admissible range 1 ... 19');
+if norder  < 1 
+    error ('Order of basis less than one.');
 end
 
 %  check NDERIV
@@ -63,7 +63,7 @@ else
     sortwrd = 0;
 end
 if x(1) - breaks(1) < -1e-10 || x(n) - breaks(nbreaks) > 1e-10
-    disp([x(1), x(n)])
+    disp([x(1), x(n), breaks(1), breaks(nbreaks)])
     error ('Argument values out of range.')
 end
 
@@ -99,15 +99,6 @@ knotslower      = knots(1:nbasis);
 pointer         = find(index > nbasis) - [1:length(x)];
 left            = max([pointer; k*onenx']);  
 
-% %  check for interior multiple knots and correct if found
-% 
-% leftinner       = find(left > k);
-% leftinner       = leftinner(find(leftinner-k+nd > 0));
-% leftind = find(knotslower(left(leftinner)) == knotslower(left(leftinner-k+nd)));
-% if ~isempty(leftind)
-%     left(leftind) = left(leftind) - k + nd - 1;
-% end
-
 % compute bspline values and derivatives, if needed:
 
 % initialize the  b  array.
@@ -133,13 +124,6 @@ for j=1:k-nd
    b(nxs,j+1)  = saved;
 end
 
-% b =
-% 
-%     1.0000         0         0         0
-%     0.0013    0.0963    0.9025         0
-%     1.0000         0         0         0
-%     1.0000         0         0         0
-
 % save the B-spline values in successive blocks in  b .
 
 for jj=1:nd-1
@@ -157,13 +141,6 @@ for jj=1:nd-1
    b(nxn,j+1)  = saved; 
    nxs = nxn;
 end
-
-% b =
-% 
-%     0.0000    0.0036    0.1390    0.8574
-%     0.0013    0.0963    0.9025         0
-%     1.0000         0         0         0
-%     1.0000         0         0         0
 
 % now use the fact that derivative values can be obtained by differencing:
 

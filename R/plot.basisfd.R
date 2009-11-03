@@ -2,8 +2,7 @@ plot.basisfd <- function(x, knots=TRUE, axes=NULL, ...) {
   basisobj <- x
 #  plot a basis object
 
-# last modified 2008.07.21 by Spencer Graves
-#  Previously modified 26 October 2005 and 2007.09.09
+# last modified 26 May 2012 by Jim Ramsay
 
 #  check BASISOBJ
 
@@ -62,7 +61,7 @@ plot.basisfd <- function(x, knots=TRUE, axes=NULL, ...) {
   if(is.null(dot.args$lty))
     dot.args$lty <- rep(1:3, max(1, nbasis/3))
 
-  nx       <- max(101,10*nbasis)
+  nx       <- max(501,10*nbasis)
 
   {
     if(is.null(dot.args$xlim))rangex <- basisobj$rangeval

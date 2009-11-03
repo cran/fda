@@ -22,7 +22,7 @@ also be used to define weights for the inner product.
 \usage{
 inprod(fdobj1, fdobj2,
        Lfdobj1=int2Lfd(0), Lfdobj2=int2Lfd(0),
-       rng = range1, wtfd = 0)
+       rng = range1, wtfd = 0, returnMatrix=FALSE)
 }
 \arguments{
 \item{fdobj1}{
@@ -52,6 +52,10 @@ within the range over which the arguments are defined.
 \item{wtfd}{
 a univariate functional data object with a single replicate
 defining weights to be used in computing the inner product.
+}
+\item{returnMatrix}{
+logical:  If TRUE,  a two-dimensional is returned using a
+special class from the Matrix package.
 }
 }
 \value{
@@ -94,7 +98,7 @@ it calls is important.
 Press, et, al, $Numerical Recipes$.
 }
 \seealso{
-\code{\link{eval.penalty}}, 
+\code{\link{eval.penalty}},
 }
 % docclass is function
 \keyword{smooth}

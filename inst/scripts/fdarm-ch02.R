@@ -5,19 +5,19 @@
 
 #  Remarks and disclaimers
 
-#  These R commands are either those in this book, or designed to 
+#  These R commands are either those in this book, or designed to
 #  otherwise illustrate how R can be used in the analysis of functional
-#  data.  
-#  We do not claim to reproduce the results in the book exactly by these 
+#  data.
+#  We do not claim to reproduce the results in the book exactly by these
 #  commands for various reasons, including:
 #    -- the analyses used to produce the book may not have been
 #       entirely correct, possibly due to coding and accuracy issues
-#       in the functions themselves 
-#    -- we may have changed our minds about how these analyses should be 
+#       in the functions themselves
+#    -- we may have changed our minds about how these analyses should be
 #       done since, and we want to suggest better ways
 #    -- the R language changes with each release of the base system, and
 #       certainly the functional data analysis functions change as well
-#    -- we might choose to offer new analyses from time to time by 
+#    -- we might choose to offer new analyses from time to time by
 #       augmenting those in the book
 #    -- many illustrations in the book were produced using Matlab, which
 #       inevitably can imply slightly different results and graphical
@@ -95,7 +95,7 @@ F = c('Do', 'not', 'use', 'F', 'as', 'a', 'logical.')
 # The following will now throw an error, and illustrates why only
 # TRUE and FALSE ought to be used as logical constants:
 
-if (F) cat('TRUE')
+# if (F) cat('TRUE')
 
 # addition?
 
@@ -152,7 +152,7 @@ temp[, index] # not a matrix
 index = 1:2
 temp[, index][, 1] # OK
 index = 1
-temp[, index][, 1] # Error
+# temp[, index][, 1] # Error
 
 # 3-d array
 

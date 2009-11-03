@@ -13,8 +13,8 @@ function evalmat = eval_FEM_fd(Xvec, Yvec, fdobj, nderivs)
 %        output:
 % EVALMAT   an array of the same size as Xvec and Yvec containing the value  
 %           of FELSPLOBJ at (Xvec,Yvec).
-
-%  Last modified on 19 March 2011 by Jim ramsay.
+%
+%  Last modified on 27 September 2011 by Jim ramsay.
 
 %  Set up the arguments if the first argument is a matrix with two
 %  columns
@@ -130,21 +130,21 @@ end
 
 % denominator of change-of-coordinates change matrix
 
-modJac = Jvec;
-ones3  = ones(3,1);
+modJac    = Jvec;
+ones3     = ones(3,1);
 modJacMat = modJac*ones3';
 
 % 1st, 2nd, and 3rd columns of transformations to barycentric coordinates,
 % with a row for each vertex
 
-M1 = [(v2(:,1).*v3(:,2))-(v3(:,1).*v2(:,2)) ...
-       v2(:,2)-v3(:,2)                      ...
+M1 = [ v2(:,1).*v3(:,2) - v3(:,1).*v2(:,2) ...
+       v2(:,2)-v3(:,2)                     ...
        v3(:,1)-v2(:,1)]./modJacMat/2;
-M2 = [(v3(:,1).*v1(:,2))-(v1(:,1).*v3(:,2)) ...
-       v3(:,2)-v1(:,2)                      ...
+M2 = [ v3(:,1).*v1(:,2) - v1(:,1).*v3(:,2) ...
+       v3(:,2)-v1(:,2)                     ...
        v1(:,1)-v3(:,1)]./modJacMat/2;
-M3 = [(v1(:,1).*v2(:,2))-(v2(:,1).*v1(:,2)) ...
-       v1(:,2)-v2(:,2)                      ...
+M3 = [ v1(:,1).*v2(:,2) - v2(:,1).*v1(:,2) ...
+       v1(:,2)-v2(:,2)                     ...
        v2(:,1)-v1(:,1)]./modJacMat/2;
 
 % Identify triangles containing points in vector (Xvec(i),Yvec(i))

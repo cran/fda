@@ -8,11 +8,11 @@ Provide a compact summary of the characteristics of a
 functional data object.
 }
 \usage{
-summary.basisfd(object, ...)
+\method{summary}{basisfd}(object, ...)
 }
 \arguments{
 \item{object}{
-a functional data object.
+a functional data object (i.e., of class 'basisfd').
 }
 \item{...}{Other arguments to match generic}
 }

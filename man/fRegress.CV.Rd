@@ -14,7 +14,8 @@
   criterion.
 }
 \usage{
-fRegress.CV(y, xfdlist, betalist, wt=NULL, CVobs=1:N, ...)
+fRegress.CV(y, xfdlist, betalist, wt=NULL, CVobs=1:N,
+            returnMatrix=FALSE, ...)
 }
 \arguments{
   \item{y}{
@@ -34,6 +35,10 @@ fRegress.CV(y, xfdlist, betalist, wt=NULL, CVobs=1:N, ...)
   }
   \item{CVobs}{
     Indices of observations to be deleted.  Defaults to 1:N.
+  }
+  \item{returnMatrix}{
+    logical:  If TRUE,  a two-dimensional is returned using a
+    special class from the Matrix package.
   }
   \item{\dots}{
     optional arguments not used by \code{fRegress.CV} but needed for

@@ -9,7 +9,7 @@ bivariate functional data object.
 }
 \usage{
 \method{summary}{bifd}(object, ...)
-summary.bifd(object, ...)
+%summary.bifd(object, ...)
 }
 \arguments{
 \item{object}{
@@ -21,7 +21,7 @@ a bivariate functional data object.
 a displayed summary of the bivariate functional data object.
 }
 \seealso{
-\code{\link{summary}}, 
+\code{\link{summary}},
 }
 % docclass is function
 \keyword{smooth}

@@ -10,7 +10,7 @@
 }
 \usage{data(MontrealTemp)}
 \format{
-  A numeric array with dimnames = list(1964:1992, names(dayOfYear)).
+  A numeric array with dimnames = list(1961:1994, names(dayOfYear)).
 }
 %\details{}
 %\source{}

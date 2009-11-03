@@ -6,12 +6,13 @@
 \description{
   This is the constructor function for objects of the \code{fd} class.
   Each function that sets up an object of this class must call this
-  function.  This includes functions \code{data2fd},
-  \code{smooth.basis}, \code{density.fd}, and so forth that estimate
-  functional data objects that smooth or otherwise represent data.
-  Ordinarily, users of the functional data analysis software will not
-  need to call this function directly, but these notes are valuable to
-  understanding the components of a \code{list} of class \code{fd}.
+  function.  This includes functions \code{\link{Data2fd}},
+  \code{\link{smooth.basis}}, \code{\link{density.fd}}, and so forth
+  that estimate functional data objects that smooth or otherwise
+  represent data.  Ordinarily, users of the functional data analysis
+  software will not need to call this function directly, but these notes
+  are valuable to understanding the components of a \code{list} of class
+  \code{fd}.
 }
 \usage{
 fd(coef=NULL, basisobj=NULL, fdnames=NULL)

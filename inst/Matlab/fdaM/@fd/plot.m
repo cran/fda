@@ -1,4 +1,4 @@
-function Hline = plot(fdobj, Lfdobj, matplt, href)
+function Hline = plot(fdobj, Lfdobj, matplt, href, nx)
 %  PLOT   Plot a functional data object.
 %  Arguments:
 %  FDOBJ   ... A functional data object to be plotted.
@@ -11,14 +11,15 @@ function Hline = plot(fdobj, Lfdobj, matplt, href)
 %              next curve is plotted when the mouse is clicked.
 %  HREF    ... If HREF is nonzero, a horizontal dotted line through 0 
 %              is plotted.
+%  NX      ... The number of plotting points to be used.
 
-%  Last modified 26 July 2010
+%  Last modified 24 December 2011
 
 %  set default arguments
 
-if nargin < 4, href = 1;             end
-if nargin < 3, matplt = 1;           end
-if nargin < 2, Lfdobj = int2Lfd(0);  end
+if nargin < 4 || isempty(href),   href = 1;             end
+if nargin < 3 || isempty(matplt), matplt = 1;           end
+if nargin < 2 || isempty(Lfdobj), Lfdobj = int2Lfd(0);  end
 
 %  check arguments
 
@@ -41,16 +42,30 @@ type     = getbasistype(basisobj);
 %  special case of an FEM basis
 
 if strcmp(type, 'FEM')
-    plot_FEM(fdobj);
+    plot_FEM(fdobj, [], [], [], nx);
     return;
 end
 
+%  special case of an fdVariance basis
+
+if strcmp(type, 'fdVariance')
+    cvec     = getcoef(fdobj);
+    basisobj = getbasis(fdobj);
+    T        = max(getbasisrange(basisobj));
+    tfine    = linspace(0,T,51)';
+    RstCell  = eval_basis(tfine, basisobj);
+    Sigma    = fdVar_Sigma(cvec, RstCell);      
+    surf(tfine, tfine, Sigma);
+    return;
+end
+
+
 % set up dimensions of problem
 
-coef    = getcoef(fdobj);
-coefd   = size(coef);
-ndim    = length(coefd);
-ncurve  = coefd(2);
+coef   = getcoef(fdobj);
+coefd  = size(coef);
+ndim   = length(coefd);
+ncurve = coefd(2);
 
 if ndim > 2
     nvar = coefd(3);
@@ -64,8 +79,8 @@ if nargin < 5
     nx = max([101, 10*nbasis+1]);
 end
 
-x        = linspace(rangex(1),rangex(2),nx)';
-fdmat    = eval_fd(x, fdobj, Lfdobj);
+x     = linspace(rangex(1),rangex(2),nx)';
+fdmat = eval_fd(x, fdobj, Lfdobj);
 
 %  calculate range of values to plot
 
@@ -99,6 +114,7 @@ fdnames  = getnames(fdobj);
 %  --------------------  Plot for a single variable  ----------------------
 
 if ndim == 2
+    subplot(1,1,1)
     if matplt
         %  plot all curves
         if href && (frng(1) <= 0 && frng(2) >= 0)
@@ -115,28 +131,44 @@ if ndim == 2
             end
         end
         xlabel(['\fontsize{12} ',fdnames{1}]);
-        ylabel(['\fontsize{12} ',fdnames{3}]);
-        if frng(2) > frng(1) 
-            axis([x(1), x(nx), frng(1), frng(2)]); 
+        if iscell(fdnames{3})
+            ylabel(['\fontsize{12} ',fdnames{3}{1}])
+        else
+            ylabel(['\fontsize{12} ',fdnames{3}])
+        end
+        if frng(2) > frng(1)
+            axis([x(1), x(nx), frng(1), frng(2)]);
         end
     else
         %  page through curves one by one
         for icurve = 1:ncurve
-            Hline = plot (x, fdmat(:,icurve), '-');
-            title(['Curve ', num2str(icurve)]);
             if href && (frng(1) <= 0 && frng(2) >= 0)
                 if nargout > 0
-                    Hline = plot(x, zeros(nx), ':');
+                    Hline = plot(x, fdmat(:,icurve), 'b-', ...
+                                 [min(x),max(x)], [0,0], 'r:');
                 else
-                    plot(x, zeros(nx), ':')
+                    plot(x, fdmat(:,icurve), 'b-', ...
+                         [min(x),max(x)], [0,0], 'r:')
+                end
+            else
+                if nargout > 0
+                    Hline = plot(x, fdmat(:,icurve), 'b-');
+                else
+                    plot(x, fdmat(:,icurve), 'b-')
                 end
             end
             xlabel(['\fontsize{12} ',fdnames{1}])
-            ylabel(['\fontsize{12} ',fdnames{3}])
-            if frng(2) > frng(1) 
-                axis([x(1), x(nx), frng(1), frng(2)]); 
+            if iscell(fdnames{3})
+                ylabel(['\fontsize{12} ',fdnames{3}{1}])
+            else
+                ylabel(['\fontsize{12} ',fdnames{3}])
             end
-            ginput(1);
+            if iscell(fdnames{2})
+                title( ['\fontsize{12}', fdnames{2}{2}(icurve,:)]);
+            else
+                title( ['\fontsize{12} Curve ', num2str(icurve)]);
+            end
+            pause;
         end
     end
 end
@@ -146,29 +178,31 @@ end
 if ndim == 3
     if matplt
         %  plot all curves
-        varnames = getfdlabels(fdnames{3});
         for ivar = 1:nvar
             subplot(nvar,1,ivar);
             temp = squeeze(fdmat(:,:,ivar));
-            if href && (frng(1) <= 0 && frng(2) >= 0)
-                plot (x, temp, '-', x, zeros(nx), ':');
+            if nargout > 0
+                if href && (frng(1) <= 0 && frng(2) >= 0)
+                    Hline = plot(x, temp, 'b-', ...
+                        [min(x),max(x)], [0,0], 'r:');
+                else
+                    Hline = plot(x, temp, 'b-');
+                end
             else
-                plot (x, temp, '-');
+                if href && (frng(1) <= 0 && frng(2) >= 0)
+                    plot(x, temp, 'b-', ...
+                        [min(x),max(x)], [0,0], 'r:');
+                else
+                    plot(x, temp, 'b-');
+                end
             end
             if ivar == nvar
                 xlabel(['\fontsize{12} ',fdnames{1}]);
             end
-            if isempty(varnames)
-                ylabel(['\fontsize{12} Variable ',num2str(ivar)])
+            if iscell(fdnames{3})
+                ylabel(['\fontsize{12} ',fdnames{3}{2}(ivar,:)])
             else
-                ylabel(['\fontsize{12} ',varnames(ivar,:)]);
-            end
-            if ivar == 1
-                if iscell(fdnames{3})
-                    title(['\fontsize{13} ',fdnames{3}{1}]);
-                else
-                    title(['\fontsize{13} ',fdnames{3}]);
-                end
+                ylabel(['\fontsize{12} ',fdnames{3}]);
             end
         end
     else
@@ -177,18 +211,37 @@ if ndim == 3
             for ivar = 1:nvar
                 subplot(nvar,1,ivar);
                 temp = squeeze(fdmat(:,icurve,ivar));
-                if href && (frng(1) <= 0 && frng(2) >= 0)
-                    plot (x, temp, '-', x, zeros(nx), '.');
+                if nargout > 0
+                    if href && (frng(1) <= 0 && frng(2) >= 0)
+                        Hline = plot(x, temp, 'b-', ...
+                                     [min(x),max(x)], [0,0], 'r:');
+                    else
+                        Hline = plot(x, temp, 'b-');
+                    end
                 else
-                    plot (x, temp, '-');
+                    if href && (frng(1) <= 0 && frng(2) >= 0)
+                        plot(x, temp, 'b-', ...
+                            [min(x),max(x)], [0,0], 'r:');
+                    else
+                        plot(x, temp, 'b-');
+                    end
                 end
-                xlabel(fdnames{1});
-                ylabel(fdnames{3});
+                if ivar == 1 && ncurve > 1
+                    title(['\fontsize{12} Curve ', num2str(icurve)]);
+                end
+                if ivar == nvar
+                    xlabel(['\fontsize{12} ',fdnames{1}]);
+                end
+                if iscell(fdnames{3})
+                    ylabel(['\fontsize{12} ',fdnames{3}{2}(ivar,:)])
+                else
+                    ylabel(['\fontsize{12} ',fdnames{3}]);
+                end
                 axis([x(1), x(nx), frng(1), frng(2)])
-                title(['Variable ', num2str(ivar), ...
-                       ' Curve ', num2str(icurve)]);
             end
-            ginput(1);
+            if ncurve > 1
+                pause;
+            end
         end
     end
 end

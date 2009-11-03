@@ -42,6 +42,27 @@
 }
 \examples{
 ##
+## As noted in the Preface to Ramsay, Hooker and Graves (p. v),
+## the fda package includes scripts to reproduce all but one of the
+## figures in the book.
+##
+## These figures can be found and run as follows:
+##
+\dontrun{
+scriptsDir <- system.file('scripts', package='fda')
+Rscripts <- dir(scriptsDir, full.names=TRUE, pattern='R$')
+fdarm <- grep('fdarm', Rscripts, value=TRUE)
+chapters <- length(fdarm)
+# NOTE:  If R fails in any of these scripts,
+# this for loop will not end normally,
+# and the abnormal termination will be displayed:
+for(ch in 1:chapters){
+  cat('Running', fdarm[ch], '\n')
+  invisible(source(fdarm[ch]))
+}
+}
+
+##
 ## Simple smoothing
 ##
 girlGrowthSm <- with(growth, smooth.basisPar(argvals=age, y=hgtf, lambda=0.1))

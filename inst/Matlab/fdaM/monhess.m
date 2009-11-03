@@ -14,7 +14,7 @@ function [hessmat, tval] = monhess(x, Wfd, basiscell)
 %  D2H  ... values of D2 h wrt c
 %  TVAL ... Arguments used for trapezoidal approximation to integral
 
-%  Last modified 3 January 2008
+%  Last modified 26 February 2012
 
 %  set some constants
 
@@ -33,16 +33,16 @@ end
 
 %  get the basis
 
-basis  = getbasis(Wfd);
-rng    = getbasisrange(basis);
-nbasis = getnbasis(basis);
-params = getbasispar(basis);
-norder = nbasis - length(params);
+basisobj = getbasis(Wfd);
+rng      = getbasisrange(basisobj);
+nbasis   = getnbasis(basisobj);
+params   = getbasispar(basisobj);
+norder   = nbasis - length(params);
 
 %  Compute the number of active pairs.
 %  Note that the first basis is not active, but we still
 %    need its space in the array.
-nbaspr   = nbasis*norder - norder*(norder-1)/2;
+nbaspr = nbasis*norder - norder*(norder-1)/2;
 
 %  set up first iteration
 
@@ -62,13 +62,13 @@ xiter   = rng';
 tval    = xiter;
 if nargin == 3
     if isempty(basiscell{iter})
-        bmat = getbasismatrix(xiter, basis);
+        bmat = getbasismatrix(xiter, basisobj);
         basiscell{iter} = bmat;
     else
         bmat = basiscell{iter};
     end
 else
-    bmat = getbasismatrix(xiter, basis);
+    bmat = getbasismatrix(xiter, basisobj);
 end
 fx   = exp(bmat*coef);
 D2fx = zeros(2,nbaspr);
@@ -97,13 +97,13 @@ for iter = 2:JMAX
     tval = [tval; xiter];
     if nargin == 3
         if isempty(basiscell{iter})
-            bmat = getbasismatrix(xiter, basis);
+            bmat = getbasismatrix(xiter, basisobj);
             basiscell{iter} = bmat;
         else
             bmat = basiscell{iter};
         end
     else
-        bmat = getbasismatrix(xiter, basis);
+        bmat = getbasismatrix(xiter, basisobj);
     end
     fx   = exp(bmat*coef);
     D2fx = zeros(length(xiter),nbaspr);
@@ -130,7 +130,7 @@ for iter = 2:JMAX
             % set up partial integral values
             del     = tval(2) - tval(1);
             D2ifval = del.*cumtrapz(D2fval(ordind,:));
-            hessmat = safeinterp(tval, D2ifval, x, 'cubic');
+            hessmat = safeinterp(tval, D2ifval, x);
             return;
         end
     end

@@ -22,7 +22,7 @@
 \usage{
 smooth.monotone(argvals, y, WfdParobj, wtvec=rep(1,n),
                 zmat=NULL, conv=.0001, iterlim=50,
-                active=rep(TRUE,nbasis), dbglev=1)
+                active=rep(TRUE,nbasis), dbglev=1, returnMatrix=FALSE)
 }
 \arguments{
   \item{argvals}{
@@ -76,6 +76,10 @@ smooth.monotone(argvals, y, WfdParobj, wtvec=rep(1,n),
     on each iteration, with 0 implying no output, 1 intermediate output
     level, and 2 full output.  If either level 1 or 2 is specified, it
     can be helpful to turn off the output buffering feature of S-PLUS.
+  }
+  \item{returnMatrix}{
+    logical:  If TRUE,  a two-dimensional is returned using a
+    special class from the Matrix package.
   }
 }
 

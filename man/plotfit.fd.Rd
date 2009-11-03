@@ -142,7 +142,7 @@ plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
 \details{
   \code{plotfit} plots discrete data along with a functional data object
   for fitting the data.  It is designed to be used after something like
-  \code{data2fd}, \code{smooth.fd}, \code{smooth.basis} or
+  \code{Data2fd}, \code{smooth.fd}, \code{smooth.basis} or
   \code{smoothe.basisPar} to check the fit of the data offered by the
   \code{fd} object.
 
@@ -198,11 +198,11 @@ plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
 #  set up a Fourier basis for smoothing temperature data
 daybasis65 <- create.fourier.basis(c(0, 365), 65,
                     axes=list("axesIntervals"))
-#  smooth the average temperature data using function data2fd
-Daytempfd <- with(CanadianWeather, smooth.basis(day.5, 
+#  smooth the average temperature data using function Data2fd
+Daytempfd <- with(CanadianWeather, smooth.basis(day.5,
          dailyAv[,,"Temperature.C"], daybasis65)$fd )
 daytempfd <- with(CanadianWeather, smooth.basis(day.5,
-         dailyAv[,,"Temperature.C"], 
+         dailyAv[,,"Temperature.C"],
          daybasis65, fdnames=list("Day", "Station", "Deg C"))$fd )
 #  Plot the temperature data along with the fit to the data for the first
 #  station, St. John's Newfoundland

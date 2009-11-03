@@ -1,4 +1,4 @@
-function [Wfdobj, beta, yhatfd, Fstr, y2cMap, argvals, y] = ...
+function [Wfdobj, betm, yhatfd, Fstr, y2cMap, argvals, y] = ...
           smooth_monotone(argvals, y, fdParobj, zmat, wtvec, ...
                           conv, iterlim, active, dbglev)
 %SMOOTH_MONOTONE smooths the relationship of Y to ARGVALS by fitting 
@@ -90,7 +90,7 @@ function [Wfdobj, beta, yhatfd, Fstr, y2cMap, argvals, y] = ...
 %  ARGVALS  ... Input argument values
 %  Y        ... Input data to be smoothed
 
-%  Last modified 4 October 2008
+%  Last modified 1 September 2011
   
 if nargin < 3
     error('The first three arguments are not specified.');
@@ -190,10 +190,10 @@ end
 
 if ndim == 2
     coef = zeros(nbasis,ncurve);
-    beta = zeros(ncovp1,ncurve);
+    betm = zeros(ncovp1,ncurve);
 else
     coef = zeros(nbasis,ncurve,nvar);
-    beta = zeros(ncovp1,ncurve,nvar);
+    betm = zeros(ncovp1,ncurve,nvar);
 end
 
 if nargout > 2
@@ -224,13 +224,13 @@ for ivar=1:nvar
 
         %  Compute initial function and gradient values
 
-        [Fstri, betai, Dyhat, basiscell] = ...
+        [Fstri, betmi, Dyhat, basiscell] = ...
             fngrad(yi, argvals, zmat, wtvec, cveci, lambda, ...
                    basisobj, Kmat, basiscell, inactive);
 
         %  compute the initial expected Hessian
 
-        hessmat = hesscal(betai, Dyhat, wtvec, lambda, Kmat, inactive);
+        hessmat = hesscal(betmi, Dyhat, wtvec, lambda, Kmat, inactive);
 
         %  evaluate the initial line search direction vector
 
@@ -239,18 +239,18 @@ for ivar=1:nvar
         %  initialize iteration status arrays
 
         iternum = 0;
-        status = [iternum, Fstri.f, Fstri.norm, betai'];
+        status = [iternum, Fstri.f, Fstri.norm, betmi'];
         if dbglev >= 1
             fprintf(['\nResults for curve ',num2str(icurve), ...
                    ' and variable ',num2str(ivar),'\n'])
             fprintf('\nIter.   PENSSE   Grad Length Intercept   Slope\n')
             fprintf('%3.f %10.4f %10.4f %10.4f %10.4f\n', ...
-                [status(1:4),betai(ncovp1)]);
+                [status(1:4),betmi(ncovp1)]);
         end
         if dbglev > 2
             for ibasis = 1:nbasis, fprintf('%10.4f%', cveci(ibasis)); end
             fprintf('\n');
-            for ibeta  = 1:3,      fprintf('%10.4f%', betai(ibeta)); end
+            for ibetm  = 1:3,      fprintf('%10.4f%', betmi(ibetm)); end
             fprintf('\n');
         end
 
@@ -261,7 +261,7 @@ for ivar=1:nvar
         trial   = 1;
         reset   = 0;
         linemat = zeros(3,5);
-        betaold = betai;
+        betmold = betmi;
         cvecold = cveci;
         Foldstr = Fstri;
         dbgwrd  = dbglev >= 2;
@@ -315,7 +315,7 @@ for ivar=1:nvar
                 end
                 %  compute new function value and gradient
                 cvecnew = cveci + linemat(1,5).*deltac;  
-                [Fstri, betai, Dyhat, basiscell] = ...
+                [Fstri, betmi, Dyhat, basiscell] = ...
                     fngrad(yi, argvals, zmat, wtvec, cvecnew, lambda, ...
                            basisobj, Kmat, basiscell, inactive);
                 linemat(3,5) = Fstri.f;
@@ -344,14 +344,14 @@ for ivar=1:nvar
                     fprintf('%10.4f %10.4f\n',[Foldstr.f, Fstri.f]);
                 end
                 %  reset parameters and fit
-                betai  = betaold;
+                betmi  = betmold;
                 cveci  = cvecold;
                 Fstri  = Foldstr;
                 deltac = -Fstri.grad;
                 if dbglev > 2
                     for i = 1:nbasis, fprintf('%10.4f%', cveci(i)); end
                     fprintf('\n');
-                    for i = 1:3,      fprintf('%10.4f%', betai(i)); end
+                    for i = 1:3,      fprintf('%10.4f%', betmi(i)); end
                     fprintf('\n');
                 end
                 if reset == 1
@@ -367,29 +367,29 @@ for ivar=1:nvar
             else
                 %  function value has not increased,  check for convergence
                 if abs(Foldstr.f-Fstri.f) < conv
-                    status = [iternum, Fstri.f, Fstri.norm, betai'];
+                    status = [iternum, Fstri.f, Fstri.norm, betmi'];
                     if dbglev >= 1
                         fprintf('%3.f %10.4f %10.4f %10.4f %10.4f\n', ...
-                            [status(1:4),betai(ncovp1)]);
+                            [status(1:4),betmi(ncovp1)]);
                     end
                     break;
                 end
                 %  update old parameter vectors and fit structure
                 cvecold = cveci;
-                betaold = betai;
+                betmold = betmi;
                 Foldstr = Fstri;
                 %  update the expected Hessian
                 hessmat = ...
-                    hesscal(betai, Dyhat, wtvec, lambda, Kmat, inactive);
+                    hesscal(betmi, Dyhat, wtvec, lambda, Kmat, inactive);
                 %  update the line search direction vector
                 deltac = linesearch(Fstri, hessmat, dbglev);
                 reset = 0;
             end
             %  store iteration status
-            status = [iternum, Fstri.f, Fstri.norm, betai'];
+            status = [iternum, Fstri.f, Fstri.norm, betmi'];
             if dbglev >= 1
                 fprintf('%3.f %10.4f %10.4f %10.4f %10.4f\n', ...
-                    [status(1:4),betai(ncovp1)]);
+                    [status(1:4),betmi(ncovp1)]);
             end
         end
         
@@ -397,10 +397,10 @@ for ivar=1:nvar
         
         if ndim == 2
             coef(:,icurve) = cveci;
-            beta(:,icurve) = betai;
+            betm(:,icurve) = betmi;
         else
             coef(:,icurve,ivar) = cveci;
-            beta(:,icurve,ivar) = betai;
+            betm(:,icurve,ivar) = betmi;
         end
         
         %  save Fstr if required in cell array.
@@ -443,8 +443,8 @@ if isempty(zmat)
   if ndim == 2 
     yhatmat = zeros(narg,ncurve);
     for icurve = 1:ncurve 
-      yhatmat(:,icurve) = beta(1,icurve) + ...
-                          beta(2,icurve)*hmat(:,icurve);
+      yhatmat(:,icurve) = betm(1,icurve) + ...
+                          betm(2,icurve)*hmat(:,icurve);
     end
     yhatcoef = project_basis(yhatmat, evalarg, basisobj);
     yhatfd   = fd(yhatcoef, basisobj);
@@ -453,8 +453,8 @@ if isempty(zmat)
     yhatmati = zeros(narg,ncurve);
     for ivar = 1:nvar 
       for icurve = 1:ncurve 
-        yhatmati(:,icurve) = beta(1,icurve,ivar) + ...
-                             beta(2,icurve,ivar)*hmat(:,icurve,ivar);
+        yhatmati(:,icurve) = betm(1,icurve,ivar) + ...
+                             betm(2,icurve,ivar)*hmat(:,icurve,ivar);
       end
       yhatcoef(:,:,ivar) = project_basis(yhatmati, evalarg, basisobj);
     end
@@ -480,7 +480,7 @@ end
         
         %  ----------------------------------------------------------------
         
-        function [Fstri, betai, Dyhat, basiscell] = ...
+        function [Fstri, betmi, Dyhat, basiscell] = ...
                 fngrad(yi, argvals, zmat, wtvec, cveci, lambda, ...
                 basisobj, Kmat, basiscell, inactive)
             n      = length(argvals);
@@ -496,17 +496,17 @@ end
             ncov   = size(xmat,2);
             matwrd = all(size(wtvec) == n);
             if matwrd
-                betai = (xmat'*wtvec*xmat)\(xmat'*wtvec*yi);
+                betmi = (xmat'*wtvec*xmat)\(xmat'*wtvec*yi);
             else
                 wtroot = sqrt(wtvec);
                 wtrtmt = wtroot*ones(1,ncov);
                 yroot  = yi.*wtroot;
                 xroot  = xmat.*wtrtmt;
                 %  compute regression coefs.
-                betai = xroot\yroot;
+                betmi = xroot\yroot;
             end
             %  update fitted values
-            yhat  = xmat*betai;
+            yhat  = xmat*betmi;
             %  update residuals and function values
             res     = yi - yhat;
             if matwrd
@@ -520,14 +520,14 @@ end
             for j=1:nbasis
                 Dxmatj = squeeze(Dxmat(:,:,j));
                 if matwrd
-                    yDx = yi'*wtvec*Dxmatj*betai;
+                    yDx = yi'*wtvec*Dxmatj*betmi;
                     xDx = xmat'*wtvec*Dxmatj;
                 else
                     Dxroot  = squeeze(Dxmat(:,:,j)).*wtrtmt;
-                    yDx     = yroot'*Dxroot*betai;
+                    yDx     = yroot'*Dxroot*betmi;
                     xDx     = xroot'*Dxroot;
                 end
-                grad(j) = betai'*(xDx+xDx')*betai - 2*yDx;
+                grad(j) = betmi'*(xDx+xDx')*betmi - 2*yDx;
             end
             Fstri.grad = grad/n;
             if lambda > 0
@@ -539,10 +539,10 @@ end
             
             %  ----------------------------------------------------------------
             
-            function hessmat = hesscal(betai, Dyhat, wtvec, lambda, Kmat, inactive)
-                nbet = length(betai);
+            function hessmat = hesscal(betmi, Dyhat, wtvec, lambda, Kmat, inactive)
+                nbet = length(betmi);
                 [n, nbasis] = size(Dyhat);
-                temp = betai(nbet).*Dyhat;
+                temp = betmi(nbet).*Dyhat;
                 matwrd = all(size(wtvec) == n);
                 if matwrd
                     hessmat = 2.*temp'*wtvec*temp./n;

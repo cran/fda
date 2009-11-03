@@ -14,7 +14,7 @@ function basisvalues = getbasisvalues(basisobj, argvals, nderiv)
 %               cell array containing all of the available
 %               derivative matrices is returned.
 
-%  Last modified 21 June  2007 
+%  Last modified 10 March  2011 
 
 %  check BASISOBJ
 
@@ -61,7 +61,7 @@ for i=1:sizevec(1)
     evalarg = basisobj.basisvalues{i,1};
     if ~isempty(basisobj.basisvalues{i,nderiv+2})
         if N == length(evalarg)
-            if all(argvals == evalarg)
+            if all(argvals(:) == evalarg(:))
                 basisvalues = basisobj.basisvalues{i,nderiv+2};
                 return;
             end

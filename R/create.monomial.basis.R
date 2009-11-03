@@ -126,7 +126,7 @@ create.monomial.basis <- function(rangeval=c(0,1), nbasis=NULL,
           stop('nbasis must be a scalar;  length(nbasis) = ',
                length(nbasis) )
         if((nbasis %%1) != 0)
-          stop('nbasis just be an integer;  nbasis%%1 = ',
+          stop('nbasis must be an integer;  nbasis%%1 = ',
                nbasis%%1)
         {
           if(is.null(exponents))
@@ -139,7 +139,7 @@ create.monomial.basis <- function(rangeval=c(0,1), nbasis=NULL,
                      ' != nbasis = ', nbasis)
               if(length(unique(exponents)) != nbasis)
                 stop('duplicates found in exponents;  not allowed.')
-              if(any(exponents %%1))
+              if(any((exponents %%1) != 0))
                 stop('exponents must be integers;  some are not.')
               if(any(exponents<0))
                 stop('exponents must be nonnegative;  some are not.')

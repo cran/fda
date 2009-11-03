@@ -4,7 +4,7 @@ function basismat = getbasismatrix(evalarg, basisobj, nderiv)
 %    The returned basis matrix BASISMAT contains the basis
 %    derivatives of order NDERIV (0 by default).
 
-%  last modified 6 April 2010 by Jim Ramsay
+%  last modified 7 March 2011 by Jim Ramsay
 
 if nargin < 3,  nderiv = 0;  end
 
@@ -80,8 +80,18 @@ else
             nodemesh = params.nodemesh;
             order    = params.order;
             basismat = FEM(evalarg, nodes, nodemesh, order, nderiv);
+        case 'TP'
+            error('GETBASISMATRIX not implemented for TP basis objects');
+        case 'fdVariance'
+            T = max(getbasisrange(basisobj));
+            pars = getbasispar(basisobj);
+            I = pars.I;
+            J = pars.J;
+            delta = T./I;
+            B = delta.*J;
+            basismat = RstCellSetup(evalarg, T, B, delta);
         otherwise
-            error('Basis type not recognizable')
+            error('Basis type not recognizable');
     end
 
     if ~isempty(dropind)

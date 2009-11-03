@@ -20,7 +20,7 @@ function plot_pca_fd(pcastr, matplt, harm, expand, cycle, colorwrd)
 %  This is identical to plot_pca and is included for 
 %  compatibility with the corresponding R function.
 
-%  last modified 16 September 2009
+%  last modified 24 April 2012
 
 %  set up default argument values
 
@@ -103,7 +103,7 @@ if length(dimfd) == 2
                 ' (Percentage of variability ',  ...
                 num2str(percentvar), ')'])
         else
-            title(['PCA function ', casenames(iharm,:), ...
+            title(['PCA function ', casenames{2}(iharm,:), ...
                 ' (Percentage of variability ',  ...
                 num2str(percentvar), ')'])
         end

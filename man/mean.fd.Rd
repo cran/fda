@@ -7,7 +7,7 @@
 Evaluate the mean of a set of functions in a functional data object.
 }
 \usage{
-mean.fd(x, ...)
+\method{mean}{fd}(x, ...)
 }
 \arguments{
 \item{x}{
@@ -20,9 +20,9 @@ a functional data object with a single replication
 that contains the mean of the functions in the object \code{fd}.
 }
 \seealso{
-  \code{\link{stddev.fd}}, 
-  \code{\link{var.fd}}, 
-  \code{\link{sum.fd}}, 
+  \code{\link{stddev.fd}},
+  \code{\link{var.fd}},
+  \code{\link{sum.fd}},
   \code{\link{center.fd}}
   \code{\link{mean}}
 }
@@ -55,10 +55,10 @@ plot(lipmeanfd)
 ##
 ## 2.  Trivariate:  CanadianWeather
 ##
-dayrng <- c(0, 365) 
+dayrng <- c(0, 365)
 
 nbasis <- 51
-norder <- 6 
+norder <- 6
 
 weatherBasis <- create.fourier.basis(dayrng, nbasis)
 

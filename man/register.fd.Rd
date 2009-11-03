@@ -16,7 +16,8 @@
 }
 \usage{
 register.fd(y0fd=NULL, yfd=NULL, WfdParobj=NULL,
-            conv=1e-04, iterlim=20, dbglev=1, periodic=FALSE, crit=2)
+            conv=1e-04, iterlim=20, dbglev=1, periodic=FALSE, crit=2,
+            returnMatrix=FALSE)
 }
 \arguments{
   \item{y0fd}{
@@ -94,6 +95,10 @@ register.fd(y0fd=NULL, yfd=NULL, WfdParobj=NULL,
     of a cross-product matrix.  In general, criterion 2 is to be
     preferred.
   }
+  \item{returnMatrix}{
+    logical:  If TRUE,  a two-dimensional is returned using a
+    special class from the Matrix package.
+  }
 }
 \value{
   a named list of length 4 containing the following components:
@@ -134,8 +139,9 @@ register.fd(y0fd=NULL, yfd=NULL, WfdParobj=NULL,
 \seealso{
   \code{\link{smooth.monotone}},
   \code{\link{smooth.morph}}
-  \code{\link{register.fd0}}
   \code{\link{plotreg.fd}}
+  \code{\link{register.fd0}}
+  \code{\link{register.newfd}}
 }
 \examples{
 #See the analyses of the growth data for examples.
@@ -256,7 +262,7 @@ nwbasis   <- 7
 wbasis    <- create.bspline.basis(gaitrange,nwbasis,3)
 Warpfd    <- fd(matrix(0,nwbasis,nBoys),wbasis)
 WarpfdPar <- fdPar(Warpfd)
-#  register the functions 
+#  register the functions
 gaitreglist <- register.fd(D2gaitmeanfd, D2gaitfd[1:nBoys], WarpfdPar,
                            periodic=TRUE)
 #  plot the results

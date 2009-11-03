@@ -3,14 +3,14 @@ fRegress <- function(y, ...){
 }
 
 fRegress.fd <- function(y, xfdlist, betalist, wt=NULL,
-                        y2cMap=NULL, SigmaE=NULL, ...){
+                        y2cMap=NULL, SigmaE=NULL, returnMatrix=FALSE, ...){
   yfdPar <- fdPar(y, ...)
   fRegress.fdPar(yfdPar, xfdlist, betalist, wt=wt,
-                 y2cMap=y2cMap, SigmaE=SigmaE, ...)
+                 y2cMap=y2cMap, SigmaE=SigmaE, returnMatrix=FALSE, ...)
 }
 
 fRegress.fdPar <- function(y, xfdlist, betalist, wt=NULL,
-                           y2cMap=NULL, SigmaE=NULL, ...)
+                           y2cMap=NULL, SigmaE=NULL, returnMatrix=FALSE, ...)
 {
 
 #  FREGRESS  Fits a functional linear model using multiple
@@ -48,6 +48,9 @@ fRegress.fdPar <- function(y, xfdlist, betalist, wt=NULL,
 #  SIGMAE   ... Estimate of the covariances among the residuals.  This
 #               can only be estimated after a preliminary analysis
 #               with FREGRESS.
+#  RETURNMATRIX ... If False, a matrix in sparse storage model can be returned
+#               from a call to function BsplineS.  See this function for
+#               enabling this option.
 #
 #  Returns FREGRESSLIST  ... A list containing seven members with names:
 #    yfdPar      ... first  argument of FREGRESS
@@ -60,8 +63,7 @@ fRegress.fdPar <- function(y, xfdlist, betalist, wt=NULL,
 #    wt          ... weights for observations
 #    df          ... degrees of freedom for fit
 
-# Last modified 2008.12.24 by Spencer
-# Previously modified 11 December 2008 by Jim
+# Last modified 8 May 2012 by Jim Ramsay
 
 ##
 ## 1.  check YFDPAR and compute sample size N
@@ -326,10 +328,10 @@ fRegress.fdPar <- function(y, xfdlist, betalist, wt=NULL,
     yhatmat <- matrix(0,nfine,N)
     for (j in 1:p) {
       xfdj       <- xfdlist[[j]]
-      xmatj      <- eval.fd(tfine, xfdj)
+      xmatj      <- eval.fd(tfine, xfdj, 0, returnMatrix)
       betafdParj <- betaestlist[[j]]
       betafdj    <- betafdParj$fd
-      betavecj   <- eval.fd(tfine, betafdj)
+      betavecj   <- eval.fd(tfine, betafdj, 0, returnMatrix)
       yhatmat    <- yhatmat + xmatj*as.vector(betavecj)
     }
     yhatfdobj <- smooth.basis(tfine, yhatmat, ybasisobj)
@@ -348,7 +350,7 @@ fRegress.fdPar <- function(y, xfdlist, betalist, wt=NULL,
          y2cdim[2] != dim(SigmaE)[1])  stop(
                    "Dimensions of Y2CMAP not correct.")
 
-      ybasismat <- eval.basis(tfine, ybasisobj)
+      ybasismat <- eval.basis(tfine, ybasisobj, 0, returnMatrix)
 
       deltat    <- tfine[2] - tfine[1]
 
@@ -361,9 +363,9 @@ fRegress.fdPar <- function(y, xfdlist, betalist, wt=NULL,
         betafdParj <- betalist[[j]]
         betabasisj <- betafdParj$fd$basis
         ncoefj     <- betabasisj$nbasis
-        bbasismatj <- eval.basis(tfine, betabasisj)
+        bbasismatj <- eval.basis(tfine, betabasisj, 0, returnMatrix)
         xfdj       <- xfdlist[[j]]
-        tempj      <- eval.fd(tfine, xfdj)
+        tempj      <- eval.fd(tfine, xfdj, 0, returnMatrix)
             #  row indices of BASISPRODMAT to fill
         mj1    <- mj2 + 1
         mj2    <- mj2 + ncoefj
@@ -397,7 +399,7 @@ fRegress.fdPar <- function(y, xfdlist, betalist, wt=NULL,
         mj1 	     <- mj2 + 1
         mj2 	     <- mj2 + ncoefj
         indexj 	   <- mj1:mj2
-        bbasismat  <- eval.basis(tfine, betabasisj)
+        bbasismat  <- eval.basis(tfine, betabasisj, 0, returnMatrix)
         bvarj      <- bvar[indexj,indexj]
         bstderrj   <- sqrt(diag(bbasismat %*% bvarj %*% t(bbasismat)))
         bstderrfdj <- smooth.basis(tfine, bstderrj, betabasisj)$fd
@@ -458,7 +460,7 @@ fRegress.fdPar <- function(y, xfdlist, betalist, wt=NULL,
         lambdaj    <- betafdParj$lambda
         if (lambdaj > 0) {
           Lfdj  <- betafdParj$Lfd
-          Rmatj <- lambdaj*eval.penalty(bbasis,Lfdj)
+          Rmatj <- lambdaj*eval.penalty(bbasis,Lfdj, returnMatrix)
         } else {
           Rmatj <- matrix(0,bnbasis,bnbasis)
         }
@@ -541,10 +543,10 @@ fRegress.fdPar <- function(y, xfdlist, betalist, wt=NULL,
         nfine      <- max(501,10*xnbasis+1)
         tfine      <- seq(xrng[1], xrng[2], len=nfine)
         deltat     <- tfine[2]-tfine[1]
-        xmat       <- eval.fd(tfine, xfdj)
+        xmat       <- eval.fd(tfine, xfdj, 0, returnMatrix)
         betafdParj <- betaestlist[[j]]
         betafdj    <- betafdParj$fd
-        betamat    <- eval.fd(tfine, betafdj)
+        betamat    <- eval.fd(tfine, betafdj, 0, returnMatrix)
         fitj       <- deltat*(crossprod(xmat,betamat) -
                               0.5*(outer(xmat[1,    ],betamat[1,    ]) +
                                    outer(xmat[nfine,],betamat[nfine,])))
@@ -593,7 +595,7 @@ fRegress.fdPar <- function(y, xfdlist, betalist, wt=NULL,
           betarng    <- betabasisj$rangeval
           nfine      <- max(c(501,10*ncoefj+1))
           tfine      <- seq(betarng[1], betarng[2], len=nfine)
-          bbasismat  <- eval.basis(tfine, betabasisj)
+          bbasismat  <- eval.basis(tfine, betabasisj, 0, returnMatrix)
           bstderrj   <- sqrt(diag(bbasismat %*% bvarj %*% t(bbasismat)))
           bstderrfdj <- smooth.basis(tfine, bstderrj, betabasisj)$fd
         } else {

@@ -34,8 +34,7 @@ function [penaltymat, iter] = eval_penalty(basisobj, Lfdobj, rng)
 %                 it is called.  Otherwise 0.
 %
 
-%  last modified 25 May 2010
-
+%  last modified 27 September 2011
 %  get BASISOBJ
 
 if isa_fd(basisobj)
@@ -92,6 +91,8 @@ switch type
         penaltymat = fourierpen(basisobj, Lfdobj);
     case 'monom'
         penaltymat = monompen(basisobj,   Lfdobj);
+    case 'naturalbspline'
+        [penaltymat, iter] = naturalbsplinepen(basisobj, Lfdobj, rng);        
     case 'polyg'
         penaltymat = polygpen(basisobj,   Lfdobj);
     case 'power'

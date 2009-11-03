@@ -5,19 +5,19 @@
 
 #  Remarks and disclaimers
 
-#  These R commands are either those in this book, or designed to 
+#  These R commands are either those in this book, or designed to
 #  otherwise illustrate how R can be used in the analysis of functional
-#  data.  
-#  We do not claim to reproduce the results in the book exactly by these 
+#  data.
+#  We do not claim to reproduce the results in the book exactly by these
 #  commands for various reasons, including:
 #    -- the analyses used to produce the book may not have been
 #       entirely correct, possibly due to coding and accuracy issues
-#       in the functions themselves 
-#    -- we may have changed our minds about how these analyses should be 
+#       in the functions themselves
+#    -- we may have changed our minds about how these analyses should be
 #       done since, and we want to suggest better ways
 #    -- the R language changes with each release of the base system, and
 #       certainly the functional data analysis functions change as well
-#    -- we might choose to offer new analyses from time to time by 
+#    -- we might choose to offer new analyses from time to time by
 #       augmenting those in the book
 #    -- many illustrations in the book were produced using Matlab, which
 #       inevitably can imply slightly different results and graphical
@@ -101,7 +101,7 @@ DpGampli = matrix(0,201,5)
 for (i in 1:5) DpGampli[,i] = sigma[i]*DGauss(tvec, 0, 1)
 DpGampliMean = apply(DpGampli,1,mean)
 
-op = par(mfrow=c(2,1), cex=1, ask=F)
+op = par(mfrow=c(2,1), cex=1, ask=FALSE)
 #  top panel
 matplot(tvec, DpGphase, "l", lwd=1, col=1, lty=1,
         xlim=c(-5,5), ylim=c(-0.8,0.8),
@@ -323,10 +323,10 @@ MS.pha      = AmpPhasList$MS.pha
 RSQRLM      = AmpPhasList$RSQR
 CLM         = AmpPhasList$C
 
-print(paste("Total MS =",     round(MS.amp+MS.pha,2), 
+print(paste("Total MS =",     round(MS.amp+MS.pha,2),
             "Amplitude MS =", round(MS.amp,2),
             "Phase MS =",     round(MS.pha,2)))
-            
+
 #  [1] "Total MS = 7.06 Amplitude MS = 2.12 Phase MS = 4.95"
 
 print(paste("R-squared =", round(RSQRLM,3), ",  C =", round(CLM,3)))
@@ -351,6 +351,7 @@ WfdParCR  = fdPar(Wfd0CR, 1, lambdaCR)
 registerlistCR = register.fd(accelmeanfdLM, accelfdLM, WfdParCR)
 
 accelfdCR = registerlistCR$regfd
+warpfdCR  = registerlistCR$warpfd
 WfdCR     = registerlistCR$Wfd
 
 #  plot landmark and continuously registered curves for the
@@ -417,10 +418,10 @@ MS.pha      = AmpPhasList$MS.pha
 RSQRCR      = AmpPhasList$RSQR
 CCR         = AmpPhasList$C
 
-print(paste("Total MS =",     round(MS.amp+MS.pha,2), 
+print(paste("Total MS =",     round(MS.amp+MS.pha,2),
             "Amplitude MS =", round(MS.amp,2),
             "Phase MS =",     round(MS.pha,2)))
-            
+
 #  "Total MS = 1.5 Amplitude MS = 1.6 Phase MS = -0.1"
 
 print(paste("R-squared =", round(RSQRCR,3), ",  C =", round(CCR,3)))

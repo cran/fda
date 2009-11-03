@@ -12,7 +12,7 @@ nonhomogeneous, and $mu(t)$, and is estimated by this function
 }
 \usage{
 intensity.fd(x, WfdParobj, conv=0.0001, iterlim=20,
-             dbglev=1)
+             dbglev=1, returnMatrix=FALSE)
 }
 \arguments{
 \item{x}{
@@ -39,6 +39,10 @@ either 0, 1, or 2.  This controls the amount information printed out on
 each iteration, with 0 implying no output, 1 intermediate output level,
 and 2 full output.  If levels 1 and 2 are used, turn off the output
 buffering option.
+}
+\item{returnMatrix}{
+logical:  If TRUE,  a two-dimensional is returned using a
+special class from the Matrix package.
 }
 }
 \value{

@@ -1,26 +1,30 @@
-predict.fdSmooth <- function(object, newdata=NULL, Lfdobj=0, ...){
+predict.fdSmooth <- function(object, newdata=NULL, Lfdobj=0,
+                             returnMatrix=FALSE, ...){
   if(is.null(newdata)){
     newdata <- object$argvals
   }
-  eval.fd(newdata, object$fd, Lfdobj)
+  eval.fd(newdata, object$fd, Lfdobj, returnMatrix=returnMatrix)
 }
 
-fitted.fdSmooth <- function(object, ...){
+fitted.fdSmooth <- function(object, returnMatrix=FALSE, ...){
   newdata <- object$argvals
-  eval.fd(newdata, object$fd)
+  eval.fd(newdata, object$fd, 0, returnMatrix=returnMatrix)
 }
 
-residuals.fdSmooth <- function(object, ...){
+residuals.fdSmooth <- function(object, returnMatrix=FALSE, ...){
   newdata <- object$argvals
-  pred <- eval.fd(newdata, object$fd)
+  pred <- eval.fd(newdata, object$fd, 0, returnMatrix=returnMatrix)
   object$y-pred
 }
 
-predict.fdPar <- function(object, newdata=NULL, Lfdobj=0, ...){
-  predict.fd(object$fd, newdata, Lfdobj, ...)
+predict.fdPar <- function(object, newdata=NULL, Lfdobj=0,
+                          returnMatrix=FALSE, ...){
+  predict.fd(object$fd, newdata, Lfdobj,
+             returnMatrix=returnMatrix, ...)
 }
 
-predict.fd <- function(object, newdata=NULL, Lfdobj=0, ...){
+predict.fd <- function(object, newdata=NULL, Lfdobj=0,
+                       returnMatrix=FALSE, ...){
   if(is.null(newdata)){
     basis <- object$basis
     type <- basis$type
@@ -33,12 +37,12 @@ predict.fd <- function(object, newdata=NULL, Lfdobj=0, ...){
       else basis$rangeval
     }
   }
-  eval.fd(newdata, object, Lfdobj)
+  eval.fd(newdata, object, Lfdobj, returnMatrix=returnMatrix)
 }
 
 #  ----------------------------------------------------------------------------
 
-eval.fd <- function(evalarg, fdobj, Lfdobj=0) {
+eval.fd <- function(evalarg, fdobj, Lfdobj=0, returnMatrix=FALSE) {
 
 #  EVAL_FD evaluates a functional data observation at argument
 #  values EVALARG.
@@ -54,13 +58,16 @@ eval.fd <- function(evalarg, fdobj, Lfdobj=0) {
 #  FDOBJ   ... Functional data object
 #  LFDOBJ  ... A linear differential operator object
 #              applied to the functions before they are evaluated.
+#  RETURNMATRIX ... If False, a matrix in sparse storage model can be returned
+#               from a call to function BsplineS.  See this function for
+#               enabling this option.
 
 #  Note that the first two arguments may be interchanged.
 
 #  Returns:  An array of function values corresponding to the evaluation
 #              arguments in EVALARG
 
-#  Last modified 3 January 2008 by Jim Ramsay
+#  Last modified 9 May 2012 by Jim Ramsay
 
 #  Check LFDOBJ
 
@@ -135,12 +142,14 @@ if (is.vector(evalarg)) {
 
     evalarg[evalarg < rangeval[1]-1e-10] <- NA
     evalarg[evalarg > rangeval[2]+1e-10] <- NA
-    basismat <- eval.basis(evalarg, basisobj, Lfdobj)
+    basismat <- eval.basis(evalarg, basisobj, Lfdobj, returnMatrix)
 
     #  evaluate the functions at arguments in EVALARG
 
     if (ndim <= 2) {
       evalarray <- basismat %*% coef
+#     needed because dimnames may malfunction with Matrix basismat
+      dimnames(evalarray) <- list(rownames(basismat), colnames(coef))
     } else {
        evalarray <- array(0,c(n,nrep,nvar))
        for (ivar in 1:nvar) evalarray[,,ivar] <- basismat %*% coef[,,ivar]
@@ -158,25 +167,28 @@ if (is.vector(evalarg)) {
     index    <- !(is.na(evalargi) | evalargi < rangeval[1] |
                                     evalargi > rangeval[2])
     evalargi <- evalargi[index]
-       basismat <- eval.basis(evalargi, basisobj, Lfdobj)
+       basismat <- eval.basis(evalargi, basisobj, Lfdobj, returnMatrix)
 
        #  evaluate the functions at arguments in EVALARG
 
        if (ndim == 2) {
-           evalarray[  index, i] <- basismat %*% coef[,i]
+           evalarray[  index, i] <- as.vector(basismat %*% coef[,i])
            evalarray[!(index),i] <- NA
        }
        if (ndim == 3) {
            for (ivar in 1:nvar) {
-             evalarray[   index,i,ivar] <- basismat %*% coef[,i,ivar]
-               evalarray[!(index),i,ivar] <- NA
+             evalarray[   index,i,ivar] <- 
+                                as.vector(basismat %*% coef[,i,ivar])
+             evalarray[!(index),i,ivar] <- NA
            }
        }
   }
 
 }
 
-return(evalarray)
-
+if((length(dim(evalarray))==2) && !returnMatrix) {
+    return(as.matrix(evalarray))
+} else
+    return(evalarray)
 }
 

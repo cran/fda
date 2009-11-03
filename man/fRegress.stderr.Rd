@@ -15,14 +15,14 @@
   and not sampling covariances.
 }
 \usage{
-fRegress.stderr(y, y2cMap, SigmaE, ...)
+fRegress.stderr(y, y2cMap, SigmaE, returnMatrix=FALSE, ...)
 }
 \arguments{
   \item{y}{
-    the named list that is returned from a call to
-    function \code{fRegress}, where it is referred to as fRegressList.
-    R syntax requires that the first argument of any function beginning
-    with \code{fRegress.} must begin with \code{y}.
+    the named list that is returned from a call to function
+    \code{fRegress}, where it is referred to as fRegressList.  (R syntax
+    requires that the first argument of any function beginning with
+    \code{fRegress.} must begin with \code{y}.)
   }
   \item{y2cMap}{
     a matrix that contains the linear transformation that takes the raw
@@ -38,6 +38,10 @@ fRegress.stderr(y, y2cMap, SigmaE, ...)
     respectively.  This object has a number of replications equal to the
     length of the dependent variable object.  It contains an estimate of
     the variance-covariance matrix or function for the residuals.
+  }
+  \item{returnMatrix}{
+    logical:  If TRUE,  a two-dimensional is returned using a
+    special class from the Matrix package.
   }
   \item{\dots}{
     optional arguments not used by \code{fRegress.stderr} but needed for

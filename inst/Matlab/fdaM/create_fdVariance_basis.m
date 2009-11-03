@@ -1,8 +1,8 @@
 function basisobj = create_fdVariance_basis(rangeval, I, J)
-%  Creates a functional basis object with type 'fdVariance' that
-%  can be used to define a covariance surface.  This object can
-%  consist of one or more trapezoidal domains defined over a common
-%  range.  The range is defined in argument RANGEVAL, which is also
+%  CREATE_FDVARIANCE_BASIS Creates a functional basis object with type 
+%  'fdVariance' thatcan be used to define a covariance surface.  This 
+%  object can consist of one or more trapezoidal domains defined over a 
+%  common range.  The range is defined in argument RANGEVAL, which is also
 %  the RANGEVAL field of the basis object.
 %  Each trapezoidal region is defined by the number of vertical
 %  intervals in the corresponding element in I, and the number of
@@ -15,7 +15,7 @@ function basisobj = create_fdVariance_basis(rangeval, I, J)
 %
 %  Arguments:
 
-%  Last modified 9 May 2011 by Jim Ramsay
+%  Last modified 21 September 2011 by Jim Ramsay
 
 if nargin < 3,  J = I;  end
 
@@ -50,7 +50,7 @@ end
 
 if length(rangeval) == 1
     if rangeval <= 0
-        error('RANGEVAL a single value that is not positive.');
+        error('RANGEVAL is a single value that is not positive.');
     end
     rangeval = [0,rangeval];
 end

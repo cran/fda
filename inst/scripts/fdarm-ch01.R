@@ -5,19 +5,19 @@
 
 #  Remarks and disclaimers
 
-#  These R commands are either those in this book, or designed to 
+#  These R commands are either those in this book, or designed to
 #  otherwise illustrate how R can be used in the analysis of functional
-#  data.  
-#  We do not claim to reproduce the results in the book exactly by these 
+#  data.
+#  We do not claim to reproduce the results in the book exactly by these
 #  commands for various reasons, including:
 #    -- the analyses used to produce the book may not have been
 #       entirely correct, possibly due to coding and accuracy issues
-#       in the functions themselves 
-#    -- we may have changed our minds about how these analyses should be 
+#       in the functions themselves
+#    -- we may have changed our minds about how these analyses should be
 #       done since, and we want to suggest better ways
 #    -- the R language changes with each release of the base system, and
 #       certainly the functional data analysis functions change as well
-#    -- we might choose to offer new analyses from time to time by 
+#    -- we might choose to offer new analyses from time to time by
 #       augmenting those in the book
 #    -- many illustrations in the book were produced using Matlab, which
 #       inevitably can imply slightly different results and graphical
@@ -31,7 +31,7 @@
 #  to the package, or just for fun.
 
 #  We want to call you attention particularly to a new package  called 'fds'
-#  containing functional data that has appeared since the publication of 
+#  containing functional data that has appeared since the publication of
 #  book.  It contains most of the data that we analyze here, as well as
 #  many new data sets.
 
@@ -99,17 +99,17 @@ gr.Lfd    = 3
 
 gr.lambda = 10^(-1.5)
 
-%  Define the functional parameter object
+#  Define the functional parameter object
 
 gr.fdPar  = fdPar(gr.fd0, Lfdobj=gr.Lfd, lambda=gr.lambda)
 
-#  Monotonically smooth the female data 
+#  Monotonically smooth the female data
 
-hgtfmonfd   = with(growth, smooth.monotone(age, hgtf[,children], gr.fdPar)) 
+hgtfmonfd   = with(growth, smooth.monotone(age, hgtf[,children], gr.fdPar))
 
 #  Plot Figure 1.1
 
-#   The with function evaluates an R expression in an environment constructed 
+#   The with function evaluates an R expression in an environment constructed
 #   from data, possibly modifying the original data.
 
 with(growth, matplot(age, hgtf[, children], pch='o', col=1,
@@ -132,18 +132,18 @@ lines(agefine, rowMeans(accfvec), lty='dashed', lwd=2)
 
 # Figure 1.3
 
-plot(nondurables, ylim=c(0, 120), 
+plot(nondurables, ylim=c(0, 120),
      xlab = 'Year', ylab='Nondurable Goods Index', las=1)
 
 # Figure 1.4
 
-plot(log10(nondurables), xlab = 'Year', 
+plot(log10(nondurables), xlab = 'Year',
      ylab=expression(Log[10]~~Nondurable~~Goods~~Index), las=1 )
 abline(lm(log10(nondurables) ~ index(nondurables)), lty='dashed')
 
 #  ------------------------  Plot refinery data  --------------------------
 
-%  Input and output values have baselines 0 here
+#  Input and output values have baselines 0 here
 
 # Figure 1.5
 
@@ -289,7 +289,9 @@ legend('bottom', paste(fig1.11Stns, ' (', StnLtrs, ')', sep=''),
 yearRng      = c(0,365)
 Lbasis       = create.constant.basis(yearRng,
                                   axes=list("axesIntervals"))
+
 Lcoef        = matrix(c(0,(2*pi/365)^2,0),1,3)
+
 bfdobj       = fd(Lcoef,Lbasis)
 bwtlist      = fd2list(bfdobj)
 harmaccelLfd = Lfd(3, bwtlist)
@@ -315,7 +317,7 @@ legend('bottom', paste(fig1.11Stns, ' (', StnLtrs, ')', sep=''),
 ## Section 1.5.  The first steps in a functional data analysis
 ##
 
-%  Plot the precipitation for Prince Rupert
+#  Plot the precipitation for Prince Rupert
 
 P.RupertPrecip = CanadianWeather$dailyAv[ ,
                         'Pr. Rupert', 'Precipitation.mm']

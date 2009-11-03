@@ -15,7 +15,7 @@ function [regfd, warpfd, Wfd] = landmarkreg(fdobj, ximarks, x0marks, ...
 %                 function.  If MONWRD is 0 and an error message results 
 %                 indicating nonmonotonicity, rerun with MONWRD = 1.
 %                 Default:  1
-%  YLAMBDA ... smoothing parameter to be used in computing the registered
+%  YLAMBDA    ... smoothing parameter to be used in computing the registered
 %                 functions.  For high dimensional bases, local wiggles may be 
 %                 found in the registered functions or its derivatives that are
 %                 not seen in the unregistered functions.  In this event, this
@@ -33,10 +33,10 @@ function [regfd, warpfd, Wfd] = landmarkreg(fdobj, ximarks, x0marks, ...
 %                     warpvec = rng(1) + width.*harg./rng(2);
 %              where rng is the argument range vector.
 
-%  last modified 15 May 2009 by Jim Ramsay
+%  last modified 26 December 2011 by Jim Ramsay
 
 if nargin < 6, ylambda = 0; end
-if nargin < 5, monwrd = 0; end
+if nargin < 5, monwrd  = 0; end
 
 %  check FDOBJ
 
@@ -109,9 +109,6 @@ WLfdobj = int2Lfd(WLfdobj);
 wlambda = getlambda(WfdParobj);
 
 %  check landmark target values
-disp(x0marks)
-disp(ximarks)
-disp(rangeval)
 
 test1 = any(x0marks(:) <= rangeval(1));
 test2 = any(ximarks(:) >= rangeval(2));
@@ -141,11 +138,12 @@ WfdParobj = fdPar(Wfd0, WLfdobj, wlambda);
 for icurve = 1:ncurve
     
     %  set up landmark times for this curve
-    fprintf(['Curve ',num2str(icurve),'\n']);
+    if ncurve > 1
+        fprintf(['Curve ',num2str(icurve),'\n']);
+    end
     yval = [rangeval(1),ximarks(icurve,:),rangeval(2)]';
     
     if all(ximarks(icurve,:) == x0marks)
-        Wcoef(:,icurve)   = zeros(nwbasis,1);
         hfunmat(:,icurve) = x;
         yregmat(:,icurve) = eval_fd(x, fdobj(icurve));
     else
@@ -155,6 +153,7 @@ for icurve = 1:ncurve
         if monwrd
             %  use monotone smoother
             Wfd      = smooth_morph(xval, yval, WfdParobj);
+            Wcoef(:,icurve) = getcoef(Wfd);
             h        = monfn(x, Wfd);
             %  normalize h
             b        = (rangeval(2)-rangeval(1))/(h(n)-h(1));
@@ -230,8 +229,17 @@ end
 fdParobj      = fdPar(fdbasisobj, 2, 1e-10);
 regfd         = smooth_basis(x, yregmat, fdParobj);
 regfdnames    = getnames(fdobj);
-regfdnames{3} = ['Registered ',regfdnames{3}];
-regfd         = putnames(regfd, regfdnames);
+if iscell(regfdnames{3})
+%     labelmat = regfdnames{3}{2};
+%     labeld   = size(labelmat);
+%     newlabelmat = char(labeld(1),labeld(2)+11);
+%     for j=1:labeld(1)
+%         newlabelmat(j,:) = ['Registered ',labelmat(j,:)];
+%     end
+else
+    regfdnames{3} = ['Registered ',regfdnames{3}];
+    regfd         = putnames(regfd, regfdnames);
+end
 
 %  create functional data objects for the warping functions
 
@@ -240,9 +248,12 @@ warpfdnames    = getnames(fdobj);
 warpfdnames{3} = ['Warped ',warpfdnames{3}];
 warpfd         = putnames(warpfd, warpfdnames);
 
-%  create functional data object for Wfd if monwrd is true
+%  set up Wfd if monwrd is nonzero
 
-Wfd = fd(Wcoef,wbasis);
-
+if monwrd
+    Wfd = fd(Wcoef, wbasis);
+else
+    Wfd = [];
+end
 
 

@@ -19,7 +19,7 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
 #  meanfd     ... A functional data object giving the mean function
 #
 
-#  Last modified:  9 November 2010 by Jim Ramsay
+#  Last modified:  24 April 2012 by Jim Ramsay
 
   #  Check FDOBJ
 
@@ -45,9 +45,9 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
   type     <- basisobj$type
 
   #  set up HARMBASIS
-  #  currently this is required to be BASISOBJ
 
-  harmbasis <- basisobj
+  harmbasis <- harmfdPar$fd$basis
+  nhbasis   <- harmbasis$nbasis
 
   #  set up LFDOBJ and LAMBDA
 
@@ -68,42 +68,40 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
     ctemp <- coef
   }
 
-  #  set up cross product and penalty matrices
+  #  set up cross product Lmat for harmonic basis,
+  #  roughness penalty matrix Rmat, and
+  #  penalized cross product matrix Lmat
 
-  Cmat <- crossprod(t(ctemp))/nrep
-  Jmat <- eval.penalty(basisobj, 0)
-  if(lambda > 0) {
-    Kmat <- eval.penalty(basisobj, Lfdobj)
-    Wmat <- Jmat + lambda * Kmat
-  } else {
-    Wmat <- Jmat
+  Lmat <- eval.penalty(harmbasis, 0)
+  if (lambda > 0) {
+    Rmat <- eval.penalty(harmbasis, Lfdobj)
+    Lmat <- Lmat + lambda * Rmat
   }
-  Wmat <- (Wmat + t(Wmat))/2
+  Lmat <- (Lmat + t(Lmat))/2
 
   #  compute the Choleski factor of Wmat
 
-  Lmat    <- chol(Wmat)
-  Lmatinv <- solve(Lmat)
+  Mmat    <- chol(Lmat)
+  Mmatinv <- solve(Mmat)
 
+    #  set up cross product and penalty matrices
+
+  Wmat <- crossprod(t(ctemp))/nrep
+  
+  Jmat = inprod(harmbasis, basisobj)
+  MIJW = crossprod(Mmatinv,Jmat)
+  
   #  set up matrix for eigenanalysis
 
   if(nvar == 1) {
-    if(lambda > 0) {
-            Cmat <- t(Lmatinv) %*% Jmat %*% Cmat %*% Jmat %*% Lmatinv
-    } else {
-            Cmat <- Lmat %*% Cmat %*% t(Lmat)
-    }
+    Cmat = MIJW %*% Wmat %*% t(MIJW)
   } else {
+    Cmat = matrix(0,nvar*nhbasis,nvar*nhbasis)
     for (i in 1:nvar) {
       indexi <- 1:nbasis + (i - 1) * nbasis
       for (j in 1:nvar) {
         indexj <- 1:nbasis + (j - 1) * nbasis
-        if (lambda > 0) {
-          Cmat[indexi, indexj] <- t(Lmatinv) %*% Jmat %*%
-          Cmat[indexi, indexj] %*% Jmat %*% Lmatinv
-        } else {
-          Cmat[indexi, indexj] <- Lmat %*% Cmat[indexi,indexj] %*% t(Lmat)
-        }
+        Cmat[indexi, indexj] <- MIJW %*% Wmat[indexi,indexj] %*% t(MIJW)
       }
     }
   }
@@ -122,16 +120,13 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
   #  set up harmfd
   
   if (nvar == 1) {
-    harmcoef <- Lmatinv %*% eigvecc
-    harmscr  <- t(ctemp) %*% t(Lmat) %*% eigvecc
+    harmcoef <- Mmatinv %*% eigvecc
   } else {
     harmcoef <- array(0, c(nbasis, nharm, nvar))
-    harmscr  <- array(0, c(nrep,   nharm, nvar))
     for (j in 1:nvar) {
       index <- 1:nbasis + (j - 1) * nbasis
       temp <- eigvecc[index,  ]
-      harmcoef[,  , j] <- Lmatinv %*% temp
-      harmscr[,  , j]  <- t(ctemp[index,  ]) %*% t(Lmat) %*% temp
+      harmcoef[,  , j] <- Mmatinv %*% temp
     }
   }
   harmnames <- rep("", nharm)
@@ -141,7 +136,7 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
     harmnames <- list(coefnames[[1]], harmnames,"values")
   if(length(coefd) == 3)
     harmnames <- list(coefnames[[1]], harmnames, coefnames[[3]])
-  harmfd   <- fd(harmcoef, basisobj, harmnames)
+  harmfd   <- fd(harmcoef, harmbasis, harmnames)
 
   #  set up harmscr
   

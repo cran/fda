@@ -9,7 +9,7 @@ linear differential operator object.
 }
 \usage{
 \method{summary}{Lfd}(object, ...)
-summary.Lfd(object, ...)
+%summary.Lfd(object, ...)
 }
 \arguments{
 \item{object}{
@@ -21,7 +21,7 @@ a linear differential operator object.
 a displayed summary of the linear differential operator object.
 }
 \seealso{
-\code{\link{summary}}, 
+\code{\link{summary}},
 }
 % docclass is function
 \keyword{smooth}

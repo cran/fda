@@ -1,4 +1,5 @@
-bsplinepen <- function(basisobj, Lfdobj=2, rng=basisobj$rangeval)
+bsplinepen <- function(basisobj, Lfdobj=2, rng=basisobj$rangeval, 
+                       returnMatrix=FALSE)
 {
 
 #  Computes the Bspline penalty matrix.
@@ -6,10 +7,13 @@ bsplinepen <- function(basisobj, Lfdobj=2, rng=basisobj$rangeval)
 #  BASISOBJ    a basis.fd object of type "bspline"
 #  LFDOBJ      a linear differential operator object.
 #  RNG         a range over which the product is evaluate
+#  RETURNMATRIX ... If False, a matrix in sparse storage model can be returned
+#               from a call to function BsplineS.  See this function for
+#               enabling this option.
+
 #  Returns the penalty matrix.
 
-#  Last modified 2008.08.23 by Spencer Graves
-#  Previously modified 26 October 2005
+#  Last modified 9 May by Jim Ramsay
 
 #  check BASISOBJ
 
@@ -94,7 +98,7 @@ if (nderiv > 0) {
 if (isintLfd && nderiv == norder - 1) {
     #  special case of nderiv = norder - 1
     halfseq    <- (breaks[2:nbreaks] + breaks[1:(nbreaks-1)])/2
-    halfmat    <- bsplineS(halfseq, breaks, norder, nderiv)
+    halfmat    <- bsplineS(halfseq, breaks, norder, nderiv, returnMatrix)
     brwidth    <- diff(breaks)
     penaltymat <- (t(halfmat) %*% diag(brwidth) %*% halfmat)
     return(penaltymat)

@@ -1,4 +1,4 @@
-function evalarray = eval_basis(evalarg, basisobj, Lfdobj)
+function [evalarray, basisobj] = eval_basis(evalarg, basisobj, Lfdobj)
 %  EVAL_BASIS evaluates a basis at argument values EVALARG.
 %
 %  LFDOBJ is a functional data object defining the order m 
@@ -73,7 +73,11 @@ wfdcell = getwfdcell(Lfdobj);
     
 %  get highest order of basis matrix
 
-evalarray = getbasismatrix(evalarg, basisobj, nderiv);
+if nargout == 1
+    evalarray = getbasismatrix(evalarg, basisobj, nderiv);
+else
+    [evalarray, basisobj] = getbasismatrix(evalarg, basisobj, nderiv);
+end
 nbasis    = size(evalarray,2);
 onerow    = ones(1,nbasis);
 

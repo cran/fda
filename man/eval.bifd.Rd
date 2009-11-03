@@ -8,15 +8,16 @@
   functional data object to be evaluated.
 }
 \usage{
-eval.bifd(sevalarg, tevalarg, bifd, sLfdobj=0, tLfdobj=0)
+eval.bifd(sevalarg, tevalarg, bifd, sLfdobj=0, tLfdobj=0,
+          returnMatrix=FALSE)
 }
 \arguments{
   \item{sevalarg}{
-    a vector of argument values for the first argument \code{s} of the 
+    a vector of argument values for the first argument \code{s} of the
     functional data object to be evaluated.
   }
   \item{tevalarg}{
-    a vector of argument values for the second argument \code{t} of the 
+    a vector of argument values for the second argument \code{t} of the
     functional data object to be evaluated.
   }
   \item{bifd}{
@@ -34,12 +35,16 @@ eval.bifd(sevalarg, tevalarg, bifd, sLfdobj=0, tLfdobj=0)
     operator to the object as a function of the second argument \code{t}
     is evaluated rather than the functions themselves.
   }
+  \item{returnMatrix}{
+    logical:  If TRUE,  a two-dimensional is returned using a
+    special class from the Matrix package.
+  }
 }
 \value{
   an array of 2, 3, or 4 dimensions containing the function values.  The
   first dimension corresponds to the argument values in sevalarg, the
   second to argument values in tevalarg, the third if present to
-  replications, and the fourth if present to functions. 
+  replications, and the fourth if present to functions.
 }
 \examples{
 daybasis   <- create.fourier.basis(c(0,365), 365)

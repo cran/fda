@@ -13,8 +13,14 @@ function basisobj = create_exponential_basis(rangeval, nbasis, ...
 %                when basis objects are arguments.  Default is [];
 %  Return:
 %  BASIS     ... a functional data basis object of type 'expon'
+%
+%  See also BASIS, CREATE_BSPLINE_BASIS, CREATE_FD_BASIS, 
+%  CREATE_FDVARIANCE_BASIS, CREATE_FOURIER_BASIS, CREATE_MONOMIAL_BASIS, 
+%  CREATE_POLYGONAL_BASIS,  CREATE_POLYNOMIAL_BASIS, CREATE_POWER_BASIS, 
+%  CREATE_POLYGONAL_BASIS,  CREATE_FEM_BASIS, CREATE_PRODUCT_BASIS, 
+%  CREATE_TP_BASIS
 
-%  last modified 3 January 2008
+%  Last modified 3 October 2011
 
 %  default RANGEVAL
 

@@ -32,7 +32,7 @@
 }
 \usage{
 pda.fd(xfdlist, bwtlist=NULL,
-       awtlist=NULL, ufdlist=NULL, nfine=501)
+       awtlist=NULL, ufdlist=NULL, nfine=501, returnMatrix=FALSE)
 }
 \arguments{
   \item{xfdlist}{
@@ -122,6 +122,10 @@ pda.fd(xfdlist, bwtlist=NULL,
     defines the number to use.  The default value of 501 is reset to
     five times the largest number of basis functions used to represent
     any variable in the system, if this number is larger.
+  }
+  \item{returnMatrix}{
+    logical:  If TRUE,  a two-dimensional is returned using a
+    special class from the Matrix package.
   }
 }
 

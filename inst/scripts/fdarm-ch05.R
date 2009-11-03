@@ -5,19 +5,19 @@
 
 #  Remarks and disclaimers
 
-#  These R commands are either those in this book, or designed to 
+#  These R commands are either those in this book, or designed to
 #  otherwise illustrate how R can be used in the analysis of functional
-#  data.  
-#  We do not claim to reproduce the results in the book exactly by these 
+#  data.
+#  We do not claim to reproduce the results in the book exactly by these
 #  commands for various reasons, including:
 #    -- the analyses used to produce the book may not have been
 #       entirely correct, possibly due to coding and accuracy issues
-#       in the functions themselves 
-#    -- we may have changed our minds about how these analyses should be 
+#       in the functions themselves
+#    -- we may have changed our minds about how these analyses should be
 #       done since, and we want to suggest better ways
 #    -- the R language changes with each release of the base system, and
 #       certainly the functional data analysis functions change as well
-#    -- we might choose to offer new analyses from time to time by 
+#    -- we might choose to offer new analyses from time to time by
 #       augmenting those in the book
 #    -- many illustrations in the book were produced using Matlab, which
 #       inevitably can imply slightly different results and graphical
@@ -65,7 +65,7 @@ agefine = seq(1,18,len=501)
 
 nbasis = 12;
 norder =  6;
-heightbasis12 = create.bspline.basis(ageRng, nbasis norder)
+heightbasis12 = create.bspline.basis(ageRng, nbasis, norder)
 
 #  fit the data by least squares
 
@@ -118,7 +118,7 @@ Rmat = eval.penalty(tempbasis, harmaccelLfd)
 
 #  -------  Smoothing the growth data with a roughness penalty  -----------
 
-#  set up a basis for the growth data 
+#  set up a basis for the growth data
 #  with knots at ages of height measurement
 
 norder      = 6
@@ -297,7 +297,7 @@ par(op)
 
 # ---------  5.4.2.2  Monotone smoothing the Berkeley female data  --------
 
-## 
+##
 ##  Compute the monotone smoothing of the Berkeley female growth data.
 ##
 
@@ -338,7 +338,7 @@ Wfd        = growthMon$Wfd
 betaf      = growthMon$beta
 hgtfhatfd  = growthMon$yhatfd
 
-#  Set up functional data objects for the acceleration curves 
+#  Set up functional data objects for the acceleration curves
 #  and their mean.  Suffix UN means "unregistered".
 
 accelfdUN     = deriv.fd(hgtfhatfd, 2)
@@ -346,7 +346,7 @@ accelmeanfdUN = mean(accelfdUN)
 
 #  plot unregistered curves
 
-par(ask=F)
+par(ask=FALSE)
 plot(accelfdUN, xlim=ageRng, ylim=c(-4,3), lty=1, lwd=2,
      cex=2, xlab="Age", ylab="Acceleration (cm/yr/yr)")
 

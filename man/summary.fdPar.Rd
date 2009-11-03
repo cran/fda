@@ -5,11 +5,11 @@
 }
 \description{
 Provide a compact summary of the characteristics of a functional
-parameter object.
+parameter object (i.e., class 'fdPar').
 }
 \usage{
 \method{summary}{fdPar}(object, ...)
-summary.fdPar(object, ...)
+%summary.fdPar(object, ...)
 }
 \arguments{
 \item{object}{
@@ -21,7 +21,7 @@ a functional parameter object.
 a displayed summary of the functional parameter object.
 }
 \seealso{
-\code{\link{summary}}, 
+\code{\link{summary}},
 }
 % docclass is function
 \keyword{smooth}

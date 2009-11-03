@@ -1,8 +1,7 @@
-quadset <- function(nquad=5, basisobj=NULL, breaks){
-#function [basisobj, quadpts, quadwts] = quadset(nquad, basisobj, breaks)
+quadset <- function(nquad=5, basisobj=NULL, breaks, returnMatrix=FALSE){
 
-# last modified 2007 April 25 by Spencer Graves
-#%  Matlab version last modified 14 August 2006
+# last modified 8 May 2012 by Jim Ramsay
+
 ##
 ## 1.  Check nquad
 ##
@@ -68,7 +67,7 @@ quadset <- function(nquad=5, basisobj=NULL, breaks){
   basisobj$quadvals <- quadvals
   values <- vector("list", 2)
   for( ivalue in 1:2){
-    values[[ivalue]] <- eval.basis(quadpts, basisobj, ivalue-1)
+    values[[ivalue]] <- eval.basis(quadpts, basisobj, ivalue-1, returnMatrix)
   }
   basisobj$values <- values
   basisobj

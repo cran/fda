@@ -1,4 +1,5 @@
-smooth.bibasis <- function (sarg, targ, y, fdPars, fdPart, fdnames=NULL)
+smooth.bibasis <- function (sarg, targ, y, fdPars, fdPart, fdnames=NULL,
+                            returnMatrix=FALSE)
 {
 #  SMOOTH_BIBASIS  Smooths discrete surface values over a rectangular
 #  lattice to estimate a smoothing function f(s,t)
@@ -19,6 +20,10 @@ smooth.bibasis <- function (sarg, targ, y, fdPars, fdPart, fdnames=NULL)
 #               1. argument s
 #               2. argument t
 #               3. the function f(s,t).
+#  RETURNMATRIX ... If False, a matrix in sparse storage model can be returned
+#               from a call to function BsplineS.  See this function for
+#               enabling this option.
+
 # Returns a list containing:
 #   FDOBJ ...  an object of class fd containing coefficients.
 #   DF    ...  a degrees of freedom measure.
@@ -35,7 +40,7 @@ smooth.bibasis <- function (sarg, targ, y, fdPars, fdPart, fdnames=NULL)
 #   PENMAT...  the penalty matrix.
 #   Y2CMAP...  the matrix mapping the data to the coefficients.
 
-# last modified 11 December 2008 by Jim Ramsay
+# last modified 8 May 2012 by Jim Ramsay
 
 #  ---------------------------------------------------------------------
 #                      Check argments
@@ -109,8 +114,8 @@ if (is.null(fdnames)) {
 #                set up the linear equations for smoothing
 #  ----------------------------------------------------------------
 
-sbasismat = eval.basis(sarg, sbasis)
-tbasismat = eval.basis(targ, tbasis)
+sbasismat = eval.basis(sarg, sbasis, 0, returnMatrix)
+tbasismat = eval.basis(targ, tbasis, 0, returnMatrix)
 basismat  = kronecker(tbasismat,sbasismat)
 
 if (ns*nt > snbasis*tnbasis || lambdas > 0 || lambdat > 0) {

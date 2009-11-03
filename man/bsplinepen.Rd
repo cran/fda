@@ -4,23 +4,27 @@
   B-Spline Penalty Matrix
 }
 \description{
-Computes the matrix defining the roughness penalty for functions
-expressed in terms of a B-spline basis.
+  Computes the matrix defining the roughness penalty for functions
+  expressed in terms of a B-spline basis.
 }
 \usage{
-bsplinepen(basisobj, Lfdobj=2, rng=basisobj$rangeval)
+  bsplinepen(basisobj, Lfdobj=2, rng=basisobj$rangeval, returnMatrix=FALSE)
 }
 \arguments{
-\item{basisobj}{
-a B-spline basis object.
-}
-\item{Lfdobj}{
-either a nonnegative integer or a linear differential operator object.
-}
-\item{rng}{
-a vector of length 2 defining range over which the basis penalty is to
-be computed.
-}
+  \item{basisobj}{
+  a B-spline basis object.
+  }
+  \item{Lfdobj}{
+  either a nonnegative integer or a linear differential operator object.
+  }
+  \item{rng}{
+  a vector of length 2 defining range over which the basis penalty is to
+  be computed.
+  }
+  \item{returnMatrix}{
+    logical:  If TRUE,  a two-dimensional is returned using a
+    special class from the Matrix package.
+  }
 }
 \value{
 a symmetric matrix of order equal to the number of basis functions
@@ -45,7 +49,7 @@ function specific to the basis involved.
 ## bsplinepen with only one basis function
 ##
 bspl1.1 <- create.bspline.basis(nbasis=1, norder=1)
-pen1.1 <- bsplinepen(bspl1.1, 0) 
+pen1.1 <- bsplinepen(bspl1.1, 0)
 
 ##
 ## bspline pen for a cubic spline with knots at seq(0, 1, .1)

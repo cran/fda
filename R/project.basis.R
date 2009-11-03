@@ -1,4 +1,5 @@
-project.basis <- function(y, argvals, basisobj, penalize=FALSE)
+project.basis <- function(y, argvals, basisobj, penalize=FALSE, 
+                          returnMatrix=FALSE)
 {
 #  Arguments for this function:
 #
@@ -20,8 +21,11 @@ project.basis <- function(y, argvals, basisobj, penalize=FALSE)
 #     of basis functions and the other dimensions (if any) match
 #  the other dimensions of Y.
 #
+#  RETURNMATRIX ... If False, a matrix in sparse storage model can be returned
+#               from a call to function BsplineS.  See this function for
+#               enabling this option.
 
-#  Last modified:  29 October 2005
+#  Last modified 9 May 2012  by Jim Ramsay
 
 #  Check BASISOBJ
 
@@ -32,7 +36,7 @@ project.basis <- function(y, argvals, basisobj, penalize=FALSE)
 #  Calculate the basis and penalty matrices, using the default
 #   for the number of derivatives in the penalty.
 #
-  basismat <- getbasismatrix(argvals, basisobj)
+  basismat <- getbasismatrix(argvals, basisobj, 0, returnMatrix)
   Bmat     <- crossprod(basismat)
   if (penalize) {
     penmat <- eval.penalty(basisobj)

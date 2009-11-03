@@ -5,19 +5,19 @@
 
 #  Remarks and disclaimers
 
-#  These R commands are either those in this book, or designed to 
+#  These R commands are either those in this book, or designed to
 #  otherwise illustrate how R can be used in the analysis of functional
-#  data.  
-#  We do not claim to reproduce the results in the book exactly by these 
+#  data.
+#  We do not claim to reproduce the results in the book exactly by these
 #  commands for various reasons, including:
 #    -- the analyses used to produce the book may not have been
 #       entirely correct, possibly due to coding and accuracy issues
-#       in the functions themselves 
-#    -- we may have changed our minds about how these analyses should be 
+#       in the functions themselves
+#    -- we may have changed our minds about how these analyses should be
 #       done since, and we want to suggest better ways
 #    -- the R language changes with each release of the base system, and
 #       certainly the functional data analysis functions change as well
-#    -- we might choose to offer new analyses from time to time by 
+#    -- we might choose to offer new analyses from time to time by
 #       augmenting those in the book
 #    -- many illustrations in the book were produced using Matlab, which
 #       inevitably can imply slightly different results and graphical
@@ -130,7 +130,9 @@ plot(fdsqrobj, lwd=2, xlab="", ylab="Line 1 ^2")
 #  square root of a line with negative values:  illegal
 
 a = 0.5
-fdrootobj = tstFn1^a
+# fdrootobj = tstFn1^a
+#Error in `^.fd`(tstFn1, a) :
+#  There are negative values and the power is a positive fraction.
 
 #  square root of a square:  this illustrates the hazards of
 #  fractional powers when values are near zero.  The right answer is
@@ -154,7 +156,9 @@ plot(fdrootobj, lwd=2, xlab="", ylab="sqrt(fdsqrobj + 1)")
 #  reciprocal of a function with zero values:  illegal operation
 
 a    = (-1)
-fdinvobj = tstFn1^a
+# fdinvobj = tstFn1^a
+# Error in `^.fd`(tstFn1, a) :
+#   There are zero or negative values and the power is negative.
 
 #  reciprocal of a function with near zero values:  a foolish thing
 #  to do and the power function fails miserably
@@ -181,7 +185,7 @@ plot(fdpowobj,     lwd=2, xlab="", ylab="(fdsqrobj+1)^(-0.99)")
 #
 
 Tempbasis = create.fourier.basis(yearRng, 65)
-Tempfd = smooth.basis(day.5, 
+Tempfd = smooth.basis(day.5,
           CanadianWeather$dailyAv[,,'Temperature.C'], Tempbasis)$fd
 meanTempfd = mean(Tempfd)
 sumTempfd  = sum(Tempfd)
@@ -191,7 +195,7 @@ plot((meanTempfd-sumTempfd*(1/35)))
 
 # round off error, as it should be.
 
-#  plot the temperature for Resolute and add the Canadian mean 
+#  plot the temperature for Resolute and add the Canadian mean
 
 plot(Tempfd[35], lwd=1, ylim=c(-35,20))
 lines(meanTempfd, lty=2)
@@ -251,7 +255,9 @@ par(op)
 # Figure 4.3
 
 # This assumes the data are in "MtlDaily.txt"
-# in the working directory getwd()
+# in the working directory getwd();
+# first create it and put it there
+cat(MontrealTemp, file='MtlDaily.txt')
 
 MtlDaily = matrix(scan("MtlDaily.txt",0),34,365)
 thawdata = t(MtlDaily[,16:47])

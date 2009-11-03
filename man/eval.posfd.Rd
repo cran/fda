@@ -11,8 +11,9 @@
   values, or evaluate a derivative of the functional object.
 }
 \usage{
-eval.posfd(evalarg, Wfdobj, Lfdobj=int2Lfd(0))
-\method{predict}{posfd}(object, newdata=NULL, Lfdobj=0, ...)
+eval.posfd(evalarg, Wfdobj, Lfdobj=int2Lfd(0), returnMatrix=FALSE)
+\method{predict}{posfd}(object, newdata=NULL, Lfdobj=0,
+                       returnMatrix=FALSE, ...)
 \method{fitted}{posfd}(object, ...)
 \method{residuals}{posfd}(object, ...)
 }
@@ -33,6 +34,10 @@ eval.posfd(evalarg, Wfdobj, Lfdobj=int2Lfd(0))
   \item{object}{
     an object of class \code{posfd} that defines the positive function
     to be evaluated.  Only univariate functions are permitted.
+  }
+  \item{returnMatrix}{
+    logical:  If TRUE,  a two-dimensional is returned using a
+    special class from the Matrix package.
   }
   \item{\dots}{
     optional arguments required by \code{predict};  not currently used.

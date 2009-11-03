@@ -14,12 +14,15 @@
   operator to the functional object.
 }
 \usage{
-eval.fd(evalarg, fdobj, Lfdobj=0)
-\method{predict}{fd}(object, newdata=NULL, Lfdobj=0, ...)
-\method{predict}{fdPar}(object, newdata=NULL, Lfdobj=0, ...)
-\method{predict}{fdSmooth}(object, newdata=NULL, Lfdobj=0, ...)
-\method{fitted}{fdSmooth}(object, ...)
-\method{residuals}{fdSmooth}(object, ...)
+eval.fd(evalarg, fdobj, Lfdobj=0, returnMatrix=FALSE)
+\method{predict}{fd}(object, newdata=NULL, Lfdobj=0, returnMatrix=FALSE,
+                     ...)
+\method{predict}{fdPar}(object, newdata=NULL, Lfdobj=0,
+                     returnMatrix=FALSE, ...)
+\method{predict}{fdSmooth}(object, newdata=NULL, Lfdobj=0,
+                     returnMatrix=FALSE, ...)
+\method{fitted}{fdSmooth}(object, returnMatrix=FALSE, ...)
+\method{residuals}{fdSmooth}(object, returnMatrix=FALSE, ...)
 }
 \arguments{
   \item{evalarg, newdata}{
@@ -36,6 +39,10 @@ eval.fd(evalarg, fdobj, Lfdobj=0)
   }
   \item{object}{
     an object of class \code{fd}
+  }
+  \item{returnMatrix}{
+    logical:  Should a 2-dimensional array to be returned using a
+    special class from the Matrix package if appropriate?
   }
   \item{\dots}{
     optional arguments for \code{predict}, not currently used

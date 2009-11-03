@@ -8,6 +8,7 @@ function basisobj = basis(basistype, rangeval, nbasis, params, ...
 %               'exp', 'exponen', 'exponential'
 %               'Fourier', 'fourier', 'Fou', 'fou',
 %               'mon', 'monom', 'monomial',
+%               'Nspline', 'nspline', 'Nsp', 'nsp',
 %               'polyg' 'polygon', 'polygonal'
 %               'pol', 'poly', 'polynomial'
 %               'power', 'pow'
@@ -17,14 +18,16 @@ function basisobj = basis(basistype, rangeval, nbasis, params, ...
 %               'slide'
 %               'fd'
 %               'FEM'
+%               'TP'
+%               'fdVariance', 'fdV', fdVar'
 %  RANGEVAL ... an array of length 2 containing the lower and upper
 %               boundaries for the rangeval of argument values
 %  NBASIS   ... the number of basis functions
-%  PARAMS   ... If the basis is 'fourier', this is a single number indicating
-%                 the period.  That is, the basis functions are periodic on
+%  PARAMS   ... If the basis is 'fourier', this is the period.  
+%                 That is, the basis functions are periodic on
 %                 the interval (0,PARAMS) or any translation of it.
-%               If the basis is 'bspline', the values are interior points at
-%                 which the piecewise polynomials join.
+%               If the basis is 'bspline', the values are interior points 
+%                 at which the piecewise polynomials join.
 %                 Note that the number of basis functions NBASIS is equal
 %                 to the order of the Bspline functions plus the number of
 %                 interior knots, that is the length of PARAMS.
@@ -40,14 +43,13 @@ function basisobj = basis(basistype, rangeval, nbasis, params, ...
 %                rule for NQUAD = 7, the points are equally spaced and the
 %                weights are delta.*[1, 4, 2, 4, 2, 4, 1]/3.  DELTA is the
 %                spacing between quadrature points.  The default is [].
-%  VALUES  ... A cell array, with entries containing the values of
+%  VALUES  ... A cell array, with cells containing the values of
 %                the basis function derivatives starting with 0 and
 %                going up to the highest derivative needed.  The values
-%                correspond to quadrature points in QUADVALS and it is
-%                up to the user to decide whether or not to multiply
-%                the derivative values by the square roots of the
-%                quadrature weights so as to make numerical integration
-%                a simple matrix multiplication.
+%                correspond to quadrature points in QUADVALS.  It is
+%                up to the user to multiply the derivative values by the 
+%                square roots of the quadrature weights so as to make 
+%                numerical integration a simple matrix multiplication.
 %                Values are checked against QUADVALS to ensure the correct
 %                number of rows, and against NBASIS to ensure the correct
 %                number of columns.
@@ -64,12 +66,12 @@ function basisobj = basis(basistype, rangeval, nbasis, params, ...
 %                their derivatives up to a maximum derivative order.
 %                Whenever function getbasismatrix is called, it checks
 %                the first cell in each row to see, first, if the number of
-%                argument values corresponds to the size of the first dimension,
-%                and if this test succeeds, checks that all of the argument
-%                values match.  This takes time, of course, but is much
-%                faster than re-evaluation of the basis system.  Even this
-%                time can be avoided by direct retrieval of the desired
-%                array.
+%                argument values corresponds to the size of the first 
+%                imension, and if this test succeeds, checks that all of 
+%                the arguments match.  This takes time, of course, but is
+%                much faster than re-evaluation of the basis system.  Even
+%                this time can be avoided by direct retrieval of the 
+%                desired array.
 %
 %  Returns
 %  BASISOBJ  ... a basis object with slots
@@ -86,13 +88,14 @@ function basisobj = basis(basistype, rangeval, nbasis, params, ...
 %   These values are only generated as required, and only if slot
 %   quadvals is not empty.
 %
-%  An alternative name for this function is CREATE_BASIS, but PARAMS argument
-%     must be supplied.
+%  An alternative name for this function is CREATE_BASIS, but PARAMS 
+%     argument must be supplied.
 %  Specific types of bases may be set up more conveniently using functions
 %  CREATE_BSPLINE_BASIS    ...  creates a b-spline basis
 %  CREATE_CONSTANT_BASIS   ...  creates a constant basis
 %  CREATE_FOURIER_BASIS    ...  creates a fourier basis
 %  CREATE_MONOM_BASIS      ...  creates a monomial basis
+%  CREATE_NSPLINE_BASIS     ...  creates a n-spline basis
 %  CREATE_POLYGON_BASIS    ...  creates a polygonal basis
 %  CREATE_POLYNOMIAL_BASIS ...  creates a polynomial basis
 %  CREATE_POWER_BASIS      ...  creates a polygonal basis
@@ -101,8 +104,10 @@ function basisobj = basis(basistype, rangeval, nbasis, params, ...
 %  CREATE_SLIDE_BASIS      ...  creates a slide basis
 %  CREATE_FD_BASIS         ...  creates a functional data object basis
 %  CREATE_FEM_BASIS        ...  creates a finite element basis
+%  CREATE_TP_BASIS         ...  creates a tensor product basis
+%  CREATE_fdVariance_BASIS ...  creates a fdVariance basis
 
-%  Last modified 25 May 2010
+%  Last modified 25 May 2011
 
 %  Set up default basis if there are no arguments
 
@@ -268,6 +273,17 @@ switch basistype
             end
         end
 
+    case 'nspline'
+        if ~isempty(params)
+            nparams  = length(params);
+            if (params(1) < rangeval(1))
+                error('Smallest value in BREAKS not within RANGEVAL');
+            end
+            if (params(nparams) > rangeval(2))
+                error('Largest value in BREAKS not within RANGEVAL');
+            end
+        end
+        
     case 'expon'
         if (length(params) ~= nbasis)
             error(['No. of parameters not equal to no. of basis fns ',  ...
@@ -317,13 +333,21 @@ switch basistype
             error('Number of parameters not correct for a slide basis.');
         end
     case 'fd'
-        if ~strcmp(class(params), 'fd')
+        if ~isa_fd(params)
             error('Parameter not a functional data object')
         end
     case 'FEM'
-        if ~strcmp(class(params), 'struct')
+        if ~isstruct(params)
             error('Parameter not a struct object')
         end
+    case 'TP'
+        if ~isstruct(params)
+            error('Parameter not a struct object')
+        end
+    case 'fdVariance'
+        if ~isstruct(params)
+            error('Parameter not a struct object')
+        end        
     otherwise
         error('Unrecognizable basis');
 end
@@ -363,7 +387,7 @@ switch fdtype
         fdtype = 'const';
     case 'const'
         fdtype = 'const';
-    case 'const'
+    case 'constant'
         fdtype = 'const';
 
     %  exponential basis
@@ -395,6 +419,17 @@ switch fdtype
     case 'monomial'
         fdtype = 'monom';
 
+    %  N-spline basis (natural splines)
+
+    case 'nspline'
+        fdtype = 'nspline';
+    case 'Nspline'
+        fdtype = 'nspline';
+    case 'Nsp'
+        fdtype = 'nspline';
+    case 'nsp'
+        fdtype = 'nspline';
+        
     %  Polygonal basis
 
     case 'polyg'
@@ -448,6 +483,20 @@ switch fdtype
     case 'FEM'
         fdtype = 'FEM';
 
+    case 'TP'
+        fdtype = 'TP';
+
+%  fdVariance basis
+
+    case 'fdVariance'
+        fdtype = 'fdVariance';
+        
+    case 'fdV'
+        fdtype = 'fdVariance';
+        
+    case 'fdVar'
+        fdtype = 'fdVariance';
+        
     %  Not a recognizable basis
 
     otherwise

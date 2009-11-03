@@ -1,10 +1,9 @@
-deriv.fd <- function(expr, Lfdobj=int2Lfd(1), ...)
+deriv.fd <- function(expr, Lfdobj=int2Lfd(1), returnMatrix=FALSE, ...)
 {
   #  Applies linear differential operator LFD to functional data object FD
   #    and returns the result as functional data object DERIVFD.
 
-# Last modified 2007 May 3 by Spencer Graves  
-  #  Previously modified 26 October 2005
+  #  Last modified 8 May 2012 by Jim Ramsay
 
   fdobj <- expr
   if (!inherits(fdobj, "fd")) stop(
@@ -17,9 +16,9 @@ deriv.fd <- function(expr, Lfdobj=int2Lfd(1), ...)
   rangeval <- basisobj$rangeval
 
   evalarg  <- seq(rangeval[1], rangeval[2], len=10*nbasis+1)
-  Lfdmat   <- eval.fd(evalarg, fdobj, Lfdobj)
+  Lfdmat   <- eval.fd(evalarg, fdobj, Lfdobj, returnMatrix)
 
-  Lfdcoef  <- project.basis(Lfdmat, evalarg, basisobj)
+  Lfdcoef  <- project.basis(Lfdmat, evalarg, basisobj, returnMatrix)
 
   Dfdnames <- fdobj$fdnames
   Dfdnames[[3]] <- paste("D",Dfdnames[[3]])

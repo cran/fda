@@ -9,8 +9,13 @@ function basisobj = create_constant_basis(rangeval)
 %  Return:
 %  BASIS.FD  ... a functional data basis object of type 'constant'
 %
+%  See also BASIS, CREATE_BSPLINE_BASIS, CREATE_EXPONENTIAL_BASIS, 
+%  CREATE_FD_BASIS, CREATE_FDVARIANCE_BASIS, CREATE_FOURIER_BASIS, 
+%  CREATE_MONOMIAL_BASIS, CREATE_POLYGONAL_BASIS, CREATE_POLYNOMIAL_BASIS, 
+%  CREATE_POWER_BASIS, CREATE_POLYGONAL_BASIS, CREATE_FEM_BASIS, 
+%  CREATE_PRODUCT_BASIS, CREATE_TP_BASIS
 
-%  Last modified 3 January 2008
+%  Last modified 3 October 2011
 
 %  default rangeval
 

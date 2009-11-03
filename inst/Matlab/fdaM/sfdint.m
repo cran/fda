@@ -9,6 +9,8 @@ function integhat = sfdint(space_basis, v, integorder, nderivs)
 %                   for spatial polynomials of that order
 %  NDERIVS     ...  A vector of length 2 containing the orders of derivatives
 %                   for X and Y, respectively
+%
+%  Last modified 27 September 2011
 
 if nargin < 4, nderivs = zeros(1,2);  end
 if nargin < 3, integorder = 2;        end
@@ -58,12 +60,10 @@ end
 %  compute the quadrature points
 
 xymat = B*v;         
-% disp(xymat)
 
 %  evaluate the function at the quadrature points
 
 evalvec = eval_FEM_fd(xymat(:,1),xymat(:,2), space_basis, nderivs);
-% disp(sparse(evalvec))
 
 %  approximate the integral
 

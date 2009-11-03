@@ -43,7 +43,6 @@ plotreg.fd(reglist)
   \code{\link{smooth.monotone}},
   \code{\link{smooth.morph}}
   \code{\link{register.fd}}
-  \code{\link{register.fd0}}
 }
 \examples{
 #  register and plot the angular acceleration of the gait data

@@ -1,1 +1,6 @@
 exportPattern("^[^\\.]")
+
+## Quick and dirty: {just to confirm that it is sufficient}
+import(Matrix)
+
+

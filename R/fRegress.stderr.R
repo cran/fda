@@ -1,4 +1,4 @@
-fRegress.stderr <- function(y, y2cMap, SigmaE, ...) {
+fRegress.stderr <- function(y, y2cMap, SigmaE, returnMatrix=FALSE, ...) {
 
 #  FREGRESS.STDERR  computes standard error estimates for regression
 #       coefficient functions estimated by function FREGRESS.
@@ -27,8 +27,11 @@ fRegress.stderr <- function(y, y2cMap, SigmaE, ...) {
 #                     column-wise in defining BVARIANCE.
 #  C2BMAP         ... the matrix mapping from response variable coefficients
 #                     to coefficients for regression coefficients
+#  RETURNMATRIX ... If False, a matrix in sparse storage model can be returned
+#               from a call to function BsplineS.  See this function for
+#               enabling this option.
 
-#  Last modified 4 November 2008 by Jim Ramsay
+#  Last modified 8 May 2012 by Jim Ramsay
 
 #  generic argument y is actually fRegressList
 
@@ -71,7 +74,7 @@ fRegressList <- y
     tfine     <- seq(rangeval[1], rangeval[2], len=nfine)
     deltat    <- tfine[2] - tfine[1]
 
-    ybasismat <- eval.basis(tfine, ybasisobj)
+    ybasismat <- eval.basis(tfine, ybasisobj, 0, returnMatrix)
 
     #  compute BASISPRODMAT
 
@@ -82,9 +85,9 @@ fRegressList <- y
       betafdParj <- betalist[[j]]
       betabasisj <- betafdParj$fd$basis
       ncoefj     <- betabasisj$nbasis
-      bbasismatj <- eval.basis(tfine, betabasisj)
+      bbasismatj <- eval.basis(tfine, betabasisj, 0, returnMatrix)
       xfdj       <- xfdlist[[j]]
-      tempj      <- eval.fd(tfine, xfdj)
+      tempj      <- eval.fd(tfine, xfdj, 0, returnMatrix)
         #  row indices of BASISPRODMAT to fill
       mj1    <- mj2 + 1
       mj2    <- mj2 + ncoefj
@@ -98,8 +101,7 @@ fRegressList <- y
         mk2    <- mk2 + N
         indexk <- mk1:mk2
         tempk  <- bbasismatj*ybasismat[,k]
-        basisprodmat[indexj,indexk] <-
-          deltat*crossprod(tempk,tempj)
+        basisprodmat[indexj,indexk] <- deltat*crossprod(tempk,tempj)
         }
     }
 
@@ -125,7 +127,7 @@ fRegressList <- y
       mj1 	     <- mj2 + 1
       mj2 	     <- mj2 + ncoefj
       indexj 	   <- mj1:mj2
-      bbasismat  <- eval.basis(tfine, betabasisj)
+      bbasismat  <- eval.basis(tfine, betabasisj, 0, returnMatrix)
       bvarj      <- bvar[indexj,indexj]
       bstderrj   <- sqrt(diag(bbasismat %*% bvarj %*% t(bbasismat)))
       bstderrfdj <- smooth.basis(tfine, bstderrj, betabasisj)$fd
@@ -179,7 +181,7 @@ fRegressList <- y
         betarng    <- betabasisj$rangeval
         nfine      <- max(c(501,10*ncoefj+1))
         tfine      <- seq(betarng[1], betarng[2], len=nfine)
-        bbasismat  <- eval.basis(tfine, betabasisj)
+        bbasismat  <- eval.basis(tfine, betabasisj, 0, returnMatrix)
         bstderrj   <- sqrt(diag(bbasismat %*% bvarj %*% t(bbasismat)))
         bstderrfdj <- smooth.basis(tfine, bstderrj, betabasisj)$fd
       } else {

@@ -21,10 +21,10 @@ function [uxy,tn,al2,al3] = tri2grid_fd(p,t,u,tn,al2,al3)
 %       For grid points outside of the triangular mesh, NaN is
 %       returned in UXY, TN, A2, and A3.
 %
-
+%
 %  This version is an adaption of function tri2grid in the pde toolbox
 %  in Matlab by Jim Ramsay.  
-
+%
 %  Last modified 8 March 2011
 
 small = 10000*eps;

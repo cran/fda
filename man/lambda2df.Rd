@@ -13,7 +13,7 @@ This function converts a multipler $lambda$ into a degrees of freedom value.
 }
 \usage{
 lambda2df(argvals, basisobj, wtvec=rep(1, n),
-          Lfdobj=NULL, lambda=0)
+          Lfdobj=NULL, lambda=0, returnMatrix=FALSE)
 }
 \arguments{
   \item{argvals}{
@@ -33,6 +33,10 @@ lambda2df(argvals, basisobj, wtvec=rep(1, n),
   }
   \item{lambda}{
     the smoothing parameter to be converted.
+  }
+  \item{returnMatrix}{
+    logical:  If TRUE,  a two-dimensional is returned using a
+    special class from the Matrix package.
   }
 }
 \value{

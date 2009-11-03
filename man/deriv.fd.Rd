@@ -4,41 +4,45 @@
   Compute a Derivative of a Functional Data Object
 }
 \description{
-A derivative of a functional data object, or the result of applying
-a linear differential operator to a functional data object, is then
-converted to a functional data object. This is intended for situations
-where a derivative is to be manipulated as a functional data object
-rather than simply evaluated.
+  A derivative of a functional data object, or the result of applying
+  a linear differential operator to a functional data object, is then
+  converted to a functional data object. This is intended for situations
+  where a derivative is to be manipulated as a functional data object
+  rather than simply evaluated.
 }
 \usage{
-deriv.fd(expr, Lfdobj=int2Lfd(1), ...)
+\method{deriv}{fd}(expr, Lfdobj=int2Lfd(1), returnMatrix=FALSE, ...)
 }
 \arguments{
-\item{expr}{
-a functional data object.  It is assumed that the basis for
-representing the object can support the order of derivative
-to be computed.  For B-spline bases, this means that the
-order of the spline must be at least one larger than the order of
-the derivative to be computed.
-}
-\item{Lfdobj}{
-either a positive integer or a linear differential operator object.
-}
-\item{...}{Other arguments to match generic for 'deriv'}
+  \item{expr}{
+    a functional data object.  It is assumed that the basis for
+    representing the object can support the order of derivative
+    to be computed.  For B-spline bases, this means that the
+    order of the spline must be at least one larger than the order of
+    the derivative to be computed.
+  }
+  \item{Lfdobj}{
+    either a positive integer or a linear differential operator object.
+  }
+  \item{returnMatrix}{
+    logical:  If TRUE,  a two-dimensional is returned using a
+    special class from the Matrix package.
+  }
+  \item{...}{Other arguments to match generic for 'deriv'}
 }
 \value{
-a functional data object for the derivative
+  a functional data object for the derivative
 }
 \details{
-Typically, a derivative has more high frequency variation or detail
-than the function itself.  The basis defining the function is used,
-and therefore this must have enough basis functions to represent
-the variation in the derivative satisfactorily.
+  Typically, a derivative has more high frequency variation or detail
+  than the function itself.  The basis defining the function is used,
+  and therefore this must have enough basis functions to represent
+  the variation in the derivative satisfactorily.
 }
 \seealso{
-\code{\link{getbasismatrix}}, 
-\code{\link{eval.basis}}
-\code{\link{deriv}}
+  \code{\link{getbasismatrix}},
+  \code{\link{eval.basis}}
+  \code{\link{deriv}}
 }
 \examples{
 

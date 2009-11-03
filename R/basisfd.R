@@ -508,8 +508,7 @@ return(basisequal)
 
 #  Of course the ranges must also match.
 
-#  Last modified 2008.12.26 by Spencer Graves
-#  previously modified 22 March 2007
+#  Last modified 2012.06.12 by Spencer Graves
 
 #  check the ranges
 
@@ -552,7 +551,11 @@ return(basisequal)
     #  get orders
     interiorknots1 <- basisobj1$params
     interiorknots2 <- basisobj2$params
-    uniqueknots    <- sort(union(interiorknots1, interiorknots2))
+#    uniqueknots    <- sort(union(interiorknots1, interiorknots2))
+    interiorknots1.2 <- union(interiorknots1, interiorknots2)
+    uniqueknots <- {
+        if(is.null(interiorknots1.2)) NULL else sort(interiorknots1.2)
+    }
     nunique <- length(uniqueknots)
     multunique <- rep(0,nunique)
     for (i in seq(length=nunique)) {

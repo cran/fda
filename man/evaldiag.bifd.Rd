@@ -15,7 +15,7 @@ function of either object holding the other object fixed.
 }
 \usage{
 evaldiag.bifd(evalarg, bifdobj, sLfd=int2Lfd(0),
-                                tLfd=int2Lfd(0))
+                                tLfd=int2Lfd(0), returnMatrix=FALSE)
 }
 \arguments{
 \item{evalarg}{
@@ -32,12 +32,16 @@ object.
 either a nonnegative integer or a linear differential operator
 object.
 }
+\item{returnMatrix}{
+logical:  If TRUE,  a two-dimensional is returned using a
+special class from the Matrix package.
+}
 }
 \value{
 a vector or matrix of diagonal function values.
 }
 \seealso{
-\code{\link{var.fd}}, 
+\code{\link{var.fd}},
 \code{\link{eval.bifd}}
 }
 % docclass is function

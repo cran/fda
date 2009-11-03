@@ -1,4 +1,5 @@
-lambda2df <- function (argvals, basisobj, wtvec=rep(1,n), Lfdobj=NULL, lambda=0)
+lambda2df <- function (argvals, basisobj, wtvec=rep(1,n), Lfdobj=NULL, 
+                       lambda=0, returnMatrix=FALSE)
 {
   #  Computes the the degrees of freedom associated with a regularized
   #    basis smooth by calculating the trace of the smoothing matrix.
@@ -16,10 +17,13 @@ lambda2df <- function (argvals, basisobj, wtvec=rep(1,n), Lfdobj=NULL, lambda=0)
   #  LAMBDA   ... The smoothing parameter determining the weight to be
   #               placed on the size of the derivative in smoothing.  This
   #               is 0 by default.
+  #  RETURNMATRIX ... If False, a matrix in sparse storage model can be returned
+  #               from a call to function BsplineS.  See this function for
+  #               enabling this option.
   #  Returns:
   #  DF    ...  a degrees of freedom measure
 
-  #  Last modified:  26 October 2005
+  #  Last modified:  7 May 2012
 
   n        <- length(argvals)
   nbasis   <- basisobj$nbasis
@@ -29,12 +33,12 @@ lambda2df <- function (argvals, basisobj, wtvec=rep(1,n), Lfdobj=NULL, lambda=0)
   }
   if (length(wtvec) != n) stop("WTVEC of wrong length")
   if (min(wtvec) <= 0)    stop("All values of WTVEC must be positive.")
-  basismat <- getbasismatrix(argvals, basisobj)
+  basismat <- getbasismatrix(argvals, basisobj, 0, returnMatrix)
   basisw   <- basismat*outer(wtvec,rep(1,nbasis))
   Bmat     <- crossprod(basisw,basismat)
   penmat   <- getbasispenalty(basisobj, Lfdobj)
-  Bnorm    <- sqrt(sum(c(Bmat)^2))
-  pennorm  <- sqrt(sum(c(penmat)^2))
+  Bnorm    <- sqrt(sum(Bmat^2))
+  pennorm  <- sqrt(sum(penmat^2))
   condno   <- pennorm/Bnorm
   if (lambda*condno > 1e12) {
     lambda <- 1e12/condno

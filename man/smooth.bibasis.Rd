@@ -7,8 +7,7 @@
   Estimate a smoothing function f(s, t) over a rectangular lattice
 }
 \usage{
-smooth.bibasis(sarg, targ, y, fdPars, fdPart,
-             fdnames=NULL)
+smooth.bibasis(sarg, targ, y, fdPars, fdPart, fdnames=NULL, returnMatrix=FALSE)
 }
 \arguments{
   \item{sarg, targ}{
@@ -25,6 +24,10 @@ smooth.bibasis(sarg, targ, y, fdPars, fdPart,
   \item{fdnames}{
     a list of length 3 containing character vectors of names for
     \code{sarg}, \code{targ}, and the surface function f(s, t).
+  }
+  \item{returnMatrix}{
+    logical:  If TRUE,  a two-dimensional is returned using a
+    special class from the Matrix package.
   }
 }
 %\details{}

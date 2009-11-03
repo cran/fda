@@ -2,13 +2,13 @@
 \alias{smooth.fd}
 \title{
   Smooth a Functional Data Object Using an Indirectly Specified
-  Roughness Penalty 
+  Roughness Penalty
 }
 \description{
   Smooth data already converted to a functional data object, fdobj,
   using criteria consolidated in a functional data parameter object,
   fdParobj.  For example, data may have been converted to a functional
-  data object using function \code{data2fd} using a fairly large set of
+  data object using function \code{Data2fd} using a fairly large set of
   basis functions.  This 'fdobj' is then smoothed as specified in
   'fdParobj'.
 }
@@ -29,7 +29,7 @@ smooth.fd(fdobj, fdParobj)
 a functional data object.
 }
 \seealso{
-\code{\link{smooth.basis}}, 
+\code{\link{smooth.basis}},
 \code{\link{Data2fd}}
 }
 \examples{
@@ -54,7 +54,7 @@ yfd1 <- smooth.fd(yfd, yfdPar)
 # FIXME: using 3rd derivative here gave error?????
 yfdPar3 <- fdPar(yfd, 3, 1e-6)
 yfd1.3 <- smooth.fd(yfd, yfdPar3)
-#Error in bsplinepen(basisobj, Lfdobj, rng) : 
+#Error in bsplinepen(basisobj, Lfdobj, rng) :
 #	Penalty matrix cannot be evaluated
 #  for derivative of order 3 for B-splines of order 4
 }

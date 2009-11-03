@@ -9,7 +9,7 @@ data object.
 }
 \usage{
 \method{summary}{fd}(object,...)
-summary.fd(object,...)
+%summary.fd(object,...)
 }
 \arguments{
 \item{object}{
@@ -21,7 +21,7 @@ a functional data object.
 a displayed summary of the functional data object.
 }
 \seealso{
-\code{\link{summary}}, 
+\code{\link{summary}},
 }
 % docclass is function
 \keyword{smooth}

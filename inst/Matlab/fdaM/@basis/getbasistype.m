@@ -2,7 +2,7 @@ function typestr = getbasistype (basisobj)
 %  GETBASISTYPE   Extracts the type of basis from basis object BASISOBJ.
 %    Variations in spelling are possible.
 
-%  last modified 25 May 2010
+%  last modified 27 September 2011
 
 if ~isa_basis(basisobj)
     error('Argument is not a functional basis object.');
@@ -31,6 +31,14 @@ switch basisobj.type
         typestr = 'monom';
     case 'monomial'
         typestr = 'monom';
+    case 'naturalbspline'
+        typestr = 'naturalbspline';
+    case 'NaturalBspline'
+        typestr = 'naturalbspline';
+    case 'Nbsp'
+        typestr = 'naturalbspline';
+    case 'nbsp'
+        typestr = 'naturalbspline';
     case 'power'
         typestr = 'power';
     case 'pow'
@@ -65,6 +73,10 @@ switch basisobj.type
         typestr = 'fd';
     case 'FEM'
         typestr = 'FEM';
+    case 'TP'
+        typestr = 'TP';
+    case 'fdVariance'
+        typestr = 'fdVariance';
     otherwise
         error('Unknown type encountered');
 end

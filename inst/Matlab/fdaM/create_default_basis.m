@@ -1,11 +1,11 @@
 function basisobj = create_default_basis(argvals, nresol, nderiv, periodic)
-%  CREATE_DEfAULT_BASIS takes a vector or matrix argvals and creates a default
-%   basis to be used for data observed on these arguments.
+%  CREATE_DEfAULT_BASIS takes a vector or matrix argvals and creates a 
+%   default basis to be used for data observed on these arguments.
 %
-%  ARGVALS  ... A vector or matrix of argument values. Missing values allowed.
-%
-%  NRESOL   ... A number that specifies the number of the finest features or
-%               events that are of interest that can occur within the
+%  ARGVALS  ... A vector or matrix of argument values. Missing values 
+%               allowed.
+%  NRESOL   ... A number that specifies the number of the finest features 
+%               or events that are of interest that can occur within the
 %               range of the argument values. By feature or event is
 %               meant things like peaks, valleys, zero crossings,
 %               plateaus, linear slopes, and so on.  NRESOL specifies
@@ -21,8 +21,14 @@ function basisobj = create_default_basis(argvals, nresol, nderiv, periodic)
 %               The default is F.
 %
 %  Returns an object of class BASISOBJ, a functional data basis object
+%
+%  See also BASIS, CREATE_BSPLINE_BASIS,  CREATE_CONSTANT_BASIS, 
+%  CREATE_EXPONENTIAL_BASIS, CREATE_FD_BASIS, CREATE_FDVARIANCE_BASIS,
+%  CREATE_FOURIER_BASIS, CREATE_MONOMIAL_BASIS, CREATE_POLYGONAL_BASIS, 
+%  CREATE_POLYNOMIAL_BASIS, CREATE_POWER_BASIS, CREATE_POLYGONAL_BASIS, 
+%  CREATE_FEM_BASIS, CREATE_PRODUCT_BASIS, CREATE_TP_BASIS
 
-%  last modified 20 July 2006
+%  Last modified 3 October 2011
 
 if nargin < 4, periodic = 0; end
 if nargin < 3, nderiv = 2;   end
