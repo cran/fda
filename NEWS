@@ -9,6 +9,11 @@ _______ (2002) 'Applied Functional Data Analysis' (Springer)
 James O. Ramsay, Giles Hooker, and Spencer Graves (2009)
       'Functional Data Analysis with R and Matlab' (Springer)
 
+Release 2.2.1 contained corrections to fRegress and inprod.
+
+Release 2.2.0 was released in Oct. 2009 as the working version to
+accompany 'Functional Data Analysis with R and Matlab' (Springer)
+
 Release 2.1.2 fixed problems with linmod among others and
 completed script files for Ramsay, Hooker and Graves.
 

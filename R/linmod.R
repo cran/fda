@@ -7,8 +7,8 @@ linmod = function(xfdobj, yfdobj, betaList, wtvec=NULL)  {
 #  Arguments:
 #  XFD       a functional data object for the independent variable 
 #  YFD       a functional data object for the   dependent variable 
-#  BETACELL  a List array of length 3 containing functional
-#               parameter objects for \alpha and for 
+#  BETACELL  a List array of length 2 containing a functional
+#               parameter object for \alpha and a bifdPar object for
 #               \beta as a function of s and t, respectively.
 #  WTVEC    a vector of weights
 #  Returns:  a list object linmodList with fields
@@ -16,7 +16,7 @@ linmod = function(xfdobj, yfdobj, betaList, wtvec=NULL)  {
 #  BETA1ESTBIFD  a bivariate functional parameter object for \beta
 #  YHATFDOBJ     a functional data object for the approximation to y
 
-#  Last modified 5 May 2009
+#  Last modified 11 June 2010
 
 #  check xfdobj and yfdobj
 
@@ -57,7 +57,7 @@ if (!is.null(wtvec)) wtvec = wtcheck(ncurves, wtvec)
 
 if (!inherits(betaList, "list")) stop("betaList is not a list object.")
 
-if (length(betaList) != 3) stop("betaList not of length 3.")
+if (length(betaList) != 2) stop("betaList not of length 2.")
 
 alphafdPar  = betaList[[1]]
 betabifdPar = betaList[[2]]

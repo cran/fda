@@ -208,6 +208,9 @@ for (icurve in 1:ncurve) {
         y0fdi <- y0fd[icurve,]
       }
     }
+    else{
+      y0fdi <- y0fd
+    }
   }
 
   #  evaluate curve to be registered at fine mesh

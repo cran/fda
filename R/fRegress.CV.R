@@ -76,7 +76,8 @@ if (inherits(yfdPar, "numeric"))  {
       for(k in 1:p){
         txfdlist[[k]] <- xfdlist[[k]][-i]
       }
-      tres <- fRegress(yfd[-i],txfdlist,betalist,wt)
+      wti = wt[-i]
+      tres <- fRegress(yfd[-i],txfdlist,betalist,wti)
       yhat <- 0                       
       for(k in 1:p){
         yhat <- yhat + xfdlist[[k]][i]*tres$betaestlist[[k]]$fd

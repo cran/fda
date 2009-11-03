@@ -68,7 +68,7 @@ for (j in 1:p) {
     betavecm   = betavec - 2*betastderr
     zeroval  = c(0,0)
     plot(argvals, betavec, type="l", xlab=xlab, ylab="",
-         xlim=rangeval, ylim=c(min(betavecm),max(betavecp), ...))
+         xlim=rangeval, ylim=c(min(betavecm),max(betavecp)), ...)
     lines(rangeval, zeroval,lty=3, col=2)
         #fill([argvals   argvals(n-11)], ...
         #     [betavecp   betavecm(n-11)], "w", "LineStyle", "--")
