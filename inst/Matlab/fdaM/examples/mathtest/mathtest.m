@@ -222,7 +222,7 @@ for j = itemindex
     end
 end
 
-print -dps2 'c:\MyFiles\fdabook1\revision\figs.dir\threeirfs.ps'
+% print -dps2 'c:\MyFiles\fdabook1\revision\figs.dir\threeirfs.ps'
 
 % plot log odds functions
 
@@ -238,7 +238,7 @@ axis([-3,3,0,9])
 xlabel('\fontsize{16} \theta')
 ylabel('\fontsize{16} Arc Length s')
 
-print -dps2 'figs.dir\actarclength.ps'
+% print -dps2 'figs.dir\actarclength.ps'
 
 %  plot squared slopes against arc length one by one
 

@@ -9,14 +9,14 @@ function prodmat = inprod_bspline(fdobj1, fdobj2, nderiv1, nderiv2)
 %  it is taken to be 0.
 %
 
-%  Last modified 2 December 2006
+%  Last modified 30 September 2009
 
 if nargin < 4, nderiv2 = 0;  end
 if nargin < 3, nderiv1 = 0;  end
 
 %  check nderiv1 and nderiv2
 
-if strcmp(class(nderiv1), 'double')
+if isnumeric(nderiv1)
     if floor(nderiv1) ~= nderiv1
         error('NDERIV1 not an integer.');
     end
@@ -27,7 +27,7 @@ else
     error('NDERIV1 is not a number.');
 end
 
-if strcmp(class(nderiv2), 'double')
+if isnumeric(nderiv2)
     if floor(nderiv2) ~= nderiv2
         error('NDERIV2 not an integer.');
     end
@@ -107,15 +107,10 @@ if length(size(coef2)) ~= 2
     error('FDOBJ2 is not univariate.');
 end
 
-nbreaks = length(breaks);
-ninterval  = nbreaks - 1;      
-nbasis1 = ninterval + norder1 - 1;  
-nbasis2 = ninterval + norder2 - 1;  
-if any(size(coef1) ~= nbasis1) || any(size(coef2) ~= nbasis2)
-    error(['Error: coef1 should be should have length ', ...
-           '#breaks1+norder1-2', ...
-           ' and coef2 #breaks2+norder2-2.']);
-end
+nbreaks   = length(breaks);
+ninterval = nbreaks - 1;      
+nbasis1   = ninterval + norder1 - 1;  
+nbasis2   = ninterval + norder2 - 1;  
 
 breaks1 = breaks(1);
 breaksn = breaks(nbreaks);

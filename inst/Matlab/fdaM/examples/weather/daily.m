@@ -1,81 +1,100 @@
-%  add path to data and funcitons
+%  add path to data and functions
 
-addpath ('c:\Program Files\matlab\fdaM')
-addpath ('c:\Program Files\matlab\fdaM\examples\weather')
+addpath ('../..')
 
-%  Last modified 26 July 2006
+%  Last modified 11 November 2010
 
 %  -----------------------------------------------------------------------
 %                     Daily Weather Data
 %  -----------------------------------------------------------------------
 
-%  ------------------------  input the data  -----------------------
+%  -----------------------  input the raw data  -----------------------
 
-fid    = fopen('dailtemp.dat','rt');
-tempav = fscanf(fid,'%f');
-tempav = reshape(tempav, [365,35]);
+% fid    = fopen('dailtemp.dat','rt');
+% tempav = fscanf(fid,'%f');
+% tempav = reshape(tempav, [365,35]);
+% 
+% fid    = fopen('dailprec.dat','rt');
+% precav = fscanf(fid,'%f');
+% precav = reshape(precav, [365,35]);
+% 
+% %  set up the times of observation at noon
+% 
+% daytime   = (1:365)'-0.5;
+% dayrange  = [0,365];
+% dayperiod = 365;
+% 
+% %  day values roughly in weeks
+% 
+% weeks = linspace(0,365,53)';   
+% 
+% %  define 8-character names for stations
+% 
+% place = [ ...
+%     'Arvida     '; ...
+%     'Bagottville'; ...
+%     'Calgary    '; ...
+%     'Charlottown'; ...
+%     'Churchill  '; ...
+%     'Dawson     '; ...
+%     'Edmonton   '; ...
+%     'Fredericton'; ...
+%     'Halifax    '; ...
+%     'Inuvik     '; ...
+%     'Iqaluit    '; ...
+%     'Kamloops   '; ...
+%     'London     '; ...
+%     'Montreal   '; ...
+%     'Ottawa     '; ...
+%     'Pr. Albert '; ...
+%     'Pr. George '; ...
+%     'Pr. Rupert '; ...
+%     'Quebec     '; ...
+%     'Regina     '; ...
+%     'Resolute   '; ...
+%     'Scheffervll'; ...
+%     'Sherbrooke '; ...
+%     'St. Johns  '; ...
+%     'Sydney     '; ...
+%     'The Pas    '; ...
+%     'Thunder Bay'; ...
+%     'Toronto    '; ...
+%     'Uranium Cty'; ...
+%     'Vancouver  '; ...
+%     'Victoria   '; ...
+%     'Whitehorse '; ...
+%     'Winnipeg   '; ...
+%     'Yarmouth   '; ...
+%     'Yellowknife'];
+% 
+% %  set up indices that order the stations from east to west to north
+% 
+% geogindex = [24,  9, 25, 34,  4,  8, 22,  1,  2, 19, 23, 14, 15, 28, 13, ...
+%              27, 33, 26,  5, 20, 16, 29,  7,  3, 12, 30, 31, 17, 18, 32, ...
+%               6, 35, 11, 10, 21];
+%          
+% place  = place(geogindex,:);
+% tempav = tempav(:,geogindex);
+% precav = precav(:,geogindex);
+% 
+% %  define 1-character names for months
+% 
+% monthletter = ['J'; 'F'; 'M'; 'A'; 'M'; 'J'; 'J'; 'A'; 'S'; 'O'; 'N'; 'D'];
 
-fid    = fopen('dailprec.dat','rt');
-precav = fscanf(fid,'%f');
-precav = reshape(precav, [365,35]);
+%  load the data from file daily.mat.  The stations in this file have
+%  been rearranged to run from east to west to north.
 
-%  set up the times of observation at noon
+load daily
 
-daytime   = (1:365)'-0.5;
-dayrange  = [0,365];
-dayperiod = 365;
-%  day values roughly in weeks
-
-weeks = linspace(0,365,53)';   
-
-%  define 8-character names for stations
-
-place = [ ...
-    'Arvida     '; ...
-    'Bagottville'; ...
-    'Calgary    '; ...
-    'Charlottown'; ...
-    'Churchill  '; ...
-    'Dawson     '; ...
-    'Edmonton   '; ...
-    'Fredericton'; ...
-    'Halifax    '; ...
-    'Inuvik     '; ...
-    'Iqaluit    '; ...
-    'Kamloops   '; ...
-    'London     '; ...
-    'Montreal   '; ...
-    'Ottawa     '; ...
-    'Pr. Albert '; ...
-    'Pr. George '; ...
-    'Pr. Rupert '; ...
-    'Quebec     '; ...
-    'Regina     '; ...
-    'Resolute   '; ...
-    'Scheffervll'; ...
-    'Sherbrooke '; ...
-    'St. Johns  '; ...
-    'Sydney     '; ...
-    'The Pas    '; ...
-    'Thunder Bay'; ...
-    'Toronto    '; ...
-    'Uranium Cty'; ...
-    'Vancouver  '; ...
-    'Victoria   '; ...
-    'Whitehorse '; ...
-    'Winnipeg   '; ...
-    'Yarmouth   '; ...
-    'Yellowknife'];
-
-%  set up indices that order the stations from east to west to north
-
-geogindex = [24,  9, 25, 34,  4,  8, 22,  1,  2, 19, 23, 14, 15, 28, 13, ...
-             27, 33, 26,  5, 20, 16, 29,  7,  3, 12, 30, 31, 17, 18, 32, ...
-              6, 35, 11, 10, 21];
-         
-%  define 1-character names for months
-
-monthletter = ['J'; 'F'; 'M'; 'A'; 'M'; 'J'; 'J'; 'A'; 'S'; 'O'; 'N'; 'D'];
+tempav      = daily.tempav;
+precav      = daily.precav;
+place       = daily.place;
+daytime     = daily.time;
+dayrange    = daily.rng;
+dayperiod   = daily.period;
+weeks       = daily.weeks;
+monthletter = daily.monthletter;
+LatLong     = daily.LatLong;
 
 %  -------------  set up fourier basis  ---------------------------
 %  Here it was decided that 65 basis functions captured enough of
@@ -89,23 +108,21 @@ daybasis65 = create_fourier_basis(dayrange, nbasis);
 
 %  ----  set up the harmonic acceleration operator  -------
 
-% Lbasis  = create_constant_basis(dayrange);  %  create a constant basis
- Lcoef   = [0,(2*pi/365)^2,0];    %  set up three coefficients
-% wfd     = fd(Lcoef,Lbasis);      % define an FD object for weight functions
-% wfdcell = fd2cell(wfd);          % convert the FD object to a cell object
-% harmaccelLfd = Lfd(3, wfdcell);  %  define the operator object
-
-harmaccelLfd = vec2Lfd(Lcoef,dayrange);
+Lbasis  = create_constant_basis(dayrange);  %  create a constant basis
+Lcoef   = [0,(2*pi/365)^2,0];    %  set up three coefficients
+wfd     = fd(Lcoef,Lbasis);      % define an FD object for weight functions
+wfdcell = fd2cell(wfd);          % convert the FD object to a cell object
+harmaccelLfd = Lfd(3, wfdcell);  %  define the operator object
 
 %  ---------  create fd objects for temp. and prec. ------------
 
-daytempfd = data2fd(tempav, daytime, daybasis65);
+daytempfd = smooth_basis(daytime, tempav, daybasis65);
 daytempfd_fdnames{1} = 'Day';
 daytempfd_fdnames{2} = 'Station';
 daytempfd_fdnames{3} = 'Deg C';
 daytempfd = putnames(daytempfd, daytempfd_fdnames);
 
-dayprecfd = data2fd(precav, daytime, daybasis65);
+dayprecfd = smooth_basis(daytime, precav, daybasis65);
 dayprecfd_fdnames{1} = 'Day';
 dayprecfd_fdnames{2} = 'Station';
 dayprecfd_fdnames{3} = 'mm';
@@ -129,7 +146,7 @@ plotfit_fd(tempav, daytime, daytempfd, casenames, varnames, ...
 
 %  Plot precipitation curves and values
 
-plotfit_fd(precav, daytime, daytempfd, place)
+plotfit_fd(precav, daytime, dayprecfd, place)
 
 %  Assessment: the functions are definitely too rough with
 %  this many basis functions, and especially for precip. which
@@ -157,13 +174,13 @@ precmat = eval_fd(dayprecfd, daytime);
 index = 1:35;
 for i = index
   subplot(2,1,1)
-  plot(daytime,tempav(:,i),'go',daytime,tempmat(:,i),'-')
+  plot(daytime,tempav(:,i),'ro',daytime,tempmat(:,i),'-')
   axis([0 365 -35 25])
   xlabel('Day')
   ylabel('Temperature (deg. C)')
   title(place(i,:))
   subplot(2,1,2)
-  plot(daytime,precav(:,i),'go',daytime,precmat(:,i),'-')
+  plot(daytime,precav(:,i),'ro',daytime,precmat(:,i),'-')
   axis([0 365 0 13])
   xlabel('Day')
   ylabel('Precipitation (mm)')
@@ -172,12 +189,15 @@ end
 
 %  plot all the functions
 
+figure(1)
 subplot(1,1,1)
 plot(daytempfd);
   axis([0 365 -35 25])
 xlabel('\fontsize{12} Day')
 title('\fontsize{16} Mean Temperature')
 
+figure(2)
+subplot(1,1,1)
 plot(dayprecfd);
   axis([0 365 0 13])
 xlabel('\fontsize{12} Day')
@@ -220,6 +240,7 @@ end
 disp('Log lambda    df          gcv')
 disp([loglam, dfsave, gcvsave])
 
+figure(1)
 subplot(2,1,1)
 plot(loglam, gcvsave, 'o-')
 ylabel('\fontsize{16} GCV Criterion')
@@ -236,6 +257,9 @@ fdParobj = fdPar(daybasis365, harmaccelLfd, lambda);
 
 [daytempfd, df, gcv, coef, SSE] = ...
              smooth_basis(daytime, tempav, fdParobj);
+
+disp(['Degrees of freedom = ',num2str(df)])
+disp(['Generalized cross-validation = ',num2str(sum(gcv))])
 
 %  estimate standard error of fit
 
@@ -290,6 +314,9 @@ fdParobj = fdPar(daybasis365, harmaccelLfd, lambda);
 [dayprecfd, df, gcv, coef, SSE] = ...
             smooth_basis(daytime, precav, fdParobj);
 
+disp(['Degrees of freedom = ',num2str(df)])
+disp(['Generalized cross-validation = ',num2str(sum(gcv))])
+
 %  estimate standard error of fit
 
 stderr = sqrt(sum(SSE)/(35*(365-df)));  %  0.94 mm
@@ -298,6 +325,7 @@ disp(['standard error of fit = ',num2str(stderr)])
 
 %  plot data and fit
 
+subplot(1,1,1)
 plotfit_fd(precav, daytime, dayprecfd, place)
 
 %  Assessment: the temperature curves are still pretty rough,
@@ -306,21 +334,6 @@ plotfit_fd(precav, daytime, dayprecfd, place)
 %  early in the year. 
 %  The precip. curves may be oversmoothed for some weather
 %  stations. 
-
-%  use interactive menu program to try out different plots
-
-station =   1;  %  number of St. John's
-lambda  = 100;  %  a smoothing level that corresponds to 56 df
-[H_f1, H_f2, Hc_OK, ...
-      Hc_Next, Hc_Last, Hc_This, Hc_Enter, Hc_Quit,  ...
-      Hc_Weather, Hc_Velocity, Hc_Accel, Hc_HarmAcc, Hc_Residual, ...
-      Hc_Temp, Hc_Prec, Hc_CaseNo, Hc_Lambda] = ...
-      dailysetup(station, lambda, daytime, ...
-                 tempav(:,geogindex), precav(:,geogindex), ...
-                 fdParobj, place(geogindex,:));
-pause;
-delete(H_f1);
-delete(H_f2);
 
 %  smooth precipitation in Prince Rupert
 
@@ -354,7 +367,7 @@ daytemprotpcastr = varmx_pca(daytemppcastr);
 %  plot rotated harmonics
 
 subplot(1,1,1)
-plot_pca(daytemprotpcastr)
+plot_pca_fd(daytemprotpcastr)
 
 %  plot log eigenvalues
 
@@ -383,7 +396,7 @@ text(harmscr(:,1)+5, harmscr(:,2), place)
 %  ------------------------------------------------------------------
 
 %  ---------------------------------------------------------------
-%             Predicting temperature from climate zone 
+%             Predicting temperature from climate region 
 %  ---------------------------------------------------------------
 
 %  set up a smaller basis using only 65 Fourier basis functions
@@ -391,26 +404,22 @@ text(harmscr(:,1)+5, harmscr(:,2), place)
 
 smallnbasis = 65;
 smallbasis  = create_fourier_basis(dayrange, smallnbasis);
-tempfd      = data2fd(tempav, daytime, smallbasis);
+tempfd      = smooth_basis(daytime, tempav, smallbasis);
 
-%  names for climate zones
+%  names for climate regions
 
-zonenames = [ ...
+region_names = [ ...
 'Canada  '; 'Atlantic'; 'Pacific '; 'Contintl'; 'Arctic  '];
 
-%  indices for weather stations in each of four climate zones
+%  indices for weather stations in each of four climate regions
 
 atlindex = [1,2,4,8,9,13,14,15,19,22,23,24,25,28,34];
 pacindex = [12,17,18,30,31];
 conindex = [3,5,6,7,16,20,26,27,29,32,33,35];
 artindex = [10,11,21];
 
-% T-test for differences
-
-tperm_fd(tempfd(atlindex),tempfd(conindex));
-
 %  Set up a design matrix having a column for the grand mean, and
-%    a column for each climate zone effect. Add a dummy contraint
+%    a column for each climate region effect. Add a dummy contraint
 %    observation
 
 zmat = zeros(35,5);
@@ -420,7 +429,7 @@ zmat(pacindex,3) = 1;
 zmat(conindex,4) = 1;
 zmat(artindex,5) = 1;
 
-%  attach a row of 0, 1, 1, 1, 1 to force zone
+%  attach a row of 0, 1, 1, 1, 1 to force region
 %  effects to sum to zero, and define first regression
 %  function as grand mean for all stations
 
@@ -459,17 +468,17 @@ end
 %  compute regression coefficient functions and 
 %  predicted functions
 
-fRegressCell = fRegress(tempfd, xfdcell, betacell);
+fRegressStruct = fRegress(tempfd, xfdcell, betacell);
 
-betaestcell = fRegressCell{4};
-yhatfdobj   = fRegressCell{5};
+betaestcell = fRegressStruct.betahat;
+yhatfdobj   = fRegressStruct.yhat;
 
 %  plot regression functions
 
 for j=1:p
     subplot(2,3,j)
     plot(getfd(betaestcell{j}))
-    title(['\fontsize{16} ',zonenames(j,:)])
+    title(['\fontsize{16} ',region_names(j,:)])
 end
 
 %  plot predicted functions
@@ -478,16 +487,10 @@ subplot(2,3,6)
 plot(yhatfdobj)
 title('Predicted values')
 
-% Try a cross-validation and permutation test
-
-sse_cv = fRegress_CV(tempfd, xfdcell, betacell,1:35);
-
-Fperm_fd(tempfd,xfdcell,betacell);
-
 %  compute mapping from data y to coefficients in c
 
 smallbasismat = eval_basis(daytime, smallbasis);
-y2cMap = inv(smallbasismat'*smallbasismat)*smallbasismat';
+y2cMap = (smallbasismat'*smallbasismat)\smallbasismat';
 
 %  compute residual matrix and get covariance of residuals
 
@@ -515,25 +518,27 @@ ylabel('\fontsize{19} Deg C')
 %  Repeat regression, this time outputting results for
 %  confidence intervals
 
-stderrCell = fRegress_stderr(fRegressCell, y2cMap, SigmaE);
+stderrStruct = fRegress_stderr(fRegressStruct, y2cMap, SigmaE);
 
-betastderrcell = stderrCell{1};
+betastderrcell = stderrStruct.betastderr;
 
-%  plot regression functions with confidence limits
+%  plot regression functions
 
 subplot(1,1,1)
 for j=1:p
     plot(daytime, eval_fd(daytime, betastderrcell{j}))
-    title(['\fontsize{16} ',zonenames(j,:)])
+    title(['\fontsize{16} ',region_names(j,:)])
     pause
 end
+
+%  plot regression functions with confidence limits
 
 subplot(1,1,1)
 for j=1:p
     plotbeta(betaestcell{j}, betastderrcell{j}, weeks)
     xlabel('\fontsize{19} Day')
     ylabel('\fontsize{19} deg C')
-    title(['\fontsize{16} ',zonenames(j,:)])
+    title(['\fontsize{16} ',region_names(j,:)])
     axis([0,365,-25,20])
     pause
 end
@@ -549,11 +554,15 @@ tempresfdobj = smooth_basis(daytime, tempresmat, fdParobj);
 
 plot(tempresfdobj)
 
+%  -----------------------------------------------------------------------
+%    predict log precipitation from climate region and temperature
+%  -----------------------------------------------------------------------
+
 %  Now repeat all this for log precipitation.  
 
 smallnbasis = 65;
 smallbasis  = create_fourier_basis(dayrange, smallnbasis);
-precfd      = data2fd(precav, daytime, smallbasis);
+precfd      = smooth_basis(daytime, precav, smallbasis);
 
 %  set up functional data object for log precipitation
 
@@ -571,12 +580,8 @@ lnprecfd = putnames(lnprecfd, lnprecfd_fdnames);
 plot(lnprecfd);
 title('Log Precipitation Functions')
 
-%  -----------------------------------------------------------------------
-%    predict log precipitation from climate zone and temperature
-%  -----------------------------------------------------------------------
-
 %  Be sure to run previous analysis predicting temperature from
-%  climate zone before running this example.
+%  climate region before running this example.
 
 %  revise LOGPREDFD by adding a zero function
 
@@ -622,19 +627,19 @@ betacell{6} = betafdPar;
 %  compute regression coefficient functions and 
 %  predicted functions
 
-fRegressCell = fRegress(lnprecfd, xfdcell, betacell);
+fRegressStruct = fRegress(lnprecfd, xfdcell, betacell);
 
-betaestcell = fRegressCell{4}; 
-yhatfdobj   = fRegressCell{5};
+betaestcell = fRegressStruct.betahat; 
+yhatfdobj   = fRegressStruct.yhat;
 
 %  plot regression functions
 
-prednames = [zonenames; 'tempres '];
+prednames = [region_names; 'tempres '];
 for j=1:p+1
     plot(getfd(betaestcell{j}))
     title(['\fontsize{16} ',prednames(j,:)])
     pause
-end
+end  
 
 %  plot predicted functions
 
@@ -652,9 +657,9 @@ colorbar
 
 %  get confidence intervals
 
-stderrCell = fRegress_stderr(fRegressCell, y2cMap, SigmaE);
+stderrStruct = fRegress_stderr(fRegressStruct, y2cMap, SigmaE);
 
-betastderrcell = stderrCell{1};
+betastderrcell = stderrStruct.betastderr;
 
 %  plot regression functions
 
@@ -679,10 +684,10 @@ annualprec = log10(sum(precav))';
 
 smallnbasis = 65;
 smallbasis  = create_fourier_basis(dayrange, smallnbasis);
-tempfd      = data2fd(tempav, daytime, smallbasis);
+tempfd      = smooth_basis(daytime, tempav, smallbasis);
 
 smallbasismat = eval_basis(daytime, smallbasis);
-y2cMap = inv(smallbasismat'*smallbasismat)*smallbasismat';
+y2cMap = (smallbasismat'*smallbasismat)\smallbasismat';
 
 %  set up the covariates, the first the constant, and the second
 %  temperature
@@ -715,15 +720,10 @@ betacell{2} = betafdPar2;
 
 %  carry out the regression analysis
 
-fRegressCell = fRegress(annualprec, xfdcell, betacell);
+fRegressStruct = fRegress(annualprec, xfdcell, betacell);
 
-betaestcell   = fRegressCell{4}; 
-annualprechat = fRegressCell{5};
-
-% Permutation F-test
-
-Fperm_fd(annualprec, xfdcell, betacell);
-
+betaestcell   = fRegressStruct.betahat; 
+annualprechat = fRegressStruct.yhat;
 
 %  constant term
 
@@ -766,9 +766,9 @@ betacell{2} = betafdPar2;
 
 %  carry out the regression analysis
 
-fRegressCell  = fRegress(annualprec, xfdcell, betacell);
-betaestcell   = fRegressCell{4}; 
-annualprechat = fRegressCell{5};
+fRegressStruct  = fRegress(annualprec, xfdcell, betacell);
+betaestcell   = fRegressStruct.betahat; 
+annualprechat = fRegressStruct.yhat;
 
 %  constant term
 
@@ -804,9 +804,9 @@ SigmaE = mean(resid.^2);
 
 %  get confidence intervals
 
-stderrCell = fRegress_stderr(fRegressCell, y2cMap, SigmaE);
+stderrStruct = fRegress_stderr(fRegressStruct, y2cMap, SigmaE);
 
-betastderrcell = stderrCell{1};
+betastderrcell = stderrStruct.betastderr;
 
 %  constant  coefficient standard error:
 
@@ -833,7 +833,7 @@ end
 
 logprecmat = log10(eval_fd(daytime,dayprecfd));
 
-lnprecfd = data2fd(logprecmat, daytime, smallbasis);
+lnprecfd = smooth_basis(daytime, logprecmat, smallbasis);
 lnprecfd_fdnames{1} = 'Months';
 lnprecfd_fdnames{2} = 'Station';
 lnprecfd_fdnames{3} = 'log_{10} mm';
@@ -923,8 +923,7 @@ dayfdPar = fdPar(smallbasis, harmaccelLfd, lambda);
 
 %  smooth the data with a positive function
 
-[Wfd1, Fstr, iternum, iterhist] = ...
-   smooth_pos(daytime, VanPrec, dayfdPar);
+Wfd1 = smooth_pos(daytime, VanPrec, dayfdPar);
 
 %  plot both the original smooth and positive smooth
 
@@ -945,8 +944,7 @@ title('Residuals from positive fit')
 
 lambda = 1e3;
 dayfdPar = fdPar(smallbasis, harmaccelLfd, lambda);
-[Wfd, Fstr, iternum, iterhist] = ...
-   smooth_pos(daytime, VanPrecres.^2, dayfdPar);
+Wfd = smooth_pos(daytime, VanPrecres.^2, dayfdPar);
 
 %  plot the square root of this smooth along with the residuals
 
@@ -961,8 +959,7 @@ wtvec = 1./VanPrecvarhat;
  
 lambda   = 1e3;
 dayfdPar = fdPar(smallbasis, harmaccelLfd, lambda);
-[Wfd2, Fstr, iternum, iterhist] = ...
-         smooth_pos(daytime, VanPrec, dayfdPar, wtvec);
+Wfd2 = smooth_pos(daytime, VanPrec, dayfdPar, wtvec);
 
 %  plot the two smooths, one with weighting, one without
 
@@ -971,6 +968,69 @@ VanPrecposvec2 = eval_pos(daytime, Wfd2);
 plot(daytime, VanPrec, '.', daytime, VanPrecposvec2, 'b-', ...
      daytime, VanPrecposvec, 'r--')
 legend('Observed', 'Weighted', 'Unweighted')
+
+%  ------------------------------------------------------------------
+%                PCA of log precipitation
+%  -----------------------------------------------------------------
+
+%  change 0's to 0.05 mm for precipitation
+
+prectmp = precav;
+for j=1:35
+    index = find(prectmp(:,j)==0);
+    prectmp(index,j) = 0.05;
+end
+
+%  work with log base 10 precipitation
+
+logprec = log10(prectmp);
+
+%  set up a fourier basis with 13 basis functions
+
+logprecbasis = create_fourier_basis([0,365], 13);
+
+%  smooth the data with unpenalized regression splines
+
+logprecfd = smooth_basis(daytime, logprec, logprecbasis);
+
+%  PCA with four principal components
+
+nharm = 4;
+logprecpca = pca_fd(logprecfd, nharm);
+
+%  proportion of variance accounted for
+
+disp('Proportions of variance accounted for:')
+disp(logprecpca.varprop)
+disp(['Total proportion of variance = ', ...
+      num2str(sum(logprecpca.varprop))])
+
+%  plot the unrotated principal components
+
+plot_pca(logprecpca)
+
+%  rotate the principal components
+
+logprecpca = varmx_pca(logprecpca);
+
+%  plot the rotated principal components
+
+plot_pca(logprecpca)
+plot_pca(logprecpca, 365, 0, 0)
+
+%  plot log eigenvalues
+
+x = ones(9,2);
+x(:,2) = reshape((5:13),[9,1]);
+y = log10(logprecpca.values(5:13));
+c = x\y;
+subplot(1,1,1)
+phdl = plot(1:9,log10(logprecpca.values(1:9)),'o-', ...
+            1:9, c(1)+ c(2).*(1:9), ':');
+set(phdl, 'LineWidth', 2)
+xlabel('\fontsize{13} Eigenvalue Number')
+ylabel('\fontsize{13} Log_{10} Eigenvalue')
+axis([0.9,9.1,-1.5,2])
 
 %  ------------------------------------------------------------------
 %  smoothing log precipitation with estimation of residual density
@@ -1019,7 +1079,7 @@ wbasis = create_bspline_basis(rng, nbasis, norder);
 %  estimate the coefficients assuming normality
 
 args  = linspace(rng(1),rng(2),101)';
-coef0 = getcoef(data2fd(-(args.^2)./2, args, wbasis));
+coef0 = getcoef(smooth_basis(args, -(args.^2)./2, wbasis));
 Wfd0  = fd(coef0, wbasis);
 
 %  iteration control parameters for LMdens_fd
@@ -1039,36 +1099,23 @@ stations = 1:35;
 
 % stations = [5,30];
 
-for istn = stations
-    
-    disp([num2str(istn), '  ',place(istn,:)])
-    
-    stnfd = logprecfd(istn);
-    
-    %  compute the residual vector
-    
+for istn = stations    
+    disp([num2str(istn), '  ',place(istn,:)])    
+    stnfd = logprecfd(istn);    
+    %  compute the residual vector   
     stnprec = logprec(:,istn);
     stnfit  = eval_fd(daytime, stnfd);
     stnres  = stnprec - stnfit;
     sigma0  = sqrt(cov(stnres));
-    
     %  standarize the residuals
-    
     stnstdres = stnres./sigma0;
-    
-    %  get the min and max
-    
-%     [min(stnstdres), max(stnstdres)]
-    
-    %  set up initial regression coefficients 
-    
-    beta0  = getcoef(stnfd);
-    
+    %  set up initial regression coefficients     
+    beta0  = getcoef(stnfd);    
     [Wfd, beta] = LMdens_fd(stnprec, Wfd0Par, zmat, beta0, sigma0, ...
                             conv, iterlim, dbglev);
     betasave(:,istn) = beta;
-    coefsave(:,istn) = getcoef(Wfd);
-    
+    coefsave(:,istn) = getcoef(Wfd);   
+    figure(1)
     subplot(2,1,1)
     plot(Wfd)
     xlabel('')
@@ -1079,138 +1126,43 @@ for istn = stations
     dens = exp(Wvec);
     plot(args, dens);
     xlabel('')
-    ylabel('p(t)')
-    
-    pause
-    
+    ylabel('p(t)')    
     stnfit2 = zmat*beta;
+    figure(2)
     subplot(1,1,1)
     plot(daytime, stnprec, '.', daytime, stnfit2, '-', ...
          daytime, stnfit, '--')
-    title(['\fontsize{16} ', place(istn,:)])
-    
-    pause
-    
-    stnres2 = stnprec - stnfit2;
-    
+    title(['\fontsize{16} ', place(istn,:)])    
+    stnres2 = stnprec - stnfit2;  
+    figure(3)
     subplot(2,1,1)
     plot(daytime, stnres./sigma0, '.')
     title(['\fontsize{16} ', place(istn,:)])
     subplot(2,1,2)
-    plot(daytime, stnres2./sigma0, '.')
-    
-    pause
-    
+    plot(daytime, stnres2./sigma0, '.')    
+    pause    
 end
-
-%  display results for Churchill and Vancouver
-
-istn = 5;
-Wfdi = fd(coefsave(:,istn), wbasis);
-Wvec = eval_fd(args, Wfdi);
-Pvec = exp(Wvec);
-Pvec = Pvec./((args(2)-args(1))*sum(Pvec));
-
-ahdl = axes('position', [0.1,0.12,0.40,0.45], ...
-            'Box', 'on', 'FontSize', 13);
-set(ahdl, 'Xlim', [rng(1),rng(2)]);
-set(ahdl, 'Ylim', [0,0.6]);
-set(ahdl, 'Xtick', -4:2:2);
-set(ahdl, 'Ytick', 0:0.2:0.6);
-lhdl = line(args, Pvec);
-set(lhdl, 'LineWidth', 2, 'color', 'b')
-title('Churchill')
-xlabel('Residual', 'FontSize', 13);
-ylabel('Density',  'FontSize', 13);
-
-istn = 30;
-Wfdi = fd(coefsave(:,istn), wbasis);
-Wvec = eval_fd(args, Wfdi);
-Pvec = exp(Wvec);
-Pvec = Pvec./((args(2)-args(1))*sum(Pvec));
-
-ahdl = axes('position', [0.55,0.12,0.40,0.45], ...
-            'Box', 'on', 'FontSize', 13);
-set(ahdl, 'Xlim', [rng(1),rng(2)]);
-set(ahdl, 'Ylim', [0,0.6]);
-set(ahdl, 'Xtick', -4:2:2);
-set(ahdl, 'Ytick', []);
-lhdl = line(args, Pvec);
-set(lhdl, 'LineWidth', 2, 'color', 'b')
-title('Vancouver')
-xlabel('Residual', 'FontSize', 13);
-
-print -dps2 'c:/MyFiles/fdabook/revision/figs.dir/LMdens.ps'
-
-istn = 5;
-stnfit  = eval_fd(daytime, logprecfd(istn));
-stnfit2 = zmat*betasave(:,istn);
-
-ahdl = axes('position', [0.13,0.12,0.40,0.45], ...
-            'Box', 'on', 'FontSize', 13);
-set(ahdl, 'Xlim', [0,365]);
-set(ahdl, 'Ylim', [-0.5,1]);
-set(ahdl, 'Xtick', 0:100:300);
-set(ahdl, 'Ytick', -0.5:0.5:1);
-lhdl = line(daytime, stnfit2);
-set(lhdl, 'LineWidth', 2, 'color', 'b')
-lhdl = line(daytime, stnfit);
-set(lhdl, 'LineWidth', 2, 'LineStyle', '--', 'color', 'm')
-xlabel('Day', 'FontSize', 13);
-ylabel('Log_{10}Prec. (mm)',  'FontSize', 13);
-title('Churchill')
-
-istn = 30;
-stnprec = logprec(:,istn);
-stnfit  = eval_fd(daytime, logprecfd(istn));
-stnfit2 = zmat*betasave(:,istn);
-
-ahdl = axes('position', [0.58,0.12,0.40,0.45], ...
-            'Box', 'on', 'FontSize', 13);
-set(ahdl, 'Xlim', [0,365]);
-set(ahdl, 'Ylim', [-0.5,1]);
-set(ahdl, 'Xtick', 0:100:300);
-set(ahdl, 'Ytick', []);
-lhdl = line(daytime, stnfit2);
-set(lhdl, 'LineWidth', 2, 'color', 'b')
-lhdl = line(daytime, stnfit);
-set(lhdl, 'LineWidth', 2, 'LineStyle', '--', 'color', 'm')
-xlabel('Day', 'FontSize', 13);
-title('Vancouver')
-
-print -dps2 'c:/MyFiles/fdabook/revision/figs.dir/LMdensfit.ps'
 
 %  functional ANOVA of Wfd's
 
 stations = 1:35;
 
-for istn = stations
-    
-    disp([num2str(istn), '  ',place(istn,:)])
-    
-    stnfd = logprecfd(istn);
-    
-    %  compute the residual vector
-    
+for istn = stations    
+    disp([num2str(istn), '  ',place(istn,:)])    
+    stnfd = logprecfd(istn);    
+    %  compute the residual vector    
     stnprec = logprec(:,istn);
     stnfit  = eval_fd(daytime, stnfd);
     stnres  = stnprec - stnfit;
-    sigma0  = sqrt(cov(stnres));
-    
-    %  standarize the residuals
-    
-    stnstdres = stnres./sigma0;
-    
+    sigma0  = sqrt(cov(stnres));    
+    %  standarize the residuals    
+    stnstdres = stnres./sigma0;    
     %  set up initial regression coefficients 
-    
-    beta0  = getcoef(stnfd);
-    
+    beta0  = getcoef(stnfd);    
     [Wfd, beta] = LMdens_fd(stnprec, Wfd0Par, zmat, beta0, sigma0, ...
-        conv, iterlim, dbglev);
-    
+        conv, iterlim, dbglev);    
     betasave(:,istn) = beta;
-    coefsave(:,istn) = getcoef(Wfd);
-    
+    coefsave(:,istn) = getcoef(Wfd);    
 end
 
 %  set up design matrix
@@ -1257,15 +1209,14 @@ W36fdPar = fdPar(W36fd);
 
 %  carry out the functional ANOVA
 
-fRegressCell = fRegress(W36fd, xfdcell, betacell);
-betaestcell = fRegressCell{4};
-W36hatfd    = fRegressCell{5};
+fRegressStruct = fRegress(W36fd, xfdcell, betacell);
+betaestcell = fRegressStruct.betahat;
+W36hatfd    = fRegressStruct.yhat;
 
 %  a quick plot of the regression functions
 
 subplot(1,1,1)
 plotbeta(betaestcell)
-
 
 plot(W36hatfd)
 

@@ -47,13 +47,18 @@ varmx.pca.fd <- function(pcafd, nharm=scoresd[2], nx=501)
   if (ndim == 2)
     rotharmcoef[,1:nharm] <- harmcoef[,1:nharm] %*% rotm
   else
-    for(j in (1:coefd[3]))
+    for(j in 1:coefd[3])
 		rotharmcoef[,1:nharm,j] <- harmcoef[,1:nharm,j] %*% rotm
 
   #  rotate principal component scores
 
   rotharmscrs <- pcafd$scores		
-  rotharmscrs[,1:nharm] <- rotharmscrs[,1:nharm] %*% rotm
+  if (ndim == 2)
+    rotharmscrs[,1:nharm] <- rotharmscrs[,1:nharm] %*% rotm
+  else
+    for (j in 1:coefd[3])
+    rotharmscrs[,1:nharm,j] <- rotharmscrs[,1:nharm,j] %*% rotm
+    
 
   #  compute proportions of variance
 

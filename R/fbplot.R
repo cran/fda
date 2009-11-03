@@ -25,7 +25,7 @@ estaEntre=function(v,matrizDatos){
 #combination
 combinat=function(n,p){
 	if (n<p){combinat=0}
-	else {combinat=factorial(n)/(factorial(p)*factorial(n-p))}
+	else {combinat=exp(lfactorial(n)-(lfactorial(p)+lfactorial(n-p)))}
 }
 
 #BD3
@@ -156,5 +156,6 @@ fbplot=function(fit,x=NULL,method='MBD',depth=NULL,plot=TRUE,prob=0.5,color=6,ou
 	}
 	return(list(depth=depth,outpoint=outpoint))
 }
+
 
 

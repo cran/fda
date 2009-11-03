@@ -1,5 +1,5 @@
-function fRegressCell = ...
-            fRegress(yfdPar, xfdcell, betacell, wt)
+function fRegressStruct = ...
+        fRegress(yfdPar, xfdcell, betacell, wt, y2cMap, SigmaE)
 %  FREGRESS  Fits a functional linear model using multiple 
 %  functional independent variables with the dependency being 
 %  pointwise or concurrent.  
@@ -23,191 +23,97 @@ function fRegressCell = ...
 %               the corresponding regression function.
 %  WT       ... a vector of N nonnegative weights for observations,
 %               where N is the number of observations. 
+%  Y2CMAP   ... the matrix mapping from the vector of observed values
+%               to the coefficients for the dependent variable.
+%               This is output by function SMOOTH_BASIS.  If this is
+%               supplied, confidence limits are computed, otherwise not.
+%  SIGMAE   ... Estimate of the covariances among the residuals.  This
+%               can only be estimated after a preliminary analysis
+%               with FREGRESS.
 %  
 %  Returns:  
-%  FREGRESSCELL  ...  A cell containing members with names:
+%  FREGRESSSTRUCT...  A struct object containing members with names:
 %    yfdPar      ... first  argument of FREGRESS
 %    xfdcell     ... second argument of FREGRESS
 %    betacell    ... third  argument of FREGRESS
-%    betaestcell ... estimated regression functions 
-%    yhatfdobj   ... functional data object containing fitted functions 
+%    betahat     ... estimated regression functions 
+%    yhat        ... if yfdPar is a functional parameter object, this is a
+%                    functional data object containing fitted functions
+%                    if yfdPar is a vector, this is a vector containing
+%                    fitted values
+%    Cmat        ... coefficient matrix for the linear system defining
+%                    the regression coefficient basis vector
+%    Dmat        ... right side vector for the linear system defining
+%                    the regression coefficient basis vector
 %    Cmatinv     ... inverse of the coefficient matrix, needed for
 %                    function FREGRESS_STDERR that computes standard errors
 %    wt          ... weights for observations
-%    df          ... degrees of freedom for fit  (scalar response)
-%    OCV         ... ordinary cross validation score (scalar response)
-%    GCV         ... generalized cross validation score (scalar resonse)
+%    df          ... degrees of freedom for fit
+%    y2cMap      ... input matrix mapping y observations into y
+%                    coefficients
+%    SigmaE      ... input covariance of residuals
+%    betastderr  ... estimated standard error functional data objects for
+%                    for regression coefficiens
+%    bvar        ... covariance matrix for coefficients defining regression
+%                    functions
+%    c2bMap      ... matrix mapping y coefficients into b coefficients
 
-%  Last modified 15 May 2009
+%  Last modified 26 July 2010 by Jim Ramsay
 
 if nargin < 3
     error('Less than three arguments supplied.');
 end
 
-%  Check that xfdcell is a cell object
+%  set default values for last two arguments
 
-if ~iscell(xfdcell)
-    error('Argument XFDCELL is not a cell object.');
-end
+if nargin < 6,  SigmaE = [];  end
+if nargin < 5,  y2cMap = [];  end
+if nargin < 4,  wt     = [];  end
 
-%  get number of independent variables 
-    
+[yfdPar, xfdcell, betacell, wt, rangeval] = ...
+               fRegress_argcheck(yfdPar, xfdcell, betacell, wt);
+          
 p = length(xfdcell);
+N = size(getcoef(xfdcell{1}),2);
 
-%  check contents of XFDCELL
+wtconstant = (var(wt) == 0);
 
-xerror = 0;
-for j=1:p
-    xfdj = xfdcell{j};
-    if ~(isa_fd(xfdj) || isa_fdPar(xfdj) || isnumeric(xfdj))
-        disp(['XFDCELL{',num2str(j), ...
-               '} is not a vector, an FD object or an FDPAR object.']);
-        xerror = 1;
-    end
-end
+onesbasis = create_constant_basis(rangeval);
+onesfd    = fd(1, onesbasis);
 
-%  Check BETACELL
-  
-if ~iscell(betacell)
-    error('Argument BETACELL is not a cell object.');
-end
+%  --------------------------------------------------------------------------
+%  branch depending on whether the dependent variable is functional or scalar 
+%  --------------------------------------------------------------------------
 
-if length(betacell) ~= p
-    error(['Number of regression coefficients does not match', ...
-           ' number of independent variables.']);
-end
-
-%  check contents of BETAFDCELL
-
-berror = 0;
-for j=1:p
-    betafdParj = betacell{j};
-    if isa_fd(betafdParj) 
-        betafdParj  = fdPar(betafdParj);
-        betacell{j} = betafdParj;
-    end
-    if ~isa_fdPar(betafdParj)
-        disp(['BETACELL{',num2str(j),'} is not a FDPAR object.']);
-        berror = 1;
-    end
-end
-
-if xerror || berror
-    error('An error has been found in either XFDCELL or BETACELL.'); 
-end
-
-%  set up a constant basis for vector independent variables
-
-betafdPar = betacell{1};
-betafd    = getfd(betafdPar);
-betabasis = getbasis(betafd);
-betarange = getbasisrange(betabasis);
-onebasis  = create_constant_basis(betarange);
-onesfd    = fd(1,onebasis);
-
-%  Get sample size and check YFDPAR.  
-
-if isa_fdPar(yfdPar) || isa_fd(yfdPar)
+if isa_fdPar(yfdPar)
     
     %  ----------------------------------------------------------------
-    %                   YFDPAR is functional
+    %              YFDPAR is a functional parameter object
     %  ----------------------------------------------------------------
     
-    if isa_fd(yfdPar)
-        yfdPar = fdPar(yfdPar);
-    end
-    yfdobj  = getfd(yfdPar);
-    ycoef   = getcoef(yfdobj);
-    if length(size(ycoef)) > 2
-        error('YFDOBJ from YFDPAR is not univariate.');
-    end
-    N         = size(ycoef,2);
+    %  extract dependent variable information
+    
+    yfdobj    = getfd(yfdPar);
+    ycoef     = getcoef(yfdobj);
     ybasisobj = getbasis(yfdobj);
     rangeval  = getbasisrange(ybasisobj);
     ynbasis   = getnbasis(ybasisobj);
     
-    %  check weight vector WT
-    
-    if nargin < 4
-        wt = ones(N,1);
+    if length(size(ycoef)) > 2
+        error('YFDOBJ from YFDPAR is not univariate.');
     end
     
-    if length(wt) ~= N
-        error('The number of observation weights is incorrect.');
-    end
-    
-    if any(wt < 0)
-        error('Negative observation weights encountered.');
-    end
-    
-    if var(wt) > 0 
-        wtconstant = 0;
-    else
-        wtconstant = 1;
-    end
-        
-    %  check each cell.  If the object is a vector of length N,
-    %  it is converted to a functional data object with a 
-    %  constant basis
-    
-    xerror = 0;
-    for j=1:p
-        xfdj = xfdcell{j};
-        if isa_fd(xfdj)
-            xcoef = getcoef(xfdj);
-            if length(size(xcoef)) > 2
-                error(['Covariate ',num2str(j),' is not univariate.']);
-            end
-            rangevalx  = getbasisrange(getbasis(xfdj));
-            if any(rangevalx ~= rangeval)
-                disp(['Range for covariate ',num2str(j), ...
-                        ' does not match that of YFDOBJ.']);
-                xerror = 1;
-            end
-        elseif strcmp(class(xfdj), 'double')
-            xfdcell{j} = fd(xfdj(:)', onebasis);
-        else
-            disp(['Covariate ', num2str(j),       ...
-                   ' is neither a functional nor', ...
-                   ' a multivariate object.']);
-            xerror = 1;
-        end
-        %  check size of coefficient array
-        coefj = getcoef(xfdcell{j});
-        Nj = size(coefj, 2);
-        if Nj ~= N
-            disp('Incorrect number of replications in XFDCELL');
-            xerror = 1;
-        end
-    end
-    if xerror, error(''); end
-    
-    if length(betacell) ~= p
-        error(['Number of regression coefficients does not match', ...
-                ' number of independent variables.']);
-    end
-    
-    %  check weights
-
-    if length(wt) ~= N 
-        error('Number of weights not equal to N.');
-    end
-    if any(wt < 0)    
-        error('Negative weights found.');
-    end
-    
-    %  -----------------------------------------------------------
-    %          set up the linear equations for the solution
-    %  -----------------------------------------------------------
+    %  -------- set up the linear equations for the solution  ----------
     
     %  compute the total number of coefficients to be estimated
     
     ncoef = 0;
     for j=1:p
         betafdParj = betacell{j};
-        betafdj    = getfd(betafdParj);
-        ncoefj     = size(getcoef(betafdj),1);
-        ncoef      = ncoef + ncoefj;
+        if getestimate(betafdParj)
+            ncoefj  = size(getcoef(getfd(betafdParj)),1);
+            ncoef   = ncoef + ncoefj;
+        end
     end
     
     Cmat = zeros(ncoef,ncoef);
@@ -264,7 +170,8 @@ if isa_fdPar(yfdPar) || isa_fd(yfdPar)
             %  attach penalty term to diagonal block
             lambda = getlambda(betafdParj);
             if lambda > 0
-                Rmatj = eval_penalty(getbasis(getfd(betafdParj)));
+                Lfdj  = getLfd(betafdParj);
+                Rmatj = eval_penalty(getbasis(getfd(betafdParj)), Lfdj);
                 Cmat(indexj,indexj) = Cmat(indexj,indexj) + lambda.*Rmatj;
             end
         end
@@ -279,30 +186,30 @@ if isa_fdPar(yfdPar) || isa_fd(yfdPar)
     %  solve for coefficients defining BETA
     
     Cmatinv  = inv(Cmat);
-    betacoef = Cmatinv*Dmat;
+    betacoef = Cmat\Dmat;
     
-    %  set up fdPar object for BETAFDPAR
+    %  set up fdPar objects for reg. fns. for BETAESTCELL
     
     betaestcell = betacell;
     mj2 = 0;
     for j=1:p
-        betafdParj     = betacell{j};
+        betafdParj = betacell{j};
         if getestimate(betafdParj)
-            betafdj        = getfd(betafdParj);
-            ncoefj = size(getcoef(betafdj),1);
-            mj1    = mj2 + 1;
-            mj2    = mj2 + ncoefj;
-            indexj = mj1:mj2;
+            betafdj = getfd(betafdParj);
+            ncoefj  = size(getcoef(betafdj),1);
+            mj1     = mj2 + 1;
+            mj2     = mj2 + ncoefj;
+            indexj  = mj1:mj2;
             betaestfdj     = putcoef(betafdj, betacoef(indexj));
             betaestfdPar   = putfd(betafdParj, betaestfdj);
         end
         betaestcell{j} = betaestfdPar;
     end
     
-    %  set up fd object for predicted values
+    %  set up fd object for predicted values in YHATFDOBJ
     
-    nfine     = max(501,10*ynbasis+1);
-    tfine     = linspace(rangeval(1), rangeval(2), nfine)';
+    nfine   = max(501,10*ynbasis+1);
+    tfine   = linspace(rangeval(1), rangeval(2), nfine)';
     yhatmat = zeros(nfine,N);
     for j=1:p
         xmat    = eval_fd(tfine, xfdcell{j});
@@ -310,86 +217,114 @@ if isa_fdPar(yfdPar) || isa_fd(yfdPar)
         betavec = eval_fd(tfine, betafdj);
         yhatmat = yhatmat + xmat.*(betavec*ones(1,N));
     end
-    yhatfdobj = data2fd(yhatmat, tfine, ybasisobj);
+    yhatfd = smooth_basis(tfine, yhatmat, ybasisobj);
     
     df = NaN;
-    OCV = NaN;
-    GCV = NaN;
         
-elseif strcmp(class(yfdPar),'double')
+    if ~(isempty(y2cMap) || isempty(SigmaE))
+    
+        %  check dimensions of y2cMap and SigmaE
+
+        y2cdim = size(y2cMap);
+        if y2cdim(1) ~= ynbasis || ...
+           y2cdim(2) ~= size(SigmaE, 1)  
+             error('Dimensions of Y2CMAP not correct.');
+        end
+					
+        ybasismat = eval_basis(tfine, ybasisobj);
+
+        deltat    = tfine(2) - tfine(1);
+
+        %  compute BASISPRODMAT
+
+        basisprodmat = zeros(ncoef,ynbasis*N);
+
+        mj2 = 0;
+        for j = 1:p
+            betafdParj = betacell{j};
+            betabasisj = getbasis(getfd(betafdParj));
+            ncoefj     = getnbasis(betabasisj);
+            bbasismatj = eval_basis(tfine, betabasisj);
+            xfdj       = xfdcell{j};
+            tempj      = eval_fd(tfine, xfdj);
+            %  row indices of BASISPRODMAT to fill
+            mj1    = mj2 + 1;
+            mj2    = mj2 + ncoefj;
+            indexj = mj1:mj2;
+            %  inner products of beta basis and response basis
+            %    weighted by covariate basis functions
+            mk2 = 0;
+            for k = 1:ynbasis
+                %  row indices of BASISPRODMAT to fill
+                mk1    = mk2 + 1;
+                mk2    = mk2 + N;
+                indexk = mk1:mk2;
+                tempk  = bbasismatj*ybasismat(:,k);
+                basisprodmat(indexj,indexk) = ...
+                                 deltat*crossprod(tempk,tempj);
+            end
+        end
+
+        %  compute variances of regression coefficient function values
+		
+        c2bMap    = Cmat\basisprodmat;
+        VarCoef   = y2cMap * SigmaE * y2cMap';
+        CVariance = kron(VarCoef,diag(ones(N,1)));
+        bvar      = c2bMap * CVariance * c2bMap';
+        betastderrcell = cell(p,1);
+        mj2 = 0;
+        for j = 1:p
+            betafdParj = betacell{j};
+            betabasisj = getbasis(getfd(betafdParj));
+            ncoefj     = getnbasis(betabasisj);
+            mj1 	   = mj2 + 1;
+            mj2 	   = mj2 + ncoefj;
+            indexj 	   = mj1:mj2;
+            bbasismat  = eval_basis(tfine, betabasisj);
+            bvarj      = bvar(indexj,indexj);
+            bstderrj   = sqrt(diag(bbasismat * bvarj * bbasismat'));
+            bstderrfdj = smooth_basis(tfine, bstderrj, betabasisj);
+            betastderrcell{j} = bstderrfdj;
+        end
+    else
+        betastderrcell = [];
+        bvar           = [];
+        c2bMap         = [];
+    end
+    
+else  
     
     %  ----------------------------------------------------------------
     %                   YFDPAR is scalar or multivariate
     %  ----------------------------------------------------------------
     
     ymat = yfdPar;
-    N    = size(ymat,1);
-    
-    %  check weight vector WT
-    
-    if nargin < 4
-        wt = ones(N,1);
-    end
-    
-    if length(wt) ~= N
-        error('The number of observation weights is incorrect.');
-    end
-    
-    if any(wt < 0)
-        error('Negative observation weights encountered.');
-    end
-
-    %  check each cell.  If the object is a functional data object,
-    %  it is converted to a multivariate object
     
     Zmat  = [];
     Rmat  = [];
     pjsum = 0;
     pjvec = zeros(p,1);
     for j=1:p
-        xfdj = xfdcell{j};
-        if isa_fd(xfdj)
-            xcoef  = getcoef(xfdj);
-            Nj     = size(xcoef,2);
-            if Nj ~= N
-                error(['Coefficient matrix ',num2str(j), ...
-                       ' has the wrong number of columns.']);
+        xfdj       = xfdcell{j};
+        xcoef      = getcoef(xfdj);
+        xbasis     = getbasis(xfdj);
+        betafdParj = betacell{j};
+        bbasis     = getbasis(getfd(betafdParj));
+        bnbasis    = getnbasis(bbasis);
+        pjvec(j)   = bnbasis;
+        Jpsithetaj = inprod_basis(xbasis,bbasis);
+        Zmat       = [Zmat,xcoef'*Jpsithetaj];
+        if getestimate(betafdParj)
+            lambdaj    = getlambda(betafdParj);
+            if lambdaj > 0
+                Lfdj  = getLfd(betafdParj);
+                Rmatj = lambdaj.*eval_penalty(betafdParj, Lfdj);
+            else
+                Rmatj = zeros(pjvec(j));
             end
-            xbasis     = getbasis(xfdj);
-            betafdParj = betacell{j};
-            bbasis     = getbasis(getfd(betafdParj));
-            bnbasis    = getnbasis(bbasis);
-            pjvec(j)   = bnbasis;
-            Jpsithetaj = inprod_basis(xbasis,bbasis);
-            Zmat       = [Zmat,xcoef'*Jpsithetaj];
-            if getestimate(betafdParj)
-                lambdaj    = getlambda(betafdParj);
-                if getestimate(betafdParj) && lambdaj > 0
-                    Lfdj  = getLfd(betafdParj);
-                    Rmatj = lambdaj.*eval_penalty(betafdParj, Lfdj);
-                else
-                    Rmatj = zeros(pjvec(j));
-                end
-                Rmat  = [ [Rmat,    zeros(pjsum,bnbasis)]; ...
-                    [zeros(bnbasis,pjsum), Rmatj] ];
-                pjsum = pjsum + bnbasis;
-            end
-        elseif strcmp(class(xfdj), 'double')
-            Zmatj    = xfdj;
-            [Nj,pj]  = size(Zmatj);
-            pjvec(j) = pj;
-            if Nj ~= N
-                error(['Covariate matrix ',num2str(j), ...
-                       ' has the wrong number of rows.']);
-            end
-            Zmat  = [Zmat,Zmatj];
-            Rmatj = zeros(pj);
-            Rmat  = [ [Rmat,  zeros(pjsum,pj)]; ...
-                      [zeros(pj,pjsum), Rmatj] ];
-            pjsum = pjsum + pj;
-        else
-            error(['Covariate ',num2str(j), ...
-                   ' is neither a functional nor a multivariate object.']);
+            Rmat  = [ [Rmat,    zeros(pjsum,bnbasis)]; ...
+                      [zeros(bnbasis,pjsum), Rmatj] ];
+            pjsum = pjsum + bnbasis;
         end
     end
     
@@ -403,7 +338,7 @@ elseif strcmp(class(yfdPar),'double')
         rtwt   = sqrt(wt);
         Zmatwt = Zmat.*(rtwt*ones(1,p));
         Cmat   = Zmatwt'*Zmatwt + Rmat;
-        Dmat   = Zmatwt'*ymatwt;
+        Dmat   = Zmatwt'*ymat;
     else
         Cmat = Zmat'*Zmat + Rmat;
         Dmat = Zmat'*ymat;
@@ -411,36 +346,28 @@ elseif strcmp(class(yfdPar),'double')
     
     eigchk(Cmat);
     
-    Cmatinv  = inv(Cmat);
-    betacoef = Cmatinv*Dmat;
+    betacoef = Cmat\Dmat;
     
     % compute degrees of freedom measure
     
-%    df = sum(diag(Zmat*Cmatinv*Zmat'));
-    hatvals = diag(Zmat * Cmatinv * Zmat');
-    df = sum(hatvals);
+    Cmatinv = inv(Cmat);
+    temp    = Cmat\Zmat';
+    df      = sum(diag(Zmat*temp));
     
     %  set up fdPar object for BETAESTFDPAR
     
     betaestcell = betacell;
-    onebasis    = create_constant_basis([0,1]);
     mj2 = 0;
     for j=1:p
-        mj1 = mj2 + 1;
-        mj2 = mj2 + pjvec(j);
+        mj1    = mj2 + 1;
+        mj2    = mj2 + pjvec(j);
         indexj = mj1:mj2;
-        betacoefj  = betacoef(indexj);
-        betafdParj = betacell{j};
-        if isa_fd(xfdj)        
-            betafdj        = getfd(betafdParj);
-            betaestfdj     = putcoef(betafdj, betacoefj);
-            betaestfdParj  = putfd(betafdParj, betaestfdj);
-            betaestcell{j} = betaestfdParj;
-        else
-            betaestfdj     = fd(betacoefj',onebasis);
-            betaestfdParj  = putfd(betafdParj, betaestfdj);
-            betaestcell{j} = betaestfdParj;
-        end
+        betacoefj      = betacoef(indexj);
+        betafdParj     = betacell{j};
+        betafdj        = getfd(betafdParj);
+        betaestfdj     = putcoef(betafdj, betacoefj);
+        betaestfdParj  = putfd(betafdParj, betaestfdj);
+        betaestcell{j} = betaestfdParj;
     end
     
     %  set up fd object for predicted values
@@ -466,26 +393,65 @@ elseif strcmp(class(yfdPar),'double')
             yhatmat = yhatmat + xfdj*betaj';
         end
     end
-    yhatfdobj = yhatmat;
+    yhatfd = yhatmat;
+        
+    %  -----------------------------------------------------------------------
+    %        Compute pointwise standard errors of regression coefficients
+    %               if both y2cMap and SigmaE are supplied.
+    %  -----------------------------------------------------------------------
 
-    OCV = sum( (ymat-yhatmat).^2./(1-hatvals).^2 );
-    GCV = sum( (ymat-yhatmat).^2 )/( (sum(1-hatvals)).^2 );
+    if ~(isempty(y2cMap) || isempty(SigmaE))
     
-else
-    %  YFDOBJ is neither functional nor multivariate
-    error('YFDOBJ is neither functional nor multivariate.');
+        %  compute linear mapping c2bMap takinging coefficients for
+        %  response into coefficients for regression functions
+
+        c2bMap = Cmat\Zmat';
+        y2bmap = c2bMap;
+        bvar   = y2bmap*SigmaE*y2bmap';
+        betastderrcell = cell(p,1);
+        mj2 = 0;
+        for j = 1:p
+	        betafdParj = betacell{j};
+            betabasisj = getbasis(getfd(betafdParj));
+	        ncoefj     = getnbasis(betabasisj);
+            mj1        = mj2 + 1;
+            mj2        = mj2 + ncoefj;
+            indexj     = mj1:mj2;
+            bvarj      = bvar(indexj,indexj);
+            betarng    = getbasisrange(betabasisj);
+            nfine      = max([501,10*ncoefj+1]);
+            tfine      = linspace(betarng(1), betarng(2), nfine);
+            bbasismat  = eval_basis(tfine, betabasisj);
+            bstderrj   = sqrt(diag(bbasismat*bvarj*bbasismat'));
+            bstderrfdj = smooth_basis(tfine, bstderrj, betabasisj);
+            betastderrcell{j} = bstderrfdj;
+        end
+    else
+        betastderrcell = [];
+        bvar           = [];
+        c2bMap         = [];
+    end
 end
 
-fRegressCell{1} = yfdPar;
-fRegressCell{2} = xfdcell;
-fRegressCell{3} = betacell;
-fRegressCell{4} = betaestcell;
-fRegressCell{5} = yhatfdobj;
-fRegressCell{6} = Cmatinv;
-fRegressCell{7} = wt;
-fRegressCell{8} = df;
-fRegressCell{9} = OCV;
-fRegressCell{10} = GCV;
+%  -----------------------------------------------------------------------
+%                  Set up output struct object
+%  -----------------------------------------------------------------------
+
+fRegressStruct.yfdPar     = yfdPar;
+fRegressStruct.xfdcell    = xfdcell;
+fRegressStruct.betacell   = betacell;
+fRegressStruct.betahat    = betaestcell;
+fRegressStruct.yhat       = yhatfd;
+fRegressStruct.Cmat       = Cmat;
+fRegressStruct.Dmat       = Dmat;
+fRegressStruct.Cmatinv    = Cmatinv;
+fRegressStruct.w          = wt;
+fRegressStruct.df         = df;
+fRegressStruct.y2cMap     = y2cMap;
+fRegressStruct.SigmaE     = SigmaE;
+fRegressStruct.betastderr = betastderrcell;
+fRegressStruct.bvar       = bvar;
+fRegressStruct.c2bMap     = c2bMap;
 
 %  ------------------------------------------------------------
 

@@ -1,10 +1,16 @@
 function [fdobj, df, gcv, SSE, penmat, y2cMap, argvals, y] = ...
     smooth_basis(argvals, y, fdParobj, wtvec, fdnames, dffactor)
-%SMOOTH_BASIS  Smooths discrete curve values using penalized basis functions
-%  Arguments for this function:
+%SMOOTH_BASIS  Smooths data by penalized least squares.  The smooth curves
+%  are expressed as a basis function expansions, and this function 
+%  computes the coefficients of the expansions.  Smoothness is controlled
+%  by controlling the size of an integrated squared linear differential
+%  operator.  The integral is multiplied by a smoothing or bandwidth
+%  parameter.
 %
-%  ARGVALS  ... A set of argument values, set by default to equally spaced on
-%               the unit interval (0,1).
+%  Required arguments for this function are:
+%
+%  ARGVALS  ... A set of argument values, set by default to equally spaced
+%               on the unit interval (0,1).
 %  Y        ... an array containing values of curves
 %               If the array is a matrix, rows must correspond to argument
 %               values and columns to replications, and it will be assumed
@@ -12,38 +18,46 @@ function [fdobj, df, gcv, SSE, penmat, y2cMap, argvals, y] = ...
 %               If Y is a three-dimensional array, the first dimension
 %               corresponds to argument values, the second to replications,
 %               and the third to variables within replications.
-%               If Y is a vector, only one replicate and variable are assumed.
+%               If Y is a vector, only one replicate and variable are 
+%               assumed.
 %  FDPAROBJ ... A functional parameter or fdPar object.  This object 
 %               contains the specifications for the functional data
 %               object to be estimated by smoothing the data.  See
 %               comment lines in function fdPar for details.
 %               This argument may also be either a FD object, or a 
-%               BASIS object.  In this case, the smoothing parameter 
-%               LAMBDA is set to 0.
+%               BASIS object.  If this argument is a basis object, the 
+%               smoothing parameter LAMBDA is set to 0.
+%
+%  Optional arguments are:
+%
 %  WTVEC    ... A vector of N weights, set to one by default, that can
 %               be used to differentially weight observations.
-%  FDNAMES  ... A cell of length 3 with names for
+%               WTVEC may also be an order N matrix (usually symmetric)
+%               that also allows for correlations among observations.
+%  FDNAMES  ... A cell array of length 3 with names for
 %               1. argument domain, such as 'Time'
 %               2. replications or cases
 %               3. the function.
 %  DFFACTOR ... A multiplier of df in GCV, set to one by default
-%  Returns:
-%    FDOBJ  ...  an object of class fd containing coefficients.
-%    DF     ...  a degrees of freedom measure.
-%    GCV    ...  a measure of lack of fit discounted for df.
-%                If the function is univariate, GCV is a vector 
-%                containing the error  sum of squares for each 
-%                function, and if the function is multivariate, 
-%                GCV is a NVAR by NCURVES matrix.
-%    SSE    ...  the error sums of squares.  
-%                SSE is a vector or matrix of the same size as 
-%                GCV.
-%    PENMAT ...  the penalty matrix, if computed, otherwise [].
-%    Y2CMAP ...  the matrix mapping the data to the coefficients.
-%  ARGVALS  ... The input set of argument values.
-%  Y        ... The input array containing values of curves
+%
+%  Returned objects are:
+%
+%  FDOBJ   ... an object of class fd containing coefficients.
+%  DF      ... a degrees of freedom measure.
+%  GCV     ... a measure of lack of fit discounted for df.
+%                 If the function is univariate, GCV is a vector 
+%                 containing the error  sum of squares for each 
+%                 function, and if the function is multivariate, 
+%                 GCV is a NVAR by NCURVES matrix.
+%  SSE     ... the error sums of squares.  
+%                 SSE is a vector or matrix of the same size as 
+%                 GCV.
+%  PENMAT  ... the penalty matrix, if computed, otherwise [].
+%  Y2CMAP  ... the matrix mapping the data to the coefficients.
+%  ARGVALS ... the input set of argument values.
+%  Y       ... the input array containing values of curves
 
-%  Last modified 22 October 2009
+%  Last modified 20 July 2010 by Jim Ramsay
 
 if nargin < 3
     error('There is not at least three arguments.');
@@ -67,7 +81,6 @@ Lfdobj   = getLfd(fdParobj);
 %  check LAMBDA
 
 if lambda < 0
-    warning('Value of LAMBDA was negative, 0 used instead.');
     lambda = 0;
 end
 
@@ -75,10 +88,12 @@ end
 
 if nargin < 6, dffactor = 1;        end
 if nargin < 5
+    fdnames = cell(1,3);
     fdnames{1} = 'arguments';
     fdnames{2} = 'replications';
     fdnames{3} = 'variables';
 end
+
 if nargin < 4, wtvec  = ones(n,1);  end
 
 %  get BASIS and NBASIS
@@ -88,7 +103,7 @@ nbasis   = getnbasis(basisobj) - length(getdropind(basisobj));
 
 %  check WTVEC
 
-wtvec = wtcheck(n, wtvec);
+[wtvec, onewt, matwt] = wtcheck(n, wtvec);
 
 %  check DFFACTOR
 
@@ -106,7 +121,11 @@ if n >= nbasis || lambda > 0
     
     %  The following code is for the coefficients completely determined
     
-    basisw = basismat .* (wtvec * ones(1,nbasis));
+    if matwt
+        basisw = basismat*wtvec;
+    else
+        basisw = basismat .* (wtvec * ones(1,nbasis));
+    end
     Bmat   = basisw' * basismat;
     Bmat0  = Bmat;
     

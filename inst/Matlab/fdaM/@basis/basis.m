@@ -13,6 +13,10 @@ function basisobj = basis(basistype, rangeval, nbasis, params, ...
 %               'power', 'pow'
 %               'QW'
 %               'QWM'
+%               'QS'
+%               'slide'
+%               'fd'
+%               'FEM'
 %  RANGEVAL ... an array of length 2 containing the lower and upper
 %               boundaries for the rangeval of argument values
 %  NBASIS   ... the number of basis functions
@@ -94,8 +98,11 @@ function basisobj = basis(basistype, rangeval, nbasis, params, ...
 %  CREATE_POWER_BASIS      ...  creates a polygonal basis
 %  CREATE_QW_BASIS         ...  creates a Weibull W basis
 %  CREATE_QWM_BASIS        ...  creates a modified Weibull W basis
+%  CREATE_SLIDE_BASIS      ...  creates a slide basis
+%  CREATE_FD_BASIS         ...  creates a functional data object basis
+%  CREATE_FEM_BASIS        ...  creates a finite element basis
 
-%  Last modified 11 June 2009
+%  Last modified 25 May 2010
 
 %  Set up default basis if there are no arguments
 
@@ -301,6 +308,22 @@ switch basistype
         if ~isempty(params)
             error('More than zero parameters for a QWM basis.');
         end
+    case 'QS'
+        if ~isempty(params)
+            error('More than zero parameters for a QWM basis.');
+        end
+    case 'slide'
+        if length(params) ~= 2*nbasis-1
+            error('Number of parameters not correct for a slide basis.');
+        end
+    case 'fd'
+        if ~strcmp(class(params), 'fd')
+            error('Parameter not a functional data object')
+        end
+    case 'FEM'
+        if ~strcmp(class(params), 'struct')
+            error('Parameter not a struct object')
+        end
     otherwise
         error('Unrecognizable basis');
 end
@@ -406,6 +429,24 @@ switch fdtype
 
     case 'QWM'
         fdtype = 'QWM';
+
+    case 'QS'
+        fdtype = 'QS';
+        
+    %  slide basis    
+        
+    case 'slide'
+        fdtype = 'slide';
+
+    %  functional data object basis    
+        
+    case 'fd'
+        fdtype = 'fd';
+
+    %  FEM basis    
+        
+    case 'FEM'
+        fdtype = 'FEM';
 
     %  Not a recognizable basis
 

@@ -17,7 +17,7 @@ function evalarray = eval_basis(evalarg, basisobj, Lfdobj)
 %  Returns:  An array of function values corresponding to the evaluation
 %              arguments in EVALARG
 
-%  Last modified 20 July 2006
+%  Last modified 9 June 2010
 
 if nargin < 2
     error('Number of arguments is less than 2.');
@@ -45,10 +45,17 @@ end
 %  check EVALARG
 
 sizeevalarg = size(evalarg);
-if sizeevalarg(1) > 1 && sizeevalarg(2) > 1
-    error('Argument EVALARG is not a vector.');
+type = getbasistype(basisobj);
+if ~strcmp(type, 'FEM')
+    if sizeevalarg(1) > 1 && sizeevalarg(2) > 1
+        error('Argument EVALARG is not a vector.');
+    end
+    evalarg = evalarg(:);
+else
+    if size(evalarg,2) ~= 2
+        error('Argument EVALARG is not a matrix with two columns.');
+    end
 end
-evalarg = evalarg(:);
 
 %  check BASISOBJ
 

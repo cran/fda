@@ -3,7 +3,7 @@ CSTRsse <- function(par, datstruct, fitstruct, CSTRbasis, lambda){
 #
   estimate = fitstruct$estimate;
   if(is.null(estimate))
-    stop("fitstruct has no 'estimate' component")  
+    stop("fitstruct has no 'estimate' component")
 #  Compare estimate with par
   if(sum(estimate) != length(par)){
     cat("ERROR in CSTRfn:  sum(estimate) != length(par)\n")
@@ -13,7 +13,7 @@ CSTRsse <- function(par, datstruct, fitstruct, CSTRbasis, lambda){
   }
   m <- 0
   {
-#  1.1.  Estimate kref starting from par or use fitstruct?      
+#  1.1.  Estimate kref starting from par or use fitstruct?
     if(estimate[1]){
       m <- m+1
       kref <- par[m]
@@ -23,17 +23,17 @@ CSTRsse <- function(par, datstruct, fitstruct, CSTRbasis, lambda){
       kref <- fitstruct$kref
   }
   {
-#  1.2.  Estimate EoverR starting from parvec or use fitstruct?      
+#  1.2.  Estimate EoverR starting from parvec or use fitstruct?
     if(estimate[2]){
       m <- m+1
       EoverR <- par[m]
       fitstruct$EoverR <- EoverR
     }
     else
-      EoverR<- fitstruct$EoverR 
+      EoverR<- fitstruct$EoverR
   }
   {
-#  1.3.  Estimate 'a' starting from parvec or use fitstruct?      
+#  1.3.  Estimate 'a' starting from parvec or use fitstruct?
     if(estimate[3]){
       m <- m+1
       a <- par[m]
@@ -43,16 +43,16 @@ CSTRsse <- function(par, datstruct, fitstruct, CSTRbasis, lambda){
       a <- fitstruct$a
   }
   {
-#  1.4.  Estimate b starting from parvec or use fitstruct?      
+#  1.4.  Estimate b starting from parvec or use fitstruct?
     if(estimate[4]){
       m <- m+1
       b <- par[m]
       fitstruct$b <- b
     }
     else
-      b<- fitstruct$b 
-  }  
-#  
+      b<- fitstruct$b
+  }
+#
   res <- CSTRres(kref=kref, EoverR=EoverR, a=a, b=b,
                datstruct=datstruct, fitstruct=fitstruct,
                CSTRbasis=CSTRbasis, lambda=lambda,
@@ -97,7 +97,7 @@ CSTRres <- function(kref=NULL, EoverR=NULL, a=NULL, b=NULL,
   }
   if(gradwrd)
     attr(Res, "gradient") <- cstr.$Dres
-#  
+#
   Res
 }
 
@@ -140,17 +140,17 @@ CSTRres0 <- function(kref=NULL, EoverR=NULL, a=NULL, b=NULL,
   if(gradwrd)
     attr(Res, "gradient") <- cstr.$Dres
 ##
-## 4.  Store trace in '.CSTRres0.trace' if it exists 
+## 4.  Store trace in '.CSTRres0.trace' if it exists
 ##
   if(exists(".CSTRres0.trace")){
     CSTRr.tr <- get(".CSTRres0.trace")
     CSTRr.tr2 <- rbind(CSTRr.tr,
        c(kref, EoverR, a, b, sum(Res^2), Res) )
-    assign(".CSTRres0.trace", CSTRr.tr2, env=.GlobalEnv)
+    assign(".CSTRres0.trace", CSTRr.tr2, envir=.GlobalEnv)
     cat(".")
-  }  
+  }
 ##
-## 5.  Done 
+## 5.  Done
 ##
   Res
 }

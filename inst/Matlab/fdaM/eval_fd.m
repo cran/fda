@@ -19,7 +19,7 @@ function evalarray = eval_fd(evalarg, fdobj, Lfdobj)
 %  Returns:  An array of function values corresponding
 %              to the evaluation arguments in EVALARG
 
-%  Last modified 4 January 2008
+%  Last modified 25 May 2010
 
 %  Check arguments
 
@@ -46,11 +46,22 @@ end
 
 %  check EVALARG
 
+if isnumeric(evalarg)
 sizeevalarg = size(evalarg);
 if sizeevalarg(1) > 1 && sizeevalarg(2) > 1
     error('Argument EVALARG is not a vector.');
 end
 evalarg = evalarg(:);
+elseif isstruct(evalarg)
+    if ~isfield(evalarg, 'pts')
+        error('Argument EVALARG does not contain a field pts.');
+    end
+    if ~isfield(evalarg, 'z')
+        error('Argument EVALARG does not contain a field z.');
+    end
+else
+    error('Argument evalarg is neither numeric nor a struct object.');
+end
 
 %  check FDOBJ
 
@@ -61,99 +72,113 @@ end
 %  Extract information about the basis
 
 basisobj = getbasis(fdobj);
+type     = getbasistype(basisobj);
 rangeval = getbasisrange(basisobj);
 
 %  check that arguments are within range
 
-evaldim = size(evalarg);
-temp    = reshape(evalarg,prod(evaldim),1);
-temp    = temp(~(isnan(temp)));
-EPS     = 1e-14;
-if min(temp) < rangeval(1) - EPS | max(temp) > rangeval(2) + EPS
-    warning('Wid1:range', ...
+if ~strcmp(type, 'FEM')
+    evaldim = size(evalarg);
+    temp    = reshape(evalarg,prod(evaldim),1);
+    temp    = temp(~(isnan(temp)));
+    EPS     = 1e-14;
+    if min(temp) < rangeval(1) - EPS | max(temp) > rangeval(2) + EPS
+        warning('Wid1:range', ...
             ['Values in argument EVALARG are outside of ', ...
-             'permitted range, and will be ignored.']);
-    disp(['Min and max args:             ', ...
-         num2str([min(temp), max(temp)])])
-    disp(['Min and max permitted values: ', ...
-         num2str([rangeval(1), rangeval(2)])])
-end
-
-%  get maximum number of evaluation values
-
-n = evaldim(1);
-
-%  Set up coefficient array for FD
-
-coef  = getcoef(fdobj);
-coefd = size(coef);
-ndim  = length(coefd);
-if ndim <= 1
-    nrep = 1;
-else
-    nrep = coefd(2);
-end
-if ndim <= 2
-    nvar = 1;
-else
-    nvar = coefd(3);
-end
-
-%  Set up array for function values
-
-if ndim <= 2
-    evalarray = zeros(n,nrep);
-else
-    evalarray = zeros(n,nrep,nvar);
-end
-
-%  Case where EVALARG is a vector of values to be used for all curves
-
-if evaldim(2) == 1
-
-    evalarg(evalarg < rangeval(1)-1e-10) = NaN;
-    evalarg(evalarg > rangeval(2)+1e-10) = NaN;
-    basismat = eval_basis(evalarg, basisobj, Lfdobj);
-
-    %  evaluate the functions at arguments in EVALARG
-
+            'permitted range, and will be ignored.']);
+        disp(['Min and max args:             ', ...
+            num2str([min(temp), max(temp)])])
+        disp(['Min and max permitted values: ', ...
+            num2str([rangeval(1), rangeval(2)])])
+    end
+    
+    %  get maximum number of evaluation values
+    
+    n = evaldim(1);
+    
+    %  Set up coefficient array for FD
+    
+    coef  = getcoef(fdobj);
+    coefd = size(coef);
+    ndim  = length(coefd);
+    if ndim <= 1
+        nrep = 1;
+    else
+        nrep = coefd(2);
+    end
     if ndim <= 2
-        evalarray = basismat*coef;
+        nvar = 1;
+    else
+        nvar = coefd(3);
+    end
+    
+    %  Set up array for function values
+    
+    if ndim <= 2
+        evalarray = zeros(n,nrep);
+    else
+        evalarray = zeros(n,nrep,nvar);
+    end
+    
+    %  discard values in evalarg that are out of range
+    
+    if ~isempty(rangeval)
+        evalarg(evalarg < rangeval(1)-1e-10) = NaN;
+        evalarg(evalarg > rangeval(2)+1e-10) = NaN;
+    end
+    
+    basismat = eval_basis(evalarg, basisobj, Lfdobj);
+    
+    %  evaluate the functions at arguments in EVALARG
+    
+    if ndim <= 2
+        evalarray = full(basismat*coef);
     else
         for ivar = 1:nvar
-            evalarray(:,:,ivar) = basismat*coef(:,:,ivar);
+            evalarray(:,:,ivar) = full(basismat*coef(:,:,ivar));
         end
     end
-
+    
 else
-
-    %  case of evaluation values varying from curve to curve
-
-    for i = 1:nrep
-        evalargi = evalarg(:,i);
-        if all(isnan(evalargi))
-            error(['All values are NaN for replication ',num2str(i)]);
-        end
-
-        index = find(~isnan(evalargi)       || ...
-                     evalargi < rangeval(1) || ...
-        evalargi > rangeval(2));
-        evalargi = evalargi(index);
-        basismat = eval_basis(evalargi, basisobj, Lfdobj);
-
-        %  evaluate the functions at arguments in EVALARG
-
-        if ndim == 2
-            evalarray(:,i) = NaN;
-            evalarray(index, i) = basismat*coef(:,i);
-        end
-        if ndim == 3
-            for ivar = 1:nvar
-                evalarray(:,i,nvar) = NaN;
-                evalarray(index,i,ivar) = basismat*coef(:,i,ivar);
-            end
-        end
+    
+    if nderiv ~= 0
+        error('Derivative values cannot be evaluated for FEM objects.');
     end
+    X = evalarg(:,1);
+    Y = evalarg(:,2);
+    evalarray = eval_FEM_fd(X,Y,fdobj);   
+    
 end
+
+% else
+% 
+%     %  case of evaluation values varying from curve to curve
+% 
+%     for i = 1:nrep
+%         evalargi = evalarg(:,i);
+%         if all(isnan(evalargi))
+%             error(['All values are NaN for replication ',num2str(i)]);
+%         end
+% 
+%         index = find(~isnan(evalargi)       || ...
+%                      evalargi < rangeval(1) || ...
+%         evalargi > rangeval(2));
+%         evalargi = evalargi(index);
+%         basismat = eval_basis(evalargi, basisobj, Lfdobj);
+% 
+%         %  evaluate the functions at arguments in EVALARG
+% 
+%         if ndim == 2
+%             evalarray(:,i) = NaN;
+%             evalarray(index, i) = basismat*coef(:,i);
+%         end
+%         if ndim == 3
+%             for ivar = 1:nvar
+%                 evalarray(:,i,nvar) = NaN;
+%                 evalarray(index,i,ivar) = basismat*coef(:,i,ivar);
+%             end
+%         end
+%     end
+% end
 
 

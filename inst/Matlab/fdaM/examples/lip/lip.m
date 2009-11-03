@@ -99,12 +99,13 @@ for i = 1:nobs
   lipmarks(i,:) = liptime(index)';
 end
 
-save lipmarks lipmarks  % save lip marks in case you need them for future work
+% save lipmarks lipmarks  % save lip marks in case you need them for future work
 
 %  load the landmarks if they have already been identified
 
 load lipmarks
 
+lipmarks = lipmarks*0.35;
 lipmeanmarks = mean(lipmarks);
 
 %  -----------   register the curves  ---------------------
@@ -122,9 +123,9 @@ lipmeanmarks = mean(lipmarks);
 
 nbasis = 6;
 norder = 4;
-breaks = [0,lipmeanmarks,1];
-warpbasis = create_bspline_basis([0,1], nbasis, norder, breaks);
-WfdPar    = fdPar(warpbasis);
+breaks = [0,lipmeanmarks,0.35];
+warpbasis = create_bspline_basis([0,0.35], nbasis, norder, breaks);
+WfdPar    = fdPar(warpbasis,int2Lfd(2),0);
 
 %  plot the basis
 
@@ -136,11 +137,11 @@ line([lipmeanmarks(2),lipmeanmarks(2)],[0,1])  % second knot
 %  call landmark registration function to set up struct LMRKSTR
 
 [lipregfd, lipwarpfd, Wfd] = ...
-     landmarkreg(lipfd, lipmarks, lipmeanmarks, WfdPar);
+     landmarkreg(lipfd, lipmarks, lipmeanmarks, WfdPar,0,0);
 
 %  plot Wfd, the functions defining the warping functions
 
-plot(Wfd)
+plot(lipwarpfd)
 
 %  plot unregistered and registered curves
 
@@ -188,21 +189,21 @@ title('Deformation Functions')
 
 nbasis = 4;
 norder = 4;
-breaks = [0,lipmeanmarks,1];
-warpbasis = create_bspline_basis([0,1], nbasis, norder, breaks);
-WfdPar = fdPar(warpbasis);
+breaks = [0,lipmeanmarks,0.35];
+warpbasis = create_bspline_basis([0,0.35], nbasis, norder, breaks);
+WfdPar = fdPar(warpbasis,int2Lfd(0),1e-1);
 
 %  plot the basis
 
 subplot(1,1,1)
 plot(warpbasis)  %  plot of B-spline basis functions
-line([lipmeanmarks(1),lipmeanmarks(1)],[0,1])  % first knot
-line([lipmeanmarks(2),lipmeanmarks(2)],[0,1])  % second knot
+line([lipmeanmarks(1),lipmeanmarks(1)],[0,0.35])  % first knot
+line([lipmeanmarks(2),lipmeanmarks(2)],[0,0.35])  % second knot
 
 %  call landmark registration function to set up struct LMRKSTR
 
 [lipregfd, lipwarpfd, Wfd] = ...
-     landmarkreg(lipfd, lipmarks, lipmeanmarks, WfdPar, 0);
+     landmarkreg(lipfd, lipmarks, lipmeanmarks, WfdPar, 0, 0);
 
 %  plot unregistered and registered curves
 
@@ -311,7 +312,7 @@ force = eval_fd(liptime, lipfd, lipLfd);
 %  plot the forcing functions for each curve
 subplot(1,1,1)
 plot(liptime, force);
-axis([0,1,-1e3,1e3]);
+% axis([0,0.35,-1e3,1e3]);
 
 %  plot the mean forcing function along with second deriv.
 

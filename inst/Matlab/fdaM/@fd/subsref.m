@@ -39,19 +39,11 @@ elseif strcmp(type, '()')
             error('Too many subscripts.');
     end
     
-    nrep = sizec(2);
-    if ndim == 2
-        nvar = 1;
-    else
-        nvar = sizec(3);
-    end
-
     subfd.coef     = newcoef;
     subfd.basisobj = getbasis(fdobj);
     fdnames        = getnames(fdobj);
-%    caselabels     = getfdlabels(fdnames{2},nrep);
-%    varlabels      = getfdlabels(fdnames{3},nvar);
-    [caselabels, varlabels] = getfdlabels(fdnames,nrep,nvar);
+    caselabels     = fdnames{2};
+    varlabels      = fdnames{3};
     if ~isempty(caselabels) && iscell(fdnames{2})
         fdnames{2}{2} = caselabels(subs{1},:);
     end

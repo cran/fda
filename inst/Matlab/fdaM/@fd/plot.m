@@ -1,4 +1,4 @@
-function plot(fdobj, Lfdobj, matplt, href)
+function Hline = plot(fdobj, Lfdobj, matplt, href)
 %  PLOT   Plot a functional data object.
 %  Arguments:
 %  FDOBJ   ... A functional data object to be plotted.
@@ -12,7 +12,7 @@ function plot(fdobj, Lfdobj, matplt, href)
 %  HREF    ... If HREF is nonzero, a horizontal dotted line through 0 
 %              is plotted.
 
-%  Last modified 4 March 2009
+%  Last modified 26 July 2010
 
 %  set default arguments
 
@@ -31,6 +31,20 @@ if ~isa_Lfd(Lfdobj)
     error ('Argument Lfdobj not a linear differential operator object.');
 end
 
+%  extract basis information
+
+basisobj = getbasis(fdobj);
+rangex   = getbasisrange(basisobj);
+nbasis   = getnbasis(basisobj);
+type     = getbasistype(basisobj);
+
+%  special case of an FEM basis
+
+if strcmp(type, 'FEM')
+    plot_FEM(fdobj);
+    return;
+end
+
 % set up dimensions of problem
 
 coef    = getcoef(fdobj);
@@ -43,12 +57,6 @@ if ndim > 2
 else
     nvar = 1;
 end
-
-%  extract basis information
-
-basisobj = getbasis(fdobj);
-rangex   = getbasisrange(basisobj);
-nbasis   = getnbasis(basisobj);
 
 %  set up fine mesh of evaluation points and evaluate curves
 
@@ -94,9 +102,17 @@ if ndim == 2
     if matplt
         %  plot all curves
         if href && (frng(1) <= 0 && frng(2) >= 0)
-            plot (x, fdmat, '-', x, zeros(nx), ':');
+            if nargout > 0
+                Hline = plot (x, fdmat, '-', x, zeros(nx), ':');
+            else
+                plot (x, fdmat, '-', x, zeros(nx), ':')
+            end
         else
-            plot (x, fdmat, '-');
+            if nargout > 0
+                Hline = plot (x, fdmat, '-');
+            else
+                plot (x, fdmat, '-')
+            end
         end
         xlabel(['\fontsize{12} ',fdnames{1}]);
         ylabel(['\fontsize{12} ',fdnames{3}]);
@@ -106,10 +122,14 @@ if ndim == 2
     else
         %  page through curves one by one
         for icurve = 1:ncurve
-            plot (x, fdmat(:,icurve), '-');
+            Hline = plot (x, fdmat(:,icurve), '-');
             title(['Curve ', num2str(icurve)]);
             if href && (frng(1) <= 0 && frng(2) >= 0)
-                plot(x, zeros(nx), ':');
+                if nargout > 0
+                    Hline = plot(x, zeros(nx), ':');
+                else
+                    plot(x, zeros(nx), ':')
+                end
             end
             xlabel(['\fontsize{12} ',fdnames{1}])
             ylabel(['\fontsize{12} ',fdnames{3}])
@@ -126,7 +146,7 @@ end
 if ndim == 3
     if matplt
         %  plot all curves
-        varnames = getfdlabels(fdnames{3}, nvar);
+        varnames = getfdlabels(fdnames{3});
         for ivar = 1:nvar
             subplot(nvar,1,ivar);
             temp = squeeze(fdmat(:,:,ivar));

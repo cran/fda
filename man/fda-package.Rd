@@ -4,29 +4,36 @@
 \docType{package}
 \title{Functional Data Analysis in R}
 \description{
-  Functions and data sets companion to Ramsay, J. O., and Silverman,
-  B. W. (2006) Functional Data Analysis, 2nd ed. and (2002) Applied
-  Functional Data Analysis (Springer).  This includes finite bases
-  approximations (such as splines and Fourier series) to functions fit
-  to data smoothing on the integral of the squared deviations from an
-  arbitrary differential operator.
+  Functions and data sets companion to Ramsay, J. O.; Hooker, Giles; and
+  Graves, Spencer (2010) Functional Data Analysis with R and Matlab,
+  plus Ramsay, J. O., and Silverman, B. W. (2006) Functional Data
+  Analysis, 2nd ed. and (2002) Applied Functional Data Analysis
+  (Springer).  This includes finite bases approximations (such as
+  splines and Fourier series) to functions fit to data smoothing on the
+  integral of the squared deviations from an arbitrary differential operator.
 }
 \details{
   \tabular{ll}{
     Package: \tab fda\cr
     Type: \tab Package\cr
-    Version: \tab 2.1.0\cr
-    Date: \tab 2008-11-28\cr
+    Version: \tab 2.2.6\cr
+    Date: \tab 2011-02-03\cr
     License: \tab GPL-2\cr
     LazyLoad: \tab yes\cr
   }
 }
 \author{
-  J. O. Ramsay,
+  J. O. Ramsay,  <ramsay@psych.mcgill.ca>, Hadley Wickham
+  <h.wickham@gmail.com>, Spencer Graves <spencer.graves@prodsyse.com>,
+  Giles Hooker <gjh27@cornell.edu>
 
   Maintainer:  J. O. Ramsay <ramsay@psych.mcgill.ca>
 }
 \references{
+  Ramsay, J. O.; Hooker, Giles; and Graves, Spencer (2010)
+  \emph{Functional Data Analysis with R and Matlab}, Springer, New
+  York.
+
   Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
     Data Analysis, 2nd ed.}, Springer, New York.
 

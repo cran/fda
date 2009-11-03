@@ -1,6 +1,6 @@
 smooth.basisPar <- function(argvals, y, fdobj=NULL, Lfdobj=NULL,
       lambda=0, estimate=TRUE, penmat=NULL,
-      wtvec=rep(1, length(argvals)), fdnames=NULL ){
+      wtvec=NULL, fdnames=NULL ){
 ##
 ## 1.  fdobj
 ##

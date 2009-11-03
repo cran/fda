@@ -38,29 +38,33 @@ eval.bifd <- function(sevalarg, tevalarg, bifd, sLfdobj = 0, tLfdobj = 0) {
   snderiv <- sLfdobj$nderiv
   tnderiv <- tLfdobj$nderiv
 
-  sbasismat <- getbasismatrix(sevalarg, sbasisobj, snderiv)
-  if (snderiv > 0 && !is.null(sLfdobj)) {
-    sLfdmat <- eval.fd(sevalarg, sLfdobj)
-    onerow  <- rep(1,snbasis)
-    for (j in 1:snderiv) {
-      if (any(abs(sLfdmat[,j])) > 1e-7) {
-        sbasismat <- sbasismat + outer(sLfdmat[,j],onerow)*
-                         getbasismatrix(sevalarg, sbasisobj, j-1)
-      }
-    }
-  }
+#  sbasismat <- getbasismatrix(sevalarg, sbasisobj, snderiv)
+#  if (snderiv > 0 && !is.null(sLfdobj)) {
+#    sLfdmat <- eval.fd(sevalarg, sLfdobj)
+#    onerow  <- rep(1,snbasis)
+#    for (j in 1:snderiv) {
+#      if (any(abs(sLfdmat[,j])) > 1e-7) {
+#        sbasismat <- sbasismat + outer(sLfdmat[,j],onerow)*
+#                         getbasismatrix(sevalarg, sbasisobj, j-1)
+#      }
+#    }
+#  }
 
-  tbasismat <- getbasismatrix(tevalarg, tbasisobj, tnderiv)
-  if (tnderiv > 0 && !is.null(tLfdobj)) {
-    tLfdmat <- eval.fd(tevalarg, tLfdobj)
-    onerow <- rep(1,tnbasis)
-    for (j in 1:tnderiv) {
-      if (any(abs(tLfdmat[,j])) > 1e-7) {
-        tbasismat <- tbasismat + outer(tLfdmat[,j],onerow)*
-                         getbasismatrix(tevalarg, tbasisobj, j-1)
-      }
-    }
-  }
+  sbasismat <- eval.basis(sevalarg,sbasisobj,sLfdobj)
+
+#  tbasismat <- getbasismatrix(tevalarg, tbasisobj, tnderiv)
+#  if (tnderiv > 0 && !is.null(tLfdobj)) {
+#    tLfdmat <- eval.fd(tevalarg, tLfdobj)
+#    onerow <- rep(1,tnbasis)
+#    for (j in 1:tnderiv) {
+#      if (any(abs(tLfdmat[,j])) > 1e-7) {
+#        tbasismat <- tbasismat + outer(tLfdmat[,j],onerow)*
+#                         getbasismatrix(tevalarg, tbasisobj, j-1)
+#      }
+#    }
+#  }
+
+  tbasismat <- eval.basis(tevalarg,tbasisobj,tLfdobj)
 
   if (ndim == 2) {
     evalbifd <- sbasismat %*% coef %*% t(tbasismat)

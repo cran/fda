@@ -12,7 +12,9 @@
 }
 \usage{
 Data2fd(argvals=NULL, y=NULL, basisobj=NULL, nderiv=NULL,
-        lambda=0, fdnames=NULL)
+        lambda=3e-8/diff(range(argvals)), fdnames=NULL)
+%       lambda=NULL here
+% explain:  default = 1e-9*sd(y)/diff(range(argvals)) below
 }
 \arguments{
   \item{argvals}{
@@ -25,7 +27,7 @@ Data2fd(argvals=NULL, y=NULL, basisobj=NULL, nderiv=NULL,
     Dimensions for \code{argvals} must match the first dimensions of
     \code{y}, though \code{y} can have more dimensions.  For example, if
     dim(y) = c(9, 5, 2), \code{argvals} can be a vector of length 9 or a
-    matrix of dimenions c(9, 5) or an array of dimensions c(9, 5, 2).
+    matrix of dimensions c(9, 5) or an array of dimensions c(9, 5, 2).
   }
   \item{y}{
     an array containing sampled values of curves.
@@ -195,7 +197,7 @@ b2.3 <- create.bspline.basis(norder=2, breaks=c(0, .5, 1))
 # 3 bases, order 2 = degree 1 =
 # continuous, bounded, locally linear
 
-fd2.3 <- Data2fd(0:1, basisobj=b2.3)
+fd2.3 <- Data2fd(0:1, basisobj=b2.3, lambda=0)
 round(fd2.3$coefs, 4)
 # (0, 0, 1),
 # though (0, a, 1) is also a solution for any 'a'
@@ -227,7 +229,7 @@ b3.4 <- create.bspline.basis(norder=3, breaks=c(0, .5, 1))
 # 4 bases, order 3 = degree 2 =
 # continuous, bounded, locally quadratic
 
-fd3.4 <- Data2fd(0:1, basisobj=b3.4)
+fd3.4 <- Data2fd(0:1, basisobj=b3.4, lambda=0)
 round(fd3.4$coefs, 4)
 # (0, 0, 0, 1),
 # but (0, a, b, 1) is also a solution for any 'a' and 'b'
@@ -271,7 +273,7 @@ plot(tempfd)
 ##
 hgtbasis <- with(growth, create.bspline.basis(range(age),
                                               breaks=age, norder=6))
-girl.data2fd <- with(growth, Data2fd(hgtf, age, hgtbasis))
+girl.data2fd <- with(growth, Data2fd(hgtf, age, hgtbasis, lambda=0))
 age2 <- with(growth, sort(c(age, (age[-1]+age[-length(age)])/2)))
 girlPred <- eval.fd(age2, girl.data2fd)
 range(growth$hgtf)
@@ -286,14 +288,20 @@ with(growth, matpoints(age, hgtf))
 # between points
 
 # Smooth
-girl.data2fd1 <- with(growth, Data2fd(age, hgtf, hgtbasis, lambda=1))
+girl.data2fd1 <- with(growth, Data2fd(age, hgtf, hgtbasis))
 girlPred1 <- eval.fd(age2, girl.data2fd1)
 
 matplot(age2, girlPred1, type="l")
 with(growth, matpoints(age, hgtf))
 
-# problems splikes disappear
+# problems splikes disappear with the default lambda
 
+##
+## multivariate argvals
+##
+ageMat <- with(growth, array(age, dim(hgtf)))
+
+girl.data2fd2 <- Data2fd(ageMat, growth$hgtf, hgtbasis)
 }
 
 % docclass is function

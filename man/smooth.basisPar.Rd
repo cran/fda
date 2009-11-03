@@ -10,7 +10,7 @@
 \usage{
 smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
       lambda=0, estimate=TRUE, penmat=NULL,
-      wtvec=rep(1, length(argvals)), fdnames=NULL)
+      wtvec=NULL, fdnames=NULL)
 }
 \arguments{
   \item{argvals}{
@@ -88,8 +88,8 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
     calculations.
   }
   \item{wtvec}{
-    a vector of the same length as \code{argvals} containing weights for
-    the values to be smoothed.
+    a vector of the same length as the first dimension of \code{y}
+    containing weights for the values to be smoothed.  Defaults to 1.
   }
 %  \item{dffactor}{
 %    Chong Gu in his book \emph{Smoothing Spline ANOVA Models} suggests a

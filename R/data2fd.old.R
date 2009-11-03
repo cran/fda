@@ -228,7 +228,7 @@ data2fd <- function(y, argvals = seq(0, 1, len = n), basisobj,
 # set up penalty and basis matrices
 #
       index    <- !is.na(argvals)
-      basismat <- eval.basis(argvals, basisobj)
+      basismat <- eval.basis(as.vector(argvals), basisobj)
       penmat   <- getbasispenalty(basisobj)
       # add a small amount to diagonal of penalty to ensure conditioning
       penmat   <- penmat + 1e-10 * max(penmat) * diag(dim(penmat)[1])

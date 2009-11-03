@@ -18,7 +18,7 @@ N = size(getcoef(xfdcell{1}),2);
 if nargin < 5, CVobs = 1:N;  end
 M = length(CVobs);
 
-if isa_double(yfdPar)  
+if isnumeric(yfdPar)  
     %  Dependent variable is scalar
     yvec   = yfdPar;
     SSE_CV = 0;
@@ -78,7 +78,7 @@ else
         end
         yfdi = yfd(indexi);        
         fRegresscelli = fRegress(yfdi,xfdcelli,betacell,wti);
-        betaestcelli = fRegresscelli{4};
+        betaestcelli = fRegresscelli.betahat;
         yhatfdi = 0;
         for j=1:p
             betafdParj = betaestcelli{j};

@@ -4,7 +4,11 @@
 % addpath ('c:\Program Files\Matlab\fdaM')
 % addpath ('c:\Program Files\Matlab\fdaM\examples\growth')
 
-%  Last modified 2008.06.21;  previously modified 31 July 2006
+%  add path to data and functions
+
+addpath ('../..')
+
+%  Last modified 18 November 2010
 
 %  -----------------------------------------------------------------------
 %                    Berkeley Growth Data
@@ -59,6 +63,8 @@ hgtffd = smooth_basis(age, hgtfmat, hgtfdPar);
 
 %  plot the data and the smooth
 
+figure(1)
+subplot(1,1,1)
 plotfit_fd(hgtmmat, age, hgtmfd)
 plotfit_fd(hgtfmat, age, hgtffd)
 
@@ -69,6 +75,10 @@ plotfit_fd(hgtfmat, age, hgtffd)
 agefine = linspace(1,18,101)';
 hgtfmatfine = eval_fd(agefine, hgtffd(1:10));
 
+%  add path to data and functions
+
+figure(1)
+subplot(1,1,1)
 phdl = plot(agefine, hgtfmatfine, '-');
 set(phdl, 'LineWidth', 2)
 hold on
@@ -82,6 +92,8 @@ axis([1,18,60,200])
 
 velfmatfine = eval_fd(agefine, hgtffd(1:10), 1);
 
+figure(2)
+subplot(1,1,1)
 phdl = plot(agefine, velfmatfine, '-');
 set(phdl, 'LineWidth', 2)
 xlabel('\fontsize{19} Age')
@@ -92,72 +104,13 @@ axis([1,18,0,20])
 
 accfmatfine = eval_fd(agefine, hgtffd(1:10), 2);
 
+figure(3)
+subplot(1,1,1)
 phdl = plot(agefine, accfmatfine, '-', ...
             [1,18], [0,0], 'r:');
 set(phdl, 'LineWidth', 2)
 xlabel('\fontsize{19} Age')
 ylabel('\fontsize{19} Height Acceleration (cm/yr/yr)')
-axis([1,18,-4,2])
-
-
-%  plot velocities with knots at each age
-
-plot((1:10),1)
-xlabel('\fontsize{16} Age')
-ylabel('\fontsize{16} Velocity (cm/yr)')
-
-%  plot velocities with 12 basis functions
-
-hgtbasis = create_bspline_basis(rng, 12, norder);
-hgtffd   = data2fd(hgtfmat, age, hgtbasis);
-
-plot((1:10),1)
-xlabel('\fontsize{16} Age')
-ylabel('\fontsize{16} Velocity (cm/yr)')
-
-%  plot accelerations with 12 basis functions
-
-plot((1:10),2)
-xlabel('\fontsize{16} Age')
-ylabel('\fontsize{16} Acceleration (cm/yr^2)')
-
-%  plot acceleration curves for the first 10 girls
-%  estimated both by 12 basis
-%  functions and by spline smoothing.
-
-hgtbasis1 = create_bspline_basis(rng, 12, norder);
-hgtffd1   = data2fd(hgtfmat, age, hgtbasis1);
-
-subplot(1,2,1)
-hgtfmat1 = eval_fd(agefine, hgtffd1(1:10), 2);
-plot(agefine, hgtfmat1, 'k-')
-xlabel('\fontsize{12} Age')
-ylabel('\fontsize{12} Acceleration (cm/yr^2)')
-axis([1,18,-40,10])
-axis('square')
-
-hgtbasis2 = create_bspline_basis(rng, 35, 6, age);
-hgtfdPar2 = fdPar(hgtbasis2, 4, lambda);
-hgtffd2   = smooth_basis(age, hgtfmat, hgtfdPar2);
-
-subplot(1,2,2)
-hgtfmat2 = eval_fd(agefine, hgtffd2(1:10), 2);
-plot(agefine, hgtfmat2, 'k-')
-xlabel('\fontsize{12} Age')
-ylabel('\fontsize{12} Acceleration (cm/yr^2)')
-axis([1,18,-12,2])
-axis('square')
-
-print -dps2 'c:/MyFiles/fdabook1/figs.dir/twoaccelplots.ps'
-
-subplot(1,1,1)
-hgtfmat2 = eval_fd(agefine, hgtffd2(1:10), 2);
-phdl = plot(agefine, hgtfmat2, 'k-', [1,18], [0,0], 'k:');
-set(phdl, 'LineWidth', 1)
-lhdl = line(agefine, mean(hgtfmat2,2));
-set(lhdl, 'LineStyle', '--')
-xlabel('\fontsize{19} Age')
-ylabel('\fontsize{19} Acceleration (cm/yr^2)')
 axis([1,18,-4,2])
 
 %  ----------------------------------------------------------
@@ -192,8 +145,14 @@ Wfd = smooth_pos(age, hgtmresmnsqr, hgtfdPar);
 hgtmvar = eval_pos(age, Wfd);
 hgtmstd = sqrt(hgtmvar);
 
+figure(1)
 subplot(1,1,1)
-plot(age, sqrt(hgtmresmnsqr), 'o', age, hgtmstd, 'b-')
+phdl = plot(age, sqrt(hgtmresmnsqr), 'o', age, hgtmstd, 'b-');
+set(phdl, 'LineWidth', 2)
+xlabel('\fontsize{19} Age')
+ylabel('\fontsize{19} Height Standard error (cm)')
+title('\fontsize{19} Boys')
+axis([1,18,0,1])
 
 %  update weight vector for smoothing data
 
@@ -211,10 +170,6 @@ hgtfdpar = fdPar(hgtbasis, Lfdobj, lambda);
 [hgtmfd, df, gcv, coef, SSE, penmat, y2cMap] = ...
     smooth_basis(age, hgtmmat, hgtfdpar, wtvec);
 
-%  display the results
-
-growthdisplay(age, hgtmmat, hgtmfd, hgtmstd, y2cMap, 'male')
-
 %  Females
 
 hgtffit      = eval_fd(age, hgtffd);
@@ -230,15 +185,14 @@ Wfd = smooth_pos(age, hgtfresmnsqr, hgtfdPar);
 hgtfvar = eval_pos(age, Wfd);
 hgtfstd = sqrt(hgtfvar);
 
+figure(2)
 subplot(1,1,1)
-plot(age, hgtfresmnsqr, 'o', age, hgtfvar, 'b-')
-plot(age, sqrt(hgtfresmnsqr), 'o', age, hgtfstd, 'b-')
-
-plot(age, hgtfresmnsqr, 'ko', age, hgtfvar, 'k-')
-xlabel('\fontsize{16} Age')
-ylabel('\fontsize{16} Variance of Measurement')
-
-print -dps2 'c:/MyFiles/fdabook1/figs.dir/growthvariance.ps'
+phdl = plot(age, sqrt(hgtfresmnsqr), 'o', age, hgtfstd, 'b-');
+set(phdl, 'LineWidth', 2)
+xlabel('\fontsize{19} Age')
+ylabel('\fontsize{19} Height Standard error (cm)')
+title('\fontsize{19} Girls')
+axis([1,18,0,1])
 
 %  update weight vector for smoothing data
 
@@ -267,10 +221,6 @@ xlabel('\fontsize{19} Age')
 ylabel('\fontsize{19} Height Acceleration(cm/year/year)')
 axis([1,18,-4,2])
 
-
-%  display the results
-
-growthdisplay(age, hgtfmat, hgtffd, hgtfstd, y2cMap, 'female')
 %%
 % 2.  Smooth the data monotonically 
 %
@@ -351,13 +301,10 @@ end
 
 %  histograms of residuals
 
-for icase=1:ncasef
-    hist(resf(:,icase))
-    pause
-end
-
 resfvec = reshape(resf, ncasef*nage,1);
 hist(resfvec)
+
+%  trim residuals outside of [-1,1]
 
 resftrim = resf;
 for icase=1:ncasef
@@ -530,6 +477,8 @@ hgtfdPar = fdPar(hgtbasis, Lfd, lambda);
 
 %  plot the function W = log Dh
 
+figure(1)
+subplot(1,1,1)
 subplot(1,1,1)
 plot(Wfd);
 

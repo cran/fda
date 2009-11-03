@@ -93,8 +93,8 @@
   }
 }
 \details{
-  Note that for multivariate data, a
-  suitable array must first be defined using the \code{par} function.
+  Note that for multivariate data, a suitable array must first be
+  defined using the \code{par} function.
 }
 \value{
   'done'

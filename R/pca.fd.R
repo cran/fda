@@ -6,19 +6,20 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
 #  FDOBJ      ... Functional data object
 #  NHARM     ... Number of principal components or harmonics to be kept
 #  HARMFDPAR ... Functional parameter object for the harmonics
-#  CENTERFNS ... If TRUE, the mean function is first subtracted from each function
+#  CENTERFNS ... If TRUE, the mean function is first subtracted from each 
+#                function.
 #
 #  Returns:  An object PCAFD of class "pca.fd" with these named entries:
 #  harmonics  ... A functional data object for the harmonics or eigenfunctions
 #  values     ... The complete set of eigenvalues
-#  scores     ... A matrix of scores on the principal components or harmonics
+#  scores     ... A matrix or array of scores on the principal components or 
+#                 harmonics
 #  varprop    ... A vector giving the proportion of variance explained
 #                 by each eigenfunction
 #  meanfd     ... A functional data object giving the mean function
 #
 
-#  Last modified:  3 January 2008 by Jim Ramsay
-# Previously modified 2007 April 26 by Spencer Graves
+#  Last modified:  9 November 2010 by Jim Ramsay
 
   #  Check FDOBJ
 
@@ -123,12 +124,12 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
     harmscr  <- t(ctemp) %*% t(Lmat) %*% eigvecc
   } else {
     harmcoef <- array(0, c(nbasis, nharm, nvar))
-    harmscr  <- matrix(0, nrep, nharm)
+    harmscr  <- array(0, c(nrep,   nharm, nvar))
     for (j in 1:nvar) {
       index <- 1:nbasis + (j - 1) * nbasis
       temp <- eigvecc[index,  ]
       harmcoef[,  , j] <- Lmatinv %*% temp
-      harmscr <- harmscr + t(ctemp[index,  ]) %*% t(Lmat) %*% temp
+      harmscr[,  , j]  <- t(ctemp[index,  ]) %*% t(Lmat) %*% temp
     }
   }
   harmnames <- rep("", nharm)
@@ -140,6 +141,8 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
     harmnames <- list(coefnames[[1]], harmnames, coefnames[[3]])
   harmfd   <- fd(harmcoef, basisobj, harmnames)
 
+  #  set up the object pcafd of the pca.fd class containing the results
+  
   pcafd        <- list(harmfd, eigvalc, harmscr, varprop, meanfd)
   class(pcafd) <- "pca.fd"
   names(pcafd) <- c("harmonics", "values", "scores", "varprop", "meanfd")

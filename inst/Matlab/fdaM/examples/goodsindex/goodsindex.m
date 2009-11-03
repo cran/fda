@@ -201,6 +201,6 @@ axis('square')
 xlabel('\fontsize{19} Velocity') 
 ylabel('\fontsize{19} Acceleration')
 
-print -dps2 'c:/MyFiles/fdabook1/revision/figs.dir/GoodsD2D164.ps'
+% print -dps2 'c:/MyFiles/fdabook1/revision/figs.dir/GoodsD2D164.ps'
 
 

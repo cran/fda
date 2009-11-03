@@ -32,7 +32,7 @@ plot(year, mela, 'ko', year, melahat1, 'k--', year, melahat2, 'k-')
 xlabel('\fontsize{16} Year')
 ylabel('\fontsize{16} Cases of Melanoma per 100,000')
 
-print -dps2 'c:/MyFiles/P651/melanoma.ps'
+% print -dps2 'c:/MyFiles/P651/melanoma.ps'
 
 lnmela = log(mela);
 
@@ -52,7 +52,7 @@ plot(year, lnmela, 'ko', year, lnmelahat1, 'k--', year, lnmelahat2, 'k-')
 xlabel('\fontsize{16} Year')
 ylabel('\fontsize{16} Log Cases of Melanoma per 100,000')
 
-print -dps2 'c:/MyFiles/P651/melanoma.ps'
+% print -dps2 'c:/MyFiles/P651/melanoma.ps'
 
 %  -----------------------------------------------------------------------
 %             smooth data using B-splines

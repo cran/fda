@@ -28,8 +28,7 @@
 #
 #  --------------------------------------------------------------------
 
-#  Last modified 21 November 2008 by Jim Ramsay
-#  Previously modified 25 February 2007 by Spencer Graves
+#  Last modified 10 November 2010 by Jim Ramsay
 
 #  attach the FDA functions
 
@@ -44,7 +43,7 @@ library(fda)
 (gaittime <- as.numeric(dimnames(gait)[[1]])*20)
 gaitrange <- c(0,20)
 
-#  set up a three-dimensional array of function values
+#  display ranges of gait for each variable
 
 apply(gait, 3, range)
 
@@ -104,13 +103,12 @@ par(op)
 # With gaittime <- (1:20)/21,
 #    GCV is minimized with lambda = 10^(-2).
 
-str(gait)
 gaitfd <- smooth.basisPar(gaittime, gait,
        gaitbasis, Lfdobj=harmaccelLfd, lambda=1e-2)$fd
-
-str(gaitfd)
 names(gaitfd$fdnames) <- c("Normalized time", "Child", "Angle")
 gaitfd$fdnames[[3]] <- c("Hip", "Knee")
+
+str(gaitfd)
 
 #  --------  plot curves and their first derivatives  ----------------
 
@@ -121,26 +119,17 @@ par(op)
 
 #  plot each pair of curves interactively
 
-#par(mfrow=c(1,2), mar=c(3,4,2,1), pty="s")
-op <- par(mfrow=c(2,1))
-plotfit.fd(gait, gaittime, gaitfd, cex=1.2)
-# Problem:  does not work properly;
-# ask=TRUE with appropriate choices for lty, etc.,
-# might make it stop after each one,
-# but would not fix the overplotting
-# Need to modify plotfit.fd to accept ylim = array,
-# not just a vector of length 2.
-par(op)
+plotfit.fd(gait, gaittime, gaitfd, cex=1.2, ask=FALSE)
 
 #  plot the residuals, sorting cases by residual sum of squares
 
-#par(mfrow=c(1,2), mar=c(3,4,2,1), pty="s")
 plotfit.fd(gait, gaittime, gaitfd, residual=TRUE, sort=TRUE, cex=1.2)
 
 #  plot first derivative of all curves
 
-#par(mfrow=c(1,2), mar=c(3,4,2,1), pty="s")
-plot(gaitfd, Lfdob=1)
+op <- par(mfrow=c(2,1))
+plot(gaitfd, Lfdobj=1)
+par(op)
 
 #  -----------------------------------------------------------------
 #            Display the mean, variance and covariance functions
@@ -152,8 +141,6 @@ gaitmeanfd <- mean.fd(gaitfd)
 
 #  plot these functions and their first two derivatives
 
-#par(mfcol=c(2,3),pty="s")
-#op <- par(mfrow=c(3,2))
 op <- par(mfcol=2:3)
 plot(gaitmeanfd)
 plot(gaitmeanfd, Lfdobj=1)
@@ -166,8 +153,6 @@ gaitvarbifd <- var.fd(gaitfd)
 str(gaitvarbifd)
 
 gaitvararray <- eval.bifd(gaittime, gaittime, gaitvarbifd)
-
-#par(mfrow=c(1,1), mar=c(3,4,2,1), pty="m")
 
 #  plot variance and covariance functions as contours
 
@@ -191,8 +176,6 @@ title("Knee - Hip")
 persp(gaittime, gaittime, gaitvararray[,,1,3], cex=1.2)
 title("Hip - Hip")
 
-#par(mfrow=c(1,1), mar=c(3,4,2,1), pty="m")
-
 #  plot correlation functions as contours
 
 gaitCorArray <- cor.fd(gaittime, gaitfd)
@@ -208,7 +191,6 @@ title("Knee - Hip")
 contour(gaittime, gaittime, gaitCorArray[,,1,3], cex=1.2)
 title("Hip - Hip")
 
-
 #  --------------------------------------------------------------
 #            Principal components analysis
 #  --------------------------------------------------------------
@@ -216,6 +198,7 @@ title("Hip - Hip")
 #  do the PCA with varimax rotation
 
 # Smooth with lambda as determined above
+
 gaitfdPar  <- fdPar(gaitbasis, harmaccelLfd, lambda=1e-2)
 gaitpca.fd <- pca.fd(gaitfd, nharm=4, gaitfdPar)
 
@@ -223,10 +206,88 @@ gaitpca.fd <- varmx.pca.fd(gaitpca.fd)
 
 #  plot harmonics using cycle plots
 
-#par(mfrow=c(1,1), mar=c(3,4,2,1), pty="s")
 op <- par(mfrow=c(2,2))
 plot.pca.fd(gaitpca.fd, cycle=TRUE)
 par(op)
+
+#  compute proportions of variance associated with each angle
+
+#  compute the harmonic scores associated with each angle
+
+gaitscores = gaitpca.fd$scores
+
+#  compute the values of the harmonics at time values for each angle
+
+gaitharmmat = eval.fd(gaittime, gaitpca.fd$harmonics)
+hipharmmat  = gaitharmmat[,,1]
+kneeharmmat = gaitharmmat[,,2]
+
+#  we need the values of the two mean functions also
+
+gaitmeanvec = eval.fd(gaittime, gaitmeanfd)
+hipmeanvec  = gaitmeanvec[,,1]
+kneemeanvec = gaitmeanvec[,,2]
+
+#  the values of the smooths of each angle less each mean function
+
+gaitsmtharray = eval.fd(gaittime, gaitfd)
+hipresmat  = gaitsmtharray[,,1] - outer( hipmeanvec,rep(1,39))
+kneeresmat = gaitsmtharray[,,2] - outer(kneemeanvec,rep(1,39))
+
+#  the variances of the residuals of the smooth angles from their means
+
+hipvar  = mean( hipresmat^2)
+kneevar = mean(kneeresmat^2)
+
+print(paste("Variances of fits by the means:", 
+            round(c(hipvar, kneevar),1)))
+
+#  compute the fits to the residual from the mean achieved by the PCA
+
+hipfitarray  = array(NA, c(nrow(hipharmmat ),nrow(gaitscores),ncol(gaitscores)))
+kneefitarray = array(NA, c(nrow(kneeharmmat),nrow(gaitscores),ncol(gaitscores)))
+for (isc in 1:2) {
+               hipfitarray[,,isc]  = hipharmmat  %*% t(gaitscores[,,isc]) 
+               kneefitarray[,,isc] = kneeharmmat %*% t(gaitscores[,,isc])
+}
+
+#  compute the variances of the PCA fits
+
+hipfitvar  = c()
+kneefitvar = c()
+for (isc in 1:2) {
+            hipfitvar  = c(hipfitvar,  mean( hipfitarray[,,isc]^2))
+            kneefitvar = c(kneefitvar, mean(kneefitarray[,,isc]^2))
+}
+
+#  compute percentages relative to the total PCA fit variance
+#  these percentages will add to 100
+
+hippropvar1 = c()
+kneepropvar1 = c()
+for (isc in 2) {
+            hippropvar1  = c(hippropvar1,  hipfitvar[isc]/(hipfitvar[isc] +
+                                           kneefitvar[isc]))
+            kneepropvar1 = c(kneepropvar1, kneefitvar[isc]/(hipfitvar[isc]+
+                                           kneefitvar[isc]))
+}
+
+print(paste("Percentages of fits for the PCA:", 
+            round(100*c(hippropvar1, kneepropvar1),1)))
+
+#  compute percentages relative to the total mean fit variance
+#  these percentages will add to the total percentage of fit
+#  accounted for by the pca, which will typically be less than 100
+
+hippropvar2  = c()
+kneepropvar2 = c()
+for (isc in 1:2) {
+            hippropvar2  = c(hippropvar2,  hipfitvar[isc] /(hipvar+kneevar))
+            kneepropvar2 = c(kneepropvar2, kneefitvar[isc]/(hipvar+kneevar))
+}
+
+print((paste("Percentages of fits for the PCA:", 
+             round(100*c(hippropvar2, kneepropvar2),1))))
 
 #  --------------------------------------------------------------
 #           Canonical correlation analysis
@@ -258,55 +319,32 @@ plot(1:6, ccafd$ccacorr[1:6], type="b")
 
 #  compute the acceleration and mean acceleration
 
-D2gaitfd <- deriv.fd(gaitfd,2)
+D2gaitfd      <- deriv.fd(gaitfd,2)
+names(D2gaitfd$fdnames)[[3]] <- "Angular acceleration"
+D2gaitfd$fdnames[[3]] <- c("Hip", "Knee")
 D2gaitmeanfd  <- mean.fd(D2gaitfd)
+names(D2gaitmeanfd$fdnames)[[3]] <- "Mean angular acceleration"
+D2gaitmeanfd$fdnames[[3]] <- c("Hip", "Knee")
 
 #  set up basis for warping function
 
 nwbasis   <- 7
 wbasis    <- create.bspline.basis(gaitrange,nwbasis,3)
-Warpfd    <- fd(matrix(0,nwbasis,39),wbasis)
+Warpfd    <- fd(matrix(0,nwbasis,5),wbasis)
 WarpfdPar <- fdPar(Warpfd)
 
 #  register the functions
 
-regstr <- register.fd(D2gaitmeanfd, D2gaitfd, WarpfdPar, periodic=TRUE)
+gaitreglist <- register.fd(D2gaitmeanfd, D2gaitfd[1:5,], WarpfdPar, periodic=TRUE)
 
-xfine        <- seq(0,1,len=101)
-D2gaitregfd  <- regstr$regfd
-D2gaitregmat <- eval.fd(xfine, D2gaitregfd)
-warpfd       <- regstr$Wfd
-shift        <- regstr$shift
-warpmat      <- eval.monfd(xfine, warpfd)
-warpmat      <- warpmat/outer(rep(1,101),warpmat[101,])
+plotreg.fd(gaitreglist)
 
-print(round(shift,1))
-hist(shift)
+#  display horizonal shift values
+print(round(gaitreglist$shift,1)))
 
-#  plot warping functions
-
-op <- par(mfrow=c(1,1), mar=c(4,4,2,1), pty="m")
-matplot(xfine, warpmat, type="l", xlab="t", ylab="h(t)",
-        main="Time warping functions", cex=1.2)
-par(op)
-
-#  plot the deformation functions, def(t) = warp(t) - t
-
-defmat <- warpmat
-for (i in 1:39)
-	defmat[,i] <- warpmat[,i] - xfine - shift[i]
-
-op <- par(mfrow=c(1,1), mar=c(4,4,2,1), pty="m")
-matplot(xfine, defmat, type="l", xlab="t", ylab="h(t) - t",
-        main="Deformation functions", cex=1.2)
-par(op)
-
-#  plot both the unregistered and registered versions of the curves
-
-op <- par(mfrow=c(2,2))
-plot(D2gaitfd,    ask=FALSE)
-plot(D2gaitregfd, ask=FALSE)
-par(op)
+#  histogram of horizontal shift values
+par(mfrow=c(1,1))
+hist(gaitreglist$shift,xlab="Normalized time")
 
 #  --------------------------------------------------------------
 #              Predict knee angle from hip angle
@@ -356,7 +394,6 @@ par(op)
 
 gaitfine    <- seq(0,20,len=101)
 kneemat     <- eval.fd(gaitfine, kneefd)
-#kneehatmat  <- eval.fd(gaitfine, kneehatfd)
 kneehatmat  <- predict(kneehatfd, gaitfine)
 kneemeanvec <- as.vector(eval.fd(gaitfine, kneemeanfd))
 
@@ -409,7 +446,6 @@ par(op)
 #  compute and plot squared multiple correlation function
 
 D2kneemat     <- eval.fd(gaitfine, D2kneefd)
-#D2kneehatmat  <- eval.fd(gaitfine, D2kneehatfd)
 D2kneehatmat  <- predict(D2kneehatfd, gaitfine)
 D2kneemeanvec <- as.vector(eval.fd(gaitfine, D2kneemeanfd))
 

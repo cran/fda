@@ -1,7 +1,7 @@
 function display(basis)
 %  DISPLAY  Display a functional data basis object.
 
-%  Last modified 22 December 2007
+%  Last modified 25 May 2010
 
 if ~strcmp(class(basis), 'basis')
     error('Argument not a functional data object');
@@ -15,8 +15,10 @@ fprintf(['  Type: ', basis.type,'\n']);
 
 %  display range
 
-fprintf(['  Range: ', num2str(basis.rangeval(1)), ...
-         ' to ',      num2str(basis.rangeval(2)),'\n']);
+if ~isempty(basis.rangeval)
+    fprintf(['  Range: ', num2str(basis.rangeval(1)), ...
+        ' to ',      num2str(basis.rangeval(2)),'\n']);
+end
 
 %  return if a constant basis
 
@@ -56,6 +58,29 @@ end
 if strcmp(basis.type, 'power')
     fprintf('  Exponents\n');
     disp(basis.params);
+end
+if strcmp(basis.type, 'slide')
+    breaks = [basis.rangeval(1), basis.params(1:(basis.nbasis-1)), ...
+              basis.rangeval(2)];
+    rates  = basis.params(basis.nbasis:(2*basis.nbasis-1));
+    fprintf('   Breaks\n');
+    disp(breaks)
+    fprintf('   Rates\n');
+    disp(rates)
+end
+if strcmp(basis.type, 'fd')
+    fprintf('  Functional data object\n');
+    disp(basis.params);
+end
+if strcmp(basis.type, 'FEM')
+    fprintf('  FEM\n');
+    FEMstruct = basis.params;
+    disp('Points:')
+    disp(FEMstruct.p);
+    disp('Edges:')
+    disp(FEMstruct.e);
+    disp('Triangles:')
+    disp(FEMstruct.t);
 end
 
 %  display indices of basis functions to be dropped

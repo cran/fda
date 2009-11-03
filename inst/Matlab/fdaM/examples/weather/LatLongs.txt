@@ -6,7 +6,6 @@ Churchill       58 44    94 04
 Dawson          64 03   139 08
 Edmonton        53 41   113 28
 Fredericton     45 52    66 32
-Halifax         44 53    63 31
 Inuvik          68 18   133 29
 Iqaaluit        63 45    68 33
 Kamloops        50 42   120 27

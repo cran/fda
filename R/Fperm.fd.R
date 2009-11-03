@@ -46,7 +46,7 @@ Fperm.fd <- function(yfdPar, xfdlist, betalist,wt=NULL,
     yhat <- fRegressList$yhatfdobj
     if(is.list(yhat) && ('fd' %in% names(yhat))) yhat <- yhat$fd
 
-    tFstat = Fstat.fd(yfdPar,yhat,argvals)
+    tFstat = Fstat.fd(tyfdPar,yhat,argvals)
 
     Fnullvals <- cbind(Fnullvals,tFstat$F)
 

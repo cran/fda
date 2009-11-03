@@ -1,6 +1,6 @@
 function fdobj = fd(coef, basisobj, fdnames)
 %  FD   Creates a functional data object.
-%    A functional data object consists of a basis for expanding a functional
+%  A functional data object consists of a basis for expanding a functional
 %    observation and a set of coefficients defining this expansion.
 %    The basis is contained=a 'basis' object; that is, a realization
 %    of the 'basis' class.
@@ -40,7 +40,7 @@ function fdobj = fd(coef, basisobj, fdnames)
 %  Returns:
 %  FD ... a functional data object
 
-%  last modified 2 January 2008
+%  last modified 25 May 2010
 
 superiorto('double', 'struct', 'cell', 'char', 'inline', 'basis');
 
@@ -68,8 +68,9 @@ end
 %  set default arguments
 
 if nargin < 3,  fdnames  = defaultfdnames;  end
-if nargin < 2,  basisobj = basis();         end
-if nargin < 1,  coef     = [];              end
+if nargin < 2
+    error('Less than two arguments.');         
+end
 
 %  check leading argument COEF
 
@@ -88,6 +89,8 @@ if ~isempty(coef)
     if (ndim > 3)
         error('Coefficient array has more than three dimensions.');
     end
+else
+    error('Coefficient matrix is empty.');
 end
 
 %  check BASISOBJ

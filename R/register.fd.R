@@ -1,4 +1,4 @@
-register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=c(Lfdobj=2, lambda=1),
+register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=NULL,
                     conv=1e-4, iterlim=20, dbglev=1, periodic=FALSE, crit=2)
 {
 #REGISTERFD registers a set of curves YFD to a target function Y0FD.
@@ -7,22 +7,28 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=c(Lfdobj=2, lambda=1),
 #                a single curve, or have the same dimensions as YFD.
 #  YFD       ... Functional data object for functions to be registered
 #  WFDPAROBJ ... Functional parameter object for function W defining warping 
-#                functions. The basis must be a B-spline basis.  If constant
-#                basis is desired, use create_bspline_basis(wrng, 1, 1).
-#                Its coefficients are the starting values used in the
-#                iterative computation of the final warping fns.
-#                NB:  The first coefficient is NOT used.  This first
-#                coefficient determines the constant term in the expansion,
-#                and, since a register function is normalized, this term
-#                is, in effect, eliminated or has no influence on the
-#                result.  This first position is used, however, to
-#                contain the shift parameter in case the data are
+#                functions. The basis that is defined in WFDPAROBJ must be a 
+#                B-spline basis, and the number of basis functions must be at 
+#                least 2.
+#                The coefficients, which supplied either in a functional
+#                data object or as defaults to zero if a basis object is 
+#                supplied in the definition of WFDPAROBJ are used as the 
+#                initial values in the iterative computation of the final 
+#                warping functions.
+#                NB:  The value of the first coefficient is NOT used.  
+#                This is because a warping function is normalized, and when
+#                this happens, the impact of the first coefficient, if used,
+#                would be eliminated.  This first position is used, however, to
+#                contain the shift parameter in case the data are to be
 #                treated as periodic.  At the end of the calculations,
 #                the shift parameter is returned separately.
+#                If WFDPAROBJ is not supplied, it defaults to a bspline
+#                basis of order 2 with 2 basis functions.  This is equivalent 
+#                to using a linear function for W.  
 #  CONV    ... Convergence criterion
-#  ITERLIM  .. iteration limit for scoring iterations
+#  ITERLIM ... iteration limit for scoring iterations
 #  DBGLEV  ... Level of output of computation history
-#  PERIODIC .. If one, curves are periodic and a shift parameter is fit.
+#  PERIODIC... If one, curves are periodic and a shift parameter is fit.
 #              Initial value for shift parameter is taken to be 0.
 #              The periodic option should ONLY be used with a Fourier
 #              basis for the target function Y0FD, the functions to be
@@ -31,29 +37,40 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=c(Lfdobj=2, lambda=1),
 #                Default:  0
 #  Returns:
 
-#  REGSTR  ...  A list with fields:
-#    REGSTR$REGFD  ... A functional data object for the registered curves
-#    REGSTR$WARPFD ... A Functional data object for warping functions h
-#    REGSTR$WFD    ... A Functional data object for functions W defining
+#  REGLIST ...  A list with fields:
+#    REGLIST$REGFD  ... A functional data object for the registered curves
+#    REGLIST$WARPFD ... A Functional data object for warping functions h
+#    REGLIST$WFD    ... A Functional data object for functions W defining
 #                         warping fns
-#    REGSTR$SHIFT  ... Shift parameter value if curves are periodic
+#    REGLIST$SHIFT  ... Shift parameter value if curves are periodic
+#    REGLIST$Y0FD   ... Argument Y0FD
+#    REGLIST$YFD    ... Argument YFD
 
-# last modified 28 April 2009 by Jim Ramsay
+#  Last modified 15 December 2010 by Jim Ramsay
 
 ##
 ## 1.  Check y0fd and yfd
 ##  
 
-#  check classes of first two arguments
+#  if YFD is not supplied, and therefore defaults to NULL,  it is
+#  assumed that the first argument is to be taken as YFD, and that
+#  the target function Y0FD defaults to NULL.  In this event,  Y0FD
+#  is set up as the mean of the functions in YFD.
+
   if(is.null(yfd)){
     yfd  <- y0fd
     y0fd <- NULL
   }
-#  
+  
+#  Check that YFD is a functional data object
+
   if (!(inherits(yfd, "fd")))
       stop("'yfd' must be a functional data object.  ",
            "Instead, class(yfd) = ", class(yfd))
-#
+               
+#  If target Y0FD is not supplied, and therefore defaults to NULL, replace
+#  it be the mean of the functions in YFD
+
   if(is.null(y0fd)) {
     y0fd <- mean.fd(yfd) 
   } else {
@@ -62,9 +79,11 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=c(Lfdobj=2, lambda=1),
              "Instead, class(y0fd) = ", class(y0fd)) 
   } 
   
-#  check functions to be registered
+#  get dimensions of functions in YFD to be registered
 
-  ydim   <- dim(yfd$coefs)
+  ycoefs <- yfd$coefs
+  if (is.vector(ycoefs)) ycoefs = as.matrix(ycoefs)
+  ydim   <- dim(ycoefs)
   ncurve <- ydim[2]
   ndimy  <- length(ydim)
   if (ndimy == 3) {
@@ -72,12 +91,21 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=c(Lfdobj=2, lambda=1),
   } else {
       nvar <- 1
   }
-
   if (ndimy > 3) stop("'yfd' is more than 3-dimensional.")
 
-#  Check target function
+#  Extract basis information from YFD
+
+  ybasis  <- yfd$basis
+  ynbasis <- ybasis$nbasis
+  yrange  <- ybasis$rangeval
+  if (periodic && !(ybasis$type == "fourier"))
+    stop("'periodic' is TRUE but 'type' is not 'fourier'; ",
+         "periodic B-splines are not currently part of 'fda'")
+
+#  Get dimensions of target function object Y0FD
 
   y0coefs0 <- y0fd$coefs
+  if (is.vector(y0coefs0)) y0coefs0 = as.matrix(y0coefs0)
   y0dim0   <- dim(y0coefs0)
   ndimy00  <- length(y0dim0)
   if (ndimy00 > ndimy) stop("Y0FD has more dimensions than YFD")
@@ -88,44 +116,58 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=c(Lfdobj=2, lambda=1),
       if (y0dim0[2] == ydim[2]) {
           fulltarg <- TRUE
       } else {
-          stop("Second argument of Y0FD not correct.")
+          stop(paste("Second dimension of coefficient matrix for Y0FD",
+                     "is neither 1 nor equal to the number of functions",
+                     "to be registered."))
       }
   }
   if (ndimy00 == 3 && ydim[3] != y0dim0[3]) stop(
       "Third dimension of YOFD does not match that of YFD.")
     
-#  Extract basis information from YFD
+#  Extract basis information from Y0FD
 
-  ybasis  <- yfd$basis
-  ynbasis <- ybasis$nbasis
-  if (periodic && !(ybasis$type == "fourier"))
-    stop("'periodic' is TRUE but 'type' is not 'fourier'; ",
-         "periodic B-splines are not currently part of 'fda'")
-
+  y0basis  <- y0fd$basis
+  y0nbasis <- y0basis$nbasis
+  y0range  <- y0basis$rangeval
+  #  check that target range matches function range
+  if (!all(y0range == yrange)) stop(
+      "Range for Y0FD does not match range for YFD.")
+      
 ##
 ## 2.  Check WfdParobj
 ##
 
-  WfdParobj = fdParcheck(WfdParobj)
+  if (is.null(WfdParobj)) {
+      #  default WfdParobj to a B-spline basis of order 2 with 2 basis functions 
+      wbasis    <- create.bspline.basis(yrange,2,2)
+      Wfd0      <- fd(matrix(0,2,ncurve),wbasis)
+      WfdParobj <- fdPar(Wfd0)
+  }
+  WfdParobj <- fdParcheck(WfdParobj)
   Wfd0   <- WfdParobj$fd
   wcoef  <- Wfd0$coefs
+  if (is.vector(wcoef)) wcoef <- as.matrix(wcoef)
   wbasis <- Wfd0$basis
   wtype  <- wbasis$type
-  if (wtype != "bspline") stop(
-      "Basis for Wfd is not a B-spline basis.")
-  nbasis <- wbasis$nbasis
-  norder <- nbasis - length(wbasis$params)
+  if (wtype != "bspline") stop("Basis for Wfd is not a B-spline basis.")
+  wnbasis <- wbasis$nbasis
+  norder  <- wnbasis - length(wbasis$params)
+  if (wnbasis < 2) stop(
+      "At least two basis functions for W are required.")
+  if (norder < 2) stop(
+      "The order of the basis functions for W must be at least 2.")  
   wtype  <- wbasis$type
   rangex <- wbasis$rangeval
   wdim   <- dim(wcoef)
-  ncoef  <- wdim[1]
-  ndimw  <- length(wdim)
-  if (wdim[ndimw] == 1) ndimw <- ndimw - 1
-  if (ndimw == 1 && ncurve > 1)
-    stop("WFD and YFD do not have the same dimensions.")
-  if (ndimw == 2 && wdim[2] != ncurve)
-    stop("WFD and YFD do not have the same dimensions.")
-  if (ndimw > 2)  stop("WFD is not univariate.")
+  if (length(wdim) > 2) stop("WFDPAROBJ contains a multivariate function.")
+  if (wdim[2] == 1) {
+      wcoef      <- wcoef %*% matrix(1,1,ncurve)
+      Wfd0$coefs <- wcoef
+  } else {
+      if (wdim[2] != ncurve) stop(
+          "WFDPAROBJ and YFD containing differing numbers of functions.")
+  }
+  
 
 ##
 ## 3.  Do the work   
@@ -141,19 +183,15 @@ xhi   <- rangex[2]
 width <- xhi - xlo
 xfine <- seq(xlo, xhi, len=nfine)
 
-#  evaluate target curve at fine mesh of values
-
-y0fine <- eval.fd(xfine, y0fd)
-
 #  set up indices of coefficients that will be modified in ACTIVE
 
 wcoef1   <- wcoef[1,]
 if (periodic) {
-   active   <- 1:nbasis
+   active   <- 1:wnbasis
    wcoef[1] <- 0
    shift    <- 0
 } else {
-   active <- 2:nbasis
+   active <- 2:wnbasis
 }
 
 #  initialize matrix Kmat defining penalty term
@@ -162,7 +200,7 @@ lambda <- WfdParobj$lambda
 if (lambda > 0) {
    Lfdobj <- WfdParobj$Lfd
    Kmat <- getbasispenalty(wbasis, Lfdobj)
-   ind  <- 2:ncoef
+   ind  <- 2:wnbasis
    Kmat <- lambda*Kmat[ind,ind]
 } else {
    Kmat <- NULL
@@ -170,7 +208,7 @@ if (lambda > 0) {
 
 #  set up limits on coefficient sizes
 
-climit <- 50*c(-rep(1,ncoef), rep(1,ncoef))
+climit <- 50*c(-rep(1,wnbasis), rep(1,wnbasis))
 
 #  set up cell for storing basis function values
 
@@ -199,7 +237,8 @@ for (icurve in 1:ncurve) {
     if (nvar == 1) {
       yfdi <- yfd[icurve]
     } else {
-      yfdi <- yfd[icurve,]
+      yfdi <- yfd[icurve]
+      yfdi$coef <- array(yfdi$coef,c(ynbasis,1,nvar))
     }
     if (fulltarg) {
       if (nvar == 1) {
@@ -207,19 +246,18 @@ for (icurve in 1:ncurve) {
       } else {
         y0fdi <- y0fd[icurve,]
       }
-    }
-    else{
+    } else {
       y0fdi <- y0fd
     }
   }
 
   #  evaluate curve to be registered at fine mesh
 
-  yfine <- eval.fd(xfine, yfdi)
+  yfine  <- matrix(eval.fd(xfine, yfdi),nfine,nvar)
   
-  #  evaluage target curve at fine mesh
+  #  evaluate target curve at fine mesh
   
-  y0fine <- eval.fd(xfine, y0fdi)
+  y0fine <- matrix(eval.fd(xfine, y0fdi),nfine,nvar)
 
   #  evaluate objective function for starting coefficients
 
@@ -240,7 +278,7 @@ for (icurve in 1:ncurve) {
 
   #  compute initial criterion value and gradient
 
-  Fstr <- regfngrad(xfine, y0fine, Dhfine, yregfdi, Wfdi, 
+  Flist <- regfngrad(xfine, y0fine, Dhfine, yregfdi, Wfdi, 
                     Kmat, periodic, crit)
 
   #  compute the initial expected Hessian
@@ -251,8 +289,8 @@ for (icurve in 1:ncurve) {
      fmax2 <- fmax*fmax
      fmax3 <- fmax*fmax2
      m <- 1
-     if (nbasis > 1) {
-        for (j in 2:nbasis) {
+     if (wnbasis > 1) {
+        for (j in 2:wnbasis) {
            m <- m + 1
            for (k in 2:j) {
               m <- m + 1
@@ -271,13 +309,13 @@ for (icurve in 1:ncurve) {
 
   #  evaluate the initial update vector for correcting the initial cvec
 
-  result   <- linesearch(Fstr, hessmat, dbglev)
+  result   <- linesearch(Flist, hessmat, dbglev)
   deltac   <- result[[1]]
   cosangle <- result[[2]]
   #  initialize iteration status arrays
 
   iternum <- 0
-  status <- c(iternum, Fstr$f, Fstr$norm)
+  status <- c(iternum, Flist$f, Flist$norm)
   if (dbglev >= 1) {
         cat("\nIter.    Criterion   Grad Length")
         cat("\n")
@@ -299,7 +337,7 @@ for (icurve in 1:ncurve) {
   reset   <- 0
   linemat <- matrix(0,3,5)
   cvecold <- cvec
-  Foldstr <- Fstr
+  Foldlist <- Flist
   dbgwrd  <- dbglev >= 2
   #  ---------------  beginning of optimization loop  -----------
   for (iter in 1:iterlim) {
@@ -310,13 +348,13 @@ for (icurve in 1:ncurve) {
       ind <- 0
       ips <- 0
       #  compute slope
-      linemat[2,1] <- sum(deltac*Foldstr$grad)
+      linemat[2,1] <- sum(deltac*Foldlist$grad)
       #  normalize search direction vector
       sdg          <- sqrt(sum(deltac^2))
       deltac       <- deltac/sdg
       linemat[2,1] <- linemat[2,1]/sdg
       # initialize line search vectors
-      linemat[,1:4] <- outer(c(0, linemat[2,1], Fstr$f),rep(1,4)) 
+      linemat[,1:4] <- outer(c(0, linemat[2,1], Flist$f),rep(1,4)) 
       stepiter  <- 0
       if (dbglev >= 2) {
           cat("\n")
@@ -373,11 +411,11 @@ for (icurve in 1:ncurve) {
         hfine[nfine] <- xhi
         #  register curves given current Wfdi
         yregfdi <- regyfn(xfine, yfine, hfine, yfdi, Wfdnewi, periodic)
-        Fstr    <- regfngrad(xfine, y0fine, Dhfine, yregfdi, Wfdnewi, 
+        Flist    <- regfngrad(xfine, y0fine, Dhfine, yregfdi, Wfdnewi, 
                              Kmat, periodic, crit)
-        linemat[3,5] <- Fstr$f
+        linemat[3,5] <- Flist$f
         #  compute new directional derivative
-        linemat[2,5] <- sum(deltac*Fstr$grad)
+        linemat[2,5] <- sum(deltac*Flist$grad)
         if (dbglev >= 2) {
           cat("\n")
           cat(paste("                 ", stepiter, "  "))
@@ -397,20 +435,20 @@ for (icurve in 1:ncurve) {
      cvec   <- cvecnew
      Wfdi   <- Wfdnewi
      #  test for function value made worse
-     if (Fstr$f > Foldstr$f) {
+     if (Flist$f > Foldlist$f) {
         #  Function value worse  warn and terminate
         ier <- 1
         if (dbglev >= 2) {
           cat("Criterion increased, terminating iterations.\n")
-          cat(paste("\n",round(c(Foldstr$f, Fstr$f),4)))
+          cat(paste("\n",round(c(Foldlist$f, Flist$f),4)))
         }
         #  reset parameters and fit
         cvec   <- cvecold
         Wfdi[[1]] <- cvecold
-        Fstr   <- Foldstr
-        deltac <- -Fstr$grad
+        Flist   <- Foldlist
+        deltac <- -Flist$grad
         if (dbglev > 2) {
-          for (i in 1:nbasis) cat(cvec[i])
+          for (i in 1:wnbasis) cat(cvec[i])
           cat("\n")
         }
         if (reset == 1) {
@@ -423,9 +461,9 @@ for (icurve in 1:ncurve) {
         }
      } else {
         #  function value has not increased,  check for convergence
-        if (abs(Foldstr$f-Fstr$f) < conv) {
+        if (abs(Foldlist$f-Flist$f) < conv) {
            wcoef[,icurve]    <- cvec
-           status <- c(iternum, Fstr$f, Fstr$norm)
+           status <- c(iternum, Flist$f, Flist$norm)
            iterhist[iter+1,] <- status
            if (dbglev >= 1) {
               cat("\n")
@@ -437,9 +475,9 @@ for (icurve in 1:ncurve) {
 	        }
            break
         }
-        #  update old parameter vectors and fit structure
+        #  update old parameter vectors and fit list
         cvecold <- cvec
-        Foldstr <- Fstr
+        Foldlist <- Flist
         #  update the expected Hessian
         if (crit == 2) {
            cvectmp <- cvec
@@ -451,8 +489,8 @@ for (icurve in 1:ncurve) {
            fmax2 <- fmax*fmax
            fmax3 <- fmax*fmax2
            m <- 1
-           if (nbasis > 1) {
-              for (j in 2:nbasis) {
+           if (wnbasis > 1) {
+              for (j in 2:wnbasis) {
                  m <- m + 1
                  for (k in 2:j) {
                     m <- m + 1
@@ -468,12 +506,12 @@ for (icurve in 1:ncurve) {
         hessmat <- reghess(xfine, y0fine, Dhfine, D2hwrtc, yregfdi, 
                            Kmat, periodic, crit)
         #  update the line search direction vector
-        result   <- linesearch(Fstr, hessmat, dbglev)
+        result   <- linesearch(Flist, hessmat, dbglev)
         deltac   <- result[[1]]
         cosangle <- result[[2]]
         reset <- 0
      }
-     status <- c(iternum, Fstr$f, Fstr$norm)
+     status <- c(iternum, Flist$f, Flist$norm)
      iterhist[iter+1,] <- status
      if (dbglev >= 1) {
         cat("\n")
@@ -523,7 +561,7 @@ warpmat = eval.monfd(xfine, Wfd)
 warpmat = rangex[1] + (rangex[2]-rangex[1])*
            warpmat/outer(rep(1,nfine),warpmat[nfine,]) + 
            outer(rep(1,nfine),shift)
-if (nbasis > 1) {
+if (wnbasis > 1) {
    warpfdobj  = smooth.basis(xfine, warpmat, wbasis)$fd
 } else {
    wbasis    = create.monomial.basis(rangex, 2)
@@ -533,9 +571,10 @@ warpfdnames       <- yfd$fdnames
 warpfdnames[[3]]  <- paste("Warped",warpfdnames[[1]])
 warpfdobj$fdnames <- warpfdnames      
 
-regstr <- list("regfd"=regfd, "warpfd"=warpfdobj, "Wfd"=Wfd, "shift"=shift)
+reglist <- list("regfd"=regfd, "warpfd"=warpfdobj, "Wfd"=Wfd, 
+                "shift"=shift, "y0fd"  =y0fd,      "yfd"=yfd)
 
-return(regstr)
+return(reglist)
 }
 
 #  ----------------------------------------------------------------
@@ -557,11 +596,6 @@ regfngrad <- function(xfine, y0fine, Dhwrtc, yregfd, Wfd,
   }
   yregmat  <- eval.fd(xfine, yregfd)
   Dyregmat <- eval.fd(xfine, yregfd, 1)
-  #if (nvar > 1) {
-  #	 y0fine   <- y0fine[,1,]
-  #	 yregmat  <- yregmat[,1,]
-  #	 Dyregmat <- Dyregmat[,1,]
-  #}
 
   #  loop through variables computing function and gradient values
 
@@ -600,15 +634,15 @@ regfngrad <- function(xfine, y0fine, Dhwrtc, yregfd, Wfd,
      }
   }
 
-#  set up FSTR list containing function value and gradient
+#  set up FLIST list containing function value and gradient
 
-  Fstr      <- list(f=0, grad=rep(0,ncvec), norm=0)
-  Fstr$f    <- Fval
-  Fstr$grad <- gvec
+  Flist      <- list(f=0, grad=rep(0,ncvec), norm=0)
+  Flist$f    <- Fval
+  Flist$grad <- gvec
   #  do not modify initial coefficient for B-spline and Fourier bases
-  if (!periodic)  Fstr$grad[1] <- 0
-  Fstr$norm <- sqrt(sum(Fstr$grad^2))
-  return(Fstr)
+  if (!periodic)  Flist$grad[1] <- 0
+  Flist$norm <- sqrt(sum(Flist$grad^2))
+  return(Flist)
 }
 
 #  ---------------------------------------------------------------
@@ -620,9 +654,9 @@ reghess <- function(xfine, y0fine, Dhfine, D2hwrtc, yregfd,
   y0dim <- dim(y0fine)
   if (length(y0dim) == 3) nvar <- y0dim[3] else nvar <- 1
   nfine   <- length(xfine)
-  ncoef   <- dim(Dhfine)[2]
-  onecoef <- matrix(1,1,ncoef)
-  npair   <- ncoef*(ncoef+1)/2
+  wnbasis   <- dim(Dhfine)[2]
+  onecoef <- matrix(1,1,wnbasis)
+  npair   <- wnbasis*(wnbasis+1)/2
 
   if (periodic) {
      Dhfine[,1] <- 1
@@ -642,16 +676,16 @@ reghess <- function(xfine, y0fine, Dhfine, D2hwrtc, yregfd,
      if (nvar > 1) D2yregmat <- D2yregmat[,1,]
      if (periodic) {
         D2hwrtc[,1] <- 0
-        if (ncoef > 1) {
-           for (j in 2:ncoef) {
+        if (wnbasis > 1) {
+           for (j in 2:wnbasis) {
               m <- j*(j-1)/2 + 1
               D2hwrtc[,m] <- Dhfine[,j]
            }
         }
      } else {
         D2hwrtc[,1] <- 1
-        if (ncoef > 1) {
-           for (j in 2:ncoef) {
+        if (wnbasis > 1) {
+           for (j in 2:wnbasis) {
               m <- j*(j-1)/2 + 1
               D2hwrtc[,m] <- 0
            }
@@ -668,7 +702,7 @@ reghess <- function(xfine, y0fine, Dhfine, D2hwrtc, yregfd,
     if (crit == 1) {
       hessmat <-  2*crossprod(Dywrtc, Dywrtc)/nfine
       m <- 0
-       for (j in 1:ncoef) {
+       for (j in 1:wnbasis) {
           for (k in 1:j) {
              m <- m + 1
              hessvec[m] <- hessvec[m] + hessmat[j,k]
@@ -686,7 +720,7 @@ reghess <- function(xfine, y0fine, Dhfine, D2hwrtc, yregfd,
       crossprodmat <- matrix(0,nfine,npair)
       DyD2hmat     <- matrix(0,nfine,npair)
       m <- 0
-      for (j in 1:ncoef) {
+      for (j in 1:wnbasis) {
         for (k in 1:j) {
           m <- m + 1
           crossprodmat[,m] <- Dhfine[,j]*Dhfine[,k]*D2yregmati
@@ -704,7 +738,7 @@ reghess <- function(xfine, y0fine, Dhfine, D2hwrtc, yregfd,
       ddsq   <- dd*dd
       ddcu   <- ddsq*dd
       m <- 0
-      for (j in 1:ncoef) {
+      for (j in 1:wnbasis) {
         for (k in 1:j) {
           m <- m + 1
           hessvec[m] <- hessvec[m] + D2cc[m] -
@@ -715,9 +749,9 @@ reghess <- function(xfine, y0fine, Dhfine, D2hwrtc, yregfd,
       }
     }
   }
-  hessmat <- matrix(0,ncoef,ncoef)
+  hessmat <- matrix(0,wnbasis,wnbasis)
   m <- 0
-  for (j in 1:ncoef) {
+  for (j in 1:wnbasis) {
     for (k in 1:j) {
       m <- m + 1
       hessmat[j,k] <- hessvec[m]
@@ -725,8 +759,8 @@ reghess <- function(xfine, y0fine, Dhfine, D2hwrtc, yregfd,
     }
   }
   if (!is.null(Kmat)) {
-     if (ncoef > 1) {
-        ind <- 2:ncoef
+     if (wnbasis > 1) {
+        ind <- 2:wnbasis
         hessmat[ind,ind] <- hessmat[ind,ind] + 2*Kmat
      }
   }
@@ -785,14 +819,14 @@ return(yregfd)
 
 #  ----------------------------------------------------------------
 
-linesearch <- function(Fstr, hessmat, dbglev)
+linesearch <- function(Flist, hessmat, dbglev)
 {
-deltac   <- -solve(hessmat,Fstr$grad)
-cosangle <- -sum(Fstr$grad*deltac)/sqrt(sum(Fstr$grad^2)*sum(deltac^2))
+deltac   <- -solve(hessmat,Flist$grad)
+cosangle <- -sum(Flist$grad*deltac)/sqrt(sum(Flist$grad^2)*sum(deltac^2))
 if (dbglev >= 2) cat(paste("\nCos(angle) = ",round(cosangle,2)))
 if (cosangle < 1e-7) {
    if (dbglev >=2) cat("\nangle negative")
-   deltac <- -Fstr$grad
+   deltac <- -Flist$grad
 }
 return(list(deltac, cosangle))
 }

@@ -8,7 +8,7 @@ function  pcarotstr = varmx_pca(pcastr, nharm, nx)
 %  Return:
 %  PCAROTSTR ... PCASTR object containing rotated harmonics.
 
-%  last modified 25 October 2007
+%  Last modified 30 June 2010 by Jim
 
   if nargin < 3
     nx = 501;
@@ -46,7 +46,7 @@ function  pcarotstr = varmx_pca(pcastr, nharm, nx)
   
   %  compute rotation matrix for varimax rotation of harmmat
   
-  rotmat = varmx(harmmat(1:nharm));
+  rotmat = varmx(harmmat(:,1:nharm));
   
   %  rotate harmonic coefficients 
   

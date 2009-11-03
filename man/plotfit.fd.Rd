@@ -195,36 +195,40 @@ plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
   \code{\link{checkDims3}}
 }
 \examples{
+#  set up a Fourier basis for smoothing temperature data
 daybasis65 <- create.fourier.basis(c(0, 365), 65,
                     axes=list("axesIntervals"))
-
+#  smooth the average temperature data using function data2fd
+Daytempfd <- with(CanadianWeather, Data2fd(
+       dailyAv[,,"Temperature.C"], day.5,
+       daybasis65) )
 daytempfd <- with(CanadianWeather, data2fd(
        dailyAv[,,"Temperature.C"], day.5,
        daybasis65, argnames=list("Day", "Station", "Deg C")) )
-
-with(CanadianWeather, plotfit.fd(dailyAv[, , "Temperature.C"],
-     argvals= day.5, daytempfd, index=1, titles=place) )
-# Default ylab = daytempfd[['fdnames']]
-
+#  Plot the temperature data along with the fit to the data for the first
+#  station, St. John's Newfoundland
+# If you want only the fitted functions, use plot(daytempfd)
+# To plot only a single fit vs. observations, use argument index
+# to request which one you want.
 with(CanadianWeather, plotfit.fd(dailyAv[, , "Temperature.C",
      drop=FALSE], argvals= day.5, daytempfd, index=1, titles=place) )
-# Better:  ylab = dimnames(y)[[3]]
+# Default ylab = daytempfd[['fdnames']]
+
+with(CanadianWeather, plotfit.fd(dailyAv[, , "Temperature.C"],
+     argvals= day.5, Daytempfd, index=1, titles=place) )
+
+plot(daytempfd)
 
 \dontrun{
-# The following pauses to request page changes.
-# (Without 'dontrun', the package build process
-# might encounter problems with the par(ask=TRUE)
-# feature.)
-with(CanadianWeather, plotfit.fd(
-          dailyAv[,, "Temperature.C"], day.5,
-          daytempfd, ask=TRUE) )
+# plot all the weather stations, one by one after a click on the plot
+# in response to a request.
+# This example is within the "dontrun" environment to prevent the
+# the R package checking process from pausing: without 'dontrun', the package
+# build process might encounter problems with the par(ask=TRUE) feature.
+with(CanadianWeather, plotfit.fd(dailyAv[,, "Temperature.C"], day.5,
+     daytempfd, ask=TRUE) )
 }
-
-# If you want only the fitted functions, use plot(daytempfd)
-
-# To plot only a single fit vs. observations, use index
-# to request which one you want.
-
+#  Now plot results for two weather stations.
 op <- par(mfrow=c(2,1), xpd=NA, bty="n")
 # xpd=NA:  clip lines to the device region,
 #       not the plot or figure region
@@ -233,22 +237,41 @@ ylim <- range(CanadianWeather$dailyAv[,,"Temperature.C"])
 # Force the two plots to have the same scale
 with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5,
           daytempfd, index=2, titles=place, ylim=ylim) )
-
 with(CanadianWeather, plotfit.fd(dailyAv[,,"Temperature.C"], day.5,
           daytempfd, index=35, titles=place, ylim=ylim) )
+\dontrun{
+# Plot residuals with interactive display of stations one by one
 par(op)
-
-# plot residuals
 with(CanadianWeather, plotfit.fd(dailyAv[, , "Temperature.C"],
           day.5, daytempfd, residual=TRUE) )
-# Can't read this, so try with 2 lines per page with ask=TRUE,
-# and limiting length(col), length(lty), etc. <=2
-\dontrun{
-with(CanadianWeather, plotfit.fd(
-          dailyAv[,,"Temperature.C"], day.5,
-          daytempfd, residual=TRUE, col=1:2, lty=1, ask=TRUE) )
 }
-
+#  The gait data are bivariate, and this code illustrates how plotfit.fd
+#  deals with the plotting of two variables at the same time
+#  First define normalized times and their range
+gaittime  <- as.numeric(dimnames(gait)[[1]])*20
+gaitrange <- c(0,20)
+#  Define the harmonic acceleration differential operator
+harmaccelLfd <- vec2Lfd(c(0, (2*pi/20)^2, 0), rangeval=gaitrange)
+#  Set up basis for representing gait data.
+gaitbasis <- create.fourier.basis(gaitrange, nbasis=21)
+#  Smooth the data
+gaitfd <- smooth.basisPar(gaittime, gait,
+       gaitbasis, Lfdobj=harmaccelLfd, lambda=1e-2)$fd
+#  Assign names to the data
+names(gaitfd$fdnames) <- c("Normalized time", "Child", "Angle")
+gaitfd$fdnames[[3]] <- c("Hip", "Knee")
+\dontrun{
+#  plot each pair of curves interactively, two plots per page, the top
+#  for hip angle, and the bottom for knee angle
+plotfit.fd(gait, gaittime, gaitfd)
+#  Plot the residuals, sorting cases by residual sum of squares summed over
+#  both hip and knee angles.
+#  The first series of 39 plots are for hip angle, two plots per page,
+#  and the second 39 are for knee angle.  The plots are sorted by the
+#  size of the total residual sum of squares, but RMS residual values
+#  for specific angles are not all going to be in order.
+plotfit.fd(gait, gaittime, gaitfd, residual=TRUE, sort=TRUE)
+}
 }
 % docclass is function
 \keyword{smooth}

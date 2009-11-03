@@ -1,6 +1,10 @@
 Data2fd <- function(argvals=NULL, y=NULL, basisobj=NULL, nderiv=NULL,
-                    lambda=0.0, fdnames=NULL)
+                    lambda=3e-8/diff(range(argvals)), fdnames=NULL)
 {
+## Change proposed by Spencer Graves 2011.01.10:
+## Default lambda = NULL here,
+##   converted below to 3e-8/range(argvals)
+#
 #  DATA2FD Converts an array Y of function values plus an array
 #    ARGVALS of argument values into a functional data object.
 #
@@ -139,7 +143,7 @@ Data2fd <- function(argvals=NULL, y=NULL, basisobj=NULL, nderiv=NULL,
 #    sophistication in defining the functional data object.  It uses
 #    function SMOOTH.BASIS to compute the functional data object. Indeed,
 #    in the simplest and most common situation, DATA2FD smooths data
-#    by ordinary least squares regression.  
+#    by ordinary least squares regression.
 #    However, for more advanced applications requiring more smoothing
 #    control than is possible by setting the number of basis functions in
 #    BASIS, function SMOOTH.BASIS should be used.  Or, alternatively,
@@ -154,10 +158,13 @@ Data2fd <- function(argvals=NULL, y=NULL, basisobj=NULL, nderiv=NULL,
 #  previously modified 23 July 2008
 
   argChk <- argvalsy.swap(argvals, y, basisobj)
+# Change proposed by Spencer Graves 2010.12.08
+# if(is.null(lambda))
+#   lambda <- 1e-9*sd(argChk$y)/diff(range(argChk$argvals))
 #
   smBasis <- with(argChk, smooth.basisPar(argvals=argvals, y=y,
                 fdobj=basisobj, Lfdobj=nderiv, lambda=lambda,
                 fdnames=fdnames) )
-# 
+#
   smBasis$fd
 }

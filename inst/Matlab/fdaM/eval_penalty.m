@@ -34,7 +34,7 @@ function [penaltymat, iter] = eval_penalty(basisobj, Lfdobj, rng)
 %                 it is called.  Otherwise 0.
 %
 
-%  last modified 3 January 2008
+%  last modified 25 May 2010
 
 %  get BASISOBJ
 
@@ -95,7 +95,10 @@ switch type
     case 'polyg'
         penaltymat = polygpen(basisobj,   Lfdobj);
     case 'power'
-        penaltymat = powerpen(basisobj,   Lfdobj);   otherwise
+        penaltymat = powerpen(basisobj,   Lfdobj);   
+    case 'FEM'
+        penaltymat = FEMpen(basisobj,     Lfdobj);   
+    otherwise
         error('Basis type not recognizable');
 end
 

@@ -13,9 +13,9 @@
   Arithmetic on functional data objects
 }
 \usage{
-"+.fd"(e1, e2)
-"-.fd"(e1, e2)
-"*.fd"(e1, e2)
+\method{+}{fd}(e1, e2)
+\method{-}{fd}(e1, e2)
+\method{*}{fd}(e1, e2)
 plus.fd(e1, e2, basisobj=NULL)
 minus.fd(e1, e2, basisobj=NULL)
 times.fd(e1, e2, basisobj=NULL)

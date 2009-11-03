@@ -35,6 +35,9 @@ function [regfd, warpfd, Wfd] = landmarkreg(fdobj, ximarks, x0marks, ...
 
 %  last modified 15 May 2009 by Jim Ramsay
 
+if nargin < 6, ylambda = 0; end
+if nargin < 5, monwrd = 0; end
+
 %  check FDOBJ
 
 if ~isa_fd(fdobj)
@@ -106,6 +109,9 @@ WLfdobj = int2Lfd(WLfdobj);
 wlambda = getlambda(WfdParobj);
 
 %  check landmark target values
+disp(x0marks)
+disp(ximarks)
+disp(rangeval)
 
 test1 = any(x0marks(:) <= rangeval(1));
 test2 = any(ximarks(:) >= rangeval(2));
@@ -157,7 +163,7 @@ for icurve = 1:ncurve
             h([1,n]) = rangeval;
         else
             %  use regular smoother
-            warpfd   = smooth_basis(xval, yval, wbasis);
+            warpfd   = smooth_basis(xval, yval, WfdParobj);
             %  set up warping function sampling values
             h        = eval_fd(x, warpfd);
             %  normalize h
