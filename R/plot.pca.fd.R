@@ -16,78 +16,83 @@ plot.pca.fd <- function(x, nx = 128, pointplot = TRUE, harm = 0,
 #	If the number of variables is anything else, cycle will be ignored.
 #
 
-# last modified 2007 May 3 by Spencer Graves	
-#	previously modified 20 March 2006
+# last modified 18 July 2013 by Jim Ramsay
 
-  pcafd <- x
-  if (!(inherits(pcafd, "pca.fd"))) 
+pcafd <- x
+if (!(inherits(pcafd, "pca.fd"))) 
     stop("Argument 'x' is not a pca.fd object.")
 
-  harmfd	<- pcafd[[1]]
-  basisfd <- harmfd$basis
-  rangex	<- basisfd$rangeval
-  {
-    if(length(nx)>1){
-      x <- nx
-      nx <- length(x)
-    }
-    else    
-      x <- seq(rangex[1], rangex[2], length = nx)
-  }
-  fdmat	 <- eval.fd(x, harmfd)
-  meanmat <- eval.fd(x, pcafd$meanfd)
-  dimfd	 <- dim(fdmat)
-  nharm	 <- dimfd[2]
+harmfd  <- pcafd[[1]]
+basisfd <- harmfd$basis
+rangex  <- basisfd$rangeval
+#
+#  set up argument values for plotting
+#
+if (length(nx)>1) {
+    #  A set of argument values has been input for argument nx
+    argvals <- nx
+    nx      <- length(x)
+} else {    
+    #  default: nx is the number of equally spaced argument values
+    argvals <- seq(rangex[1], rangex[2], length = nx)
+}
+fdmat	  <- eval.fd(argvals, harmfd)
+meanmat <- eval.fd(argvals, pcafd$meanfd)
+dimfd	  <- dim(fdmat)
+nharm	  <- dimfd[2]
 #
 # check number of panels
-  plotsPerPg <- sum(par("mfrow"))
+#
+plotsPerPg <- sum(par("mfrow"))
 #   
-  harm	<- as.vector(harm)
-  if(harm[1] == 0) harm <- (1:nharm)
-#  
-  if(length(dimfd) == 2) {
+# set up number of harmonics to be plotted
+#
+harm	<- as.vector(harm)
+if(harm[1] == 0) harm <- (1:nharm)
+#  switch between univariate and multivariate data
+if (length(dimfd) == 2) {
+    #  univariate case
     for(jharm in 1:length(harm)) {
-#    for(iharm in harm) {
       if(jharm==2){
         op <- par(ask=TRUE)
         on.exit(par(op)) 
-      }
-#        
+      }       
       iharm <- harm[jharm] 
+      #  compute expansion factor for plotting harmonics
       if(expand == 0) {
         fac <- sqrt(pcafd$values[iharm])
       } else {
         fac <- expand
-      }
-#      
+      }     
       vecharm <- fdmat[, iharm]
-      pcmat <- cbind(meanmat + fac * vecharm, meanmat - fac * vecharm)
+      pcmat   <- cbind(meanmat + fac * vecharm, meanmat - fac * vecharm)
       if (pointplot) plottype <- "p" else plottype <- "l"
       percentvar <- round(100 * pcafd$varprop[iharm], 1)
-      plot(x, meanmat, type = "l", ylim=c(min(pcmat),max(pcmat)),
+      plot(argvals, meanmat, type = "l", ylim=c(min(pcmat),max(pcmat)),
            ylab=paste("Harmonic", iharm),
            main=paste("PCA function", iharm,
-             "(Percentage of variability", percentvar, ")"),
-           ...)
+             "(Percentage of variability", percentvar, ")"))
+           #...)
       if (pointplot) {
-        points(x, pcmat[,1], pch="+")
-        points(x, pcmat[,2], pch="-")
+        points(argvals, pcmat[,1], pch="+")
+        points(argvals, pcmat[,2], pch="-")
       } else {
-        lines(x, pcmat[,1], lty=2)
-        lines(x, pcmat[,2], lty=3)
+        lines(argvals, pcmat[,1], lty=2)
+        lines(argvals, pcmat[,2], lty=3)
       }
     }
-  } else {
-    if(cycle && dimfd[3] == 2) {
+} else {
+    #  multivariate data
+    #  switch between cyclic and non-cyclic plot
+    if (cycle && dimfd[3] == 2) {
+      #  cyclic plot
       meanmat <- drop(meanmat)
       for(jharm in 1:length(harm)) {
-#      for(iharm in harm) {
         if(jharm==2){
           op <- par(ask=TRUE)
           on.exit(par(op)) 
         }
         iharm <- harm[jharm]
-#
         {
           if(expand == 0) fac <- 2 * sqrt(pcafd$values[iharm])
           else fac <- expand
@@ -114,19 +119,17 @@ plot.pca.fd <- function(x, nx = 128, pointplot = TRUE, harm = 0,
       }
     }
     else {
+      #  non-cyclic plot of multivariate data
       for(jharm in 1:length(harm)) {
-#      for(iharm in harm) {
         if(jharm==2){
           op <- par(ask=TRUE)
           on.exit(par(op)) 
         }
         iharm <- harm[jharm]
-#        
         fac <- {
           if (expand == 0) sqrt(pcafd$values[iharm]) 
           else expand
-        }
-        
+        }       
         meanmat <- drop(meanmat)
         matharm <- fdmat[, iharm, ]
         nvar <- dim(matharm)[2]
@@ -135,7 +138,7 @@ plot.pca.fd <- function(x, nx = 128, pointplot = TRUE, harm = 0,
                          meanmat[, jvar] - fac * matharm[, jvar])
           if (pointplot) plottype <- "p" else plottype <- "l"
           percentvar <- round(100 * pcafd$varprop[iharm], 1)
-          plot(x, meanmat[,jvar], type=plottype,
+          plot(argvals, meanmat[,jvar], type=plottype,
                ylab=paste("Harmonic", iharm),
                sub = paste("PCA function", iharm,
                  "(Percentage of variability", 
@@ -143,12 +146,12 @@ plot.pca.fd <- function(x, nx = 128, pointplot = TRUE, harm = 0,
                main = dimnames(fdmat)[[3]][jvar],
                ...)
           if (pointplot) {
-            points(x, pcmat[,1], pch="+")
-            points(x, pcmat[,2], pch="-")
+            points(argvals, pcmat[,1], pch="+")
+            points(argvals, pcmat[,2], pch="-")
           }
           else {
-            lines (x, pcmat[,1], lty=2)
-            lines (x, pcmat[,2], lty=3)
+            lines (argvals, pcmat[,1], lty=2)
+            lines (argvals, pcmat[,2], lty=3)
           }
         }
       }

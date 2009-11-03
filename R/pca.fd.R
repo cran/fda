@@ -19,7 +19,7 @@ pca.fd <- function(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
 #  meanfd     ... A functional data object giving the mean function
 #
 
-#  Last modified:  28 December 2012 by Jim Ramsay
+#  Last modified:  18 July 2013 by Jim Ramsay
 
 #  Check FDOBJ
 
@@ -28,6 +28,7 @@ if (!(inherits(fdobj, "fd"))) stop(
 
 #  compute mean function and center if required
 
+meanfd <- mean.fd(fdobj)
 if (centerfns) {
   fdobj <- center.fd(fdobj)
 }
@@ -156,7 +157,6 @@ if (nvar == 1) {
 
 #  set up the object pcafd of the pca.fd class containing the results
   
-meanfd <- mean.fd(fdobj)
 pcafd        <- list(harmfd, eigvalc, harmscr, varprop, meanfd)
 class(pcafd) <- "pca.fd"
 names(pcafd) <- c("harmonics", "values", "scores", "varprop", "meanfd")

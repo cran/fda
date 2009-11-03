@@ -47,7 +47,8 @@ eval.bifd(sevalarg, tevalarg, bifd, sLfdobj=0, tLfdobj=0,
   replications, and the fourth if present to functions.
 }
 \examples{
-daybasis   <- create.fourier.basis(c(0,365), 365)
+# every-other-day basis to save test time
+daybasis   <- create.fourier.basis(c(0,365), 183)
 harmLcoef  <- c(0,(2*pi/365)^2,0)
 harmLfd    <- vec2Lfd(harmLcoef, c(0,365))
 templambda <- 1.0

@@ -1,5 +1,5 @@
 Package: fda
-Version: 2.3.6
+Version: 2.3.8
 Date: 2013-05
 Title: Functional Data Analysis
 Author: J. O. Ramsay <ramsay@psych.mcgill.ca>, Hadley Wickham
@@ -18,28 +18,20 @@ Description: These functions were developed to support functional data
         Graves, Spencer (2009) Functional Data Analysis with R and
         Matlab (Springer). The package includes data sets and script
         files working many examples including all but one of the 76
-        figures in this latter book.  As of this release, the R-Project
-        is no longer distributing the Matlab versions of the functional
-        data analysis functions and sample analyses through the CRAN
-        distribution system.  This is due to the pressure placed on
-        storage required in the many CRAN sites by the rapidly
-        increasing number of R packages, of which the fda package is
-        one.  The three of us involved in this package have agreed to
-        help out this situation by switching to distributing the Matlab
-        functions and analyses through Jim Ramsay's ftp site at McGill
-        University.  To obtain these Matlab files, go to this site
-        using an ftp utility:
-        http://www.psych.mcgill.ca/misc/fda/downloads/FDAfuns/ There
-        you find a set of .zip files containing the functions and
-        sample analyses, as well as two .txt files giving instructions
-        for installation and some additional information.
+        figures in this latter book.  Matlab versions of the code and
+        sample analyses are no longer distributed through CRAN, as they
+        were when the book was published.  For those, ftp from
+        http://www.psych.mcgill.ca/misc/fda/downloads/FDAfuns/
+        There you find a set of .zip files containing the functions and
+        sample analyses, as well as two .txt files giving instructions for
+        installation and some additional information.
 License: GPL (>= 2)
 URL: http://www.functionaldata.org
 LazyData: true
 Repository: CRAN
 Repository/R-Forge/Project: fda
-Repository/R-Forge/Revision: 712
-Repository/R-Forge/DateTimeStamp: 2013-05-22 16:07:16
-Date/Publication: 2013-05-24 19:07:52
-Packaged: 2013-05-22 18:17:09 UTC; rforge
+Repository/R-Forge/Revision: 719
+Repository/R-Forge/DateTimeStamp: 2013-07-31 05:58:26
+Date/Publication: 2013-08-02 07:22:33
+Packaged: 2013-07-31 22:21:30 UTC; rforge
 NeedsCompilation: no
