@@ -16,6 +16,7 @@
 \alias{fdchk}
 \alias{fngrad.smooth.monotone}
 \alias{fngrad.smooth.morph}
+\alias{fRegressArgCheck}
 \alias{geigen}
 \alias{hesscal.smooth.monotone}
 \alias{hesscal.smooth.morph}
@@ -68,6 +69,7 @@
 \alias{fdParcheck}
 \alias{trapz}
 \alias{ycheck}
+\alias{moreNames}
 
 % docclass is function
 \keyword{internal}

@@ -1,40 +1,47 @@
-function rotm = varmx(amat)
+function rotm = varmx(amat, normalize)
 %  VARMX  Does a VARIMAX rotation of a principal components solution
 %  Arguments:
-%  AMAT  ...  N by K matrix of component loadings
+%  AMAT      ...  N by K matrix of component loadings
+%  NORMALIZE ...  If nonzero, the columns of AMAT are normalized
+%                 before computing the rotation matrix.  
+%                 The default is 0.
 %  Returns:
 %  ROTM  ...  Rotation matrix for rotated loadings
 
-%  last modified 20 July 2006
+%  last modified 27 Oct 2009
 
-  amatd = size(amat);
+if nargin < 2,  normalize = 0;  end
 
-  if length(amatd) ~= 2
+amatd = size(amat);
+
+if length(amatd) ~= 2
     error('AMAT must be two-dimensional')
-  end
+end
 
-  n = amatd(1);
-  k = amatd(2);
-  rotm = eye(k);
-  onek = ones(1,k);
-  hvec = sum(amat'.^2)';
-
-  if k == 1
+n = amatd(1);
+k = amatd(2);
+rotm = eye(k);
+onek = ones(1,k);
+ 
+if k == 1
     return
-  end
+end
 
-  %  normalize loadings matrix
+%  normalize loadings matrix
 
-  amat = amat./(sqrt(hvec)*onek);
+if normalize
+    hvec = sum(amat'.^2)';
+    amat = amat./(sqrt(hvec)*onek);
+end
 
-  eps  = 0.00116;
-  ccns = 0.7071068;
+eps  = 0.00116;
+ccns = 0.7071068;
 
-  varold = 0;
-  varnow = sum(var(amat.^2));
+varold = 0;
+varnow = sum(var(amat.^2));
 
-  iter = 0;
-  while abs(varnow - varold) > 1e-7 && iter <= 50
+iter = 0;
+while abs(varnow - varold) > 1e-7 && iter <= 50
     iter  = iter + 1;
     for j = 1:(k-1)
       for l = (j+1):k
@@ -108,5 +115,5 @@ function rotm = varmx(amat)
 
     varold = varnow;
     varnow = sum(var(amat.^2));
-  end
+end
 

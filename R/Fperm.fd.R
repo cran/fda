@@ -7,7 +7,7 @@ Fperm.fd <- function(yfdPar, xfdlist, betalist,wt=NULL,
 # q =  quantile to compare
 # plotres:  Do we plot the results?
 
-  Fnull = rep(0,nperm)
+  Fnull     = rep(0,nperm)
   Fnullvals = c()
 
   q = 1-q
@@ -31,8 +31,11 @@ Fperm.fd <- function(yfdPar, xfdlist, betalist,wt=NULL,
 
   argvals = tFstat$argvals
 
-  if(is.vector(yfdPar)){ n = length(yfdPar) }
-  else{ n = ncol(yfdPar$coefs) }
+  if(is.vector(yfdPar)){ 
+      n = length(yfdPar) 
+  }  else { 
+      n = ncol(yfdPar$coefs) 
+  }
 
   for(i in 1:nperm){
 
@@ -49,7 +52,6 @@ Fperm.fd <- function(yfdPar, xfdlist, betalist,wt=NULL,
 
     Fnull[i] = max(Fnullvals[,i])
   }
-
 
     pval = mean( Fobs < Fnull )
     qval = quantile(Fnull,q)
@@ -79,7 +81,7 @@ Fperm.fd <- function(yfdPar, xfdlist, betalist,wt=NULL,
         else{
             xlims = c(min(c(Fnull,Fobs)),max(c(Fnull,Fobs)))
             hstat = hist(Fnull,xlim=xlims,lwd=2,xlab='F-value',
-			main = 'Permutation F-Test',...)
+			       main = 'Permutation F-Test')
             abline(v = Fobs,col=2,lwd=2)
             abline(v = qval,col=4,lty=2,lwd=2)
 

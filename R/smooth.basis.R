@@ -50,7 +50,7 @@ smooth.basis <- function (argvals, y, fdParobj,
 
   #  check ARGVALS
 
-  if (!is.numeric(y)) stop("'argvals' is not numeric.")
+  if (!is.numeric(argvals)) stop("'argvals' is not numeric.")
 
   argvals <- as.vector(argvals)
   n      <- length(argvals)

@@ -4,7 +4,7 @@ function basismat = getbasismatrix(evalarg, basisobj, nderiv)
 %    The returned basis matrix BASISMAT contains the basis
 %    derivatives of order NDERIV (0 by default).
 
-%  last modified 1 November 2007
+%  last modified 11 June 2009 by Jim Ramsay
 
 if nargin < 3,  nderiv = 0;  end
 
@@ -33,18 +33,17 @@ else
     params   = getbasispar(basisobj);
     rangeval = getbasisrange(basisobj);
     dropind  = getdropind(basisobj);
-    nbasis   = nbasis + length(dropind);
 
     switch type
         case 'bspline'
             rangex   = rangeval;
             if isempty(params)
-                basismat = monomial(evalarg, 0:nbasis-1, nderiv);
+                breaks = rangex;
             else
                 breaks   = [rangex(1), params, rangex(2)];
-                norder   = nbasis - length(breaks) + 2;
-                basismat = bsplineM(evalarg, breaks, norder, nderiv);
             end
+            norder   = nbasis - length(breaks) + 2;
+            basismat = bsplineM(evalarg, breaks, norder, nderiv);
         case 'fourier'
             period   = params(1);
             basismat = fourier(evalarg, nbasis, period, nderiv);
@@ -59,11 +58,15 @@ else
             basismat = expon(evalarg, exponents, nderiv);
         case 'const'
             basismat = ones(length(evalarg),1);
+        case 'QW'
+            basismat = QW(evalarg, nderiv);
+        case 'QWM'
+            basismat = QWM(evalarg, nderiv);
         otherwise
             error('Basis type not recognizable')
     end
 
-    if length(dropind) > 0
+    if ~isempty(dropind)
         index = 1:nbasis;
         for i=1:length(dropind)
             index = index(index ~= dropind(i));

@@ -3,9 +3,8 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=c(Lfdobj=2, lambda=1),
 {
 #REGISTERFD registers a set of curves YFD to a target function Y0FD.
 #  Arguments are:
-#  Y0FD      ... Functional data object for target function.  It must
-#                contain a single curve, but this single curve
-#                can be multivariate.
+#  Y0FD      ... Functional data object for target function.  It may be either
+#                a single curve, or have the same dimensions as YFD.
 #  YFD       ... Functional data object for functions to be registered
 #  WFDPAROBJ ... Functional parameter object for function W defining warping 
 #                functions. The basis must be a B-spline basis.  If constant
@@ -27,8 +26,7 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=c(Lfdobj=2, lambda=1),
 #              Initial value for shift parameter is taken to be 0.
 #              The periodic option should ONLY be used with a Fourier
 #              basis for the target function Y0FD, the functions to be
-#              registered, YFD, and the functions WFD0 defining the
-#              time-warping functions.
+#              registered, YFD.
 #  CRIT    ... If 1 least squares, if 2 log eigenvalue ratio.  Default is 1.
 #                Default:  0
 #  Returns:
@@ -64,53 +62,38 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=c(Lfdobj=2, lambda=1),
              "Instead, class(y0fd) = ", class(y0fd)) 
   } 
   
-#  Check target function to determine number of variables.
-#  If the coefficient matrix is 3-dimensional, then the second
-#  dimension size must be 1, and if not, an error will be declared.
-#  If it is 1, however, then the size of the third dimension will
-#  be taken to be the number of variables for a multivariate set
-#  of curves.  A 3-dimensional coefficient matrix for the target 
-#  will then be contracted to two dimensions.  
-
-  y0coefs0 <- y0fd$coefs
-  y0dim0   <- dim(y0coefs0)
-  ndimy00  <- length(y0dim0)
-# If y0coefs is 3 dimensional, convert it to 2.    
-  if (ndimy00 == 3) {
-    if (y0dim0[2] > 1) {
-      stop("'y0fd' must be a single functional observation ",
-           "matching 'yfd';  instead it is ", y0dim0[2],
-           " observations.")
-    } else {
-#     Convert y0coefs from 3 to 2 dimensions       
-      y0coefs. <- y0coefs0[,1,, drop=TRUE]
-      y0fd$coefs <- y0coefs.
-    }
-  }
-
-#  The target function coefficient matrix is now taken to be 
-#  2-dimensional, and the size of the second dimension is taken to be
-#  the number of variables to be registered. If this size
-#  is greater than one, the functional data objects to be registered 
-#  are assumed to be multivariate.
-
-  y0coefs <- y0fd$coefs
-  y0dim   <- dim(y0coefs)
-  nvar    <- y0dim[2]
-    
 #  check functions to be registered
 
   ydim   <- dim(yfd$coefs)
   ncurve <- ydim[2]
   ndimy  <- length(ydim)
+  if (ndimy == 3) {
+      nvar <- ydim[3]
+  } else {
+      nvar <- 1
+  }
 
   if (ndimy > 3) stop("'yfd' is more than 3-dimensional.")
 
-  if (ndimy == 2) {
-    if (nvar > 1) stop("'y0fd' indicates function are multivariate,", 
-                       "but is 'yfd' is only 2-dimensional.") 
-  }
+#  Check target function
 
+  y0coefs0 <- y0fd$coefs
+  y0dim0   <- dim(y0coefs0)
+  ndimy00  <- length(y0dim0)
+  if (ndimy00 > ndimy) stop("Y0FD has more dimensions than YFD")
+  #  Determine whether the target function is full or not
+  if (y0dim0[2] == 1) {
+      fulltarg <- FALSE
+  } else {
+      if (y0dim0[2] == ydim[2]) {
+          fulltarg <- TRUE
+      } else {
+          stop("Second argument of Y0FD not correct.")
+      }
+  }
+  if (ndimy00 == 3 && ydim[3] != y0dim0[3]) stop(
+      "Third dimension of YOFD does not match that of YFD.")
+    
 #  Extract basis information from YFD
 
   ybasis  <- yfd$basis
@@ -196,7 +179,7 @@ basislist <- vector("list", JMAX)
 
 yregcoef <- yfd$coefs
 
-#  iterate through the curves
+#  loop through the curves
 
 wcoefnew <- wcoef
 if (dbglev == 0 && ncurve > 1) cat("Progress:  Each dot is a curve\n")
@@ -206,9 +189,10 @@ for (icurve in 1:ncurve) {
   if (dbglev >= 1 && ncurve > 1)
       cat(paste("\n\n-------  Curve ",icurve,"  --------\n"))
   if (ncurve == 1) {
-    yfdi <- yfd
-    Wfdi <- Wfd0
-    cvec <- wcoef
+    yfdi  <- yfd
+    y0fdi <- y0fd
+    Wfdi  <- Wfd0
+    cvec  <- wcoef
   } else {
     Wfdi <- Wfd0[icurve]
     cvec <- wcoef[,icurve]
@@ -217,11 +201,22 @@ for (icurve in 1:ncurve) {
     } else {
       yfdi <- yfd[icurve,]
     }
+    if (fulltarg) {
+      if (nvar == 1) {
+        y0fdi <- y0fd[icurve]
+      } else {
+        y0fdi <- y0fd[icurve,]
+      }
+    }
   }
 
   #  evaluate curve to be registered at fine mesh
 
   yfine <- eval.fd(xfine, yfdi)
+  
+  #  evaluage target curve at fine mesh
+  
+  y0fine <- eval.fd(xfine, y0fdi)
 
   #  evaluate objective function for starting coefficients
 

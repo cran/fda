@@ -1,4 +1,6 @@
-Fstat.fd <- function(y,yhat,argvals=NULL) {    # observed, predicted and where to evaluate
+Fstat.fd <- function(y,yhat,argvals=NULL) {    
+
+# observed, predicted and where to evaluate
 
     if( is.numeric(yhat) ){ yhat = as.vector(yhat) }
 
@@ -29,7 +31,6 @@ Fstat.fd <- function(y,yhat,argvals=NULL) {    # observed, predicted and where t
     else{
         yvec = y
         yhatvec = yhat
-
         F = var(yhatvec)/mean( (yvec-yhatvec)^2 )
     }
 

@@ -1,9 +1,9 @@
 "[.fd" <- function(fdobj, i=TRUE, j=TRUE, drop=TRUE) {
   #  select subsets of curves in a functional data object
 
-  coef <- fdobj$coefs
+  coef    <- fdobj$coefs
   fdnames <- fdobj$fdnames
-  ndim <- length(dim(coef))
+  ndim    <- length(dim(coef))
 
   if(ndim == 2) {
     coefselect <- coef[, i,drop=FALSE]

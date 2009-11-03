@@ -1,7 +1,7 @@
 #  setClass for "fd"
 
-# setClass("fd",    representation(coefs    = "array",
-#                                  basis    = "basisfd",
+# setClass("fd",    representation(coef     = "array",
+#                                  basisobj = "basisfd",
 #                                  fdnames  = "list"))
 
 #  Generator function of class fd
@@ -38,12 +38,12 @@ fd <- function (coef=NULL, basisobj=NULL, fdnames=NULL)
   #  Returns:
   #  FD ... a functional data object
 
-  #  Last modified 2008.12.26 by Spencer Graves
-  #  Previously modified 2008.10.16 by Spencer Graves
+  #  Last modified 21 October 2009 by Jim Ramsay
 
 ##
 ## 1.  check coef and get its dimensions
 ##
+
   if(is.null(coef) && is.null(basisobj)) basisobj <- basisfd()
 
   if(is.null(coef))coef <- rep(0, basisobj[['nbasis']])
@@ -657,7 +657,6 @@ times.fd <- function(e1, e2, basisobj=NULL)
     #  and if so, copy it as many times as there are replicates
     #  in the other function.
 
-
     #  e1 is single,  e2 has replications
 
     if (coefd1[2] == 1 && coefd2[2] > 1) {
@@ -712,11 +711,9 @@ times.fd <- function(e1, e2, basisobj=NULL)
     nbasis1   <- basisobj1$nbasis
     nbasis2   <- basisobj2$nbasis
 
-    if(is.null(basisobj))
-       basisobj <- {
-         if (basisobj1 == basisobj2) basisobj1
-         else basisobj1*basisobj2
-       }
+    #  set default basis object
+
+    if(is.null(basisobj)) basisobj <- basisobj1*basisobj2
 
     #  check that the ranges match if a range not supplied
 
@@ -811,32 +808,223 @@ times.fd <- function(e1, e2, basisobj=NULL)
 #  power method for "fd"
 #  -------------------------------------------------------------------
 
-"^.fd" <- function(fdobj, power)
+"^.fd" <- function(e1, e2)
 {
-#  Arguments:
-#  FDOBJ  ...  A functional data object
-#  POWER  ...  An exponent
-#  Returns:
-#  FDAPOWR  ...  A functional data object that is FD to the power POWER
+#  A positive integer pointwise power of a functional data object with
+#  a B-splinebasis.  powerfd = fdobj^a.  
+#  Generic arguments e1 = fdobj and e2 = a.  
+#
+#  The basis is tested for being a B-spline basis.  The function then
+#  sets up a new spline basis with the same knots but with an order
+#  that is M-1 higher than the basis for FDOBJ, where M = ceiling(a),
+#  so that the order of differentiability for the new basis is
+#  appropriate in the event that a is a positive integer, and also
+#  to accommodate the additional curvature arising from taking a power.
+#  The power of the values of the function over a fine mesh are computed,
+#  and these are fit using the new basis.
+#
+#  Powers should be requested with caution, however, and especially if
+#  a < 1, because, if there is strong local curvature in FDOBJ,
+#  and if its basis is just barely adequate to capture this curvature,
+#  then the power of the function may have considerable error
+#  over this local area.  fdobj^a where a is close to zero is just
+#  such a situation.
+#
+#  If a power of a functional data object is required for which the
+#  basis is not a spline, it is better to either re-represent the
+#  function in a spline basis, or, perhaps even better, to do the
+#  math required to get the right basis and interpolate function
+#  values over a suitable mesh.  This is especially true for fourier
+#  bases.
 
-    #  Last modified:  17 September 2005
+#  Last modified 3 Novem ber 2009
 
-    if ((!(inherits(fdobj, "fd"))))
+#  check first two arguments
+
+fdobj = e1
+a     = e2
+tol   = 1e-4
+
+if ((!(inherits(fdobj, "fd"))))
         stop("First argument for ^ is not a functional data object.")
-    if ((!(is.numeric(power))))
+if ((!(is.numeric(a))))
         stop("Second argument for ^ is not numeric.")
-    coef     <- fdobj$coefs
-    coefd    <- dim(coef)
-    basisfd  <- fdobj$basis
-    nbasis   <- basisfd$nbasis
-    rangeval <- basisfd$rangeval
-    neval    <- max(10*nbasis + 1,101)
-    evalarg  <- seq(rangeval[1],rangeval[2], length=neval)
-    fdnames  <- fdobj$fdnames
-    fdarray  <- eval.fd(evalarg, fdobj)^power
-    coefpowr <- project.basis(fdarray, evalarg, basisfd)
-    fdpowr   <- fd(coefpowr, basisfd, fdnames)
-    fdpowr
+
+#  extract basis
+
+basisobj = fdobj$basis
+
+#  test the basis for being of B-spline type
+
+if (basisobj$type != "bspline")
+    stop("FDOBJ does not have a spline basis.")
+
+
+nbasis        = basisobj$nbasis
+rangeval      = basisobj$rangeval
+interiorknots = basisobj$params
+norder        = nbasis - length(interiorknots)
+
+#  Number of points at which to evaluate the power.  Even low
+#  order bases can generate steep slopes and sharp curvatures,
+#  especially if powers less than 1 are involved.
+
+nmesh = max(10*nbasis+1,501)
+
+#  determine number curves and variables
+
+coefmat = fdobj$coef
+coefd   = dim(coefmat)
+ncurve  = coefd[2]
+if (length(coefd) == 2) {
+    nvar = 1
+} else {
+    nvar = coefd[3]
+}
+
+#  evaluate function over this mesh
+
+tval = seq(rangeval[1],rangeval[2],len=nmesh)
+fmat = eval.fd(tval, fdobj)
+
+#  find the minimum value over this mesh.  If the power is less than
+#  one, return an error message.
+
+fmin = min(c(fmat))
+
+#  a == 0:  set up a constant basis and return the unit function(s)
+
+if (a == 0) {
+    newbasis = create.constant.basis(rangeval)
+    if (nvar == 1) {
+      powerfd = fd(matrix(1,1,ncurve), newbasis)
+    } else {
+      powerfd = fd(array(1,c(1,ncurve,nvar)), newbasis)
+    }
+    return(powerfd)
+}
+
+#  a == 1:  return the function
+
+if (a == 1) {
+    powerfd = fdobj
+    return(powerfd)
+}
+
+#  Otherwise:
+
+m = ceiling(a)
+
+#  Check the size of the power.  If greater than one, estimating the
+#  functional data object is relatively safe since the curvatures
+#  involved are mild.  If not, then taking the power is a dangerous
+#  business.
+
+if (m == a && m > 1) {
+
+    #  a is an integer greater than one
+
+    newnorder = (norder-1)*m + 1
+    if (length(interiorknots) < 9) {
+        newbreaks = seq(rangeval[1], rangeval[2], len=11)
+    } else {
+        newbreaks = c(rangeval[1], interiorknots, rangeval[2])
+    }
+    nbreaks   = length(newbreaks)
+    newnbasis = newnorder + nbreaks - 2
+    newbasis  = create.bspline.basis(rangeval, newnbasis, newnorder, 
+                                     newbreaks)
+    ymat    = fmat^a
+    ytol    = max(abs(c(ymat)))*tol
+    powerfd = smooth.basis(tval, ymat, newbasis)$fd
+    ymathat = eval.fd(tval,powerfd)
+    ymatres = ymat - ymathat
+    maxerr  = max(abs(c(ymatres)))
+    while  (maxerr > ytol && nbreaks < nmesh) {
+        newnbasis = newnorder + nbreaks - 2
+        newbasis  = create.bspline.basis(rangeval, newnbasis, newnorder,
+                                         newbreaks)
+        newfdPar  = fdPar(newbasis, 2, 1e-20)
+        powerfd   = smooth.basis(tval, ymat, newfdPar)$fd
+        ymathat   = eval.fd(tval,powerfd)
+        ymatres   = ymat - ymathat
+        maxerr    = max(abs(c(ymatres)))
+        if (nbreaks*2 <= nmesh) {
+        newbreaks = sort(c(newbreaks,
+            (newbreaks[1:(nbreaks-1)]+newbreaks[2:nbreaks])/2))
+        } else {
+            newbreaks = tval
+        }
+        nbreaks = length(newbreaks)
+    }
+
+    if (maxerr > ytol)
+        warning("The maximum error exceeds the tolerance level.")
+
+    return(powerfd)
+
+} else {
+
+    #  a is fractional or negative
+
+    #  check for negative values and a fractional power
+
+    if (a > 0 && fmin < 0) stop(
+         paste("There are negative values",
+               "and the power is a positive fraction."))
+
+    #  check for zero or negative values and a negative power
+
+    if (a < 0 && fmin <= 0) stop(
+        paste("There are zero or negative values",
+               "and the power is negative."))
+
+    if (length(interiorknots) < 9) {
+        newbreaks = seq(rangeval[1], rangeval[2], n=11)
+    } else {
+        newbreaks = c(rangeval[1], interiorknots, rangeval[2])
+    }
+    nbreaks   = length(newbreaks)
+    newnorder = max(4, norder+m-1)
+    newnbasis = newnorder + nbreaks - 2
+    newbasis  = create.bspline.basis(rangeval, newnbasis, newnorder,
+                                     newbreaks)
+    nmesh     = max(10*nbasis+1,101)
+    tval      = seq(rangeval[1],rangeval[2],len=nmesh)
+    fmat      = eval.fd(tval, fdobj)
+    ymat      = fmat^a
+    ytol      = max(abs(c(ymat)))*tol
+    newfdPar  = fdPar(newbasis, 2, 1e-20)
+    powerfd   = smooth.basis(tval, ymat, newfdPar)$fd
+    ymathat   = eval.fd(tval,powerfd)
+    ymatres   = ymat - ymathat
+    maxerr    = max(abs(c(ymatres)))
+    while (maxerr > ytol && nbreaks < nmesh) {
+        newnbasis = newnorder + nbreaks - 2
+        newbasis  = create.bspline.basis(rangeval, newnbasis,
+                                         newnorder, newbreaks)
+        newfdPar  = fdPar(newbasis, 2, 1e-20)
+        powerfd   = smooth.basis(tval, ymat, newfdPar)$fd
+        ymathat   = eval.fd(tval,powerfd)
+        ymatres   = ymat - ymathat
+        maxerr    = max(abs(ymatres))*tol
+        if (nbreaks*2 <= nmesh) {
+            newbreaks = sort(c(newbreaks,
+            (newbreaks[1:(nbreaks-1)]+newbreaks[2:nbreaks])/2))
+        } else {
+            newbreaks = tval
+        }
+        nbreaks = length(newbreaks)
+    }
+
+    if (maxerr > ytol) {
+        warning("The maximum error exceeds the tolerance level.")
+    }
+
+    return(powerfd)
+
+}
+
 }
 
 #  -------------------------------------------------------------------
@@ -849,22 +1037,14 @@ sqrt.fd <- function(x)
 #  x ...  A functional data object
 #  Returns:
 #  FDAROOT  ...  A functional data object that is the square root of x
-#  Last modified:  17 September 2005
+#  Last modified:  27 october 2009
 
     if ((!(inherits(x, "fd")))) stop(
-      "First argument for ^ is not a functional data object.")
-    coef     <- x$coefs
-    coefd    <- dim(coef)
-    basisfd  <- x$basis
-    nbasis   <- basisfd$nbasis
-    rangeval <- basisfd$rangeval
-    neval    <- max(10*nbasis + 1,101)
-    evalarg  <- seq(rangeval[1],rangeval[2], length=neval)
-    fdnames  <- x$fdnames
-    fdarray  <- sqrt(eval.fd(evalarg, x))
-    coefroot <- project.basis(fdarray, evalarg, basisfd)
-    fdroot   <- fd(coefroot, basisfd, fdnames)
-    return(fdroot)
+      "Argument for ^ is not a functional data object.")
+
+    fdaroot <- x^0.5
+
+    return(fdaroot)
 }
 
 #  ----------------------------------------------------------------

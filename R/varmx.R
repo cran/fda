@@ -1,17 +1,32 @@
-varmx <- function(amat) {
+varmx <- function(amat, normalize=FALSE) {
 
   #  Does a VARIMAX rotation of a principal components solution
 
   #  Arguments:
-  #  AMAT  ...  N by K matrix of harmonic values
+  #  AMAT      ...  N by K matrix of harmonic values
+  #  NORMALIZE ... either TRUE or FALSE.  If TRUE, the columns of AMAT
+  #                are normalized prior to computing the rotation 
+  #                matrix.  However, this is seldom needed for 
+  #                functional data.
 
   #  Returns:
   #  ROTM  ...  Rotation matrixed loadings
 
-  n <- nrow(amat)
-  k <- ncol(amat)
+  #  Last modified 22 October by Jim Ramsay
+
+  n    <- nrow(amat)
+  k    <- ncol(amat)
   rotm <- diag(k)
+  onek <- matrix(1,1,k)
+
   if (k == 1) return(rotm)
+
+  #  normalize loadings matrix
+
+  if (normalize) {
+      hvec <- as.matrix(apply(amat^2, 1, var))
+      amat <- amat/(sqrt(hvec) %*% onek)
+  }
 
   eps  <- 0.0011
   ccns <- 0.7071068

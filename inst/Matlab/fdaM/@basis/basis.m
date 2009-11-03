@@ -11,6 +11,8 @@ function basisobj = basis(basistype, rangeval, nbasis, params, ...
 %               'polyg' 'polygon', 'polygonal'
 %               'pol', 'poly', 'polynomial'
 %               'power', 'pow'
+%               'QW'
+%               'QWM'
 %  RANGEVAL ... an array of length 2 containing the lower and upper
 %               boundaries for the rangeval of argument values
 %  NBASIS   ... the number of basis functions
@@ -90,8 +92,10 @@ function basisobj = basis(basistype, rangeval, nbasis, params, ...
 %  CREATE_POLYGON_BASIS    ...  creates a polygonal basis
 %  CREATE_POLYNOMIAL_BASIS ...  creates a polynomial basis
 %  CREATE_POWER_BASIS      ...  creates a polygonal basis
+%  CREATE_QW_BASIS         ...  creates a Weibull W basis
+%  CREATE_QWM_BASIS        ...  creates a modified Weibull W basis
 
-%  Last modified 22 December 2007
+%  Last modified 11 June 2009
 
 %  Set up default basis if there are no arguments
 
@@ -289,6 +293,14 @@ switch basistype
             error('More than one parameter for a polynomial basis.');
         end
 
+    case 'QW'
+        if ~isempty(params)
+            error('More than zero parameters for a QW basis.');
+        end
+    case 'QWM'
+        if ~isempty(params)
+            error('More than zero parameters for a QWM basis.');
+        end
     otherwise
         error('Unrecognizable basis');
 end
@@ -308,8 +320,6 @@ basisobj = class(basisobj, 'basis');
 
 function fdtype = use_proper_basis(fdtype)
 %  USE_PROPER_BASIS recognizes type of basis by use of several variant spellings
-
-%  Last modified 22 December 2007
 
 switch fdtype
 
@@ -386,6 +396,16 @@ switch fdtype
         fdtype = 'power';
     case 'pow'
         fdtype = 'power';
+
+    %  Weibull W basis
+
+    case 'QW'
+        fdtype = 'QW';
+
+    %  modified Weibull W basis
+
+    case 'QWM'
+        fdtype = 'QWM';
 
     %  Not a recognizable basis
 

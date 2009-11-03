@@ -1,13 +1,53 @@
 ###
-###
 ### Ramsay, Hooker & Graves (2009)
 ### Functional Data Analysis with R and Matlab (Springer)
+###
+
+#  Remarks and disclaimers
+
+#  These R commands are either those in this book, or designed to 
+#  otherwise illustrate how R can be used in the analysis of functional
+#  data.  
+#  We do not claim to reproduce the results in the book exactly by these 
+#  commands for various reasons, including:
+#    -- the analyses used to produce the book may not have been
+#       entirely correct, possibly due to coding and accuracy issues
+#       in the functions themselves 
+#    -- we may have changed our minds about how these analyses should be 
+#       done since, and we want to suggest better ways
+#    -- the R language changes with each release of the base system, and
+#       certainly the functional data analysis functions change as well
+#    -- we might choose to offer new analyses from time to time by 
+#       augmenting those in the book
+#    -- many illustrations in the book were produced using Matlab, which
+#       inevitably can imply slightly different results and graphical
+#       displays
+#    -- we may have changed our minds about variable names.  For example,
+#       we now prefer "yearRng" to "yearRng" for the weather data.
+#    -- three of us wrote the book, and the person preparing these scripts
+#       might not be the person who wrote the text
+#  Moreover, we expect to augment and modify these command scripts from time
+#  to time as we get new data illustrating new things, add functionality
+#  to the package, or just for fun.
+
 ###
 ### ch. Chapter 7  Exploring Variation: Functional Principal
 ###                and Canonical Components analysis
 ###
 
+#  load the fda package
+
 library(fda)
+
+#  display the data files associated with the fda package
+
+data(package='fda')
+
+#  start the HTML help system if you are connected to the Internet, in
+#  order to open the R-Project documentation index page in order to obtain
+#  information about R or the fda package.
+
+help.start()
 
 ##
 ## Section 7.1 An Overview of Functional PCA
@@ -35,59 +75,39 @@ fdParobj    = fdPar(daybasis, harmaccelLfd, lambda)
 logprec.fit = smooth.basis(day.5, logprecav, fdParobj)
 logprec.fd  = logprec.fit$fd
 
-logprec.pcalist = pca.fd(logprec.fd, 2)
+#  do principal component analysis with 2 components
+
+nharm = 2
+logprec.pcalist = pca.fd(logprec.fd, nharm)
+
 print(logprec.pcalist$values[1:4])
 
 # Figure 7.1
 
 plot.pca.fd(logprec.pcalist)
-## *** -> Click on the plot for page change
 
-op = par(mfrow=c(2,1))
-plot(logprec.pcalist, expand=.5, xlab='')
-par(op)
+%  The expansion supplied by the function is too large,
+%  and here we supply a smaller value, 0.5
+
+plot(logprec.pcalist, expand=.5)
 
 # Figure 7.2
 
 logprec.rotpcalist = varmx.pca.fd(logprec.pcalist)
 
-op = par(mfrow=c(2,1))
-plot.pca.fd(logprec.rotpcalist, expand=.5, xlab='')
-par(op)
+plot.pca.fd(logprec.rotpcalist, expand=.5)
 
 # Figure 7.3
 
-precRotSc = logprec.rotpcalist$scores
+rotpcascores = logprec.rotpcalist$scores
 
-lft = c('Pr. Rupert', 'Halifax',
-    'Thunder Bay', 'Calgary',
-    'Regina', 'Whitehorse')
-rt  = c('Quebec', 'Montreal',
-    'Toronto', 'Winnipeg', 'Edmonton',
-    'Pr. George', 'Iqaluit', 'Vancouver',
-    'Uranium City', 'Dawson',
-    'Kamloops', 'Victoria', 'Resolute')
-
-length(lft)
-length(rt)
-
-sum(lft %in% row.names(precRotSc))
-sum(rt %in% row.names(precRotSc))
-
-plot(logprec.rotpcalist$scores, xlab='Rotated Harmonic I',
-     ylab='Rotated Harmonic II')
-
-text(precRotSc[lft, ], labels=lft, pos=2)
-text(precRotSc[rt, ], labels=rt, pos=4)
+plot(rotpcascores[,1], rotpcascores[,2], type="p", pch="o",
+     xlab="Rotated Harmonic I", ylab="Rotated Harmonic II")
 
 # Section 7.2.2 PCA of Log Precipitation Residuals
+
 # logprecres = residuals from
 # the smooths of the log precipitation curves in Chapter 5.
-
-fdnames = list("Day (July 1 to June 30)",
-               "Weather Station" = CanadianWeather$place,
-               "Log 10 Precipitation (mm)")
-logprec.fd$fdnames = fdnames
 
 logprecmat = eval.fd(day.5, logprec.fd)
 logprecres = logprecav - logprecmat
@@ -103,7 +123,7 @@ plot(logprecres.fd, lwd=2, col=4, lty=1, cex=1.2,
 # Figure 7.5
 
 logprec.pca1 = pca.fd(logprecres.fd, 1)
-plot(logprec.pca1, expand=0.01, xlab='Day (July 1 to June 30)')
+plot(logprec.pca1, expand=0.01)
 
 ##
 ## Section 7.3 More Functional PCA Features
@@ -135,8 +155,11 @@ op <- par(mfrow=c(2,1))
 plot(fdafd)
 par(op)
 
+#  a principal components analysis
+
 nharm = 3
 fdapcaList = pca.fd(fdafd, nharm)
+
 plot.pca.fd(fdapcaList, expand=.2)
 
 fdarotpcaList = varmx.pca.fd(fdapcaList)
@@ -158,7 +181,7 @@ plot(1:neig, log10(fdaeig[1:neig]), "b",
 lines(1:neig, c[1]+ c[2]*(1:neig), lty=2)
 par(op)
 
-# Figure 7.7 varimax rotation
+# Figure 7.7 varimax rotation 
 
 #  set up mean function
 
@@ -204,7 +227,7 @@ j=2
 tempav = CanadianWeather$dailyAv[
               dayOfYearShifted, , 'Temperature.C']
 
-lambda   = 1e2
+lambda   = 1e2 
 fdParobj = fdPar(daybasis, harmaccelLfd, lambda)
 temp.fd  = smooth.basis(day.5, tempav, fdParobj)$fd
 temp.fd$fdnames = list("Day (July 2 to June 30)",
@@ -214,8 +237,8 @@ temp.fd$fdnames = list("Day (July 2 to June 30)",
 ccafdPar = fdPar(daybasis, 2, 5e6)
 ccalist  = cca.fd(temp.fd, logprec.fd, 3, ccafdPar, ccafdPar)
 
-ccawt.temp    = ccalist$ccawtfd1
-ccawt.logprec = ccalist$ccawtfd2
+ccawt.temp    = ccalist$ccwtfd1
+ccawt.logprec = ccalist$ccwtfd2
 corrs         = ccalist$ccacorr
 
 print(corrs[1:3])
@@ -230,7 +253,7 @@ plot(day.5, ccawtmat.temp[,1], type='l', lwd=2, cex=2,
      xlab="Day (July 1 to June 30)",
      ylab="Canonical Weight Functions")
 lines(day.5, ccawtmat.logprec[,1], lty=2, lwd=2)
-lines(c(0, 365), c(0, 0), lty=3)
+lines(yearRng, c(0, 0), lty=3)
 legend("bottomleft", c("Temp.", "Log Prec."), lty=c(1,2))
 
 #  Figure 7.9
@@ -242,9 +265,9 @@ placeindex = c(35,30,31,19,33,25,24,17,16,8,14,12,15,10,27,6,1,29)
 
 plot(ccascr.temp[,1], ccascr.logprec[,1], type="p", pch="*", cex=2,
      xlim=c(-40,80),
-     xlab="Temperature Canonical Weight",
+     xlab="Temperature Canonical Weight", 
      ylab="Log Precipitation Canonical Weight")
-text(ccascr.temp[placeindex,1]+10, ccascr.logprec[placeindex,1],
+text(ccascr.temp[placeindex,1]+10, ccascr.logprec[placeindex,1], 
      CanadianWeather$place[placeindex])
 
 ##

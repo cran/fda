@@ -148,7 +148,57 @@ if (class(type)=="basisfd"){
 
 #  check basistype
 
-type <- use.proper.basis(type)
+# type <- moreNames(type)
+
+#  recognize type of basis by use of several variant spellings
+
+if(type == "bspline" ||
+          type == "Bspline" ||
+          type == "spline"  ||
+          type == "Bsp"     ||
+          type == "bsp") {
+                type = "bspline"
+        }
+else if(type == "con"      ||
+          type == "const"    ||
+          type == "constant") {
+                type = "const"
+        }
+else if(type == "exp"    ||
+          type == "expon"  ||
+          type == "exponential") {
+                type = "expon"
+        }
+else if(type == "Fourier" ||
+     type == "fourier" ||
+     type == "Fou"     ||
+     type == "fou") {
+                type = "fourier"
+        }
+else if(type == "mon" ||
+          type == "monom"  ||
+          type == "monomial") {
+                type = "monom"
+        }
+else if(type == "polyg"    ||
+          type == "polygon"  ||
+          type == "polygonal") {
+                type = "polyg"
+        }
+else if(type == "poly"    ||
+          type == "pol"     ||
+          type == "polynom" ||
+          type == "polynomial") {
+                type = "polynom"
+        }
+else if(type == "pow"    ||
+          type == "power") {
+                type = "power"
+        }
+else {
+                type = "unknown"
+        }
+
 if (type=="unknown"){
     stop("'type' unrecognizable.")
 }

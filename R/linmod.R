@@ -59,37 +59,31 @@ if (!inherits(betaList, "list")) stop("betaList is not a list object.")
 
 if (length(betaList) != 3) stop("betaList not of length 3.")
 
-alphafdPar = betaList[[1]]
-betasfdPar = betaList[[2]]
-betatfdPar = betaList[[3]]
+alphafdPar  = betaList[[1]]
+betabifdPar = betaList[[2]]
 
 if (!inherits(alphafdPar, "fdPar")) {
     stop("BETACELL[[1]] is not a fdPar object.")
 }
-if (!inherits(betasfdPar, "fdPar")) {
-    stop("BETACELL[[2]] is not a fdPar object.")
+if (!inherits(betabifdPar, "bifdPar")) {
+    stop("BETACELL[[2]] is not a bifdPar object.")
 }
-if (!inherits(betatfdPar, "fdPar")) {
-    stop("BETACELL[[3]] is not a fdPar object.")
-}
-
-alphafd = alphafdPar$fd
-betasfd = betasfdPar$fd
-betatfd = betatfdPar$fd
 
 #  get Lfd objects
 
 alphaLfd = alphafdPar$Lfd
-betasLfd = betasfdPar$Lfd
-betatLfd = betatfdPar$Lfd
+betasLfd = betabifdPar$Lfds
+betatLfd = betabifdPar$Lfdt
 
 #  get smoothing parameters
 
 alphalambda = alphafdPar$lambda
-betaslambda = betasfdPar$lambda
-betatlambda = betatfdPar$lambda
+betaslambda = betabifdPar$lambdas
+betatlambda = betabifdPar$lambdat
 
 #  get basis objects
+
+alphafd    = alphafdPar$fd
 
 alphabasis = alphafd$basis
 alpharange = alphabasis$rangeval
@@ -97,13 +91,15 @@ if (alpharange[1] != ranget[1] || alpharange[2] != ranget[2]) {
     stop("Range of ALPHAFD coefficient and YFD not compatible.")
 }
 
-betasbasis = betasfd$basis
+betabifd = betabifdPar$bifd
+
+betasbasis = betabifd$sbasis
 betasrange = betasbasis$rangeval
 if (betasrange[1] != ranges[1] || betasrange[2] != ranges[2]) {
     stop("Range of BETASFD coefficient and XFD not compatible.")
 }
 
-betatbasis = betatfd$basis
+betatbasis = betabifd$tbasis
 betatrange = betatbasis$rangeval
 if (betatrange[1] != ranget[1] || betatrange[2] != ranget[2]) {
     stop("Range of BETATFD coefficient and YFD not compatible.")

@@ -1,126 +1,116 @@
-function [pval,qval,Fobs,Fnull,Fvals,Fnullvals,pvals_pts,qvals_pts,fregresscell,argvals] = ...
-    Fperm_fd(yfdPar, xfdlist, betalist,wt,nperm,argvals,q,plotres)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Fperm_fd
+function Fpermstr = Fperm_fd(yfdPar, xfdcell, betacell, wt, ...
+                             nperm, argvals, q, plotres)
+%  FPERM_FD does a permutation test for a functional parameter effect.
+%  Arguments;
+%  The first four are same as the corresponding arguments for function
+%  fRegress; yfdpar, xfdCell, betacell, wt
+%  NPERM   ... number of permutations to be used
+%  ARGVALS ... argument values for evaluating functional responses,
+%  Q       ... tail probability of quantile to compare
+%  PLOTRES ... If nonzero, results are plotted
+%  Results;
+%  FPERMSTR;
+%  A struct object with slots;
 %
-% Computes a permutation F-test for the significance of a functional linear
-% model, based on the maximal F-statistic for functional resposes, or an
-% F-statistic for scalar responses. 
+
+%  Last modified 22 September 2009 by Jim Ramsay
+
+%  Set default arguments
+
+if nargin < 8, plotres = 1;  end
+if nargin < 7, q = 0.05;     end
+if nargin < 6, argvals = []; end
+if nargin < 5, nperm = 200;  end
+if nargin < 4, wt = [];      end
+
 %
-% Arguments:
-%
-%   - yfdPar, xfdlist, betalist, wt; arguments to fRegress for the
-%   functional linear model. 
-%
-%   - nperm: number of permutations to use, defaults to 200
-%
-%   - argvals: time points to evaluate an F-statistic, if the response is
-%   functional. Defaults to 101 equally spaced points on the range of the
-%   response. 
-% 
-%   - q: alpha level of the test, defaults to 0.05.
-%
-%   - plotres: should a graphical display be given?
-%
-% Returns:
-%   - pval: the observed p-value for the test
-%   
-%   - qval: the permutation critical value
-%
-%   - Fobs: the observed test statistic: maximal pointwise F-statistic
-%   
-%   - Fnull: the computed permutation distribution given as a vector of
-%   samples
-%
-%   - Fvals: the pointwise t-statistics
-%
-%   - Fnullvals: a matrix of pointwise null distribution values
-%
-%   - qvals_pts: the pointwise critical values for the permutation
-%   distribution
-%
-%   - pvals_pts: pointwise p-values for the permutation test
-%
-%   - fregresscell: the functional linear model as returned from fRegress. 
-%
-%   - argvals: the time points at which the t-statistics were evaluated.
 
-% Last modified 15 May, 2009
+q = 1-q;
 
-   if nargin<8, plotres = 1; end
-   if nargin < 7, q = 0.05; end
-   if nargin < 6, argvals = []; end
-   if nargin < 5, nperm = 200; end
-    
-  Fnull = zeros(nperm,1);
-  Fnullvals = [];
+if isa_fd(xfdcell{1})
+    N = size(getcoef(xfdcell{1}),2);
+else
+    N = length(xfdcell{1});
+end
 
-  q = 1-q;
+tic;
+fRegressStr = fRegress(yfdPar, xfdcell, betacell, wt);
+elapsed_time = toc;
 
-  tic;
-  fregresscell = fRegress(yfdPar, xfdlist, betalist);
-  elapsed.time = toc;
+if elapsed_time > 30/nperm
+    disp(['Estimated Computing time = ', ...
+        num2str(nperm*elapsed_time),' seconds.'])
+end
 
-  if( elapsed.time > 30/nperm )
-    disp(strcat('Estimated Computing time =  ',num2str(round(nperm*elapsed.time)),' seconds.'))
-  end
+yhatfd = fRegressStr.yhat;
 
-    yhat = fregresscell{5};
+[Fvals, argvals] = Fstat_fd(yfdPar,yhatfd,argvals);
+nargs = length(argvals);
 
-%%  if isa_fdPar(fregresscell.yfdPar), yfdPar = getfd(fregresscell.fdPar); 
-%%  else yfdPar = fregresscell.yfdPar
+Fobs = max(Fvals);
 
-  [Fvals,argvals] = Fstat_fd(yfdPar,yhat,argvals);
+Fnull     = zeros(nperm,1);
 
-  Fobs = max(Fvals);
+Fnullvals = [];
 
-  if isnumeric(yfdPar), n = length(yfdPar);
-  else
-      tempc = getcoef(yfdPar);
-      n = size(tempc,2); 
-  end
-
-  for i = 1:nperm
-
-    tyfdPar = yfdPar(randperm(n));
-
-    tfregresscell = fRegress(tyfdPar, xfdlist, betalist);
-    yhat = tfregresscell{5};
-    
-    Fnullvals = [Fnullvals,Fstat_fd(yfdPar,yhat,argvals)];
-
+for i = 1:nperm
+    yfdPari      = yfdPar(randperm(N));
+    fRegressStri = fRegress(yfdPari, xfdcell, betacell, wt);
+    yhatfdi      = fRegressStri.yhat;
+    Fi           = Fstat_fd(yfdPar,yhatfdi,argvals);
+    Fnullvals    = [Fnullvals,Fi];
     Fnull(i) = max(Fnullvals(:,i));
-  end
+end
 
+pval = mean(Fobs < Fnull);
+qval = quantile(Fnull,q);
 
-    pval = mean( Fobs < Fnull );
-    qval = quantile(Fnull,q);
+pvals_pts = zeros(nargs,1);
+qvals_pts = pvals_pts;
+for i=1:nargs
+    pvals_pts(i) = mean(Fvals(i) < Fnullvals(:,i));
+    qvals_pts(i) = quantile(Fnullvals(:,i),q);
+end
 
-    pvals_pts = mean(repmat(Fvals,1,nperm)<Fnullvals,2);
-    qvals_pts = quantile(Fnullvals,q,2);
-
-
-    
-    if plotres 
-        if isa_fd(yfdPar),
-            fdnames = getnames(yfdPar);
-            
-            plot(argvals,Fvals,'r','linewidth',2);
-			xlabel(fdnames(3));
-            ylabel('F-statistic');
-            title('Permutation F-Test');
-            hold on
-            plot(argvals,qvals_pts,'b-.','linewidth',2);
-            plot([min(argvals) max(argvals)],qval*ones(1,2),'b-','linewidth',2);
-            legend('Observed Statistic',strcat('pointwise ',num2str(1-q),' critical value'),strcat('maximum ',num2str(1-q),' critical value'));
-        else
-            N = hist(Fnull);
-            xlabel('F-value')
-			title('Permutation F-Test')
-            hold on
-            plot(Fobs*ones(1,2),[0 max(N)],'r-')
-            plot(qval*ones(1,2),[0 max(N)],'b-')
-            legend('Observed Statistic',strcat('Permutation ',1-q,' critical value'))
-
-        end
+if plotres
+    if isa_fd(yfdPar)
+        plot(argvals, Fvals, 'b-', ...
+            argvals, qvals_pts, 'b--', ...
+            [min(argvals),max(argvals)], [qval, qval], 'b:')
+        xlabel('\fontsize{13} argument values')
+        ylabel('\fontsize{13} F-statistic')
+        title('\fontsize{13} Permutation F-Test')
+        legend('Observed Statistic', ...
+            ['pointwise ',num2str(1-q),' critical value'], ...
+            ['maximum ',  num2str(1-q),' critical value'])
+    else
+        cnts  = hist(Fnull);
+        xvals = [Fnull;Fobs];
+        xmax  = ceil(max(xvals));
+        xmin  = min(xvals);
+        Nmax  = max(cnts);
+        hist(Fnull)
+        hold on
+        phdl=plot([Fobs, Fobs], [0,Nmax], 'b-', ...
+                  [qval, qval], [0,Nmax], 'b--');
+        set(phdl, 'LineWidth', 2)
+        hold off
+        axis([xmin,xmax,0, max(N)])
+        xlabel('\fontsize{13} F-value')
+        title('\fontsize{13} Permutation F-Test')
+        legend('Frequency', 'Observed Statistic', ...
+            ['Permutation ',num2str(1-q),' critical value'])        
     end
+end
+
+Fpermstr.pval        = pval;
+Fpermstr.qval        = qval;
+Fpermstr.Fobs        = Fobs;
+Fpermstr.Fnull       = Fnull;
+Fpermstr.Fvals       = Fvals;
+Fpermstr.Fnullvals   = Fnullvals;
+Fpermstr.pvals_pts   = pvals_pts;
+Fpermstr.qvals_pts   = qvals_pts;
+Fpermstr.fRegressStr = fRegressStr;
+Fpermstr.argvals     = argvals;
+

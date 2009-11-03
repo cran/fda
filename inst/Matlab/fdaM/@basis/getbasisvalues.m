@@ -34,7 +34,7 @@ end
 
 %  check if values are available
 
-if ~isfield(basisobj, 'basisvalues') || isempty(basisobj.basisvalues)
+if isempty(basisobj.basisvalues)
     basisvalues = [];
     return;
 end

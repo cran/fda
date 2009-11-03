@@ -1,20 +1,64 @@
 ###
-###
 ### Ramsay, Hooker & Graves (2009)
 ### Functional Data Analysis with R and Matlab (Springer)
+###
+
+#  Remarks and disclaimers
+
+#  These R commands are either those in this book, or designed to 
+#  otherwise illustrate how R can be used in the analysis of functional
+#  data.  
+#  We do not claim to reproduce the results in the book exactly by these 
+#  commands for various reasons, including:
+#    -- the analyses used to produce the book may not have been
+#       entirely correct, possibly due to coding and accuracy issues
+#       in the functions themselves 
+#    -- we may have changed our minds about how these analyses should be 
+#       done since, and we want to suggest better ways
+#    -- the R language changes with each release of the base system, and
+#       certainly the functional data analysis functions change as well
+#    -- we might choose to offer new analyses from time to time by 
+#       augmenting those in the book
+#    -- many illustrations in the book were produced using Matlab, which
+#       inevitably can imply slightly different results and graphical
+#       displays
+#    -- we may have changed our minds about variable names.  For example,
+#       we now prefer "yearRng" to "yearRng" for the weather data.
+#    -- three of us wrote the book, and the person preparing these scripts
+#       might not be the person who wrote the text
+#  Moreover, we expect to augment and modify these command scripts from time
+#  to time as we get new data illustrating new things, add functionality
+#  to the package, or just for fun.
+
 ###
 ### ch.  10.  Linear Models for Functional Responses
 ###
 
+#  load the fda package
+
 library(fda)
+
+#  display the data files associated with the fda package
+
+data(package='fda')
+
+#  start the HTML help system if you are connected to the Internet, in
+#  order to open the R-Project documentation index page in order to obtain
+#  information about R or the fda package.
+
+help.start()
 
 ##
 ## Section 10.1  Functional Responses and an Analysis of Variance Model
 ##
 
-####### TEMPERATURE ~ REGION #######
+#  ----------------- Climate zone effects for temperature -----------------
 
+#
 #  Section 10.1.1 Climate Region Effects on Temperature
+#
+
+#  set up the data for the analysis
 
 regions.         = unique(CanadianWeather$region)
 p                = length(regions.) + 1
@@ -28,18 +72,28 @@ for (j in 2:p) {
 
 # tempfd from chapter 9
 
-Lcoef       = c(0,(2*pi/365)^2,0)
-harmaccelLfd= vec2Lfd(Lcoef, c(0,365))
-tempbasis   = create.fourier.basis(c(0, 365), 65)
-lambda      = 1e6
-tempfdPar65 = fdPar(tempbasis, harmaccelLfd, lambda)
-tempShifted = daily$tempav[dayOfYearShifted, ]
-tempSmooth65= smooth.basis(day.5, tempShifted, tempfdPar65)
-tempfd      = tempSmooth65$fd
+Lcoef        = c(0,(2*pi/365)^2,0)
+harmaccelLfd = vec2Lfd(Lcoef, c(0,365))
+
+tempbasis    = create.fourier.basis(c(0, 365), 65)
+
+lambda       = 1e6
+tempfdPar65  = fdPar(tempbasis, harmaccelLfd, lambda)
+
+dayOfYearShifted = c(182:365, 1:181)
+
+tempShifted  = daily$tempav[dayOfYearShifted, ]
+
+tempSmooth65 = smooth.basis(day.5, tempShifted, tempfdPar65)
+tempfd       = tempSmooth65$fd
+
+#  augment tempfd by adding a 36th observation with temp(t) = 0
 
 coef    = tempfd$coef
 coef36  = cbind(coef,matrix(0,65,1))
 temp36fd= fd(coef36,tempbasis,tempfd$fdnames)
+
+#  set up the regression coefficient list
 
 betabasis      = create.fourier.basis(c(0, 365), 11)
 betafdPar      = fdPar(betabasis)
@@ -47,7 +101,12 @@ betaList       = vector("list",p)
 names(betaList)= regions.
 for (j in 1:p) betaList[[j]] = betafdPar
 
+#  carry out the functional analysis of variance
+
 fRegressList= fRegress(temp36fd, regionList, betaList)
+
+#  extract the estimated regression coefficients and y-values
+
 betaestList = fRegressList$betaestlist
 regionFit   = fRegressList$yhatfd
 regions     = c("Canada", regions.)
@@ -62,9 +121,7 @@ plot(regionFit, lwd=2, col=1, lty=1,
      xlab="Day (July 1 to June 30)", ylab="", main="Prediction")
 par(op)
 
-####### SEA BIRDS ON KODIAK ISLAND #######
-
-# 10.1.2 Trends in Sea Bird Populations on Kodiak Island
+# ------  10.1.2 Trends in Sea Bird Populations on Kodiak Island  ---------
 
 #  select only the data for sites Uyak and Uganik, which have data
 #  from 1986 to 2005, except for 1998
@@ -75,10 +132,10 @@ UU    = seabird[sel,]
 
 # Drop 2 species with many NAs
 
-NAs  = sapply(UU, function(x)sum(is.na(x)))
-NAs. = which(NAs > 2)
-birdindex= (1:15)[-NAs.]
-birds = names(UU)[birdindex]
+NAs       = sapply(UU, function(x)sum(is.na(x)))
+NAs.      = which(NAs > 2)
+birdindex = (1:15)[-NAs.]
+birds     = names(UU)[birdindex]
 
 #  Compute mean counts taken over both sites and transects
 
@@ -90,13 +147,13 @@ for(i in 1:20){
   meanCounts[i, ] = sapply(UU[sel, birds], mean, na.rm=TRUE)
 }
 
-selYear = !is.na(meanCounts[,1])
+selYear   = !is.na(meanCounts[,1])
 logCounts = log10(meanCounts[selYear,])
 
 #  time vectors in years and in indices in 1:20
 
-yearObs   = as.numeric(rownames(logCounts))
-yearCode  = (1:20)[selYear]
+yearObs  = as.numeric(rownames(logCounts))
+yearCode = (1:20)[selYear]
 
 # Figure 10.2
 
@@ -117,6 +174,7 @@ matplot(yearObs, logCounts[, fishindex], xlab='', ylab='',
 meanFish = apply(meanCounts[, shellfishindex], 1, mean)
 lines(yearObs, log10(meanFish[!is.na(meanFish)]), lwd=3)
 abline(h=0, lty='dotted')
+
 par(op)
 
 #  Compute mean counts taken over transects only within sites
@@ -144,17 +202,9 @@ logCounts2 = log10(meanCounts2[selYear2,])
 #  Represent log mean counts exactly with a polygonal basis
 
 birdbasis = create.polygonal.basis(yearCode)
-#birdlist = smooth.basis(yearCode, logCounts, birdbasis)
 birdlist2 = smooth.basis(yearCode, logCounts2, birdbasis)
 
-#birdfd  = birdlist$fd
 birdfd2 = birdlist2$fd
-
-#yearfine = seq(1, 20, len=191)
-#birdmatS = eval.fd(yearfine, birdfd[ shellfishindex])
-#birdmatF = eval.fd(yearfine, birdfd[-shellfishindex])
-#birdvecS = apply(birdmatS, 1, mean)
-#birdvecF = apply(birdmatF, 1, mean)
 
 #  -----------------------------------------------------------------
 #  After some preliminary analyses we determined that there was no
@@ -173,12 +223,9 @@ birdfd2 = birdlist2$fd
 #  group's most abundant species, and which is designated as the
 #  baseline bird for that group.
 
-#meanlogCounts = apply(logCounts,2,mean)
-#meanlogCounts[shellfishindex]
-#meanlogCounts[-shellfishindex]
-
 # 15 columns for the intercept + diet + 13 bird species
 # 26 rows for the 26 (species - bay) combinations
+
 Zmat0 = matrix(0,26,15)
 
 #  Intercept or baseline effect
@@ -252,6 +299,9 @@ par(op)
 #  Choose the level of smoothing by minimizing cross-validated
 #  error sums of squares.
 
+#  This analysis took about 22 minutes on the author's notebook computer
+#  that was purchased in 2008.
+
 loglam = seq(-2,4,0.25)
 SSE.CV = rep(0,length(loglam))
 betafdPari = betafdPar1
@@ -277,7 +327,6 @@ for (j in 1:2) betalist[[j]] = betafdPar1
 
 #  carry out the functional regression analysis
 
-#fRegressList = fRegress(birdfd3, xfdlist, betalist)
 fitShellfish.5 = fRegress(birdfd3, xfdlist, betalist)
 
 #  plot regression functions
@@ -285,7 +334,6 @@ fitShellfish.5 = fRegress(birdfd3, xfdlist, betalist)
 betanames = list("Intercept", "Food Effect")
 
 birdBetaestlist = fitShellfish.5$betaestlist
-#betaestlist = fRegressList$betaestlist
 
 op = par(mfrow=c(2,1), cex=1.2)
 for (j in 1:2) {
@@ -300,7 +348,6 @@ par(op)
 
 #  plot predicted functions
 
-#yhatfdobj = fRegressList$yhatfdobj
 birdYhatfdobj = fitShellfish.5$yhatfdobj
 
 plotfit.fd(logCounts2, yearCode, birdYhatfdobj$fd[1:26])
@@ -313,12 +360,10 @@ plotfit.fd(logCounts2, yearCode, birdYhatfdobj$fd[1:26])
 
 #  Section 10.2.2 Confidence Intervals for Regression Functions
 
-#yhatmat = eval.fd(yearCode, fitShellfish.5$yhatfdobj$fd)
 birdYhatmat = eval.fd(yearCode, birdYhatfdobj$fd[1:26])
 rmatb   = logCounts2 - birdYhatmat
 SigmaEb = var(t(rmatb))
 
-#y2cMap = birdSmoothPar$y2cMap
 y2cMap.bird = birdlist2$y2cMap
 
 birdStderrList = fRegress.stderr(fitShellfish.5, y2cMap.bird,
@@ -328,8 +373,6 @@ birdBeta.sdList = birdStderrList$betastderrlist
 op = par(mfrow=c(2,1))
 plotbeta(birdBetaestlist[1:2], birdBeta.sdList[1:2])
 par(op)
-
-####### KNEE ~ HIP #######
 
 # Section 10.2.3 Knee Angle Predicted from Hip Angle
 
@@ -418,10 +461,12 @@ gaitRegress= fRegress(kneefd, xfdlist, betalist)
 op = par(mfrow=c(2,1))
 
 # Intercept
+
 betaestlist = gaitRegress$betaestlist
 kneeIntercept = predict(betaestlist$const$fd, gaitfine)
 
 # mean knee angle
+
 kneeMean = predict(kneefdMean, gaitfine)
 
 # Plot intercept & mean knee angle
@@ -433,13 +478,13 @@ lines(gaitfine, kneeMean, lty='dashed')
 abline(h=0, v=c(7.5, 14.7), lty='dashed')
 
 # Hip coefficient
+
 hipCoef = predict(betaestlist$hip$fd, gaitfine)
 
 # Squared multiple correlation
+
 kneehatfd = gaitRegress$yhatfd$fd
-#kneemat = predict(kneefd, gaittime)
 kneehatmat = eval.fd(gaittime, kneehatfd)
-#resmat. = kneemat - kneehatmat
 resmat. = gait[,,'Knee Angle'] - kneehatmat
 SigmaE = cov(t(resmat.))
 
@@ -461,13 +506,9 @@ plot(gaitfine, hipCoef, lwd=2, xlab='', ylab='', ylim=ylim2, type='l',
 abline(v=c(7.5, 14.7), lty='dashed')
 lines(gaitfine, knee.R2, lty='dashed')
 
-# done
-par(op)
-
 # Figure 10.8
 
 gaitbasismat = eval.basis(gaitfine, gaitbasis)
-#y2cMap0 = solve(crossprod(gaitbasismat), t(gaitbasismat))
 y2cMap = gaitSmooth$y2cMap
 
 fRegressList1 = fRegress(kneefd, xfdlist, betalist,
@@ -475,14 +516,12 @@ fRegressList1 = fRegress(kneefd, xfdlist, betalist,
 
 fRegressList2 = fRegress.stderr(fRegressList1, y2cMap, SigmaE)
 betastderrlist = fRegressList2$betastderrlist
-#titlelist = list("Intercept", "Hip coefficient")
 
 op = par(mfrow=c(2,1))
 plotbeta(betaestlist, betastderrlist, gaitfine)
 par(op)
 
 # Figure 10.9
-# fRegress(deriv(kneefd, 2) ~ deriv(hipfd, 2))
 
 xfdlist2 = list(const=rep(1,39), hip=deriv(hipfd, 2))
 kneefd.accel = deriv(kneefd, 2)
@@ -497,7 +536,6 @@ plot(gaitt3, beta.hipFine, type ='l', ylim=c(0, max(beta.hipFine)),
 abline(v=c(7.5, 14.7), lty='dashed')
 
 # Squared multiple correlation
-# kneeAccel.R2 = var(gaitAccel.Regr$yhatfd) / var(kneefd.accel)
 
 kneeAccel.pred = predict(gaitAccelRegr$yhatfd$fd, gaitt3)
 kneeAccel.     = predict(kneefd.accel, gaitt3)
@@ -513,73 +551,128 @@ lines(gaitt3, kneeAccel.R2, lty='dashed', lwd=2)
 ##
 #  (no computations in this section)
 
+##
+## Section 10.4 A Functional Linear Model for Swedish Mortality
+##
 
+#  The Swedish mortality data are proprietary, and therefore we do not
+#  provide them with the fda package.  In order to use the following
+#  code for their analysis, you must first obtain the data.  The following
+#  details are provided to help you to obtain them.
 
-### Section 10.4 A Functional Linear Model for Swedish Mortality
+#  Mortality data for 37 countries can be obtained from the 
+#  Human Mortality Database (http://www.mortality.org/). 
+#  For example, the Swedish mortality data can be found at 
+#  (http://www.mortality.org/cgi-bin/hmd/country.php?cntr=SWE&level=1).
 
-# Download the contents of
-# http://www.mortality.org/hmd/SWE/STATS/fltcoh_1x1.txt
-# to a file 'Sweden Female Lifetable.txt'  and remove the  first two 
-# lines of header information (note, you will need to sign up to mortality.org. 
+#  Citation:
 
-SwedeTab = read.table('Sweden Female Lifetable.txt',head=TRUE)
+#  Human Mortality Database. University of California, Berkeley (USA), 
+#  and Max Planck Institute for Demographic Research (Germany). 
 
-# Now Select out the death rate, ages 0-80 and take the log
+#   Two data objects are required for these analyses:
 
-HazMat   = matrix(SwedeTab[,3],111,164,byrow=FALSE)
-HazMat   = matrix(as.numeric(HazMat[1:81,]),81,164)
-SwedeMat = log(HazMat)
+#  SwedeMat:  a dataframe object with 81 rows and 144 columns
+#             containing the log hazard values for ages 0 through 80
+#             and years 1751 through 1884
+#  Swede1920: a vector object containing log hazard values for 1914
 
-# Name it by year
+#  Han Lin Shang at Monash University in Australia has kindly provided
+#  the following R function to assist you.  It requires a username and
+#  password for accessing the data, which you must obtain from the above
+#  web site.
 
-dimnames(SwedeMat)[[2]] <- paste('b', 1751:1914, sep='')
+read.hmd <- function(country,sex,file="Mx_1x1.txt",username,password)
+{
+    require(RCurl)
+    path <- paste("http://www.mortality.org/hmd/",country,"/STATS/",file,sep="")
+    userpwd <- paste(username,":",password,sep="")
+    txt <- getURL(path,userpwd=userpwd)
+    con <- textConnection(txt)
+    hmd <- read.table(con,skip=2,header=T,na.strings=".")
+    close(con)
+    j <- hmd[,"Year"]==hmd[1,"Year"]
+    x <- as.numeric(gsub("\\+","",as.character(hmd[j,"Age"])))
+    col <- match(tolower(sex),tolower(colnames(hmd)))
+    y <- matrix(as.numeric(hmd[,col]),nrow=length(x))
+    colnames(y) <- unique(hmd[,"Year"])
+    rownames(y) <- as.character(hmd[j,"Age"])
+    if(substr(file,1,2)=="Mx")
+        yname <- "Mortality rate"
+    else
+        yname <- "Unknown"
+    return(structure(list(x=x,y=y,time=sort(unique(hmd[,"Year"])),
+        xname="Age",yname=yname),class=c("fts","fds")))
+}
+
+SwedeLogHazard = as.matrix(SwedeMat)
+
+dimnames(SwedeLogHazard)[[2]] <- paste('b', 1751:1894, sep='')
 
 # Figure 10.10
 
-matplot(0:80, SwedeMat[, c('b1751', 'b1810', 'b1860', 'b1914')], type='l',lwd=2,xlab='age',ylab='log Hazard',col=1,
-  cex.lab=1.5,cex.axis=1.5)
-legend(x='bottomright',legend=c('1751','1810', '1860','1914'),lwd=2,col=1,lty=1:4)
+Fig10.10data = cbind(SwedeLogHazard[, c('b1751', 'b1810', 'b1860')], Swede1920)
 
-# Smooth the data
+SwedeTime = 0:80;
 
-SwedeLogHazard <- SwedeMat[,1:144]
-SwedeBasis = create.bspline.basis(c(0,80),norder=6,breaks=0:80)
+matplot(SwedeTime, Fig10.10data,
+        type='l',lwd=2,xlab='age',ylab='log Hazard',col=1,
+        cex.lab=1.5,cex.axis=1.5)
+
+#  smooth the log hazard observations
+
+nbasis = 85
+norder = 6
+SwedeBasis = create.bspline.basis(SwedeRng, nbasis, norder)
 
 D2fdPar = fdPar(SwedeBasis, lambda=1e-7)
 
-SwedeLogHazfd = smooth.basis(0:80, SwedeLogHazard, D2fdPar)$fd
+SwedeLogHazfd = smooth.basis(SwedeTime, SwedeLogHazard, D2fdPar)$fd
 
 # The following requires manually clicking on the plot
 # for each of 144 birth year cohorts
 
-plotfit.fd(as.matrix(SwedeLogHazard),0:80,SwedeLogHazfd$fd)
+plotfit.fd(SwedeLogHazard,SwedeTime,SwedeLogHazfd)
 
-# Now the setup for linmod
+# Set up for the list of regression coefficient fdPar objects
 
-betabasis = create.bspline.basis(c(0,80),norder=4,nbasis=23)
+nbasis     = 23
+SwedeRng   = c(0,80)
+SwedeBetaBasis = create.bspline.basis(SwedeRng,nbasis)
 
-SwedeBeta0Par = fdPar(betabasis, 2, 1e-5)
-SwedeBeta1Par = fdPar(betabasis, 2, 1e0)
+SwedeBeta0Par = fdPar(SwedeBetaBasis, 2, 1e-5)
+
+SwedeBeta1fd  = bifd(matrix(0,23,23), SwedeBetaBasis, SwedeBetaBasis)
+
+SwedeBeta1Par = bifdPar(SwedeBeta1fd, 2, 2, 1e3, 1e3)
 
 SwedeBetaList = list(SwedeBeta0Par, SwedeBeta1Par, SwedeBeta1Par)
+
+#  Define the dependent and independent variable objects
 
 NextYear = SwedeLogHazfd[2:144]
 LastYear = SwedeLogHazfd[1:143]
 
-Swede.linmodSmooth = linmod(NextYear, LastYear, SwedeBetaList)
+#  Do the regression analysis
 
+Swede.linmod = linmod(NextYear, LastYear, SwedeBetaList)
 
 Swede.ages = seq(0, 80, 2)
-Swede.beta1fd = eval.bifd(Swede.ages, Swede.ages,
-    Swede.linmodSmooth$beta1estbifd)
+Swede.beta1mat = eval.bifd(Swede.ages, Swede.ages, Swede.linmod$beta1estbifd)
 
-persp(Swede.beta1fd,xlab='s',zlab='beta0',ylab='t',theta=-190,phi=30)
+# Figure 10.11
 
+persp(Swede.ages, Swede.ages, Swede.beta1mat, 
+      xlab="age", ylab="age",zlab="beta(s,t)",
+      cex.lab=1.5,cex.axis=1.5)
 
-
+##
 ## Section 10.5 Permutation Tests of Functional Hypotheses
 ##
+
 #  Section 10.5.1 Functional t-Tests
+
+#  ---------------  Comparing male and female growth data  ----------------
 
 # Figure 10.12
 
@@ -596,13 +689,17 @@ growfdPar = fdPar(growthbasis, 3, 10^(-0.5))
 
 hgtffd = with(growth, smooth.basis(age,hgtf,growfdPar))
 hgtmfd = with(growth, smooth.basis(age,hgtm,growfdPar))
+
 tres = tperm.fd(hgtffd$fd,hgtmfd$fd)
 
 # Figure 10.13
 
 # Section 10.5.2 Functional F-Tests
 
+#  ---------------  Testing for no effect of climate zone  ----------------
+  
 # temp36fd, regionList, betaList from Section 10.1.1 above
+
 F.res = Fperm.fd(temp36fd, regionList, betaList)
 
 # Figure 10.14

@@ -1,12 +1,52 @@
 ###
-###
 ### Ramsay, Hooker & Graves (2009)
 ### Functional Data Analysis with R and Matlab (Springer)
+###
+
+#  Remarks and disclaimers
+
+#  These R commands are either those in this book, or designed to 
+#  otherwise illustrate how R can be used in the analysis of functional
+#  data.  
+#  We do not claim to reproduce the results in the book exactly by these 
+#  commands for various reasons, including:
+#    -- the analyses used to produce the book may not have been
+#       entirely correct, possibly due to coding and accuracy issues
+#       in the functions themselves 
+#    -- we may have changed our minds about how these analyses should be 
+#       done since, and we want to suggest better ways
+#    -- the R language changes with each release of the base system, and
+#       certainly the functional data analysis functions change as well
+#    -- we might choose to offer new analyses from time to time by 
+#       augmenting those in the book
+#    -- many illustrations in the book were produced using Matlab, which
+#       inevitably can imply slightly different results and graphical
+#       displays
+#    -- we may have changed our minds about variable names.  For example,
+#       we now prefer "yearRng" to "yearRng" for the weather data.
+#    -- three of us wrote the book, and the person preparing these scripts
+#       might not be the person who wrote the text
+#  Moreover, we expect to augment and modify these command scripts from time
+#  to time as we get new data illustrating new things, add functionality
+#  to the package, or just for fun.
+
 ###
 ### ch. 9.  Functional Linear Models for Scalar Response
 ###
 
+#  load the fda package
+
 library(fda)
+
+#  display the data files associated with the fda package
+
+data(package='fda')
+
+#  start the HTML help system if you are connected to the Internet, in
+#  order to open the R-Project documentation index page in order to obtain
+#  information about R or the fda package.
+
+help.start()
 
 ##
 ## Section 9.1 Functional Linear regression with a Scalar response
@@ -43,8 +83,8 @@ templist[[2]] = tempfd65
 conbasis   = create.constant.basis(c(0,365))
 betabasis5 = create.fourier.basis(c(0,365),5)
 betalist1  = vector("list",2)
-betalist1[[1]] = fdPar(conbasis)
-betalist1[[2]] = fdPar(betabasis5)
+betalist1[[1]] = conbasis
+betalist1[[2]] = betabasis5
 
 fRegressList1 = fRegress(annualprec,templist,betalist1)
 
@@ -70,10 +110,10 @@ SSE0    = sum((annualprec - mean(annualprec))^2)
 # 9.4.2 Coefficient beta Estimate Using a Roughness Penalty
 
 Lcoef = c(0,(2*pi/365)^2,0)
-
 harmaccelLfd = vec2Lfd(Lcoef, c(0,365))
 
 # refit with 35 terms rather than 5 in the fourier basis
+
 betabasis35 = create.fourier.basis(c(0, 365), 35)
 lambda      = 10^12.5
 betafdPar.  = fdPar(betabasis35, harmaccelLfd, lambda)
@@ -96,13 +136,13 @@ SSE1.2 = sum((annualprec-annualprechat2)^2)
 
 # Figure 9.2
 
-plot(annualprechat2, annualprec)
-abline(lm(annualprec~annualprechat2), lty='dashed')
+plot(annualprechat2, annualprec, lwd=2)
+abline(lm(annualprec~annualprechat2), lty='dashed', lwd=2)
 
 # Figure 9.3
 # ... see section 9.4.4 below ...
 
-plot(betaestlist2[[2]]$fd)
+plot(betaestlist2[[2]]$fd, lwd=2)
 
 # Compare with the constant fit:
 
@@ -120,13 +160,13 @@ SSE1 = sum((annualprec-annualprechat)^2)
 (Fratio = ((SSE0-SSE1)/1)/(SSE1/33))
 # 31.3 as in the book
 
-
 # 9.4.3 Choosing Smoothing Parameters
 
 loglam = seq(5,15,0.5)
 nlam   = length(loglam)
 SSE.CV = rep(NA,nlam)
 for (ilam in 1:nlam) {
+  print(paste("log lambda =", loglam[ilam]))
   lambda     = 10^(loglam[ilam])
   betalisti  = betalist2
   betafdPar2 = betalisti[[2]]
@@ -135,6 +175,8 @@ for (ilam in 1:nlam) {
   fRegi          = fRegress.CV(annualprec, templist, betalisti)
   SSE.CV[ilam]   = fRegi$SSE.CV
 }
+
+#  Figure 9.4
 
 plot(loglam, SSE.CV, type="b", lwd=2,
      xlab="log smoothing parameter lambda",
@@ -158,7 +200,6 @@ betastderrfd   = betastderrList[[2]]
 
 plot(betafd, xlab="Day", ylab="Temperature Reg. Coeff.",
      ylim=c(-6e-4,1.2e-03), lwd=2)
-
 lines(betafd+2*betastderrfd, lty=2, lwd=1)
 lines(betafd-2*betastderrfd, lty=2, lwd=1)
 
@@ -196,8 +237,8 @@ lines(betafd-2*sqrt(betavar), lty=2, lwd=1)
 ##
 
 F.res = Fperm.fd(annualprec, templist, betalist)
-F.res$Fobs
 
+F.res$Fobs
 F.res$qval
 
 ##

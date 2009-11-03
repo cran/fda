@@ -1,124 +1,124 @@
-function [pval,qval,Tobs,Tnull,Tvals,Tnullvals,qvals_pts,pvals_pts,argvals] = tperm_fd(x1fd,x2fd,nperm,q,argvals,plotres) 
-%%%%%%%%%%%%%%%%%%%%%%%
-% tperm_fd 
+function tpermStr = tperm_fd(x1fd, x2fd, nperm, q, argvals, plotres)
+%  TPERM computes a permutation t-test of the difference between
+%  the functional means of two groups of data.
 %
-% Permutation t-tests between groups of functional data objects.
-% Specifically, the function reports the permutation test for the maximal
-% pointwise t-statistic. It also reports the permutation critical values
-% for the t-statistic at each time point. 
-%
-% Arguments
-%    - x1fd, x2fd  two functional data objects, replications within the fd
-%    objects are the data of interest and the test is for differences in
-%    the means of x1fd and x2fd.
-%   
-%   - nperm:  number of permutations to use, defaults to 200
-%
-%   - q: alpha-level of the test, defaults to 0.05
-%
-%   - argvals: number of points at which to compute the t-statistic.
-%   Defaults to 100 equally spaced along the range of the functional data
-%   objects. 
-%
-%   - plotres: should a graphical desplay be plotted?
-%
-% Returns
-%   - pval: the observed p-value for the test
-%   
-%   - qval: the permutation critical value
-%
-%   - Tobs: the observed test statistic: maximal pointwise t-statistic
-%   
-%   - Tnull: the computed permutation distribution given as a vector of
-%   samples
-%
-%   - Tvals: the pointwise t-statistics
-%
-%   - Tnullvals: a matrix of pointwise null distribution values
-%
-%   - qvals_pts: the pointwise critical values for the permutation
-%   distribution
-%
-%   - pvals_pts: pointwise p-values for the permutation test
-%
-%   - argvals: the time points at which the t-statistics were evaluated.
+%  Arguments:
+%  X1FD    ... First  sample of functional observations
+%  X2FD    ... Second sample of functional observations
+%  NPERM   ... Number of permutations ... default 200
+%  Q       ... Tail probability for test ... default 0.05
+%  ARGVALS ... Argument values at which to evaluate functions
+%  PLOTRES ... If nonzero, plot results ... default 0
+%  Results:
 
-% Last modified 15 May, 2009
+%  Last modified 10 October 2009 by Jim Ramsay
 
-    if ~isa_fd(x1fd) || ~isa_fd(x2fd)                                     
-        error('x1fd and x2fd must both be functional data objects');         
-    end                                                                      
-                                                                           
-    rangeobs = getbasisrange(getbasis(x1fd));
-    rangehat = getbasisrange(getbasis(x2fd));
+%  check first two arguments
+
+if nargin < 2
+    error('Arguments X1FD and X2FD not supplied.');
+end
+
+if ~isa_fd(x1fd) || ~isa_fd(x2fd)
+    error('x1fd and x2fd must both be functional data objects');
+end
+
+if length(size(getcoef(x1fd))) > 2 || length(size(getcoef(x2fd))) > 2
+    error('Both of X1FD and X2FD are not univariate.');
+end
+
+%  Set default arguments
+
+if nargin < 6,  plotres = 1;   end
+if nargin < 5,  argvals = [];  end
+if nargin < 4,  q = 0.05;      end
+if nargin < 3,  nperm = 200;   end
 
 
-    if any(rangeobs ~= rangehat)
-        error('x1fd and x2fd do not have the same range.')
-    end
+range1 = getbasisrange(getbasis(x1fd));
+range2 = getbasisrange(getbasis(x2fd));
 
-    if nargin < 6, plotres = 1; end
-    if nargin < 5, argvals = linspace(rangeobs(1),rangeobs(2),101); end
-    if nargin < 4, q = 0.05; end
-    if nargin < 3, nperm = 200; end 
+
+if ~all(range1 == range2)
+    error('x1fd and x2fd do not have the same range.');
+end
+
+if isempty(argvals)
+    narg = 101;
+    argvals = linspace(range1(1),range1(2),narg)';
+else
+    narg = length(argvals);
+end
+
+q = 1-q;
+
+x1mat = eval_fd(argvals,x1fd);
+x2mat = eval_fd(argvals,x2fd);
+
+Xmat = [x1mat,x2mat];
+
+n1 = size(x1mat,2);
+n2 = size(x2mat,2);
+
+Tnull = zeros(nperm,1);
+
+Tnullvals = zeros(length(argvals),nperm);
+
+for i = 1:nperm
+    tXmat = Xmat(:,randperm(n1+n2));
     
-
-    q = 1-q;
-
-    x1mat = eval_fd(argvals,x1fd);
-    x2mat = eval_fd(argvals,x2fd);
-
-    n1 = size(x1mat,2);
-    n2 = size(x2mat,2);
-
-    Xmat = [x1mat x2mat];
-
-    Tnull = zeros(nperm,1);
-
-    Tnullvals = zeros(length(argvals),nperm);
-
-    for i = 1:nperm
-        tXmat = Xmat(:,randperm(n1+n2));
-
-        tmean1 = mean(tXmat(:,1:n1),2);
-        tmean2 = mean(tXmat(:,n1+(1:n2)),2);
-
-        tvar1 = var(tXmat(:,1:n1),[],2)/n1;
-        tvar2 = var(tXmat(:,n1+(1:n2)),[],2)/n2;
-
-        Tnullvals(:,i) = abs(tmean1-tmean2)./sqrt(tvar1+tvar2);
-        Tnull(i) = max(Tnullvals(:,i));
-    end
-
-    mean1 = mean(Xmat(:,1:n1),2);
-    mean2 = mean(Xmat(:,n1+(1:n2)),2);
-
-    var1 = var(Xmat(:,1:n1),[],2)/n1;
-    var2 = var(Xmat(:,n1+(1:n2)),[],2)/n2;
-
-    Tvals = abs(mean1-mean2)./sqrt(var1+var2);
-    Tobs = max(Tvals);
-
-    pval = mean( Tobs < Tnull );
-    qval = quantile(Tnull,q);
+    tmean1 = mean(tXmat(:,1:n1),     2);
+    tmean2 = mean(tXmat(:,n1+(1:n2)),2);
     
-    pvals_pts = mean(repmat(Tvals,1,nperm)<Tnullvals,2);
-    qvals_pts = quantile(Tnullvals,q,2);
+    tvar1 = var(tXmat(:,1:n1),     0,2)/n1;
+    tvar2 = var(tXmat(:,n1+(1:n2)),0,2)/n2;
+    
+    Tnullvals(:,i) = abs(tmean1-tmean2)./sqrt(tvar1+tvar2);
+    Tnull(i) = max(Tnullvals(:,i));
+end
 
-    if plotres
+mean1 = mean(Xmat(:,1:n1),     2);
+mean2 = mean(Xmat(:,n1+(1:n2)),2);
 
-        fdnames = getnames(x1fd);
+var1 = var(Xmat(:,1:n1),     0,2)/n1;
+var2 = var(Xmat(:,n1+(1:n2)),0,2)/n2;
 
-        plot(argvals,Tvals,'r','linewidth',2)
-        ylabel('t-statistic')
-        xlabel(fdnames(3))
-        hold on
-        plot(argvals,qvals_pts,'r-.','linewidth',2);
-        plot(rangeobs,qval*ones(1,2),'b-','linewidth',2);
-        hold off
-        
-	
-        legend('Observed Statistic',strcat('pointwise ',1-q,' critical value'),...
-			    strcat('maximum ',1-q,' critical value'));
+Tvals = abs(mean1-mean2)./sqrt(var1+var2);
+Tobs  = max(Tvals);
 
-    end
+pval = mean( Tobs < Tnull );
+qval = quantile(Tnull, q);
+
+pvals_pts = zeros(narg,1);
+qvals_pts = pvals_pts;
+for i=1:narg
+    pvals_pts(i) = mean(Tvals(i) < Tnullvals(i,:));
+    qvals_pts(i) = quantile(Tnullvals(i,:), q);
+end
+
+if plotres
+    
+    ylim = [ min([Tvals;qvals_pts]),max([Tobs;qval])];
+    
+    phdl=plot(argvals, Tvals, 'b-', argvals, qvals_pts, 'b--', ...
+        [min(argvals),max(argvals)], [qval,qval], 'r:');
+    set(phdl, 'LineWidth', 2)
+    xlabel('\fontsize{13} argument values')
+    ylabel('\fontsize{13} t-statistic')
+    axis([min(argvals),max(argvals),ylim])
+    legend('\fontsize{13} Observed Statistic', ...
+           ['\fontsize{13} pointwise ', 1-q, ' critical value'], ...
+           ['\fontsize{13} maximum ',   1-q, ' critical value'], ...
+           'location', 'NorthWest')  
+end
+
+tpermStr.pval         = pval;
+tpermStr.qval         = qval;
+tpermStr.Tobs         = Tobs;
+tpermStr.Tnull        = Tnull;
+tpermStr.Tvals        = Tvals;
+tpermStr.Tnullvals    = Tnullvals;
+tpermStr.pvals_pts    = pvals_pts;
+tpermStr.qvals_pts    = qvals_pts;
+tpermStr.argvals      = argvals;
+

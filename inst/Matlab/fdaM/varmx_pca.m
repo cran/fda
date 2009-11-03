@@ -34,8 +34,10 @@ function  pcarotstr = varmx_pca(pcastr, nharm, nx)
   basisobj = getbasis(harmfd);
   rangex   = getbasisrange(basisobj);
   x        = linspace(rangex(1), rangex(2), nx);
-  harmmat  = eval_fd(harmfd, x);
+  harmmat  = eval_fd(x, harmfd);
+  
   %  If fdmat is a 3-D array, stack into a matrix
+  
   if ndim == 3
     harmmatd = size(harmmat);
     harmmat  = permute(harmmat, [1, 3, 2]);
@@ -44,7 +46,7 @@ function  pcarotstr = varmx_pca(pcastr, nharm, nx)
   
   %  compute rotation matrix for varimax rotation of harmmat
   
-  rotmat = varmx(harmmat);
+  rotmat = varmx(harmmat(1:nharm));
   
   %  rotate harmonic coefficients 
   
@@ -54,7 +56,7 @@ function  pcarotstr = varmx_pca(pcastr, nharm, nx)
   else
     harmcoef = harmcoef(:,1:nharm,:);
     for j = 1:coefd(3)
-      harmcoef(:,:,j) = harmcoef(:,:,j) * rotmat;
+      harmcoef(:,1:nharm,j) = harmcoef(:,1:nharm,j) * rotmat;
     end
   end
   

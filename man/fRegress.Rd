@@ -275,7 +275,7 @@ fRegress(y, ...)
       }
 
 
-   *** If \code{class(y)} is numeric, the \code{fRegress} object also includes:
+   If \code{class(y)} is numeric, the \code{fRegress} object also includes:
 
       \item{df}{
 	equivalent degrees of freedom for the fit.
@@ -288,7 +288,7 @@ fRegress(y, ...)
       }
 
 
-      *** If \code{class(y)} is either \code{fd} or \code{fdPar}, the
+      If \code{class(y)} is either \code{fd} or \code{fdPar}, the
       \code{fRegress} object returned also includes 5 other components:
 
       \item{y2cMap}{
@@ -360,6 +360,9 @@ fRegress(y, ...)
   J. O. Ramsay, Giles Hooker, and Spencer Graves
 }
 \references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009)
+    \emph{Functional Data Analysis in R and Matlab}, Springer, New York.
+
   Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional
     Data Analysis, 2nd ed.}, Springer, New York.
 }

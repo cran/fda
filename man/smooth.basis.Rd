@@ -5,11 +5,10 @@
 }
 \description{
   This is the main function for smoothing data using a roughness
-  penalty.  Unlike function \code{data2fd}, which does not employ a
-  rougness penalty, this function controls the nature and degree of
-  smoothing by penalyzing a measure of rougness.  Roughness is definable
-  in a wide variety of ways using either derivatives or a linear
-  differential operator.
+  penalty.  This function controls the nature and degree of smoothing by
+  penalyzing a measure of rougness.  Roughness is definable in a wide
+  variety of ways using either derivatives or a linear differential
+  operator.
 }
 \usage{
 smooth.basis(argvals, y, fdParobj, wtvec=rep(1, length(argvals)),

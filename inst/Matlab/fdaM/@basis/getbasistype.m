@@ -2,7 +2,7 @@ function typestr = getbasistype (basisobj)
 %  GETBASISTYPE   Extracts the type of basis from basis object BASISOBJ.
 %    Variations in spelling are possible.
 
-%  last modified 18 August 2003
+%  last modified 11 June 2009
 
 if ~isa_basis(basisobj)
     error('Argument is not a functional basis object.');
@@ -53,6 +53,10 @@ switch basisobj.type
         typestr = 'const';
     case 'constant'
         typestr = 'const';
+    case 'QW'
+        typestr = 'QW';
+    case 'QWM'
+        typestr = 'QWM';
     otherwise
         error('Unknown type encountered');
 end

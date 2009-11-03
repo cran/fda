@@ -1,7 +1,7 @@
 #  Last modified 2008.11.22 by Spencer Graves
 #  Previously modified 21 March 2006 (by Jim Ramsay?)
 predict.posfd <- function(object, newdata=NULL, Lfdobj=0, ...){
-  if(is.null(newdata))newdata <- object$argvals
+  if (is.null(newdata)) newdata <- object$argvals
   evalPos <- eval.posfd(newdata, object$Wfdobj, Lfdobj)
 #
   evalPos

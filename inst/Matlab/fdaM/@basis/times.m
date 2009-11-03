@@ -12,7 +12,7 @@ function prodbasisobj = times(basisobj1, basisobj2)
 %      multiplicity greater than the multiplicities of this value
 %      in the two knot sequences.  
 %      The rationale this rule is that order of differentiability
-%      of the product at eachy value will be controlled  by
+%      of the product at each value will be controlled  by
 %      whichever knot sequence has the greater multiplicity.  
 %      In the case where one of the splines is order 1, or a step
 %      function, the problem is dealt with by replacing the

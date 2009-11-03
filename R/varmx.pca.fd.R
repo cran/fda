@@ -1,4 +1,4 @@
-varmx.pca.fd <- function(pcafd, nharm = scoresd[2], nx=501)
+varmx.pca.fd <- function(pcafd, nharm=scoresd[2], nx=501)
 {
 #
 #  Apply varimax to the first NHARM components of a pca.fd object.
@@ -9,7 +9,7 @@ varmx.pca.fd <- function(pcafd, nharm = scoresd[2], nx=501)
 
 #  Note that pcafd is an oldClass type object
 
-#  Last modified 15 November 2006
+#  Last modified 22 October 2009 by Jim Ramsay
 
   if (!(inherits(pcafd, "pca.fd"))) stop(
 		"Argument PCAFD is not a pca.fd object.")
@@ -27,7 +27,9 @@ varmx.pca.fd <- function(pcafd, nharm = scoresd[2], nx=501)
   x        <- seq(rangex[1], rangex[2], length = nx)
   delta    <- x[2]-x[1]
   harmmat  <- eval.fd(x, harmfd)
+
   #  If fdmat is a 3-D array, stack into a matrix
+
   if (ndim == 3) {
      harmmatd <- dim(harmmat)
      dimnames(harmmat) <- NULL
@@ -36,30 +38,40 @@ varmx.pca.fd <- function(pcafd, nharm = scoresd[2], nx=501)
   }
 
   #  compute rotation matrix for varimax rotation of harmmat
-  rotm <- varmx(harmmat)
+
+  rotm <- varmx(harmmat[,1:nharm])
 
   #  rotate coefficients and scores
-  if(ndim == 2)
-    harmcoef[,1:nharm] <- harmcoef[,1:nharm] %*% rotm
+
+  rotharmcoef <- harmcoef
+  if (ndim == 2)
+    rotharmcoef[,1:nharm] <- harmcoef[,1:nharm] %*% rotm
   else
     for(j in (1:coefd[3]))
-		harmcoef[,1:nharm,j] <- harmcoef[,1:nharm,j] %*% rotm
-  harmscrs <- pcafd$scores[,1:nharm]		
-  harmscrs <- harmscrs %*% rotm
+		rotharmcoef[,1:nharm,j] <- harmcoef[,1:nharm,j] %*% rotm
+
+  #  rotate principal component scores
+
+  rotharmscrs <- pcafd$scores		
+  rotharmscrs[,1:nharm] <- rotharmscrs[,1:nharm] %*% rotm
 
   #  compute proportions of variance
 
-  harmvar <- apply(harmscrs^2,2,sum)
-  varsum  <- sum(harmvar)
-  propvar <- sum(pcafd$varprop)*harmvar/varsum
+  rotharmvar <- apply(rotharmscrs^2,2,sum)
+  varsum  <- sum(rotharmvar)
+  propvar <- sum(pcafd$varprop)*rotharmvar/varsum
 
   #  modify pcafd object
 
-  harmfd$coefs    <- harmcoef
-  pcafd$harmonics <- harmfd
-  pcafd$varprop   <- propvar
-  pcafd$scores    <- harmscrs
-  
-  return(pcafd)
+  rotharmfd <- harmfd
+  rotharmfd$coefs <- rotharmcoef
+
+  rotpcafd <- pcafd
+  rotpcafd$harmonics <- rotharmfd
+  rotpcafd$varprop   <- propvar
+  rotpcafd$scores    <- rotharmscrs
+  rotpcafd$rotmat    <- rotm
+   
+  return(rotpcafd)
 }
 

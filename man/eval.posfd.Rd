@@ -54,25 +54,26 @@ eval.posfd(evalarg, Wfdobj, Lfdobj=int2Lfd(0))
   \code{\link{eval.monfd}}
 }
 \examples{
-harmaccelLfd365 <- vec2Lfd(c(0,(2*pi/365)^2,0), c(0, 365))
-smallbasis  <- create.fourier.basis(c(0, 365), 65)
-index <- (1:35)[CanadianWeather$place == "Vancouver"]
-VanPrec  <- CanadianWeather$dailyAv[,index, "Precipitation.mm"]
-lambda    <- 1e4
-dayfdPar <- fdPar(smallbasis, harmaccelLfd365, lambda)
-Van.pos <- smooth.pos(day.5, VanPrec, dayfdPar)
-
-VanPrecposvec <- eval.posfd(day.5, Van.pos$Wfdobj)
-
-VanPrecpos <- predict(Van.pos, day.5)
+harmaccelLfd <- vec2Lfd(c(0,(2*pi/365)^2,0), c(0, 365))
+smallbasis   <- create.fourier.basis(c(0, 365), 65)
+index        <- (1:35)[CanadianWeather$place == "Vancouver"]
+VanPrec      <- CanadianWeather$dailyAv[,index, "Precipitation.mm"]
+lambda       <- 1e4
+dayfdPar     <- fdPar(smallbasis, harmaccelLfd, lambda)
+VanPrecPos   <- smooth.pos(day.5, VanPrec, dayfdPar)
+#  compute fitted values using eval.posfd()
+VanPrecPosFit1 <- eval.posfd(day.5, VanPrecPos$Wfdobj)
+#  compute fitted values using predict()
+VanPrecPosFit2 <- predict(VanPrecPos, day.5)
 \dontshow{stopifnot(}
-all.equal(VanPrecposvec, VanPrecpos)
+all.equal(VanPrecPosFit1, VanPrecPosFit2)
 \dontshow{)}
-
-VanPrecFit <- fitted(Van.pos)
-VanPrecRes <- resid(Van.pos)
+#  compute fitted values using fitted()
+VanPrecPosFit3 <- fitted(VanPrecPos)
+#  compute residuals
+VanPrecRes <- resid(VanPrecPos)
 \dontshow{stopifnot(}
-all.equal(VanPrecRes, Van.pos$y-VanPrecFit)
+all.equal(VanPrecRes, VanPrecPos$y-VanPrecPosFit3)
 \dontshow{)}
 
 }

@@ -10,7 +10,7 @@ components analysis or a canonical correlation analysis.
 The values are computed over a fine mesh of argument values.
 }
 \usage{
-varmx(amat)
+varmx(amat, normalize=FALSE)
 }
 \arguments{
 \item{amat}{
@@ -18,6 +18,11 @@ the matrix to be rotated.  The number of rows is
 equal to the number of argument values \code{nx} used
 in a fine mesh.  The number of columns is the number of
 components to be rotated.
+}
+\item{normalize}{
+either \code{TRUE} or \code{FALSE}.  If \code{TRUE}, the columns of
+\code{amat} are normalized prior to computing the rotation
+matrix.  However, this is seldom needed for functional data.
 }
 }
 \value{
@@ -33,7 +38,7 @@ tend more and more to be either near 0 or near 1, and this tends to
 help with the process of labelling or interpreting the rotated matrix.
 }
 \seealso{
-\code{\link{varmx.pca.fd}}, 
+\code{\link{varmx.pca.fd}},
 \code{\link{varmx.cca.fd}}
 }
 % docclass is function
