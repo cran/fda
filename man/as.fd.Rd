@@ -1,7 +1,6 @@
 \name{as.fd}
 \alias{as.fd}
 \alias{as.fd.fdSmooth}
-\alias{as.fd.dierckx}
 \alias{as.fd.function}
 \alias{as.fd.smooth.spline}
 %- Also NEED an '\alias' for EACH other topic documented here.
@@ -15,7 +14,6 @@
 \usage{
 as.fd(x, ...)
 \method{as.fd}{fdSmooth}(x, ...)
-\method{as.fd}{dierckx}(x, ...)
 \method{as.fd}{function}(x, ...)
 \method{as.fd}{smooth.spline}(x, ...)
 }
@@ -125,8 +123,8 @@ as.fd(x, ...)
 }
 \author{Spencer Graves}
 \seealso{
-  \code{\link[DierckxSpline]{as.dierckx}}
-  \code{\link[DierckxSpline]{curfit}}
+%  \code{\link[DierckxSpline]{as.dierckx}}
+%  \code{\link[DierckxSpline]{curfit}}
   \code{\link{fd}}
   \code{\link{splinefun}}
 }
@@ -137,32 +135,6 @@ as.fd(x, ...)
 girlGrowthSm <- with(growth, smooth.basisPar(argvals=age, y=hgtf,
                                              lambda=0.1))
 girlGrowth.fd <- as.fd(girlGrowthSm)
-
-##
-## as.fd.dierckx
-##
-x <- 0:24
-y <- c(1.0,1.0,1.4,1.1,1.0,1.0,4.0,9.0,13.0,
-       13.4,12.8,13.1,13.0,14.0,13.0,13.5,
-       10.0,2.0,3.0,2.5,2.5,2.5,3.0,4.0,3.5)
-library(DierckxSpline)
-curfit.xy <- curfit(x, y, s=0)
-
-curfit.fd <- as.fd(curfit.xy)
-plot(curfit.fd) # as an 'fd' object
-points(x, y) # Curve goes through the points.
-
-x. <- seq(0, 24, length=241)
-pred.y <- predict(curfit.xy, x.)
-lines(x., pred.y, lty="dashed", lwd=3, col="blue")
-# dierckx and fd objects match.
-
-\dontshow{stopifnot(}
-all.equal(knots(curfit.xy, FALSE), knots(curfit.fd, FALSE))
-\dontshow{)}
-\dontshow{stopifnot(}
-all.equal(coef(curfit.xy), as.vector(coef(curfit.fd)))
-\dontshow{)}
 
 ##
 ## as.fd.function(splinefun(...), ...)

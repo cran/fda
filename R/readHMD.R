@@ -85,7 +85,7 @@ readHMD <- function(username, password,
 ## 2.  connection
 ##
   userpwd <- paste(username,":",password,sep="")
-  txt <- getURL(url,userpwd=userpwd, ...)
+  txt <- RCurl::getURL(url,userpwd=userpwd, ...)
   conChk <- textConnection(txt)
 ##
 ## 3.  Read

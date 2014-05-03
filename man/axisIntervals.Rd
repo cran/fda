@@ -10,10 +10,10 @@
   described by labels
 }
 \usage{
-axisIntervals(side=1, atTick1=monthBegin.5, atTick2=monthEnd.5,
-      atLabels=monthMid, labels=month.abb, cex.axis=0.9, ...)
-axesIntervals(side=1:2, atTick1=monthBegin.5, atTick2=monthEnd.5,
-      atLabels=monthMid, labels=month.abb, cex.axis=0.9, las=1, ...)
+axisIntervals(side=1, atTick1=fda::monthBegin.5, atTick2=fda::monthEnd.5,
+      atLabels=fda::monthMid, labels=month.abb, cex.axis=0.9, ...)
+axesIntervals(side=1:2, atTick1=fda::monthBegin.5, atTick2=fda::monthEnd.5,
+      atLabels=fda::monthMid, labels=month.abb, cex.axis=0.9, las=1, ...)
 }
 \arguments{
   \item{side}{
@@ -30,7 +30,7 @@ axesIntervals(side=1:2, atTick1=monthBegin.5, atTick2=monthEnd.5,
   }
   \item{atTick2}{
     the points at which tick-marks marking the ends of the
-    intervals are to be drawn.  This defaults to 'monthBegin.5' to mark
+    intervals are to be drawn.  This defaults to 'monthEnd.5' to mark
     monthly periods for an annual cycle.  These are constructed by
     calling axis(side, at=atTick2, labels=FALSE, ...).  Use atTick2=NA
     to rely only on atTick1.  For more detail

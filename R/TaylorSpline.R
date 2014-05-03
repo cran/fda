@@ -3,13 +3,13 @@ TaylorSpline <- function(object, ...) {
 }
 
 TaylorSpline.dierckx <- function(object, ...) {
-  if(require(DierckxSpline)){
+#  if(require(DierckxSpline)){
 #    fdo <- dierckx2fd(object)
     fdo <- as.fd(object)
     return(TaylorSpline(fdo, ...))
-  }
-  else
-    stop('Requires library(DierckxSpline);  not installed.')
+#  }
+#  else
+#    stop('Requires library(DierckxSpline);  not installed.')
 }
 
 TaylorSpline.fd <- function(object, ...) {

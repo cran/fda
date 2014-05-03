@@ -11,7 +11,7 @@
 phaseplanePlot(evalarg, fdobj, Lfdobj1=1, Lfdobj2=2,
         lty=c("longdash", "solid"),
       labels=list(evalarg=seq(evalarg[1], max(evalarg), length=13),
-             labels=monthLetters),
+             labels=fda::monthLetters),
       abline=list(h=0, v=0, lty=2), xlab="Velocity",
       ylab="Acceleration", returnMatrix=FALSE, ...)
 }

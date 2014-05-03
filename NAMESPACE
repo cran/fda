@@ -31,6 +31,7 @@ export(AmpPhaseDecomp,
        CSTR2in, CSTR2, CSTRfitLS, CSTRfn, CSTRres, CSTRsse,
        cycleplot.fd,
        Data2fd,
+#       dayOfYear, dayOfYearShifted, day.5, daysPerMonth, 
        density.fd,
        deriv.fd,
        df2lambda,
@@ -88,6 +89,7 @@ export(AmpPhaseDecomp,
        monfn,
        monomial,
        monomialpen,
+#       monthBegin.5, monthEnd, monthEnd.5, monthMid, month.abb, monthLetters, 
        norder, norder.bspline,
        objAndNames,
        odesolv,
@@ -131,18 +133,21 @@ export(AmpPhaseDecomp,
        varmx,
        varmx.cca.fd,
        varmx.pca.fd,
-       vec2Lfd,
+       vec2Lfd, 
+#       weeks, 
        wtcheck,
        zerofind )
 
 #importFrom(base, mean, coefficients)
 importFrom(graphics, boxplot)
+importFrom(splines, spline.des)
 
 #import(DierckxSpline)
 #import(zoo)
 import(Matrix)
 #import(graphics)
 #import(rpart)
+#importFrom(RCurl, getURL)
 
 S3method("==", basisfd)
 S3method('+', fd)

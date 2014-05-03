@@ -3,7 +3,6 @@
 \alias{TaylorSpline.fd}
 \alias{TaylorSpline.fdPar}
 \alias{TaylorSpline.fdSmooth}
-\alias{TaylorSpline.dierckx}
 \title{
   Taylor representation of a B-Spline
 }
@@ -17,11 +16,10 @@ TaylorSpline(object, ...)
 \method{TaylorSpline}{fd}(object, ...)
 \method{TaylorSpline}{fdPar}(object, ...)
 \method{TaylorSpline}{fdSmooth}(object, ...)
-\method{TaylorSpline}{dierckx}(object, ...)
 }
 \arguments{
   \item{ object }{
-    a spline object, e.g., of class 'dierckx'.
+    a spline object possibly of some other class 
   }
   \item{...}{ optional arguments }
 }
@@ -77,7 +75,6 @@ TaylorSpline(object, ...)
 ## The simplest b-spline basis:  order 1, degree 0, zero interior knots:
 ##       a single step function
 ##
-library(DierckxSpline)
 bspl1.1 <- create.bspline.basis(norder=1, breaks=0:1)
 # ... jump to pi to check the code
 fd.bspl1.1pi <- fd(pi, basisobj=bspl1.1)
