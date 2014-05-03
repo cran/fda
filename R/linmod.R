@@ -16,7 +16,7 @@ linmod = function(xfdobj, yfdobj, betaList, wtvec=NULL)  {
 #  BETA1ESTBIFD  a bivariate functional parameter object for \beta
 #  YHATFDOBJ     a functional data object for the approximation to y
 
-#  Last modified 11 June 2010
+#  Last modified 15 February 2014
 
 #  check xfdobj and yfdobj
 
@@ -216,7 +216,7 @@ alphafd = fd(alphacoef, alphabasis, alphafdnames)
 #  bi-functional structure for the beta function
 
 ind1 = alphanbasis + (1:betan)
-betacoef    = matrix(coefvec[ind1],betatnbasis,betasnbasis)
+betacoef    = t(matrix(coefvec[ind1],betatnbasis,betasnbasis))
 betafdnames = xfdobj$fdnames
 betafdnames[[3]] = "Reg. Coefficient"
 betafd = bifd(t(betacoef), betasbasis, betatbasis, betafdnames)

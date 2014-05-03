@@ -30,7 +30,7 @@ getbasismatrix <- function(evalarg, basisobj, nderiv=0, returnMatrix=FALSE) {
 #
 #  Note that the first two arguments may be interchanged.
 #
-#  Last modified 24 December 2012
+#  Last modified 19 March 2014
 
 ##
 ##  Exchange the first two arguments if the first is an BASIS.FD object
@@ -141,13 +141,6 @@ getbasismatrix <- function(evalarg, basisobj, nderiv=0, returnMatrix=FALSE) {
 
   } else if (type == "polyg") {
     basismat  <- polyg(evalarg, params)
-
-#  -----------------------------  Polynomial basis  -------------------
-
-  } else if (type == "polynom") {
-   	norder   <- nbasis
-   	ctr      <- params[1]
-   	basismat <- polynom(evalarg, norder, nderiv, ctr)
 
 #  -----------------------------  Power basis  -------------------
 

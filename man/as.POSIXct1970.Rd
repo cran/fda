@@ -37,9 +37,10 @@ as.POSIXct1970(x, tz="GMT", ...)
   Spencer Graves
 }
 \seealso{
-  \code{\link{as.POSIXct}}, \code{\link{ISOdate}},
+  \code{\link{as.POSIXct}},
+  \code{\link{ISOdate}},
   \code{\link{strptime}}
-  \code{\link[Ecdat]{as.Date1970}}
+  \code{\link[Ecfun]{as.Date1970}}
 }
 %\references{}
 \examples{

@@ -59,7 +59,8 @@ fdPar <- function(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
         #  a default FD object with an empty coefficient matrix.
         nbasis  <- fdobj$nbasis
         dropind <- fdobj$dropind
-        coefs   <- matrix(0,nbasis-length(dropind),1)
+        nbasis  <- nbasis - length(dropind)
+        coefs   <- matrix(0,nbasis,nbasis)
         fdnames <- list('time', 'reps 1', 'values')
         if(!is.null(fdobj$names)){
           basisnames <- {

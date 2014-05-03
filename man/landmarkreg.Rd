@@ -95,7 +95,7 @@ landmarkreg(fdobj, ximarks, x0marks=xmeanmarks,
 
 ## setting parameters
 library(lattice)
-data(landmark.reg.expData) ## containg an simple object called sampleData
+data(landmark.reg.expData) ## containing an simple object called sampleData
 
 # Preferred:
 # eps <- .Machine$double.eps
@@ -114,7 +114,8 @@ landmark <- matrix(c(0.4999, 0.657, 0.8141, 0.5523, 0.5523,
                    ncol=2)
 wbasis <- create.bspline.basis(rangeval=c(from, to),
 	                       norder=4, breaks=seq(from, to, len=nbreaks))
-WfdPar <- fdPar(wbasis, 1, 1e-4)
+Wfd0   <- fd(matrix(0,wbasis$nbasis,1),wbasis)
+WfdPar <- fdPar(Wfd0, 1, 1e-4)
 ## get the density of the data
 x <- split(sampleData, factor(sampleData$which))
 # to save time, reduce the number of curves from 5 to 3

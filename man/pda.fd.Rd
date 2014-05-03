@@ -169,8 +169,10 @@ mbasis = create.monomial.basis(c(0,1),2)
 #    defining functions to be analyzed
 xbasis = create.bspline.basis(c(0,1),24,5)
 #  set up functional parameter objects for weight bases
-cfdPar = fdPar(cbasis)
-mfdPar = fdPar(mbasis)
+cfd0   = fd(0,cbasis)
+cfdPar = fdPar(cfd0)
+mfd0   = fd(matrix(0,2,1),mbasis)
+mfdPar = fdPar(mfd0)
 #  sampling points over [0,1]
 tvec = seq(0,1,len=101)
 ##

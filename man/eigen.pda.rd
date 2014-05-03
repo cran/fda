@@ -75,7 +75,8 @@ xfdlist = list(Xfd, Yfd)
 #  basis and parameter object for weight functions
 
 fdabasis2 = create.bspline.basis(fdarange,norder=norder,nbasis=31)
-pdaPar = fdPar(fdabasis2,1,1e-8)
+fdafd2    = fd(matrix(0,31,2),fdabasis2)
+pdaPar    = fdPar(fdafd2,1,1e-8)
 
 pdaParlist = list(pdaPar, pdaPar)
 

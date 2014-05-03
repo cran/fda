@@ -213,7 +213,6 @@ create.bspline.irregular(argvals,
   \code{\link{create.fourier.basis}},
   \code{\link{create.monomial.basis}},
   \code{\link{create.polygonal.basis}},
-  \code{\link{create.polynomial.basis}},
   \code{\link{create.power.basis}}
   \code{\link[splines]{splineDesign}}
   \code{\link[splines]{spline.des}}

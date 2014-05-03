@@ -2,7 +2,7 @@
 ###
 ### Ramsey & Silverman (2002) Applied Functional Data Analysis (Springer)
 ###
-### ch. 3.  Nondurable Goods Index 
+### ch. 3.  Nondurable Goods Index
 ###
 library(fda)
 ##
@@ -25,7 +25,7 @@ max1929t <- which(nondur1929==max1929)
 
 library(zoo)
 (Max1929 <- index(nondur1929)[max1929t])
-# 'index' in in 'zoo'
+# function 'index' is in 'zoo'
 text(Max1929, log10(max1929)+.01, "Stock market crash", 0, srt=90)
 
 restrMoney <- window(nondurables, 1928, 1940)
@@ -86,10 +86,10 @@ D.sin <- D(sin., "x")
 D2.sin <- D(D.sin, "x")
 
 op <- par(pty="s")
-# square plot region so we get a circle not an ellipse  
+# square plot region so we get a circle not an ellipse
 with(data.frame(x=seq(0, 1, length=46)),
      plot(eval(D.sin), eval(D2.sin), type="l",
-          xlim=c(-10, 10), ylim=c(-50, 50), 
+          xlim=c(-10, 10), ylim=c(-50, 50),
           xlab="Velocity", ylab="Acceleration") )
 pi.2 <- (2*pi)
 #lines(x=c(-pi.2,pi.2), y=c(0,0), lty=3)
@@ -113,10 +113,10 @@ lognondursm9.5 = smooth.basis(durtime, coredata(lognondur), goodsfdPar9.5);
 
 # p. 47, Figure 3.5.  Nondurable phase-plane plot, 1964
 ##*** Need to add xlim and ylim to the following
-## to match the plots in the book.  
+## to match the plots in the book.
 
 phaseplanePlot(1964, logNondurSm$fd)
-  
+
 # pp. 48-49, Figure 3.6.  Nondurable phase-plane plots, 1929-1931
 phaseplanePlot(1929, logNondurSm$fd)
 phaseplanePlot(1930, logNondurSm$fd)
@@ -143,10 +143,10 @@ phaseplanePlot(1997, logNondurSm$fd)
 ##
 ## sec. 3.5.  What have we seen?
 ##
-# All discussion, no data analysis in this section 
+# All discussion, no data analysis in this section
 
 ##
 ## sec. 3.6.  Smoothing data for phase-plane plots
 ##
-# All discussion, no data analysis in this section 
+# All discussion, no data analysis in this section
 

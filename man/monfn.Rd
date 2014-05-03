@@ -40,8 +40,9 @@ rangeval <- range(tbreaks)
 
 ## Establish a B-spline basis for the curve
 wbasis <- create.bspline.basis(rangeval=rangeval, breaks=tbreaks)
-WfdPar <- fdPar(wbasis, 1, 1e-4)
-fdObj <- smooth.basis(tbreaks, xval, WfdPar)$fd
+Wfd0   <- fd(matrix(0,wbasis$nbasis,1),wbasis)
+WfdPar <- fdPar(Wfd0, 1, 1e-4)
+fdObj  <- smooth.basis(tbreaks, xval, WfdPar)$fd
 
 ## Set the mean landmark times. Note that the objective of the warping
 ## function is to transform the curve such that the landmarks of the curve

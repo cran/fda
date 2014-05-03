@@ -119,7 +119,6 @@ create.fourier.basis(rangeval=c(0, 1), nbasis=3,
   \code{\link{create.exponential.basis}},
   \code{\link{create.monomial.basis}},
   \code{\link{create.polygonal.basis}},
-  \code{\link{create.polynomial.basis}},
   \code{\link{create.power.basis}}
 }
 \examples{

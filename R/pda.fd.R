@@ -88,7 +88,7 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
 #               from a call to function BsplineS.  See this function for
 #               enabling this option.
 
-#  last modified 1 August 2012 by Jim Ramsay
+#  last modified 16 April 2014 by Jim Ramsay
 
 #  check dimensions of the lists
 
@@ -307,8 +307,11 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
 
     #  set up array to hold coefficients for basis expansions
 
-    if (nforce > 0) aarray <- matrix(0,nfine,nforce)
-    else            aarray <- NULL
+    if (nforce > 0) {
+      aarray <- matrix(0,nfine,nforce)
+    } else {           
+      aarray <- NULL
+    }
 
     barray <- matrix(0,nfine,difeorder)
 
@@ -692,7 +695,7 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
 
     #  check compatibility of UFDLIST and AWTLIST
 
-    if (!(is.null(ufdlist) || is.null(awtlist))) {
+      if (!(is.null(ufdlist) || is.null(awtlist))) {
         urange <- ufdlist[[1]]$basis$rangeval
         errorwrd <- FALSE
         for (ivar in 1:nvar) {
@@ -726,12 +729,12 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
             if (errorwrd) stop("")
           }
         }
-    }
+      }
 
-    #  check BWTLIST
+      #  check BWTLIST
 
-    errorwrd <- FALSE
-    for (ivar1 in 1:nvar) {
+      errorwrd <- FALSE
+      for (ivar1 in 1:nvar) {
         for (ivar2 in 1:nvar) {
           difeorder <- length(bwtlist[[ivar1]][[ivar2]])
           for (j in 1:difeorder) {
@@ -781,130 +784,132 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
     #  set up  UARRAY to hold values of u functions
 
     if (!is.null(ufdlist)) {
-        uarray <- vector("list", nvar)
-        for (ivar in 1:nvar) {
-            if (is.null(ufdlist[[ivar]])) {
-                uarray[[ivar]] <- NULL
-            } else {
-                nforce <- length(ufdlist[[ivar]])
-                uarray[[ivar]] <- vector("list", nforce)
-                for (iu in 1:nforce)
-                    uarray[[ivar]][[iu]] <- matrix(0,nfine,ncurve)
-            }
-      }
+      uarray <- vector("list", nvar)
       for (ivar in 1:nvar) {
-            if (!is.null(ufdlist[[ivar]])) {
-              nforce <- length(ufdlist[[ivar]])
-              for (iu in 1:nforce)
-                uarray[[ivar]][[iu]] <- eval.fd(tx, ufdlist[[ivar]][[iu]],
-                                                returnMatrix=returnMatrix)
-            }
+        if (is.null(ufdlist[[ivar]])) {
+          uarray[[ivar]] <- NULL
+        } else {
+          nforce <- length(ufdlist[[ivar]])
+          uarray[[ivar]] <- vector("list", nforce)
+          for (iu in 1:nforce)
+                    uarray[[ivar]][[iu]] <- matrix(0,nfine,ncurve)
         }
       }
+      for (ivar in 1:nvar) {
+        if (!is.null(ufdlist[[ivar]])) {
+          nforce <- length(ufdlist[[ivar]])
+          for (iu in 1:nforce)
+            uarray[[ivar]][[iu]] <- eval.fd(tx, ufdlist[[ivar]][[iu]],
+                                                returnMatrix=returnMatrix)
+        }
+      }
+    }
 
-      #  set up array YPROD to hold mean of products of values in YARRAY
+    #  set up array YPROD to hold mean of products of values in YARRAY
 
-      yprod <- vector("list", nvar)
-      for (i1 in 1:nvar) yprod[[i1]] <- vector("list", nvar)
-      for (i1 in 1:nvar) {
-        difeord1p1 <- length(bwtlist[[i1]][[i1]]) + 1
-        for (i2 in 1:nvar) {
+    yprod <- vector("list", nvar)
+    for (i1 in 1:nvar) yprod[[i1]] <- vector("list", nvar)
+    for (i1 in 1:nvar) {
+      difeord1p1 <- length(bwtlist[[i1]][[i1]]) + 1
+      for (i2 in 1:nvar) {
             difeord2p1 <- length(bwtlist[[i2]][[i2]]) + 1
             yprod[[i1]][[i2]] <- array(0,c(nfine,difeord2p1,difeord2p1))
+      }
+    }
+
+    for (i1 in 1:nvar) {
+      difeord1p1 <- length(bwtlist[[i1]][[i1]]) + 1
+      for (j1 in 1:difeordp1) {
+        for (i2 in 1:nvar) {
+          difeord2p1 <- length(bwtlist[[i2]][[i2]]) + 1
+          for (j2 in 1:difeord2p1) {
+            if (ncurve == 1) {
+              yprodval <-       yarray[[i1]][,1,j1]*yarray[[i2]][,1,j2]
+            } else {
+              yprodval <- apply(yarray[[i1]][,,j1]*yarray[[i2]][,,j2],1,mean)
+            }
+            yprod[[i1]][[i2]][,j1,j2] <- yprodval
+          }
         }
       }
+    }
 
+    #  set up array YUPROD to hold mean of u-variables u times
+    #    x functions and their derivatives
+
+    if (!is.null(ufdlist)) {
+      yuprod <- vector("list", nvar)
       for (i1 in 1:nvar) {
-        difeord1p1 <- length(bwtlist[[i1]][[i1]]) + 1
-        for (j1 in 1:difeordp1) {
-          for (i2 in 1:nvar) {
-            difeord2p1 <- length(bwtlist[[i2]][[i2]]) + 1
-            for (j2 in 1:difeord2p1) {
-              if (ncurve == 1) {
-                yprodval <-       yarray[[i1]][,1,j1]*yarray[[i2]][,1,j2]
-              } else {
-                yprodval <- apply(yarray[[i1]][,,j1]*yarray[[i2]][,,j2],1,mean)
-              }
-              yprod[[i1]][[i2]][,j1,j2] <- yprodval
-            }
-          }
-        }
-      }
-
-      #  set up array YUPROD to hold mean of u-variables u times
-      #    x functions and their derivatives
-
-      if (!is.null(ufdlist)) {
-        yuprod <- vector("list", nvar)
-        for (i1 in 1:nvar) {
-          if (!is.null(ufdlist[[i1]])) {
-            nforce <- length(ufdlist[[i1]])
-            if (nforce > 0) {
-              yuprod[[i1]] <- vector("list", nforce)
-              for (iu in 1:nforce) {
-                  difeordp1 <- length(bwtlist[[i1]][[i1]]) + 1
-                  yuprod[[i1]][[iu]] <- matrix(0,nfine,difeordp1)
-              }
-            }
-          }
-        }
-        onesncurve <- rep(1,ncurve)
-        for (i1 in 1:nvar) {
-          if (!is.null(ufdlist[[i1]])) {
-            nforce <- length(ufdlist[[i1]])
-            if (nforce > 0) {
-              difeordp1 <- length(bwtlist[[i1]][[i1]]) + 1
-              for (iu in 1:nforce) {
-                for (j1 in 1:difeordp1) {
-                  if (ncurve == 1) {
-                    yuprodval <- yarray[[i1]][,1,j1]*uarray[[i1]][[iu]]
-                  } else {
-                    yuprodval <- apply(yarray[[i1]][,,j1]*
-                                outer(uarray[[i1]][[iu]],onesncurve),1,mean)
-                  }
-                  yuprod[[i1]][[iu]][,j1] <- yuprodval
-                }
-              }
-            }
-          }
-        }
-      }
-
-      #  set up array UPROD to hold mean of products of u-variables u
-
-      if (!is.null(ufdlist)) {
-        uprod <- vector("list", nvar)
-        for (ivar in 1:nvar) {
-          nforce <- length(ufdlist[[ivar]])
+        if (!is.null(ufdlist[[i1]])) {
+          nforce <- length(ufdlist[[i1]])
           if (nforce > 0) {
-            uprod[[ivar]] <- array(0,c(nfine, nforce, nforce))
-            for (iu in 1:nforce) for (ju in 1:iu) {
-              uprodval <- uarray[[ivar]][[iu]]*uarray[[ivar]][[ju]]
-              uprod[[ivar]][,iu,ju] <- uprodval
-              uprod[[ivar]][,ju,iu] <- uprodval
+            yuprod[[i1]] <- vector("list", nforce)
+            for (iu in 1:nforce) {
+              difeordp1 <- length(bwtlist[[i1]][[i1]]) + 1
+              yuprod[[i1]][[iu]] <- matrix(0,nfine,difeordp1)
             }
           }
         }
       }
+      onesncurve <- rep(1,ncurve)
+      for (i1 in 1:nvar) {
+        if (!is.null(ufdlist[[i1]])) {
+          nforce <- length(ufdlist[[i1]])
+          if (nforce > 0) {
+            difeordp1 <- length(bwtlist[[i1]][[i1]]) + 1
+            for (iu in 1:nforce) {
+              for (j1 in 1:difeordp1) {
+                if (ncurve == 1) {
+                  yuprodval <- yarray[[i1]][,1,j1]*uarray[[i1]][[iu]]
+                } else {
+                  yuprodval <- apply(yarray[[i1]][,,j1]*
+                                outer(uarray[[i1]][[iu]],onesncurve),1,mean)
+                }
+                yuprod[[i1]][[iu]][,j1] <- yuprodval
+              }
+            }
+          }
+        }
+      }
+    }
 
-#  set up an index array and some arrays of 1"s
+    #  set up array UPROD to hold mean of products of u-variables u
 
-      onesn <- rep(1,nfine)
-
-#  set up array to hold coefficients for basis expansions
-
-#  --------------  beginning of loop through variables  -------------------
-
+    if (!is.null(ufdlist)) {
+      uprod <- vector("list", nvar)
       for (ivar in 1:nvar) {
+        nforce <- length(ufdlist[[ivar]])
+        if (nforce > 0) {
+          uprod[[ivar]] <- array(0,c(nfine, nforce, nforce))
+          for (iu in 1:nforce) for (ju in 1:iu) {
+            uprodval <- uarray[[ivar]][[iu]]*uarray[[ivar]][[ju]]
+            uprod[[ivar]][,iu,ju] <- uprodval
+            uprod[[ivar]][,ju,iu] <- uprodval
+          }
+        }
+      }
+    }
 
-    #  get number of coefficients to be estimated for this equation
+    #  set up an index array and some arrays of 1"s
 
-        neqns  <- 0
+    onesn <- rep(1,nfine)
 
-    # loop through u-variables  if required
+    #  set up array to hold coefficients for basis expansions
 
-        if (is.null(ufdlist) || is.null(ufdlist[[ivar]])) nforce <- 0
-        else  nforce <- length(ufdlist[[ivar]])
+    #  --------------  beginning of loop through variables  -------------------
+
+    for (ivar in 1:nvar) {
+
+      #  get number of coefficients to be estimated for this equation
+
+      neqns  <- 0
+
+      # loop through u-variables  if required
+
+      if (is.null(ufdlist) || is.null(ufdlist[[ivar]])) {
+        nforce <- 0
+      } else {
+        nforce <- length(ufdlist[[ivar]])
         if (nforce > 0) {
           for (iu in 1:nforce) {
             afdPari <- awtlist[[ivar]][[iu]]
@@ -912,326 +917,375 @@ pda.fd  <-  function(xfdlist, bwtlist=NULL, awtlist=NULL, ufdlist=NULL,
                 neqns <- neqns + afdPari$fd$basis$nbasis
           }
         }
+      }
 
-    # loop through x functions and their derivatives
+      # loop through x functions and their derivatives
 
-        for (i2 in 1:nvar) {
-          difeorder <- length(bwtlist[[ivar]][[i2]])
-          for (j2 in 1:difeorder) {
-            if (!is.null(bwtlist[[ivar]][[i2]][[j2]])) {
-              bfdParij <- bwtlist[[ivar]][[i2]][[j2]]
-              if (bfdParij$estimate) neqns <- neqns + bfdParij$fd$basis$nbasis
-            }
+      for (i2 in 1:nvar) {
+        difeorder <- length(bwtlist[[ivar]][[i2]])
+        for (j2 in 1:difeorder) {
+          if (!is.null(bwtlist[[ivar]][[i2]][[j2]])) {
+            bfdParij <- bwtlist[[ivar]][[i2]][[j2]]
+            if (bfdParij$estimate) neqns <- neqns + bfdParij$fd$basis$nbasis
           }
         }
-        if (neqns < 1)  stop("Number of equations to solve is not positive.")
+      }
+      if (neqns < 1)  stop("Number of equations to solve is not positive.")
 
-    #  set up coefficient array and right side array for linear equation
+      #  set up coefficient array and right side array for linear equation
 
-        cmat   <- matrix(0,neqns, neqns)
-        dmat   <- matrix(0,neqns, 1)
+      cmat   <- matrix(0,neqns, neqns)
+      dmat   <- matrix(0,neqns, 1)
 
-    #  evaluate default weight functions for this variable
+      #  evaluate default weight functions for this variable
 
-        if (nforce > 0) {
-          aarray <- matrix(0,nfine,nforce)
-          for (iu in 1:nforce) {
-            if (!is.null(awtlist[[ivar]][[iu]])) {
-                afdPari <- awtlist[[ivar]][[iu]]
-                aarray[,iu] <- eval.fd(tx, afdPari$fd, returnMatrix=returnMatrix)
-            }
+      if (nforce > 0) {
+        aarray <- matrix(0,nfine,nforce)
+        for (iu in 1:nforce) {
+          if (!is.null(awtlist[[ivar]][[iu]])) {
+            afdPari <- awtlist[[ivar]][[iu]]
+            aarray[,iu] <- eval.fd(tx, afdPari$fd, returnMatrix=returnMatrix)
           }
         }
-        barray <- vector("list", nvar)
-        for (i in 1:nvar) {
-            difeorder <- length(bwtlist[[ivar]][[i]])
-            barray[[i]] <- matrix(0,nfine,difeorder)
-            for (j in 1:difeorder) {
-                if (!is.null(bwtlist[[ivar]][[i]][[j]])) {
-                    bfdParij     <- bwtlist[[ivar]][[i]][[j]]
-                    barray[[i]][,j] <- as.matrix(eval.fd(tx, bfdParij$fd),
+      }
+
+      barray <- vector("list", nvar)
+      for (i in 1:nvar) {
+        difeorder <- length(bwtlist[[ivar]][[i]])
+        barray[[i]] <- array(0,c(nfine,nvar,difeorder))
+        for (j in 1:difeorder) {
+          if (!is.null(bwtlist[[ivar]][[i]][[j]])) {
+            bfdParij <- bwtlist[[ivar]][[i]][[j]]
+            bfdij    <- bfdParij$fd
+            barray[[i]][,,j] <- as.matrix(eval.fd(tx, bfdij),
                                                     returnMatrix=returnMatrix)
-                }
-            }
+          }
         }
+      }
 
-    #  loop through equations,
-    #    corresponding to rows for CMAT and DMAT
+      #  loop through equations,
+      #    corresponding to rows for CMAT and DMAT
 
-    #  loop through equations for u-variables
+      #  loop through equations for u-variables
 
-        mi12 <- 0
-        if (nforce > 0) {
-          for (iu1 in 1:nforce) {
-            if (!is.null(awtlist[[ivar]][[iu1]])) {
-              afdPari1   <- awtlist[[ivar]][[iu1]]
-              if (afdPari1$estimate) {
-                abasisi1    <- afdPari1$fd$basis
-                abasismati1 <- getbasismatrix(tx, abasisi1, returnMatrix=returnMatrix)
-                mi11 <- mi12 + 1
-                mi12 <- mi12 + abasisi1$nbasis
-                indexi1 <- mi11:mi12
-   #  DMAT entry for u-variable
-                weighti1 <- -yuprod[[ivar]][[iu1]][,difeordp1]
-                dmat[indexi1] <- trapzmat(abasismati1,onesn,deltax,weighti1)
-            #  add terms corresponding to x-derivative weights
-            #  that are not estimated
-                for (i in 1:nvar) {
-                  difeorder <- length(bwtlist[[ivar]][[i]])
-                  for (j in 1:difeorder) {
-                    bfdParij <- bwtlist[[ivar]][[i]][[j]]
-                    if (!bfdParij$estimate) {
-                      weightij <- -yuprod[[ivar]][[iu1]][,j]
-                      dmat[indexi1] <- dmat[indexi1] +
-                          trapzmat(abasismati1, barray[[ivar]][,j],
+      mi12 <- 0
+      if (nforce > 0) {
+        for (iu1 in 1:nforce) {
+          if (!is.null(awtlist[[ivar]][[iu1]])) {
+            afdPari1   <- awtlist[[ivar]][[iu1]]
+            if (afdPari1$estimate) {
+              abasisi1    <- afdPari1$fd$basis
+              abasismati1 <- getbasismatrix(tx, abasisi1, returnMatrix=returnMatrix)
+              mi11 <- mi12 + 1
+              mi12 <- mi12 + abasisi1$nbasis
+              indexi1 <- mi11:mi12
+              #  DMAT entry for u-variable
+              weighti1 <- -yuprod[[ivar]][[iu1]][,difeordp1]
+              dmat[indexi1] <- trapzmat(abasismati1,onesn,deltax,weighti1)
+              #  add terms corresponding to x-derivative weights
+              #  that are not estimated
+              for (i in 1:nvar) {
+                difeorder <- length(bwtlist[[ivar]][[i]])
+                for (j in 1:difeorder) {
+                  bfdParij <- bwtlist[[ivar]][[i]][[j]]
+                  if (!bfdParij$estimate) {
+                    weightij <- -yuprod[[ivar]][[iu1]][,j]
+                    dmat[indexi1] <- dmat[indexi1] +
+                          trapzmat(abasismati1, barray[[ivar]][,,j],
                                    deltax, weightij)
-                    }
                   }
-                }
-            #  loop through weight functions to be estimated,
-            #    corresponding to columns for CMAT
-            #  begin with u-variables
-                mi22 <- 0
-                for (iu2 in 1:nforce) {
-                  if (!is.null(awtlist[[ivar]][[iu2]])) {
-                    afdPari2   <- awtlist[[ivar]][[iu2]]
-                    if (afdPari2$estimate) {
-                      abasisi2    <- afdPari2$fd$basis
-                      abasismati2 <- getbasismatrix(tx, abasisi2,
-                                                    returnMatrix=returnMatrix)
-                      weighti2    <- uprod[[ivar]][,iu1,iu2]
-                      Cprod       <- trapzmat(abasismati1, abasismati2,
-                                              deltax, weighti2)
-                      mi21 <- mi22 + 1
-                      mi22 <- mi22 + abasisi2$nbasis
-                      indexi2 <- mi21:mi22
-                                        #  coefficient matrix CMAT entry
-                      cmat[indexi1,indexi2] <- Cprod
-                    }
-                  }
-                }
-            #  remaining columns:
-            #    loop through u-variable -- x-derivative pairs
-                mij22 <- mi22
-                for (i2 in 1:nvar) {
-                  if (!is.null(bwtlist[[ivar]][[i2]])) {
-                    difeorder <- length(bwtlist[[ivar]][[i2]])
-                    for (j2 in 1:difeorder) {
-                      bfdParij2   <- bwtlist[[ivar]][[i2]][[j2]]
-                      if (bfdParij2$estimate) {
-                        bbasisij2    <- bfdParij2$fd$basis
-                        bbasismatij2 <- getbasismatrix(tx, bbasisij2,
-                                                       returnMatrix=returnMatrix)
-                        weightij12   <- -yuprod[[i2]][[iu1]][,j2]
-                        Cprod        <- trapzmat(abasismati1,bbasismatij2,
-                                           deltax,weightij12)
-                        mij21 <- mij22 + 1
-                        mij22 <- mij22 + bbasisij2$nbasis
-                        indexij2  <- mij21:mij22
-                        cmat[indexi1,indexij2] <- Cprod
-                      }
-                    }
-                  }
-                }
-            #  add roughness penalty matrix to diagonal entries
-                lambdai1 <- afdPari1$lambda
-                if (lambdai1 > 0) {
-                    Lfdobj <- afdPari1$Lfd
-                    penmat <- lambdai1*eval.penalty(abasisi1,Lfdobj)
-                    cmat[indexi1,indexi1] <- cmat[indexi1,indexi1] + penmat
                 }
               }
-            }
-          }
-        }
-
-    #  loop through equations for x-derivatives
-
-    mij12 <- mi12
-    for (i1 in 1:nvar) {
-      difeorder1 <- length(bwtlist[[ivar]][[i1]])
-      for (j1 in 1:difeorder1) {
-        if (!is.null(bwtlist[[ivar]][[i1]][[j1]])) {
-          bfdParij1 <- bwtlist[[ivar]][[i1]][[j1]]
-          if (bfdParij1$estimate) {
-            bbasisij1    <- bfdParij1$fd$basis
-            bbasismatij1 <- getbasismatrix(tx, bbasisij1, returnMatrix=returnMatrix)
-            mij11 <- mij12 + 1
-            mij12 <- mij12 + bbasisij1$nbasis
-            indexij1 <- mij11:mij12
-            #  DMAT entry for u-variable -- x-derivative pair
-            weightij1 <- yprod[[i1]][[ivar]][,j1,difeordp1]
-            dmat[indexij1] <- trapzmat(bbasismatij1,onesn,
-                                       deltax,weightij1)
-            #  add terms corresponding to forcing functions
-            #  with unestimated coefficients
-            if (nforce > 0) {
-              for (iu in 1:nforce) {
-                if (!is.null(awtlist[[ivar]][[iu]])) {
-                  afdPari <- awtlist[[ivar]][[iu]]
-                  if (!afdPari$estimate) {
-		                weightijk <- yprod[,ivar,iu,j1]
-		                dmat[indexij1] <- dmat[indexij1] +
-		                  trapzmat(bbasismatij1,aarray[,iu],
-                                       deltax,weightijk)
-		              }
-		            }
-	            }
-            }
-            #  first columns of CMAT: u-variable entries
-            mi22 <- 0
-            if (nforce > 0) {
+              #  loop through weight functions to be estimated,
+              #    corresponding to columns for CMAT
+              #  begin with u-variables
+              mi22 <- 0
               for (iu2 in 1:nforce) {
                 if (!is.null(awtlist[[ivar]][[iu2]])) {
-                  afdPari2  <- awtlist[[ivar]][[iu2]]
+                  afdPari2   <- awtlist[[ivar]][[iu2]]
                   if (afdPari2$estimate) {
                     abasisi2    <- afdPari2$fd$basis
-                    abasismati2 <- getbasismatrix(tx, abasisi2, returnMatrix=returnMatrix)
-                    weighti2    <- -yuprod[[i1]][[iu2]][,j1]
-                    Cprod <- trapzmat(bbasismatij1,abasismati2,deltax,weighti2)
+                    abasismati2 <- getbasismatrix(tx, abasisi2,
+                                                returnMatrix=returnMatrix)
+                    weighti2    <- uprod[[ivar]][,iu1,iu2]
+                    Cprod       <- trapzmat(abasismati1, abasismati2,
+                                              deltax, weighti2)
                     mi21 <- mi22 + 1
                     mi22 <- mi22 + abasisi2$nbasis
                     indexi2 <- mi21:mi22
-                    cmat[indexij1,indexi2] <- Cprod
+                    #  coefficient matrix CMAT entry
+                    cmat[indexi1,indexi2] <- Cprod
                   }
                 }
               }
-            }
-            #  remaining columns: x-derivative pairs
-            mij22 <- mi22
-            for (i2 in 1:nvar) {
-              difeorder2 <- length(bwtlist[[ivar]][[i2]])
-              for (j2 in 1:difeorder2) {
-                if (!is.null(bwtlist[[ivar]][[i2]][[j2]])) {
-                  bfdParij2 <- bwtlist[[ivar]][[i2]][[j2]]
-                  bbasisij2    <- bfdParij2$fd$basis
-                  bbasismatij2 <- getbasismatrix(tx, bbasisij2, returnMatrix=returnMatrix)
-                  weightij22   <- yprod[[i1]][[i2]][,j1,j2]
-                  Cprod <- trapzmat(bbasismatij1,bbasismatij2,deltax,weightij22)
-                  if (bfdParij2$estimate) {
-                    mij21 <- mij22 + 1
-                    mij22 <- mij22 + bbasisij2$nbasis
-                    indexij2 <- mij21:mij22
-                    cmat[indexij1,indexij2] <- Cprod
+              #  remaining columns:
+              #    loop through u-variable -- x-derivative pairs
+              mij22 <- mi22
+              for (i2 in 1:nvar) {
+                if (!is.null(bwtlist[[ivar]][[i2]])) {
+                  difeorder <- length(bwtlist[[ivar]][[i2]])
+                  for (j2 in 1:difeorder) {
+                    bfdParij2   <- bwtlist[[ivar]][[i2]][[j2]]
+                    if (bfdParij2$estimate) {
+                      bbasisij2    <- bfdParij2$fd$basis
+                      bbasismatij2 <- getbasismatrix(tx, bbasisij2,
+                                                     returnMatrix=returnMatrix)
+                      weightij12   <- -yuprod[[i2]][[iu1]][,j2]
+                      Cprod        <- trapzmat(abasismati1,bbasismatij2,
+                                           deltax,weightij12)
+                      mij21 <- mij22 + 1
+                      mij22 <- mij22 + bbasisij2$nbasis
+                      indexij2  <- mij21:mij22
+                      cmat[indexi1,indexij2] <- Cprod
+                    }
                   }
                 }
               }
+              #  add roughness penalty matrix to diagonal entries
+              lambdai1 <- afdPari1$lambda
+              if (lambdai1 > 0) {
+                Lfdobj <- afdPari1$Lfd
+                penmat <- lambdai1*eval.penalty(abasisi1,Lfdobj)
+                cmat[indexi1,indexi1] <- cmat[indexi1,indexi1] + penmat
+              }
             }
-            #  add roughness penalty terms to diagonal entries
-            lambdaij1 <- bfdParij1$lambda
-            if (lambdaij1 > 0) {
-	             Lfdobj <- bfdParij1$Lfd
-	             penmat <- lambdaij1*eval.penalty(bbasisij1,Lfdobj)
-	             cmat[indexij1,indexij1] <- cmat[indexij1,indexij1] +
-	                  penmat
+          }
+        }
+      }
+
+      #  end of loop through equations for u-variables
+
+      #  loop through equations for x-derivatives
+
+      mij12 <- mi12
+      for (i1 in 1:nvar) {
+        difeorder1 <- length(bwtlist[[ivar]][[i1]])
+        for (j1 in 1:difeorder1) {
+          if (!is.null(bwtlist[[ivar]][[i1]][[j1]])) {
+            bfdParij1 <- bwtlist[[ivar]][[i1]][[j1]]
+            if (bfdParij1$estimate) {
+              bbasisij1    <- bfdParij1$fd$basis
+              bbasismatij1 <- getbasismatrix(tx, bbasisij1, returnMatrix=returnMatrix)
+              mij11 <- mij12 + 1
+              mij12 <- mij12 + bbasisij1$nbasis
+              indexij1 <- mij11:mij12
+              #  DMAT entry for u-variable -- x-derivative pair
+              weightij1 <- yprod[[i1]][[ivar]][,j1,difeordp1]
+              dmat[indexij1] <- trapzmat(bbasismatij1,onesn,
+                                       deltax,weightij1)
+              #  add terms corresponding to forcing functions
+              #  with unestimated coefficients
+              if (nforce > 0) {
+                for (iu in 1:nforce) {
+                  if (!is.null(awtlist[[ivar]][[iu]])) {
+                    afdPari <- awtlist[[ivar]][[iu]]
+                    if (!afdPari$estimate) {
+		                  weightijk <- yprod[,ivar,iu,j1]
+		                  dmat[indexij1] <- dmat[indexij1] +
+		                    trapzmat(bbasismatij1,aarray[,iu],deltax,weightijk)
+		                }
+		              }
+	              }
+              }
+              #  first columns of CMAT: u-variable entries
+              mi22 <- 0
+              if (nforce > 0) {
+                for (iu2 in 1:nforce) {
+                  if (!is.null(awtlist[[ivar]][[iu2]])) {
+                    afdPari2  <- awtlist[[ivar]][[iu2]]
+                    if (afdPari2$estimate) {
+                      abasisi2    <- afdPari2$fd$basis
+                      abasismati2 <- getbasismatrix(tx, abasisi2, returnMatrix=returnMatrix)
+                      weighti2    <- -yuprod[[i1]][[iu2]][,j1]
+                      Cprod <- trapzmat(bbasismatij1,abasismati2,deltax,weighti2)
+                      mi21 <- mi22 + 1
+                      mi22 <- mi22 + abasisi2$nbasis
+                      indexi2 <- mi21:mi22
+                      cmat[indexij1,indexi2] <- Cprod
+                    }
+                  }
+                }
+              }
+              #  remaining columns: x-derivative pairs
+              mij22 <- mi22
+              for (i2 in 1:nvar) {
+                difeorder2 <- length(bwtlist[[ivar]][[i2]])
+                for (j2 in 1:difeorder2) {
+                  if (!is.null(bwtlist[[ivar]][[i2]][[j2]])) {
+                    bfdParij2 <- bwtlist[[ivar]][[i2]][[j2]]
+                    bbasisij2    <- bfdParij2$fd$basis
+                    bbasismatij2 <- getbasismatrix(tx, bbasisij2, returnMatrix=returnMatrix)
+                    weightij22   <- yprod[[i1]][[i2]][,j1,j2]
+                    Cprod <- trapzmat(bbasismatij1,bbasismatij2,deltax,weightij22)
+                    if (bfdParij2$estimate) {
+                      mij21 <- mij22 + 1
+                      mij22 <- mij22 + bbasisij2$nbasis
+                      indexij2 <- mij21:mij22
+                      cmat[indexij1,indexij2] <- Cprod
+                    }
+                  }
+                }
+              }
+              #  add roughness penalty terms to diagonal entries
+              lambdaij1 <- bfdParij1$lambda
+              if (lambdaij1 > 0) {
+	              Lfdobj <- bfdParij1$Lfd
+	              penmat <- lambdaij1*eval.penalty(bbasisij1,Lfdobj)
+	              cmat[indexij1,indexij1] <- cmat[indexij1,indexij1] +penmat
+              }
+            }
+          }
+        }
+      }
+
+      #  end of loop through x derivatives
+
+      dvec <- -symsolve(cmat,dmat)
+
+      #  set up u-function weight functions
+
+      mi2 <- 0
+      if (nforce > 0) {
+        for (iu in 1:nforce) {
+          if (!is.null(awtlist[[ivar]][[iu]])) {
+            afdPari <- awtlist[[ivar]][[iu]]
+            if (afdPari$estimate) {
+              mi1 <- mi2 + 1
+              mi2 <- mi2 + afdPari$fd$basis$nbasis
+              indexi <- mi1:mi2
+              afdPari$fd$coefs <- as.matrix(dvec[indexi])
+              awtlist[[ivar]][[iu]] <- afdPari
+            }
+          }
+        }
+      }
+
+      #  set up X-function derivative weight functions
+
+      mij2 <- mi2
+      for (i1 in 1:nvar) {
+        difeorder <- length(bwtlist[[ivar]][[i1]])
+        for (j1 in 1:difeorder) {
+          if (!is.null(bwtlist[[ivar]][[i1]][[j1]])) {
+            bfdParij <- bwtlist[[ivar]][[i1]][[j1]]
+            if (bfdParij$estimate) {
+              mij1 <- mij2 + 1
+              mij2 <- mij2 + bfdParij$fd$basis$nbasis
+              indexij <- mij1:mij2
+              bfdParij$fd$coefs <- as.matrix(dvec[indexij])
+              bwtlist[[ivar]][[i1]][[j1]] <- bfdParij
             }
           }
         }
       }
     }
 
-    dvec <- -symsolve(cmat,dmat)
+    #  --------------  end of loop through variables  -------------------
 
-    #  set up u-function weight functions
+    #  set up residual list RESFDLIST
 
-    mi2 <- 0
-    if (nforce > 0) {
-      for (iu in 1:nforce) {
-        if (!is.null(awtlist[[ivar]][[iu]])) {
-          afdPari <- awtlist[[ivar]][[iu]]
-          if (afdPari$estimate) {
-            mi1 <- mi2 + 1
-            mi2 <- mi2 + afdPari$fd$basis$nbasis
-            indexi <- mi1:mi2
-            afdPari$fd$coefs <- as.matrix(dvec[indexi])
-            awtlist[[ivar]][[iu]] <- afdPari
+    resfdlist <- vector("list", nvar)
+
+    for (ivar in 1:nvar) {
+      difeorder <- length(bwtlist[[ivar]][[ivar]])
+      xfdi      <- xfdlist[[ivar]]
+      resbasis  <- xfdi$basis
+      #  initialize with highest order derivative for this variable
+      resmat    <- eval.fd(tx, xfdi, difeorder, returnMatrix)
+      #  add contributions from weighted u-functions
+      onesncurve <- rep(1,ncurve)
+      if (!is.null(ufdlist)) {
+        nforce <- length(ufdlist[[ivar]])
+        if (nforce > 0) {
+    	    for (iu in 1:nforce) {
+    	      if (!is.null(awtlist[[ivar]][[iu]])) {
+	            afdPari  <- awtlist[[ivar]][[iu]]
+              amati    <- as.vector(eval.fd(tx, afdPari$fd, 
+                                                  returnMatrix=returnMatrix))
+              umati    <- eval.fd(tx, ufdlist[[ivar]][[iu]], 
+                                                  returnMatrix=returnMatrix)
+	            if (ncurve == 1) { 
+                aumati <- amati*umati
+	            } else {            
+                aumati <- outer(amati,onesncurve)*umati
+              }
+              resmat   <- resmat - aumati
+            }
+    	    }
+        }
+      }
+      #  add contributions from weighted x-function derivatives
+      for (i1 in 1:nvar) {
+        difeorder <- length(bwtlist[[ivar]][[i1]])
+        for (j1 in 1:difeorder) {
+          if (!is.null(bwtlist[[ivar]][[i1]][[j1]])) {
+            bfdParij <- bwtlist[[ivar]][[i1]][[j1]]
+            bfdij    <- bfdParij$fd
+            bvecij   <- as.vector(eval.fd(tx, bfdij, returnMatrix=returnMatrix))
+            if (ncurve == 1) {
+              bmatij <- bvecij
+            }  else  {
+              bmatij <- outer(bvecij,onesncurve)
+            }
+            xmatij <- eval.fd(tx, xfdlist[[i1]], j1-1, returnMatrix)
+            resmat <- resmat + bmatij*xmatij
           }
         }
       }
+      #  set up the functional data object
+      resfdi            <- smooth.basis(tx, resmat, resbasis)$fd
+      resfdnames        <- xfdi$fdnames
+      resfdnames[[2]]   <- "Residual function"
+      resfdnames[[3]]   <- "Residual function value"
+      resfdlist[[ivar]] <- resfdi
     }
 
-    #  set up X-function derivative weight functions
+    #  ----------------------------------------------------------------
+    #                   End of multiple variable case
+    #  ----------------------------------------------------------------
 
-    mij2 <- mi2
-    for (i1 in 1:nvar) {
-      difeorder <- length(bwtlist[[ivar]][[i1]])
-      for (j1 in 1:difeorder) {
-        if (!is.null(bwtlist[[ivar]][[i1]][[j1]])) {
-          bfdParij <- bwtlist[[ivar]][[i1]][[j1]]
-          if (bfdParij$estimate) {
-            mij1 <- mij2 + 1
-            mij2 <- mij2 + bfdParij$fd$basis$nbasis
-            indexij <- mij1:mij2
-            bfdParij$fd$coefs <- as.matrix(dvec[indexij])
-            bwtlist[[ivar]][[i1]][[j1]] <- bfdParij
-          }
-        }
-      }
-    }
-}
-
-#  --------------  end of loop through variables  -------------------
-
-#  set up residual list RESFDLIST
-
-resfdlist <- vector("list", nvar)
-
-for (ivar in 1:nvar) {
-  difeorder <- length(bwtlist[[ivar]][[ivar]])
-  xfdi      <- xfdlist[[ivar]]
-  resbasis  <- xfdi$basis
-  #  initialize with highest order derivative for this variable
-  resmat    <- eval.fd(tx, xfdi, difeorder, returnMatrix)
-  #  add contributions from weighted u-functions
-  onesncurve <- rep(1,ncurve)
-  if (!is.null(ufdlist)) {
-    nforce <- length(ufdlist[[ivar]])
-    if (nforce > 0) {
-    	for (iu in 1:nforce) {
-    	  if (!is.null(awtlist[[ivar]][[iu]])) {
-	        afdPari  <- awtlist[[ivar]][[iu]]
-          amati    <- as.vector(eval.fd(tx, afdPari$fd, returnMatrix=returnMatrix))
-          umati    <- eval.fd(tx, ufdlist[[ivar]][[iu]], returnMatrix=returnMatrix)
-	        if (ncurve == 1) aumati <- amati*umati
-	        else             aumati <- outer(amati,onesncurve)*umati
-          resmat   <- resmat - aumati
-        }
-    	}
-    }
   }
-  #  add contributions from weighted x-function derivatives
-  for (i1 in 1:nvar) {
-    difeorder <- length(bwtlist[[ivar]][[i1]])
-    for (j1 in 1:difeorder) {
-      if (!is.null(bwtlist[[ivar]][[i1]][[j1]])) {
-        bfdParij <- bwtlist[[ivar]][[i1]][[j1]]
-        bfdij    <- bfdParij$fd
-        bvecij   <- as.vector(eval.fd(tx, bfdij, returnMatrix=returnMatrix))
-        if (ncurve == 1) {
-          bmatij <- bvecij
-        }  else  {
-          bmatij <- outer(bvecij,onesncurve)
-        }
-        xmatij <- eval.fd(tx, xfdlist[[i1]], j1-1, returnMatrix)
-        resmat <- resmat + bmatij*xmatij
-      }
-    }
-  }
-  #  set up the functional data object
-  resfdi            <- smooth.basis(tx, resmat, resbasis)$fd
-  resfdnames        <- xfdi$fdnames
-  resfdnames[[2]]   <- "Residual function"
-  resfdnames[[3]]   <- "Residual function value"
-  resfdlist[[ivar]] <- resfdi
-}
-
-#  ----------------------------------------------------------------
-#                   End of multiple variable case
-#  ----------------------------------------------------------------
-
-}
 
   pdaList <- list(bwtlist=bwtlist, resfdlist=resfdlist, awtlist=awtlist)
   class(pdaList) <- 'pda.fd'
   pdaList
 }
+
+# ---------------------------------------------------------------------------
+
+trapzmat <- function(X,Y,delta=1,wt=rep(1,n)) {
+#TRAPZMAT integrates the products of two matrices of values
+#   using the trapezoidal rule, assuming equal spacing
+#  X is the first  matrix of values
+#  Y is the second matrix of values
+#  DELTA is the spacing between argument values (one by default)
+#  WT is a vector of weights (ones by default)
+#
+#  XtWY is a matrix of integral estimates, number of rows equal to
+#  number of col of X, number of cols equal to number of cols of Y
+
+	X <- as.matrix(X)
+	Y <- as.matrix(Y)
+	
+	n <- dim(X)[1]
+
+	if (dim(Y)[1] != n) {
+    	stop("X and Y do not have same number of rows.")
+	}
+
+	if (length(wt) != n) {
+    	stop("X and WT do not have same number of rows.")
+	}
+
+	if (delta <= 0) {
+    	stop("DELTA is not a positive value.")
+	}
+
+	wt[c(1,n)] <- wt[c(1,n)]/2
+	wt <- wt*delta
+
+	X <- X*outer(wt,rep(1,dim(X)[2]))
+	XtWY <- crossprod(X,Y)
+	return(XtWY)
+}
+

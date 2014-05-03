@@ -113,10 +113,9 @@ basisfd <- function(type, rangeval, nbasis, params, dropind=vector("list",0),
 #  CREATE_FOURIER_BASIS     ...  creates a fourier basis
 #  CREATE_MONOMIAL_BASIS    ...  creates a monomial basis
 #  CREATE_POLYGON_BASIS     ...  creates a polygonal basis
-#  CREATE_POLYNOMIAL_BASIS  ...  creates a polynomial basis
 #  CREATE_POWER_BASIS       ...  creates a monomial basis
 
-#  Last modified 28 December 2012 by Jim Ramsay
+#  Last modified 19 March 2014 by Jim Ramsay
 # value -> values 2012.12.27 by spencer graves
 #  Set up default basis if there are no arguments:
 #     order 2 monomial basis over [0,1]
@@ -183,12 +182,6 @@ else if(type == "polyg"    ||
           type == "polygon"  ||
           type == "polygonal") {
                 type = "polyg"
-        }
-else if(type == "poly"    ||
-          type == "pol"     ||
-          type == "polynom" ||
-          type == "polynomial") {
-                type = "polynom"
         }
 else if(type == "pow"    ||
           type == "power") {
@@ -304,9 +297,6 @@ if (type=="fourier"){
 } else if(type=="monom") {
     if (length(params) != nbasis)
         stop("No. of parameters not equal to no. of basis fns for (monomial basisobj$")
-} else if(type=="polynom") {
-    if (length(params) > 1)
-        stop("More than one parameter for (a polynomial basisobj$")
 } else stop("Unrecognizable basis")
 
 #  Save call

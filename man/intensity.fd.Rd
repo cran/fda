@@ -111,7 +111,8 @@ tbasis <- create.bspline.basis(c(0,tmax), 23)
 #  the log intensity function.  The first derivative
 #  is penalized in order to smooth toward a constant
 lambda <- 10
-WfdParobj <- fdPar(tbasis, 1, lambda)
+Wfd0 <- fd(matrix(0,23,1),tbasis)
+WfdParobj <- fdPar(Wfd0, 1, lambda)
 #  estimate the intensity function
 Wfdobj <- intensity.fd(tvec, WfdParobj)$Wfdobj
 #  get intensity function values at 0 and event times

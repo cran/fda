@@ -29,13 +29,10 @@ basisfd(type, rangeval, nbasis, params,
     \enumerate{
       \item{Bspline, bspline, Bsp, bsp}{b-spline basis}
       \item{const, con, constant}{constant basis}
-      \item{exp, expon, exponen, exponential}{
-	exponential basis
-      }
+      \item{exp, expon, exponen, exponential}{exponential basis}
       \item{Fourier, fourier, Fou, fou}{Fourier basis}
       \item{mon, monom, monomial}{monomial basis}
       \item{polyg, polygon, polygonal}{polygonal basis}
-      \item{polynom}{polynomial basis}
       \item{power, pow}{power basis}
     }
   }
@@ -132,7 +129,7 @@ basisfd(type, rangeval, nbasis, params,
 
   It is comparatively simple to add new basis types.  The code in
   the following functions needs to be estended to allow for the new
-  type: \code{\link{basisfd}}, 
+  type: \code{\link{basisfd}},
   \code{\link{getbasismatrix}} and \code{\link{getbasispenalty}}.
   In addition, a new "create" function should be written for the
   new type, as well as functions analogous to \code{\link{fourier}} and
@@ -189,7 +186,6 @@ basisfd(type, rangeval, nbasis, params,
 \code{\link{create.fourier.basis}},
 \code{\link{create.monomial.basis}},
 \code{\link{create.polygonal.basis}},
-\code{\link{create.polynomial.basis}},
 \code{\link{create.power.basis}}
 }
 % docclass is function

@@ -109,7 +109,6 @@ create.monomial.basis(rangeval=c(0, 1), nbasis=NULL,
   \code{\link{create.fourier.basis}},
   \code{\link{create.exponential.basis}},
   \code{\link{create.polygonal.basis}},
-  \code{\link{create.polynomial.basis}},
   \code{\link{create.power.basis}}
 }
 \examples{

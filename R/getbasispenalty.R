@@ -4,7 +4,7 @@ getbasispenalty <- function(basisobj, Lfdobj=NULL)
 #    This is defined in terms of a linear differential operator LFDOBJ.
 #    The default for LFDOBJ depends on the nature of the basis.
 
-#  Last modified 26 October 2005
+#  Last modified 19 March 2014
 
 #  check BASISOBJ
 
@@ -27,9 +27,6 @@ if        (type == "fourier") {
 } else if (type == "polyg" | type == "polygonal")   {
     if (is.null(Lfdobj)) Lfdobj <- 1
     penaltymat <- polygpen(basisobj, Lfdobj)
-} else if (type == "polynom" & type == "polynomial")    {
-    if (is.null(Lfdobj)) Lfdobj <- 2
-    penaltymat <- polynompen(basisobj, Lfdobj)
 } else if (type == "power")   {
     if (is.null(Lfdobj)) Lfdobj <- 2
     penaltymat <- powerpen(basisobj, Lfdobj)

@@ -37,6 +37,10 @@ smooth.pos <- function(argvals, y, WfdParobj, wtvec=rep(1,n), conv=1e-4,
 #               to initialize the optimization process.
 #               Its coefficient array contains the starting values for
 #               the iterative minimization of mean squared error.
+#               This means that it must be set up with the coefficients
+#               for each replication in Y and each variable.  Do not
+#               supply only a basis object for the FDOBJ argument in
+#               setting up the FDPAROBJ argument.
 #  WTVEC   ...  a vector of weights, a vector of N one's by default.
 #  CONV    ...  convergence criterion, 0.0001 by default
 #  ITERLIM ...  maximum number of iterations, 50 by default.
@@ -62,7 +66,7 @@ smooth.pos <- function(argvals, y, WfdParobj, wtvec=rep(1,n), conv=1e-4,
 #  FLIST objects are indexed linear with curves varying inside
 #  variables.
 
-#  Last modified 9 May 2012  by Jim Ramsay
+#  Last modified 16 April 2014  by Jim Ramsay
 
 
 #  check ARGVALS
@@ -77,6 +81,7 @@ if (n < 2) stop('ARGVALS does not contain at least two values.')
 
 #  check Y
 
+y      = as.matrix(y)
 ychk   = ycheck(y, n)
 y      = ychk$y
 ncurve = ychk$ncurve
@@ -97,7 +102,7 @@ nbasis   <- basisobj$nbasis  #  number of basis functions
 
 #  set up initial coefficient array
 
-coef0    <- Wfdobj$coefs
+coef0 <- Wfdobj$coefs
 
 #  check WTVEC
 
@@ -106,8 +111,31 @@ wtvec = wtcheck(n, wtvec)$wtvec
 #  set up some arrays
 
 climit  <- c(rep(-400,nbasis),rep(400,nbasis))
-coef0   <- Wfdobj$coefs
 active  <- 1:nbasis
+
+#  set up initial coefficient: use that of Wfd0 if its dimensions
+#  are correct, otherwise set to a zero array.
+
+coef0 = Wfdobj$coefs  #  initial coefficients
+if (ndim == 2) {
+    if (dim(coef0)[2] != ncurve || length(dim(coef0)) != 2) {
+        coef0 = matrix(0,nbasis,ncurve)
+        warning(paste("Dimensions of coefficient array inconsistent",
+                      "with data Y, initial coefficients set to 0."))
+    }
+} else {
+    if (length(dim(coef0)) != 3) {
+        coef0 = array(0,c(nbasis,ncurve,nvar))
+        warning(paste("Dimensions of coefficient array inconsistent",
+                      "with data Y, initial coefficients set to 0."))
+    }
+    if  (dim(coef0)[2] != ncurve || dim(coef0)[3] != nvar) {
+        coef0 = array(0,c(nbasis,ncurve,nvar))
+        warning(paste("Dimensions of coefficient array inconsistent",
+                      "with data Y, initial coefficients set to 0."))
+    }
+}
+coef <- coef0
 
 #  initialize matrix Kmat defining penalty term
 
@@ -119,12 +147,6 @@ else            Kmat <- matrix(0,nbasis,nbasis)
 #  --------------------------------------------------------------------
 
 #  set up arrays and lists to contain returned information
-
-if (ndim == 2) {
-    coef = matrix(0,nbasis,ncurve)
-} else {
-    coef = array(0,c(nbasis,ncurve,nvar))
-}
 
 if (ncurve > 1 || nvar > 1 ) Flist = vector("list",ncurve*nvar)
 else                         Flist = NULL
@@ -351,14 +373,15 @@ for (ivar in 1:nvar) {
 
   posFd <- list("Wfdobj"=Wfdobj, "Flist"=Flist,
                 "argvals"=argvals, "y"=y)
+
   class(posFd) <- 'posfd'
 
-  return(posFd)
+  posFd
 }
 
 #  ---------------------------------------------------------------
 
-PENSSEfun <- function(argvals, yi, basisobj, cveci, Kmat, wtvec, 
+PENSSEfun <- function(argvals, yi, basisobj, cveci, Kmat, wtvec,
                       returnMatrix=FALSE) {
 	#  Computes the log likelihood and its derivative with
 	#    respect to the coefficients in CVEC
@@ -375,7 +398,7 @@ PENSSEfun <- function(argvals, yi, basisobj, cveci, Kmat, wtvec,
 
 #  ---------------------------------------------------------------
 
-PENSSEhess <- function(argvals, yi, basisobj, cveci, Kmat, wtvec, 
+PENSSEhess <- function(argvals, yi, basisobj, cveci, Kmat, wtvec,
                        returnMatrix=FALSE) {
 	#  Computes the expected Hessian
    	n       <- length(argvals)
@@ -389,5 +412,5 @@ PENSSEhess <- function(argvals, yi, basisobj, cveci, Kmat, wtvec,
   	D2PENSSE  <- 2*crossprod(Dres)/n + 2*Kmat
 	return(D2PENSSE)
 }
-	
+
 

@@ -104,8 +104,8 @@ create.power.basis(rangeval=c(0, 1), nbasis=NULL, exponents=NULL,
   a basis object of type \code{power}.
 }
 \details{
-  The power basis differs from the monomial and polynomial
-  bases in two ways.  First, the powers may be nonintegers.
+  The power basis differs from the monomial
+  basis in two ways.  First, the powers may be nonintegers.
   Secondly, they may be negative.  Consequently, a power
   basis is usually used with arguments that only take
   positive values, although a zero value can be tolerated
@@ -120,7 +120,6 @@ create.power.basis(rangeval=c(0, 1), nbasis=NULL, exponents=NULL,
 \code{\link{create.fourier.basis}},
 \code{\link{create.monomial.basis}},
 \code{\link{create.polygonal.basis}},
-\code{\link{create.polynomial.basis}}
 }
 \examples{
 

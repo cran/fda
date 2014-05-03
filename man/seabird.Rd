@@ -11,31 +11,31 @@
 \format{
   A data frame with 3793 observations on the following 22 variables.
   \describe{
-    \item{BAGO, BLSC, COME, COMU, CORM, HADU, HOGR, LOON, MAMU, OLDS,
-      PIGU, RBME, RNGR, SUSC, WWSC}{
+    \item{BAGO, BLSC, COME, COMU, CORM, HADU, HOGR, LOON, MAMU, OLDS, PIGU, RBME, RNGR, SUSC, WWSC}{
       integer count of the numbers of sightings of each species by
       transect by year
     }
-    \item{\code{Year}}{integer year, 1986 - 2005}
-    \item{\code{Site}}{
+    \item{Year}{integer year, 1986 - 2005}
+    \item{Site}{
       Integer codes for \code{Bay}:  10 = Uyak, 20 = Uganik, 60 =
       E. Sitkalidak, 70 = W. Sitkalidak
     }
-    \item{\code{Transect}}{
+    \item{Transect}{
       Integer code (101 - 749) for the specific plot of ground observed
     }
-    \item{\code{Temp}}{a numeric vector}
-    \item{\code{ObservCond}}{
-      a factor with levels \code{Average} \code{Excellent} \code{Fair}
-      \code{Good} \code{Ideal}
+    \item{Temp}{a numeric vector}
+    \item{ObservCond}{
+      a factor with levels \code{Average}, \code{Excellent},
+      \code{Fair}, \code{Good}, and \code{Ideal}.  
     }
-    \item{\code{Bay}}{
+    \item{Bay}{
       a factor with levels \code{E. Sitkalidak} \code{Uganik}
       \code{Uyak} \code{W. Sitkalidak}
     }
-    \item{\code{ObservCondFactor3}}{
-      a factor with levels \code{ExcellentIdeal} \code{FairAverage}
-      \code{Good}, combining levels from \code{ObservCond}
+    \item{ObservCondFactor3}{
+      a factor with levels \code{ExcellentIdeal}, 
+      \code{FairAverage}, and \code{Good}.  These combine levels 
+      from \code{ObservCond}.
     }
   }
 }

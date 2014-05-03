@@ -16,7 +16,7 @@
 }
 \usage{
 \method{density}{fd}(x, WfdParobj, conv=0.0001, iterlim=20,
-           active=2:nbasis, dbglev=1, returnMatrix=FALSE, ...)
+           active=1:nbasis, dbglev=1, returnMatrix=FALSE, ...)
 }
 \arguments{
 \item{x}{

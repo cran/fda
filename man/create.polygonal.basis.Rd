@@ -115,7 +115,6 @@ create.polygonal.basis(rangeval=NULL, argvals=NULL, dropind=NULL,
 \code{\link{create.exponential.basis}},
 \code{\link{create.fourier.basis}},
 \code{\link{create.monomial.basis}},
-\code{\link{create.polynomial.basis}},
 \code{\link{create.power.basis}}
 }
 \examples{

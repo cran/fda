@@ -1,7 +1,7 @@
 density <- function(x, ...)UseMethod('density')
 
 density.fd <- function(x, WfdParobj, conv=0.0001, iterlim=20,
-                      active=2:nbasis, dbglev=1, returnMatrix=FALSE, ...) {
+                      active=1:nbasis, dbglev=1, returnMatrix=FALSE, ...) {
 # DENSITYFD estimates the density of a sample of scalar observations.
 
 #  These observations may be one of two forms:
@@ -38,290 +38,282 @@ density.fd <- function(x, WfdParobj, conv=0.0001, iterlim=20,
 #  exponentiate the resulting vector, and then divide by the normalizing
 #  constant C.
 
-# last modified 10 May 2012 by Jim Ramsay
+# last modified 3 March 2014 by Jim Ramsay
 
-	#  check WfdParobj
+#  check WfdParobj
 
-	if (!inherits(WfdParobj, "fdPar"))
-		if (inherits(WfdParobj, "fd") || inherits(WfdParobj, "basisfd"))
-			WfdParobj <- fdPar(WfdParobj)
-		else stop("WFDPAROBJ is not a fdPar object")
+if (!inherits(WfdParobj, "fdPar")) {
+	if (inherits(WfdParobj, "fd") || inherits(WfdParobj, "basisfd")) {
+	    WfdParobj <- fdPar(WfdParobj)
+	} else {
+          stop("WFDPAROBJ is not a fdPar object")
+      }
+}
 
-	#  set up WFDOBJ
+#  set up WFDOBJ
 
-	Wfdobj   <- WfdParobj$fd
+Wfdobj   <- WfdParobj$fd
 
-	#  set up LFDOBJ
+#  set up LFDOBJ
 
-	Lfdobj <- WfdParobj$Lfd
-	Lfdobj <- int2Lfd(Lfdobj)
+Lfdobj <- WfdParobj$Lfd
+Lfdobj <- int2Lfd(Lfdobj)
 
-	#  set up BASIS
+#  set up BASIS
 
-	basisobj <- Wfdobj$basis
-	nbasis   <- basisobj$nbasis
-	rangex   <- basisobj$rangeval
+basisobj <- Wfdobj$basis
+nbasis   <- basisobj$nbasis
+rangex   <- basisobj$rangeval
 
-	x    <- as.matrix(x)
-	xdim <- dim(x)
-	N    <- xdim[1]
-	m    <- xdim[2]
+x    <- as.matrix(x)
+xdim <- dim(x)
+N    <- xdim[1]
+m    <- xdim[2]
 
-	if (m > 2 && N > 2)
+if (m > 2 && N > 2)
     	stop("Argument X must have either one or two columns.")
 
-	if ((N == 1 | N == 2) & m > 1) {
-    	x <- t(x)
-    	n <- N
-    	N <- m
-    	m <- n
-	}
+if ((N == 1 | N == 2) & m > 1) {
+    x <- t(x)
+    n <- N
+    N <- m
+    m <- n
+}
 
-	if (m == 1) {
-    	f <- rep(1,N)
-	} else {
-    	f    <- x[,2]
-    	fsum <- sum(f)
-    	f    <- f/fsum
-    	x    <- x[,1]
-	}
+if (m == 1) {
+    f <- rep(1,N)
+} else {
+    f    <- x[,2]
+    fsum <- sum(f)
+    f    <- f/fsum
+    x    <- x[,1]
+}
+f = as.matrix(f)
 
-	#  check for values outside of the range of WFD0
+#  check for values outside of the range of WFD0
 
-	inrng <- (1:N)[x >= rangex[1] & x <= rangex[2]]
-	if (length(inrng) != N) {
-		print(c(length(inrng), N))
-		print(c(rangex[1], rangex[2], min(x), max(x)))
-    	warning("Some values in X out of range and not used.")
-	}
+inrng <- (1:N)[x >= rangex[1] & x <= rangex[2]]
+if (length(inrng) != N) {
+    print(c(length(inrng), N))
+    print(c(rangex[1], rangex[2], min(x), max(x)))
+    warning("Some values in X out of range and not used.")
+}
+x     <- x[inrng]
+f     <- f[inrng]
+nobs  <- length(x)
 
-	x     <- x[inrng]
-	f     <- f[inrng]
-	nobs  <- length(x)
+#  set up some arrays
 
-	#  set up some arrays
+climit <- c(rep(-50,nbasis),rep(400,nbasis))
+cvec0  <- Wfdobj$coefs
+dbgwrd <- dbglev > 1
 
-	climit    <- c(rep(-50,nbasis),rep(400,nbasis))
-	cvec0     <- Wfdobj$coefs
-	hmat      <- matrix(0,nbasis,nbasis)
-	inactive  <- rep(TRUE,nbasis)
-	inactive[active] <- FALSE
-	ninactive <- length((1:nbasis)[inactive])
-	dbgwrd    <- dbglev > 1
+zeromat <- zerobasis(nbasis)
 
-	#  initialize matrix Kmat defining penalty term
+#  initialize matrix Kmat defining penalty term
 
-	lambda <- WfdParobj$lambda
-	if (lambda > 0)
-	  	Kmat <- lambda*getbasispenalty(basisobj, Lfdobj)
+lambda <- WfdParobj$lambda
+if (lambda > 0) Kmat <- lambda*getbasispenalty(basisobj, Lfdobj)
 
-	#  evaluate log likelihood
-	#    and its derivatives with respect to these coefficients
+#  evaluate log likelihood
+#    and its derivatives with respect to these coefficients
 
-	result <- loglfnden(x, f, basisobj, cvec0, returnMatrix)
-	logl   <- result[[1]]
-	Dlogl  <- result[[2]]
+result <- loglfnden(x, f, basisobj, cvec0, returnMatrix)
+logl   <- result[[1]]
+Dlogl  <- result[[2]]
 
-	#  compute initial badness of fit measures
+#  compute initial badness of fit measures
 
-	f0    <- -logl
-	gvec0 <- -Dlogl
-	if (lambda > 0) {
-   		gvec0 <- gvec0 + 2*(Kmat %*% cvec0)
-   		f0 <- f0 + t(cvec0) %*% Kmat %*% cvec0
-	}
-	if (ninactive > 0) gvec0[inactive] <- 0
-	Foldstr <- list(f = f0, norm = sqrt(mean(gvec0^2)))
+fun  <- -logl
+gvec <- -Dlogl
+if (lambda > 0) {
+   gvec <- gvec + 2*(Kmat %*% cvec0)
+   fun    <- fun + t(cvec0) %*% Kmat %*% cvec0
+}
+Foldstr <- list(f = fun, norm = sqrt(mean(gvec^2)))
+gvec0 <- t(zeromat) %*% as.matrix(gvec)
 
-	#  compute the initial expected Hessian
+#  compute the initial expected Hessian
 
-	hmat0 <- Varfnden(x, basisobj, cvec0, returnMatrix)
-	if (lambda > 0) hmat0 <- hmat0 + 2*Kmat
-	if (ninactive > 0) {
-    	hmat0[inactive,] <- 0
-    	hmat0[,inactive] <- 0
-    	hmat0[inactive,inactive] <- diag(rep(1,ninactive))
-	}
+hmat <- Varfnden(x, basisobj, cvec0, returnMatrix)
+if (lambda > 0) hmat <- hmat + 2*Kmat
+hmat0 = t(zeromat) %*% hmat %*% zeromat
 
-	#  evaluate the initial update vector for correcting the initial bmat
+#  evaluate the initial update vector for correcting the initial bmat
 
-	deltac   <- -solve(hmat0,gvec0)
-	cosangle <- -sum(gvec0*deltac)/sqrt(sum(gvec0^2)*sum(deltac^2))
+deltac0  <- -solve(hmat0,gvec0)
+deltac   <- zeromat %*% as.matrix(deltac0)
+cosangle <- -sum(gvec0*deltac0)/sqrt(sum(gvec0^2)*sum(deltac0^2))
 
-	#  initialize iteration status arrays
+#  initialize iteration status arrays
 
-	iternum <- 0
-	status <- c(iternum, Foldstr$f, -logl, Foldstr$norm)
-	if (dbglev > 0) {
-		cat("Iteration  Criterion  Neg. Log L  Grad. Norm\n")
-		cat("      ")
-		cat(format(iternum))
-		cat("    ")
-		cat(format(status[2:4]))
-		cat("\n")
-	}
-	iterhist <- matrix(0,iterlim+1,length(status))
-	iterhist[1,]  <- status
+iternum <- 0
+status <- c(iternum, Foldstr$f, -logl, Foldstr$norm)
+if (dbglev > 0) {
+  cat("Iteration  Criterion  Neg. Log L  Grad. Norm\n")
+  cat("      ")
+  cat(format(iternum))
+  cat("    ")
+  cat(format(status[2:4]))
+  cat("\n")
+}
+iterhist <- matrix(0,iterlim+1,length(status))
+iterhist[1,]  <- status
 
-	#  quit if ITERLIM == 0
+#  quit if ITERLIM == 0
 
-	if (iterlim == 0) {
-    	Flist     <- Foldstr
-    	iterhist <- iterhist[1,]
-    	C        <- normden.phi(basisobj, cvec0, returnMatrix=returnMatrix)
-    	return( list(Wfdobj=Wfdobj, C=C, Flist=Flist, iternum=iternum,
+if (iterlim == 0) {
+    Flist     <- Foldstr
+    iterhist <- iterhist[1,]
+    C        <- normden.phi(basisobj, cvec0, returnMatrix=returnMatrix)
+    return( list(Wfdobj=Wfdobj, C=C, Flist=Flist, iternum=iternum,
                    iterhist=iterhist) )
-	} else {
-		gvec <- gvec0
-		hmat <- hmat0
-	}
+}
 
-	#  -------  Begin iterations  -----------
+#  -------  Begin iterations  -----------
 
-	STEPMAX <- 5
-	MAXSTEP <- 400
-	trial   <- 1
-	cvec    <- cvec0
-	linemat <- matrix(0,3,5)
+STEPMAX <- 5
+MAXSTEP <- 400
+trial   <- 1
+cvec    <- cvec0
+linemat <- matrix(0,3,5)
 
-	for (iter in 1:iterlim) {
-   		iternum <- iternum + 1
-	   	#  take optimal stepsize
-   		dblwrd <- c(0,0)
-		limwrd <- c(0,0)
-		stpwrd <- 0
-		ind    <- 0
-	   	#  compute slope
-      	Flist <- Foldstr
-      	linemat[2,1] <- sum(deltac*gvec)
-      	#  normalize search direction vector
-      	sdg     <- sqrt(sum(deltac^2))
-      	deltac  <- deltac/sdg
-      	dgsum   <- sum(deltac)
-      	linemat[2,1] <- linemat[2,1]/sdg
-      	#  return with stop condition if (initial slope is nonnegative
-      	if (linemat[2,1] >= 0) {
-        	print("Initial slope nonnegative.")
-        	ind <- 3
-        	iterhist <- iterhist[1:(iternum+1),]
-        	break
-      	}
-      	#  return successfully if (initial slope is very small
-      	if (linemat[2,1] >= -1e-5) {
-        	if (dbglev>1) print("Initial slope too small")
-        	iterhist <- iterhist[1:(iternum+1),]
-        	break
-      	}
+for (iter in 1:iterlim) {
+   	iternum <- iternum + 1
+  	#  take optimal stepsize
+	  dblwrd <- c(0,0)
+	  limwrd <- c(0,0)
+  	stpwrd <- 0
+	  ind    <- 0
+	  #  compute slope
+      Flist <- Foldstr
+      linemat[2,1] <- sum(deltac*gvec)
+      #  normalize search direction vector
+      sdg     <- sqrt(sum(deltac^2))
+      deltac  <- deltac/sdg
+      dgsum   <- sum(deltac)
+      linemat[2,1] <- linemat[2,1]/sdg
+      #  return with stop condition if (initial slope is nonnegative
+      if (linemat[2,1] >= 0) {
+        print("Initial slope nonnegative.")
+        ind <- 3
+        iterhist <- iterhist[1:(iternum+1),]
+        break
+      }
+      #  return successfully if (initial slope is very small
+      if (linemat[2,1] >= -1e-5) {
+        if (dbglev>1) print("Initial slope too small")
+        iterhist <- iterhist[1:(iternum+1),]
+        break
+      }
     	#  load up initial search matrix
-      	linemat[1,1:4] <- 0
-      	linemat[2,1:4] <- linemat[2,1]
-      	linemat[3,1:4] <- Foldstr$f
+      linemat[1,1:4] <- 0
+      linemat[2,1:4] <- linemat[2,1]
+      linemat[3,1:4] <- Foldstr$f
      	#  output initial results for stepsize 0
-      	stepiter  <- 0
-      	if (dbglev > 1) {
-			    cat("              ")
-			    cat(format(stepiter))
-			    cat(format(linemat[,1]))
-			    cat("\n")
-		    }
-      	ips <- 0
-      	#  first step set to trial
-      	linemat[1,5]  <- trial
-      	#  Main iteration loop for linesrch
-      	for (stepiter in 1:STEPMAX) {
-        	#  ensure that step does not go beyond limits on parameters
-        	limflg  <- 0
-        	#  check the step size
-        	result <- stepchk(linemat[1,5], cvec, deltac, limwrd, ind,
+      stepiter  <- 0
+      if (dbglev > 1) {
+	      cat("              ")
+	      cat(format(stepiter))
+	      cat(format(linemat[,1]))
+	      cat("\n")
+	    }
+      ips <- 0
+      #  first step set to trial
+      linemat[1,5]  <- trial
+      #  Main iteration loop for linesrch
+      for (stepiter in 1:STEPMAX) {
+        #  ensure that step does not go beyond limits on parameters
+        limflg  <- 0
+        #  check the step size
+        result <- stepchk(linemat[1,5], cvec, deltac, limwrd, ind,
                             climit, active, dbgwrd)
-			    linemat[1,5] <- result[[1]]
-			    ind          <- result[[2]]
-			    limwrd       <- result[[3]]
-       	  if (linemat[1,5] <= 1e-9) {
-          		#  Current step size too small  terminate
-          		Flist   <- Foldstr
-          		cvecnew <- cvec
-          		gvecnew <- gvec
-          		if (dbglev > 1) print(paste("Stepsize too small:", linemat[1,5]))
-          		if (limflg) ind <- 1 else ind <- 4
-          		break
-        	}
-        	cvecnew <- cvec + linemat[1,5]*deltac
-        	#  compute new function value and gradient
-			    result  <- loglfnden(x, f, basisobj, cvecnew, returnMatrix)
-			    logl    <- result[[1]]
-			    Dlogl   <- result[[2]]
-        	Flist$f <- -logl
-        	gvecnew <- -Dlogl
-        	if (lambda > 0) {
-            	gvecnew <- gvecnew + 2*Kmat %*% cvecnew
-            	Flist$f <- Flist$f + t(cvecnew) %*% Kmat %*% cvecnew
-        	}
-        	if (ninactive > 0) gvecnew[inactive] <- 0
-        	Flist$norm <- sqrt(mean(gvecnew^2))
-        	linemat[3,5] <- Flist$f
-        	#  compute new directional derivative
-        	linemat[2,5] <- sum(deltac*gvecnew)
-      		if (dbglev > 1) {
-				    cat("              ")
-				    cat(format(stepiter))
-				    cat(format(linemat[,1]))
-				    cat("\n")
-			    }
-        	#  compute next step
-			    result <- stepit(linemat, ips, dblwrd, MAXSTEP)
-			    linemat <- result[[1]]
-			    ips     <- result[[2]]
-			    ind     <- result[[3]]
-			    dblwrd  <- result[[4]]
-        	trial   <- linemat[1,5]
-        	#  ind == 0 implies convergence
-        	if (ind == 0 | ind == 5) break
-        	#  end of line search loop
+	      linemat[1,5] <- result[[1]]
+	      ind          <- result[[2]]
+	      limwrd       <- result[[3]]
+        if (linemat[1,5] <= 1e-9) {
+          	#  Current step size too small  terminate
+          	Flist   <- Foldstr
+          	cvecnew <- cvec
+          	gvecnew <- gvec
+          	if (dbglev > 1) print(paste("Stepsize too small:", linemat[1,5]))
+          	if (limflg) ind <- 1 else ind <- 4
+          	break
+        }
+        cvecnew <- cvec + linemat[1,5]*deltac
+        #  compute new function value and gradient
+	      result  <- loglfnden(x, f, basisobj, cvecnew, returnMatrix)
+	      logl    <- result[[1]]
+	      Dlogl   <- result[[2]]
+        Flist$f <- -logl
+        gvecnew <- -as.matrix(Dlogl)
+        if (lambda > 0) {
+            gvecnew <- gvecnew + 2*Kmat %*% cvecnew
+            Flist$f <- Flist$f + t(cvecnew) %*% Kmat %*% cvecnew
+        }
+        gvecnew0 <- t(zeromat) %*% gvecnew
+        Flist$norm <- sqrt(mean(gvecnew0^2))
+        #  compute new directional derivative
+        linemat[2,5] <- sum(deltac*gvecnew)
+        linemat[3,5] <- Flist$f
+        if (dbglev > 1) {
+           cat("              ")
+           cat(format(stepiter))
+	         cat(format(linemat[,5]))
+	         cat("\n")
+	      }
+        #  compute next step
+	      result  <- stepit(linemat, ips, dblwrd, MAXSTEP)
+	      linemat <- result$linemat
+	      ips     <- result$ips
+	      ind     <- result$ind
+	      dblwrd  <- result$dblwrd
+        trial   <- linemat[1,5]
+        #  ind == 0 implies convergence
+        if (ind == 0 | ind == 5) break
+        #  end of line search loop
      	}
 
     	#  update current parameter vectors
 
-     	cvec <- cvecnew
-     	gvec <- gvecnew
-	  	Wfdobj$coefs <- cvec
+     	cvec  <- cvecnew
+     	gvec  <- gvecnew
+      gvec0 <- t(zeromat) %*% as.matrix(gvec)
+	    Wfdobj$coefs <- cvec
      	status <- c(iternum, Flist$f, -logl, Flist$norm)
      	iterhist[iter+1,] <- status
-		  cat("      ")
-		  cat(format(iternum))
-		  cat("    ")
-		  cat(format(status[2:4]))
-		  cat("\n")
+	    cat("      ")
+	    cat(format(iternum))
+	    cat("    ")
+	    cat(format(status[2:4]))
+	    cat("\n")
 
      	#  test for convergence
 
      	if (abs(Flist$f-Foldstr$f) < conv) {
-       	iterhist <- iterhist[1:(iternum+1),]
-  			C <- normden.phi(basisobj, cvec, returnMatrix=returnMatrix)
-			denslist <- list("Wfdobj" = Wfdobj, "C" = C, "Flist" = Flist,
-			          			"iternum" = iternum, "iterhist" = iterhist)
-			return( denslist )
+          iterhist <- iterhist[1:(iternum+1),]
+  	      C <- normden.phi(basisobj, cvec, returnMatrix=returnMatrix)
+	        denslist <- list("Wfdobj" = Wfdobj, "C" = C, "Flist" = Flist,
+			                     "iternum" = iternum, "iterhist" = iterhist)
+	        return( denslist )
      	}
      	if (Flist$f >= Foldstr$f) break
      	#  compute the Hessian
      	hmat <- Varfnden(x, basisobj, cvec, returnMatrix)
      	if (lambda > 0) hmat <- hmat + 2*Kmat
-     	if (ninactive > 0) {
-       	hmat[inactive,] <- 0
-       	hmat[,inactive] <- 0
-       	hmat[inactive,inactive] <- diag(rep(1,ninactive))
-     	}
+      hmat0 <- t(zeromat) %*% hmat %*% zeromat
      	#  evaluate the update vector
-     	deltac <- -solve(hmat,gvec)
-     	cosangle  <- -sum(gvec*deltac)/sqrt(sum(gvec^2)*sum(deltac^2))
+     	deltac0 <- -solve(hmat0,gvec0)
+     	cosangle  <- -sum(gvec0*deltac0)/sqrt(sum(gvec0^2)*sum(deltac0^2))
      	if (cosangle < 0) {
        	if (dbglev > 1) print("cos(angle) negative")
-       	deltac <- -gvec
+       	deltac0 <- -gvec0
      	}
+      deltac <- zeromat %*% as.matrix(deltac0)
      	Foldstr <- Flist
 		#  end of iterations
   	}
-  #  compute final normalizing constant
+      #  compute final normalizing constant
  	C <- normden.phi(basisobj, cvec, returnMatrix=returnMatrix)
 	denslist <- list("Wfdobj" = Wfdobj, "C" = C, "Flist" = Flist,
 			             "iternum" = iternum, "iterhist" = iterhist)
@@ -339,11 +331,10 @@ loglfnden <- function(x, f, basisobj, cvec, returnMatrix=FALSE) {
    	fsum    <- sum(f)
    	nobs    <- length(x)
    	phimat  <- getbasismatrix(x, basisobj)
-   	cval    <- normden.phi(basisobj, cvec, , returnMatrix=returnMatrix)
-   	logl    <- sum((phimat %*% cvec) * f - fsum*log(cval)/N)
-   	EDW     <- outer(rep(1,nobs),expectden.phi(basisobj, cvec,
-                                               returnMatrix=returnMatrix))
-   	Dlogl   <- apply((phimat - EDW)*fmat,2,sum)
+   	Cval    <- normden.phi(basisobj, cvec, , returnMatrix=returnMatrix)
+   	logl    <- sum((phimat %*% cvec) * f - fsum*log(Cval)/N)
+    EDw     <- expectden.phi(basisobj, cvec, Cval, returnMatrix=returnMatrix)
+   	Dlogl   <- apply((phimat - outer(rep(1,nobs),EDw))*fmat,2,sum)
 	return( list(logl, Dlogl) )
 }
 
@@ -353,14 +344,12 @@ Varfnden <- function(x, basisobj, cvec, returnMatrix=FALSE) {
 	#  Computes the expected Hessian
    	nbasis  <- basisobj$nbasis
    	nobs    <- length(x)
-   	cval    <- normden.phi(basisobj, cvec, returnMatrix=returnMatrix)
-   	EDw     <- outer(rep(1,nobs),
-                    expectden.phi(basisobj, cvec, returnMatrix=returnMatrix))
-   	EDwDwt  <- nobs*expectden.phiphit(basisobj, cvec, returnMatrix=returnMatrix)
-   	Varphi  <- EDwDwt - crossprod(EDw)
+   	Cval    <- normden.phi(basisobj, cvec, returnMatrix=returnMatrix)
+   	EDw     <- expectden.phi(basisobj, cvec, Cval, returnMatrix=returnMatrix)
+   	EDwDwt  <- expectden.phiphit(basisobj, cvec, Cval, returnMatrix=returnMatrix)
+   	Varphi  <- nobs*(EDwDwt - outer(EDw,EDw))
 	return(Varphi)
 }
-
 
 #  -----------------------------------------------------------------------------
 
@@ -434,11 +423,11 @@ normden.phi <- function(basisobj, cvec, JMAX=15, EPS=1e-7, returnMatrix=FALSE) {
 
 expectden.phi <- function(basisobj, cvec, Cval=1, nderiv=0,
                      JMAX=15, EPS=1e-7, returnMatrix=FALSE) {
-#  Computes expectations of basis functions with respect to density
-#      p(x) <- Cval^{-1} exp t(c)*phi(x)
-#  by numerical integration using Romberg integration
+    #  Computes expectations of basis functions with respect to density
+    #      p(x) <- Cval^{-1} exp t(c)*phi(x)
+    #  by numerical integration using Romberg integration
 
-  	#  check arguments, and convert basis objects to functional data objects
+    #  check arguments, and convert basis objects to functional data objects
 
     if (!inherits(basisobj, "basisfd"))
     	stop("First argument must be a basis function object.")
@@ -447,16 +436,16 @@ expectden.phi <- function(basisobj, cvec, Cval=1, nderiv=0,
     rng    <- basisobj$rangeval
     oneb   <- matrix(1,1,nbasis)
 
-  	#  set up first iteration
+    #  set up first iteration
 
     width <- rng[2] - rng[1]
     JMAXP <- JMAX + 1
     h <- matrix(1,JMAXP,1)
     h[2] <- 0.25
-#  matrix SMAT contains the history of discrete approximations to the integral
+    #  matrix SMAT contains the history of discrete approximations to the integral
     smat <- matrix(0,JMAXP,nbasis)
     sumj <- matrix(0,1,nbasis)
-  	#  the first iteration uses just the }points
+    #  the first iteration uses just the }points
     x  <- rng
     nx <- length(x)
     ox <- matrix(1,nx,nx)
@@ -466,23 +455,23 @@ expectden.phi <- function(basisobj, cvec, Cval=1, nderiv=0,
     px <- exp(wx)/Cval
     if (nderiv == 0) {
     	Dfx <- fx
-  	} else {
+    } else {
     	Dfx <- getbasismatrix(x, basisobj, 1, returnMatrix)
-  	}
+    }
     sumj <- t(Dfx) %*% px
     smat[1,]  <- width*as.vector(sumj)/2
     tnm <- 0.5
     j   <- 1
 
-  	#  now iterate to convergence
+    #  now iterate to convergence
 
     for (j in 2:JMAX) {
-    	tnm  <- tnm*2
+      tnm  <- tnm*2
     	del  <- width/tnm
     	if (j == 2) {
-      		x <- (rng[1] + rng[2])/2
+        x <- (rng[1] + rng[2])/2
     	} else {
-      		x <- seq(rng[1]+del/2, rng[2], del)
+        x <- seq(rng[1]+del/2, rng[2], del)
     	}
     	nx <- length(x)
     	fx <- getbasismatrix(x, basisobj, 0, returnMatrix)
@@ -490,25 +479,25 @@ expectden.phi <- function(basisobj, cvec, Cval=1, nderiv=0,
     	wx[wx < -50] <- -50
     	px <- exp(wx)/Cval
     	if (nderiv == 0) {
-      		Dfx <- fx
+        Dfx <- fx
     	} else {
-      		Dfx <- getbasismatrix(x, basisobj, 1, returnMatrix)
+        Dfx <- getbasismatrix(x, basisobj, 1, returnMatrix)
     	}
     	sumj <- t(Dfx) %*% px
     	smat[j,] <- (smat[j-1,] + width*as.vector(sumj)/tnm)/2
     	if (j >= 5) {
-      		ind <- (j-4):j
-      		temp <- smat[ind,]
-			result <- polintarray(h[ind],temp,0)
-			ss  <- result[[1]]
-			dss <- result[[2]]
-      		if (!any(abs(dss) > EPS*max(abs(ss)))) {
-        		#  successful convergence
-        		return(ss)
-      		}
+        ind <- (j-4):j
+        temp <- smat[ind,]
+	  result <- polintarray(h[ind],temp,0)
+	  ss  <- result[[1]]
+	  dss <- result[[2]]
+        if (!any(abs(dss) > EPS*max(abs(ss)))) {
+          #  successful convergence
+          return(ss)
+        }
     	}
     	smat[j+1,] <- smat[j,]
-    	h[j+1] <- 0.25*h[j]
+    	h[j+1]     <- 0.25*h[j]
     }
     warning(paste("No convergence after ",JMAX," steps in EXPECTDEN.PHI"))
     return(ss)
@@ -522,7 +511,7 @@ expectden.phiphit <- function(basisobj, cvec, Cval=1, nderiv1=0, nderiv2=0,
 
 #  Computes expectations of cross product of basis functions with
 #  respect to density
-#      p(x) = Cval^{-1} exp t(c) %*% phi(x)
+#      p(x) = Cval^{-1} int [exp t(c) %*% phi(x)] phi(x) t(phi(x)) dx
 #  by numerical integration using Romberg integration
 
   	#  check arguments, and convert basis objects to functional data objects
@@ -608,6 +597,7 @@ expectden.phiphit <- function(basisobj, cvec, Cval=1, nderiv1=0, nderiv2=0,
   	warning(paste("No convergence after ",JMAX," steps in EXPECTDEN.PHIPHIT"))
 	return(ss)
 }
+
 #  -----------------------------------------------------------------------------
 
 polintarray <- function(xa, ya, x0) {

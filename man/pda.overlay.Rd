@@ -53,9 +53,11 @@ names(lipfd$fdnames) <- c("time(seconds)", "replications", "mm")
 
 # Now we'll set up functional parameter objects for the beta coefficients.
 
-lipbasis = lipfd$basis
-bwtlist = list(fdPar(lipbasis,2,0.0000),fdPar(lipbasis,2,0.0000))
-xfdlist <- list(lipfd)
+lipbasis <- lipfd$basis
+lipfd0   <- fd(matrix(0,lipbasis$nbasis,1),lipbasis)
+lipfdPar <- fdPar(lipfd0,2,0)
+bwtlist  <- list(lipfdPar,lipfdPar)
+xfdlist  <- list(lipfd)
 
 # Call pda
 

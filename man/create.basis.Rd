@@ -15,12 +15,7 @@
   is provided to facilitation arithmetic with functional data objects.
   To restrict attention to solutions of certain differential equations,
   it may be useful to use a corresponding basis set such as exponential,
-  monomial, polynomial, or power basis sets.
-
-  Monomial and polynomial bases are similar.  As noted in the table
-  below, \code{create.monomial.basis} has an argument \code{exponents}
-  absent from \code{create.polynomial.basis}, which has an argument
-  \code{ctr} absent from \code{create.monomial.basis}.
+  monomial or power basis sets.
 
   Power bases support the use of negative and fractional powers, while
   monomial bases are restricted only to nonnegative integer exponents.
@@ -67,7 +62,6 @@
       \code{power} bases is 1.  This will be increased to 2 in
       \code{fda_2.0.4}.)
 
-      For \code{polynomial} bases, \code{nbasis} defaults to 2.
     }
 
     In addition to \code{rangeval} and \code{nbasis}, all but
@@ -101,11 +95,6 @@
 	\code{monomial} bases, \code{exponents} must be distinct
 	nonnegative integers.  For \code{power} bases, they must be
 	distinct real numbers.
-      }
-      \item{polynomial}{
-	Argument \code{ctr} must be a single number used to shift the
-	argument prior to computing its powers.  Default =
-	mean(rangeval).
       }
     }
 
@@ -207,7 +196,6 @@
   \code{\link{create.fourier.basis}}
   \code{\link{create.monomial.basis}}
   \code{\link{create.polygonal.basis}}
-  \code{\link{create.polynomial.basis}}
   \code{\link{create.power.basis}}
 }
 %\examples{}
