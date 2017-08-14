@@ -1,4 +1,4 @@
-Eigen <- function(x, symmetric, only.values = FALSE, EISPACK = FALSE,
+Eigen <- function(x, symmetric, only.values = FALSE,
       valuenames ){
 ##
 ## 1.  symmetric?  
@@ -9,7 +9,7 @@ Eigen <- function(x, symmetric, only.values = FALSE, EISPACK = FALSE,
 ##
 ## 2.  eigen
 ##
-  ev <- eigen(x, symmetric, only.values = FALSE, EISPACK = FALSE)
+  ev <- eigen(x, symmetric, only.values = FALSE)
 ##
 ## 3.  rNames
 ##

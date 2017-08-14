@@ -54,8 +54,7 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
       if(is.null(fdobj$basis$axes)){
         Axes <- TRUE
         axFun <- FALSE
-      }
-      else{
+      } else {
         if(!inherits(fdobj$basis$axes, 'list'))
           stop('fdobj$basis$axes must be a list;  ',
                'class(fdobj$basis$axes) = ', class(fdobj$basis$axes))
@@ -68,13 +67,11 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
         axFun <- TRUE
         axList <- c(fdobj$basis$axes, ...)
       }
-    }
-    else{
+    } else{
       if(is.logical(axes)){
         Axes <- axes
         axFun <- FALSE
-      }
-      else{
+      } else{
         if(!inherits(axes, 'list'))
           stop('axes must be a logical or a list;  class(axes) = ',
                class(axes))
@@ -120,7 +117,6 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
   } else {
     if(is.numeric(y)) y <- as.vector(y)
   }
-
   Y <- y
   if (length(y) == 1) {
     if (y >= 1) {
@@ -143,7 +139,7 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
   #  evaluate LFDOBJ(FDOBJ) at the argument values
 
   fdmat    <- eval.fd(y, fdobj, Lfdobj)
-  rangey   <- range(fdmat)
+  rangey   <- range(fdmat, na.rm=TRUE)
   if (is.null(ylim)) ylim <- rangey
 
   #  set up axis labels and,
@@ -289,9 +285,9 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
 
 #  --------------------------------------------------------------------
 
-zerofind <- function(fmat)
+zerofind <- function(fmat, na.rm=TRUE)
 {
-  frng <- range(fmat)
+  frng <- range(fmat, na.rm=na.rm)
   if (frng[1] <= 0 && frng[2] >= 0) zeroin <- TRUE else zeroin <- FALSE
   return(zeroin)
 }

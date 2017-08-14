@@ -21,7 +21,7 @@ readHMD <- function(username, password,
 ##
 ## 1.  Construct the desired url
 ##
-  require(RCurl)
+  requireNamespace('RCurl')
   missURL <- missing(url)
   if(missURL){
       if(length(country)!=1)

@@ -6,7 +6,7 @@ predict.lmeWinsor <- function(object, newdata, level=Q, asList=FALSE,
   if(any(grep('lme4', search())>0))
     stop("predict.lmeWinsor requires nlme, which can NOT be used",
          " with lme4 in the search path.") 
-  library(nlme)
+  requireNamespace('nlme')
 #  
   cl <- match.call()
 # default 'level'  

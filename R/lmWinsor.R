@@ -215,7 +215,7 @@ lmWinsor1 <- function(formula, data, lower=NULL, upper=NULL, trim=0,
 ## 7.  Else use quadratic progamming to minimize the
 ##     Winsorized sum of squares of residuals
 ##
-  if(!require(quadprog)){
+  if(!requireNamespace('quadprog')){
     msg <- paste(sum(yLow | yHi), "of", nrow(data),
                  "predictions outside bounds, but package quadprog",
                  "not installed;\ncan not iterate;  using method='clip'")
@@ -340,7 +340,7 @@ lmWinsor1 <- function(formula, data, lower=NULL, upper=NULL, trim=0,
     QPlist <- list(Dmat=quote(D), dvec=quote(d),
                    Amat=quote(A), bvec=quote(b),
                    factorized=TRUE)
-    QPi <- do.call('solve.QP', QPlist, envir=env)
+    QPi <- do.call(quadprog::solve.QP, QPlist, envir=env)
 #    QPi <- solve.QP(Dmat., as.numeric(dvec), Amat, bvec)
 #   7.3.  Are unconstrained predictions inside?
 #    pred.old <- pred

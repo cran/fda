@@ -9,7 +9,7 @@ lmeWinsor <- function(fixed, data, random,
   if(any(grep('lme4', search())>0))
     stop("lmeWinsor requires nlme, which can NOT be used",
          " with lme4 in the search path.") 
-  library(nlme)
+  requireNamespace('nlme')
 #
   cl <- match.call()
   if(missing(na.action))
@@ -101,7 +101,7 @@ lmeWinsor <- function(fixed, data, random,
   cl0$quantileType <- NULL
   cl0$data <- as.name('clipData')
 #
-  fit <- do.call('lme', cl0)
+  fit <- do.call(nlme::lme, cl0)
 ##
 ## 5.  Convert to class 'lmWinsor'
 ##

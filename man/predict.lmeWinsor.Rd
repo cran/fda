@@ -16,10 +16,10 @@
     linear mixed-effects model.  
   }
   \item{ newdata }{
-    an optional data frame to be used for obtaining the predictions. All
-    variables used in the fixed and random effects models, as well as
-    the grouping factors, must be present in the data frame. If missing,
-    the fitted values are returned.
+    an optional data frame to be used for obtaining the predictions.
+    All variables used in the fixed and random effects models, as well
+    as the grouping factors, must be present in the data frame. If
+    missing, the fitted values are returned.
   }
   \item{ level }{
     an optional integer vector giving the level(s) of grouping to be
@@ -29,16 +29,16 @@
     level of grouping. 
   }
   \item{ asList }{
-    an optional logical value. If 'TRUE' and a single value is given in
-    'level', the returned object is a list with the predictions split by
-    groups; else the returned value is either a vector or a data frame,
-    according to the length of 'level'. 
+    an optional logical value. If 'TRUE' and a single value is given
+    in 'level', the returned object is a list with the predictions
+    split by groups; else the returned value is either a vector or a
+    data.frame, according to the length of 'level'. 
   }
   \item{na.action}{
-    a function that indicates what should happen when 'newdata' contains
-    'NA's.  The default action ('na.fail') causes the function to print
-    an error message and terminate if there are any incomplete
-    observations. 
+    a function that indicates what should happen when 'newdata'
+    contains 'NA's.  The default action ('na.fail') causes the
+    function to print an error message and terminate if there are any
+    incomplete observations. 
   }
   \item{\dots}{
     additional arguments for other methods
@@ -70,7 +70,8 @@
   \code{\link[stats]{predict.lm}}
 }
 \examples{
-fm1w <- lmeWinsor(distance ~ age, data = Orthodont,
+requireNamespace('nlme')
+fm1w <- lmeWinsor(distance ~ age, data = nlme::Orthodont,
                  random=~age|Subject)
 # predict with newdata 
 newDat <- data.frame(age=seq(0, 30, 2),
@@ -78,11 +79,11 @@ newDat <- data.frame(age=seq(0, 30, 2),
 pred1w <- predict(fm1w, newDat, level=0)
 
 # fit with 10 percent Winsorization 
-fm1w.1 <- lmeWinsor(distance ~ age, data = Orthodont,
+fm1w.1 <- lmeWinsor(distance ~ age, data = nlme::Orthodont,
                  random=~age|Subject, trim=0.1)
 pred30 <- predict(fm1w.1)
 stopifnot(all.equal(as.numeric(
-              quantile(Orthodont$distance, c(.1, .9))),
+              quantile(nlme::Orthodont$distance, c(.1, .9))),
           range(pred30)) )
 
 }

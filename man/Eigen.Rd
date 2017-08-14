@@ -8,7 +8,7 @@
   and dimnames to the eigenvectors.  
 }
 \usage{
-Eigen(x, symmetric, only.values = FALSE, EISPACK = FALSE,
+Eigen(x, symmetric, only.values = FALSE, 
       valuenames )
 }
 \arguments{
@@ -25,9 +25,6 @@ Eigen(x, symmetric, only.values = FALSE, EISPACK = FALSE,
     if 'TRUE', only the eigenvalues are computed and returned, otherwise
     both eigenvalues and eigenvectors are returned. 
   }
-  \item{EISPACK}{
-    logical. Should EISPACK be used (for compatibility with R < 1.7.0)?
-  }
   \item{valuenames}{
     character vector of length nrow(x) or a character string that can be
     extended to that length by appening 1:nrow(x).
@@ -43,7 +40,7 @@ Eigen(x, symmetric, only.values = FALSE, EISPACK = FALSE,
 \details{
   1.  Check 'symmetric'  
 
-  2.  ev <- eigen(x, symmetric, only.values = FALSE, EISPACK = FALSE);
+  2.  ev <- eigen(x, symmetric, only.values = FALSE);
   see \code{\link{eigen}} for more details.  
 
   3.  rNames = rownames(x);  if this is NULL, rNames = if(symmetric)

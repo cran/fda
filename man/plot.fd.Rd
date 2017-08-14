@@ -7,9 +7,9 @@
 }
 \description{
   Functional data observations, or a derivative of them, are plotted.
-  These may be either plotted simultaneously, as \code{matplot} does for
-  multivariate data, or one by one with a mouse click to move from one
-  plot to another.  The function also accepts the other plot
+  These may be either plotted simultaneously, as \code{matplot} does
+  for multivariate data, or one by one with a mouse click to move
+  from one plot to another.  The function also accepts the other plot
   specification arguments that the regular \code{plot} does.  Calling
   \code{plot} with an \code{fdSmooth} or an \code{fdPar}
   object plots its \code{fd} component.
@@ -32,9 +32,9 @@
     functional data object(s) to be plotted.
   }
   \item{y}{
-    sequence of points at which to evaluate the functions 'x' and plot
-    on the horizontal axis.  Defaults to seq(rangex[1], rangex[2],
-    length = nx).
+    sequence of points at which to evaluate the functions 'x' and
+    plot on the horizontal axis.  Defaults to seq(rangex[1],
+    rangex[2], length = nx).
 
     NOTE:  This will be the values on the horizontal axis, NOT the
     vertical axis.
@@ -45,8 +45,8 @@
     operator is plotted rather than the functions themselves.
   }
   \item{href}{
-    a logical variable:  If \code{TRUE}, add a horizontal reference line
-    at 0.
+    a logical variable:  If \code{TRUE}, add a horizontal reference
+    line at 0.
   }
   \item{titles}{
     a vector of strings for identifying curves
@@ -58,14 +58,16 @@
     a label for the vertical axis.
   }
   \item{xlim}{
-    a vector of length 2 containing axis limits for the horizontal axis.
+    a vector of length 2 containing axis limits for the horizontal 
+    axis.
   }
   \item{ylim}{
-    a vector of length 2 containing axis limits for the vertical axis.
+    a vector of length 2 containing axis limits for the vertical 
+    axis.
   }
   \item{ask}{
-    a logical value:  If \code{TRUE}, each curve is shown separately, and
-    the plot advances with a mouse click
+    a logical value:  If \code{TRUE}, each curve is shown separately,
+    and the plot advances with a mouse click
   }
   \item{nx}{
     the number of points to use to define the plot.  The default is
@@ -77,13 +79,14 @@
 
     \itemize{
       \item{logical}{
-	whether axes should be drawn on the plot
+      	whether axes should be drawn on the plot
       }
       \item{list}{
-	a list used to create custom \code{axes} used to create axes via
-	\code{do.call(x$axes[[1]], x$axes[-1])}.  The primary example of
-	this uses \code{list("axesIntervals", ...)}, e.g., with
-	\code{Fourier} bases to create \code{CanadianWeather} plots
+	      a list used to create custom \code{axes} used to create axes
+	      via \code{do.call(x$axes[[1]], x$axes[-1])}.  The primary
+	      example of this uses \code{list("axesIntervals", ...)}, e.g.,
+	      with \code{Fourier} bases to create \code{CanadianWeather} 
+	      plots
       }
     }
   }
@@ -113,17 +116,11 @@
 ##
 ## plot.fd
 ##
-%#daytime   <- (1:365)-0.5
-%#dayrange  <- c(0,365)
-%#dayperiod <- 365
-%#nbasis     <- 65
-%#dayrange  <- c(0,365)
 
 daybasis65 <- create.fourier.basis(c(0, 365), 65,
                     axes=list("axesIntervals"))
-harmaccelLfd <- vec2Lfd(c(0,(2*pi/365)^2,0), c(0, 365))
-
-harmfdPar     <- fdPar(daybasis65, harmaccelLfd, lambda=1e5)
+%harmaccelLfd <- vec2Lfd(c(0,(2*pi/365)^2,0), c(0, 365))
+%harmfdPar     <- fdPar(daybasis65, harmaccelLfd, lambda=1e5)
 
 daytempfd <- with(CanadianWeather, Data2fd(day.5,
         dailyAv[,,"Temperature.C"], daybasis65))
@@ -134,13 +131,12 @@ plot(daytempfd, main="Temperature Functions")
 \dontrun{
 # To plot one at a time:
 # The following pauses to request page changes.
-\dontshow{
-# (Without 'dontrun', the package build process
-# might encounter problems with the par(ask=TRUE)
-# feature.)
-}
 plot(daytempfd, ask=TRUE)
 }
+
+# test plot(fd with NA)
+daytempfd$coefs[,1] <- NA
+plot(daytempfd, main="Temperature Functions")
 
 ##
 ## plot.fdSmooth
@@ -149,8 +145,6 @@ b3.4 <- create.bspline.basis(norder=3, breaks=c(0, .5, 1))
 # 4 bases, order 3 = degree 2 =
 # continuous, bounded, locally quadratic
 fdPar3 <- fdPar(b3.4, lambda=1)
-%plot(fdPar3)
-%# constant 0 because fdPar3$coefs = c(0,0,0,0)
 
 # Penalize excessive slope Lfdobj=1;
 # (Can not smooth on second derivative Lfdobj=2 at it is discontinuous.)
