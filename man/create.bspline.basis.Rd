@@ -183,11 +183,11 @@ create.bspline.irregular(argvals,
   where the curve is changing very slowly.
 
   This function automatically includes \code{norder} replicates of the
-  end points rangeval.  By contrast, the analogous functions
-  \link[splines]{splineDesign} and \link[splines]{spline.des} in the
-  \code{splines} package do NOT automatically replicate the end points.
+  end points rangeval.  By contrast, the analogous function
+  \link[splines]{splineDesign} in the
+  \code{splines} package does NOT automatically replicate the end points.
   To compare answers, the end knots must be replicated manually when
-  using \link[splines]{splineDesign} or \link[splines]{spline.des}.
+  using \link[splines]{splineDesign}.
 
   create.bspline.irregular first calls create.bspline.basis then creates
   a plot of argvals and breaks vs. the argvals index.
@@ -215,7 +215,6 @@ create.bspline.irregular(argvals,
   \code{\link{create.polygonal.basis}},
   \code{\link{create.power.basis}}
   \code{\link[splines]{splineDesign}}
-  \code{\link[splines]{spline.des}}
 }
 \examples{
 ##
