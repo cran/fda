@@ -102,9 +102,9 @@ readHMD <- function(username, password,
   hmd <- try(read.table(con,skip=2,header=T,na.strings=".",
                     stringsAsFactors=FALSE))
   close(con)
-  if((class(hmd)=='try-error') || !missURL ||
+  if(inherits(hmd, 'try-error') || !missURL ||
      (dataType != 'lt') ){
-      if(class(hmd) == 'try-error')
+      if(inherits(hmd, 'try-error'))
           warning('Error in read.table trapped by "try"; ',
                   ' returning what was read')
       return(list(URL=txt, getURL=txt, readLines=HMD,

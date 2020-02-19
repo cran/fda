@@ -259,7 +259,7 @@ smooth.basis1 <- function (argvals=1:n, y, fdParobj,
 
       Bmat    <- (Bmat+t(Bmat))/2
       Lmat    <- try(chol(Bmat), silent=TRUE)
-      if (class(Lmat)=="try-error") {
+      if (inherits(Lmat, "try-error")) {
         Beig <- eigen(Bmat, symmetric=TRUE)
         BgoodEig <- (Beig$values>0)
         Brank <- sum(BgoodEig)

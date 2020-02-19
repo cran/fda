@@ -17,7 +17,7 @@ fRegress.formula <- function(y, data=NULL, betalist=NULL,
   Formula <- y
   yName <- Formula[[2]]
   yNm <- as.character(yName)
-  if((class(yName) != 'name') || (length(yNm) > 1))
+  if(!inherits(yName, 'name') || (length(yNm) > 1))
     stop('The left hand side of formula must be a simple object; ',
          ' instead, LHS = ', as.character(Formula)[2],
          ', which has class = ', class(yName))
@@ -93,7 +93,7 @@ fRegress.formula <- function(y, data=NULL, betalist=NULL,
     {
       if(class(xi) %in% c('fd', 'fdPar')){
         xj <- {
-          if(class(xi) == 'fd') xi
+          if(inherits(xi, 'fd')) xi
           else xi$fd
         }
         xrng <- xj$basis$rangeval

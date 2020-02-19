@@ -164,7 +164,7 @@ readHMD(username, password,
 \source{
   Human Mortality Database.  University of California, Berkeley (USA),
   and Max Planck Institute for Demographic Research (Germany). Available
-  at \url{www.mortality.org} and \url{www.humanmortality.de}.
+  at \url{http://www.mortality.org} and \url{http://www.humanmortality.de}.
 }
 \author{
   Han Lin Shang, Monash University in Australia, and Spencer Graves

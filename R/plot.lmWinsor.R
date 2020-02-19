@@ -63,7 +63,7 @@ plot.lmWinsor <- function(x, n=101, lty=1:9, col=1:9,
   if(!('main' %in% names(dots))){
     cl <- x$call
     main <- paste(as.character(cl$formula)[c(2,1,3)], collapse=" ")
-    if(class(cl$data)=='name')
+    if(inherits(cl$data, 'name'))
       main <- paste(as.character(cl$data), main, sep=':  ') 
 #
     if('trim' %in% names(cl)){

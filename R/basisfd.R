@@ -139,7 +139,7 @@ if (nargs()==0) {
 
 #  if first argument is a basis object, return
 
-if (class(type)=="basisfd"){
+if (inherits(type, "basisfd")){
     basisobj <- type
     return(basisobj)
 }

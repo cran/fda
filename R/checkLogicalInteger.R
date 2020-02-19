@@ -28,7 +28,7 @@ checkLogical <- function(x, length., warnOnly=FALSE) {
 ##
 ## 3.  check class(x)
 ##  
-  if(class(x) != 'logical')
+  if(!inherits(x, 'logical'))
     good <- (good & onExit('class(', xName, ') = ', class(x),
                    ";  should be 'logical'")) 
 ##
