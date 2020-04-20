@@ -65,11 +65,11 @@ else if(type=="const") {
         rangeval   <- getbasisrange(basisobj)
         penaltymat <- rangeval[2] - rangeval[1]
       }
-else if(type=="expon")    penaltymat <- exponpen(basisobj,   Lfdobj)
-else if(type=="fourier")  penaltymat <- fourierpen(basisobj, Lfdobj)
-else if(type=="monom")    penaltymat <- monomialpen(basisobj,   Lfdobj)
-else if(type=="polyg")    penaltymat <- polygpen(basisobj,   Lfdobj)
-else if(type=="power")    penaltymat <- powerpen(basisobj,   Lfdobj)
+else if(type=="expon")     penaltymat <- exponpen(basisobj,   Lfdobj)
+else if(type=="fourier")   penaltymat <- fourierpen(basisobj, Lfdobj)
+else if(type=="monom")     penaltymat <- monomialpen(basisobj,   Lfdobj)
+else if(type=="polygonal") penaltymat <- polygpen(basisobj,   Lfdobj)
+else if(type=="power")     penaltymat <- powerpen(basisobj,   Lfdobj)
 else stop("Basis type not recognizable, can not find penalty matrix")
 
 #  If drop indices are provided, drop rows and cols

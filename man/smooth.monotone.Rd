@@ -22,7 +22,7 @@
 \usage{
 smooth.monotone(argvals, y, WfdParobj, wtvec=rep(1,n),
                 zmat=NULL, conv=.0001, iterlim=50,
-                active=rep(TRUE,nbasis), dbglev=1, returnMatrix=FALSE)
+                active=rep(TRUE,nbasis), dbglev=1)
 }
 \arguments{
   \item{argvals}{
@@ -39,7 +39,7 @@ smooth.monotone(argvals, y, WfdParobj, wtvec=rep(1,n),
     Function value array (the values to be fit).  If the functional data
     are univariate, this array will be an N by NCURVE matrix, where N is
     the number of observed curve values for each curve and NCURVE is the
-    number of curves observed.  If the functional data are muliivariate,
+    number of curves observed.  If the functional data are multivariate,
     this array will be an N by NCURVE by NVAR matrix, where NVAR the
     number of functions observed per case.  For example, for the gait
     data, NVAR = 2, since we observe knee and hip angles.
@@ -77,10 +77,6 @@ smooth.monotone(argvals, y, WfdParobj, wtvec=rep(1,n),
     level, and 2 full output.  If either level 1 or 2 is specified, it
     can be helpful to turn off the output buffering feature of S-PLUS.
   }
-  \item{returnMatrix}{
-    logical:  If TRUE,  a two-dimensional is returned using a
-    special class from the Matrix package.
-  }
 }
 
 \details{
@@ -107,7 +103,7 @@ smooth.monotone(argvals, y, WfdParobj, wtvec=rep(1,n),
   design matrix \code{Zmat} as follows:
   $b0 = Z c$. In this case, the single
   intercept coefficient is replaced by the regression coefficients
-  in vector $c$ multipying the design matrix.
+  in vector $c$ multiplying the design matrix.
 }
 \value{
   an object of class \code{monfd}, which is a list with the following 5
@@ -149,7 +145,7 @@ smooth.monotone(argvals, y, WfdParobj, wtvec=rep(1,n),
   \item{y2cMap}{
     For each estimated curve (and variable if functions are
     multivariate, this is an N by NBASIS matrix containing a linear
-    mappping from data to coefficients that can be used for computing
+    mapping from data to coefficients that can be used for computing
     point-wise confidence intervals.  If NCURVE = NVAR = 1, a matrix is
     returned.  Otherwise an NCURVE by NVAR list is returned, with each
     slot containing this mapping.
@@ -181,6 +177,7 @@ smooth.monotone(argvals, y, WfdParobj, wtvec=rep(1,n),
 #  Estimate the acceleration functions for growth curves
 #  See the analyses of the growth data.
 #  Set up the ages of height measurements for Berkeley data
+
 age <- c( seq(1, 2, 0.25), seq(3, 8, 1), seq(8.5, 18, 0.5))
 #  Range of observations
 rng <- c(1,18)
@@ -208,7 +205,7 @@ hgt1 = growth$hgtf[,1]
 
 # delete the test on CRAN because it takes too long
 
-if(!CRAN()){
+\dontrun{
 result <- smooth.monotone(age, hgt1, growfdPar, wgt,
                           conv=0.1)
 #  Extract the functional data object and regression

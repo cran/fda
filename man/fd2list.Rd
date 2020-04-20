@@ -1,7 +1,7 @@
 \name{fd2list}
 \alias{fd2list}
 \title{
-  Convert a univariate functional data object to s list
+  Convert a univariate functional data object to a list
 }
 \description{
   Convert a univariate functional data object to a list for input to

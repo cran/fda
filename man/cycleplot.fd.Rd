@@ -38,7 +38,6 @@ A plot of the cycles
 \seealso{
 \code{\link{plot.fd}}, 
 \code{\link{plotfit.fd}}, 
-demo(gait)
 }
 % docclass is function
 \keyword{smooth}

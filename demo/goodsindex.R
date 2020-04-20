@@ -96,7 +96,7 @@ lines(c(1966,1966),c(1.61,1.73),lty=2)
 
 longtermbasis <- create.bspline.basis(goodsrange, 83)
 
-longtermfit <- smooth.basis(lognondur, durtime, longtermbasis)$fd
+longtermfit <- smooth.basis(durtime, lognondur, longtermbasis)$fd
 
 #  compute and plot seasonal trend
 

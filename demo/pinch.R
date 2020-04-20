@@ -13,8 +13,7 @@
 
 #  ------------------  input the data  --------------------
 
-pinchmat   <- matrix(scan("../data/pinch.txt",0),151,20,byrow=TRUE)
-
+pinchmat   <- pinch
 pinchtime  <- seq(0,150,len=151)/600
 pinchrange <- c(0,0.25)
 

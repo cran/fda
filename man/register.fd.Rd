@@ -16,8 +16,7 @@
 }
 \usage{
 register.fd(y0fd=NULL, yfd=NULL, WfdParobj=NULL,
-            conv=1e-04, iterlim=20, dbglev=1, periodic=FALSE, crit=2,
-            returnMatrix=FALSE)
+            conv=1e-04, iterlim=20, dbglev=1, periodic=FALSE, crit=2)
 }
 \arguments{
   \item{y0fd}{
@@ -95,10 +94,6 @@ register.fd(y0fd=NULL, yfd=NULL, WfdParobj=NULL,
     of a cross-product matrix.  In general, criterion 2 is to be
     preferred.
   }
-  \item{returnMatrix}{
-    logical:  If TRUE,  a two-dimensional is returned using a
-    special class from the Matrix package.
-  }
 }
 \value{
   a named list of length 4 containing the following components:
@@ -140,11 +135,11 @@ register.fd(y0fd=NULL, yfd=NULL, WfdParobj=NULL,
   \code{\link{smooth.monotone}},
   \code{\link{smooth.morph}}
   \code{\link{plotreg.fd}}
-  \code{\link{register.fd0}}
   \code{\link{register.newfd}}
 }
 \examples{
 #See the analyses of the growth data for examples.
+
 ##
 ## 1.  smooth the growth data for the Berkeley boys
 ##
@@ -168,13 +163,14 @@ growfdPar2.3 <- fdPar(Wfd0.growth, Lfdobj.growth, lambda.gr2.3)
 hgtmfd.all   <- with(growth, smooth.basis(age, hgtm, growfdPar2.3)$fd)
 # Register the growth velocity rather than the
 # growth curves directly
-smBv <- deriv(hgtmfd.all, 1)
+smBv <- deriv.fd(hgtmfd.all, 1)
+
 ##
 ## 2.  Register the first 2 Berkeley boys using the default basis
 ##     for the warping function
 ##
-# register.fd takes time, so use only 2 curves as an illustration
-# to minimize compute time in these examples
+# register.fd takes time, so we use only 2 curves as an illustration
+# to minimize computing time in these examples
 nBoys <- 2
 #  Define the target function as the mean of the first nBoys records
 smBv0 = mean.fd(smBv[1:nBoys])
@@ -192,10 +188,11 @@ smB.reg.0 <- register.fd(smBv0, smBv[1:nBoys])
 plotreg.fd(smB.reg.0)
 #  Notice that all the warping functions all have simple shapes
 #  due to the use of the simplest possible basis
+
+if (!CRAN()) {
 ##
 ## 3.  Define a more flexible basis for the warping functions
 ##
-if(!CRAN()){
 Wnbasis   <- 4
 Wbasis    <- create.bspline.basis(rng.growth, Wnbasis)
 Wfd0      <- fd(matrix(0,Wnbasis,1),Wbasis)
@@ -206,6 +203,7 @@ WfdParobj <- fdPar(Wfd0, Lfdobj=2, lambda=0.01)
 smB.reg.1 <- register.fd(smBv0, smBv[1:nBoys], WfdParobj)
 plotreg.fd(smB.reg.1)
 #  Notice that now the warping functions can have more complex shapes
+
 ##
 ## 4.  Change the target to the mean of the registered functions ...
 ##     this should provide a better target for registration
@@ -234,31 +232,31 @@ plotreg.fd(smB.reg.3)
 #  Notice that the warping functions only deviate from the straight line
 #  over the pre-pubertal region, and that there are some small adjustments
 #  to the registered curves as well over the pre-pubertal region.
+}
+
 ##
 ## 5.  register and plot the angular acceleration of the gait data
 ##
-gaittime  <- as.numeric(dimnames(gait)[[1]])*20
+gaittime  <- as.matrix(0:19)+0.5
 gaitrange <- c(0,20)
 #  set up a fourier basis object
 gaitbasis <- create.fourier.basis(gaitrange, nbasis=21)
-%  set up a functional parameter object penalizing harmonic acceleration
+# set up a functional parameter object penalizing harmonic acceleration
 harmaccelLfd <- vec2Lfd(c(0, (2*pi/20)^2, 0), rangeval=gaitrange)
 gaitfdPar    <- fdPar(gaitbasis, harmaccelLfd, 1e-2)
 #  smooth the data
 gaitfd <- smooth.basis(gaittime, gait, gaitfdPar)$fd
 #  compute the angular acceleration functional data object
-D2gaitfd      <- deriv.fd(gaitfd,2)
+D2gaitfd    <- deriv.fd(gaitfd,2)
 names(D2gaitfd$fdnames)[[3]] <- "Angular acceleration"
 D2gaitfd$fdnames[[3]] <- c("Hip", "Knee")
 #  compute the mean angular acceleration functional data object
 D2gaitmeanfd  <- mean.fd(D2gaitfd)
 names(D2gaitmeanfd$fdnames)[[3]] <- "Mean angular acceleration"
 D2gaitmeanfd$fdnames[[3]] <- c("Hip", "Knee")
-
 #  register the functions for the first 2 boys
 #  argument periodic = TRUE causes register.fd to estimate a horizontal shift
 #  for each curve, which is a possibility when the data are periodic
-
 #  set up the basis for the warping functions
 nwbasis   <- 4
 wbasis    <- create.bspline.basis(gaitrange,nwbasis,3)
@@ -272,6 +270,4 @@ plotreg.fd(gaitreglist)
 #  display horizonal shift values
 print(round(gaitreglist$shift,1))
 }
-}
-% docclass is function
 \keyword{smooth}

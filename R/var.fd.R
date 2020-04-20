@@ -1,39 +1,17 @@
-#var <- function (x, ...) UseMethod("var")
-
-#var.default <- function (x, y = NULL, na.rm = FALSE, use, ...) {
-## First preprocess 'use'
-#  if(missing(use)){
-#    use <- {
-#      if (na.rm) "complete.obs"
-#      else "all.obs"
-#    }
-#  }
-## Now use the official non-generic.
-#  stats::var (x, y = NULL, na.rm = FALSE, use)
-#}
-
-# Seemed to work but did not pass R CMD check:
-#* checking for missing documentation entries ... WARNING
-#Undocumented code objects:
-#  sd sd.default var var.default
-#All user-level objects in a package should have documentation
-
-# I'm not sure how to fix, so revert
-
-#var.fd <- function(x, y=x, ...)
 var.fd <- function(fdobj1, fdobj2=fdobj1)
 {
-#  fdobj1 <- x
-#  fdobj2 <- y
   #  compute the variance and covariance functions for functional observations
 
-  #  Last modified 26 October 2005
+  #  Last modified 16 January 2010
 
-  if (!(inherits(fdobj1, "fd"))) stop(
-		"Argument FDX not a functional data object.")
-  if (!(inherits(fdobj2, "fd"))) stop(
-		"Argument FDY not a functional data object.")
-
+  if (!(is.fd(fdobj1) || is.fdPar(fdobj1)))  stop(
+    "First argument is neither a functional data or a functional parameter object.")
+  if (is.fdPar(fdobj1)) fdobj1 <- fdobj1$fd
+  
+  if (!(is.fd(fdobj2) || is.fdPar(fdobj2)))  stop(
+    "Second argument is neither a functional data or a functional parameter object.")
+  if (is.fdPar(fdobj2)) fdobj2 <- fdobj2$fd
+  
   coefx   <- fdobj1$coefs
   coefy   <- fdobj2$coefs
   coefdobj1  <- dim(coefx)

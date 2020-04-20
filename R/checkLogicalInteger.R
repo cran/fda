@@ -28,7 +28,7 @@ checkLogical <- function(x, length., warnOnly=FALSE) {
 ##
 ## 3.  check class(x)
 ##  
-  if(!inherits(x, 'logical'))
+  if(class(x) != 'logical')
     good <- (good & onExit('class(', xName, ') = ', class(x),
                    ";  should be 'logical'")) 
 ##
@@ -70,7 +70,9 @@ checkNumeric <- function(x, lower, upper, length., integer=TRUE,
 ##
 ## 2.  is.null(x)   
 ##
-  if(is.null(x))return(TRUE)  
+  if(is.null(x)) {
+    return(TRUE)  
+  }
 ##
 ## 3.  check class(x)
 ##
@@ -177,16 +179,20 @@ checkLogicalInteger <- function(x, length., warnOnly=FALSE){
 ##
 ## 2.  is.null(x)   
 ##
-  if(is.null(x))return(rep(TRUE, length=length.))  
+  if(is.null(x)) {
+    return(rep(TRUE, length=length.))
+  }
 ##
 ## 3.  check class(x)
 ##
 #  3.1.  is.logical?    
   if(is.logical(x)){
-    if(missing(length.)) return(x)
-    {
-      if(length(x) == length.) return(x)
-      else
+    if(missing(length.)) {
+      return(x)
+    }
+      if(length(x) == length.) {
+        return(x)
+      } else {
         onExit('length(x) = ', length(x), ';  should be ',length.)
     }
   }

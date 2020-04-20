@@ -95,7 +95,7 @@ create.bspline.basis <- function (rangeval=NULL, nbasis=NULL,
 #  Returns
 #  BASISFD ...a functional data basis object
 
-#  Last modified  28 December 2012 by Jim Ramsay
+#  Last modified  11 February 2015 by Jim Ramsay
 
 #  -------------------------------------------------------------------------
 #  Default basis for missing arguments:  A B-spline basis over [0,1] of
@@ -143,6 +143,9 @@ create.bspline.basis <- function (rangeval=NULL, nbasis=NULL,
   Breaks <- as.numeric(breaks)
   options(op)
   if(!is.null(breaks)){
+  	if(min(diff(breaks) < 0)) {
+  		stop('One or more breaks differences are negative.')
+  	}
     if(is.numeric(breaks)){
       if(length(breaks)<1)breaks <- NULL
       if(any(is.na(breaks)))

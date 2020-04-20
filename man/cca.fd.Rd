@@ -19,7 +19,7 @@ a functional data object.
 }
 \item{fdobj2}{
 a functional data object.  By default this is \code{ fdobj1 }, in
-which case the first argument must be a bivariate funnctional data
+which case the first argument must be a bivariate functional data
 object.
 }
 \item{ncan}{
@@ -90,5 +90,4 @@ ccafd <- varmx.cca.fd(ccafd0)
 #  plot the canonical weight functions
 plot.cca.fd(ccafd)
 }
-% docclass is function
 \keyword{smooth}

@@ -1,6 +1,11 @@
 "[.fd" <- function(fdobj, i=TRUE, j=TRUE, drop=TRUE) {
-  #  select subsets of curves in a functional data object
-
+  
+  #  Last moddified 16 January 2020
+  
+  if (!(is.fd(fdobj) || is.fdPar(fdobj)))  stop(
+    "First argument is neither a functional data or a functional parameter object.")
+  if (is.fdPar(fdobj)) fdobj <- fdobj$fd
+  
   coef    <- as.array(fdobj$coefs)
   fdnames <- fdobj$fdnames
   coefdim <- dim(coef)

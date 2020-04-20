@@ -23,7 +23,7 @@
       }
       \item{list}{
 	a list used to create custom \code{axes} used to create axes via
-	\code{do.call(x$axes[[1]], x$axes[-1])}.  The primary example of
+	\code{x$axes[[1]]} and  \code{x$axes[-1]}.  The primary example of
 	this uses \code{list("axesIntervals", ...)}, e.g., with
 	\code{Fourier} bases to create \code{CanadianWeather} plots
       }
@@ -39,7 +39,7 @@
   invisible(NULL)
 }
 \section{Side Effects}{
-  a plot of the lindear differential operator object.
+  a plot of the linear differential operator object.
 }
 \seealso{
   \code{\link{Lfd}}, \code{\link{plot.fd}}

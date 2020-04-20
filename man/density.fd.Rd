@@ -16,13 +16,13 @@
 }
 \usage{
 \method{density}{fd}(x, WfdParobj, conv=0.0001, iterlim=20,
-           active=1:nbasis, dbglev=1, returnMatrix=FALSE, ...)
+           active=1:nbasis, dbglev=1, ...)
 }
 \arguments{
 \item{x}{
 a set observations, which may be one of two forms:
 \enumerate{
-	\item a vector of observatons $x_i$
+	\item a vector of observations $x_i$
 	\item a two-column matrix, with the observations $x_i$ in the
 	first column, and frequencies $f_i$ in the second.
 }
@@ -51,10 +51,6 @@ either 0, 1, or 2.  This controls the amount information printed out on
 each iteration, with 0 implying no output, 1 intermediate output level,
 and 2 full output.  If levels 1 and 2 are used, it is helpful to
 turn off the output buffering option in S-PLUS.
-}
-\item{returnMatrix}{
-logical:  If TRUE,  a two-dimensional is returned using a
-special class from the Matrix package.
 }
 \item{...}{Other arguments to match the generic function 'density'}
 }

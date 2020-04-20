@@ -17,7 +17,6 @@
   Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
     Functional Data Analysis}, Springer, New York, ch. 3. 
 }
-%\seealso{\code{\link{eval.penalty}}}
 \examples{
 plot(nondurables, log="y")
 }

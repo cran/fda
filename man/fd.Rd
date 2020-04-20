@@ -7,8 +7,7 @@
 \description{
   This is the constructor function for objects of the \code{fd} class.
   Each function that sets up an object of this class must call this
-  function.  This includes functions \code{\link{Data2fd}},
-  \code{\link{smooth.basis}}, \code{\link{density.fd}}, and so forth
+  function.  This includes functions  \code{\link{smooth.basis}}, \code{\link{density.fd}}, and so forth
   that estimate functional data objects that smooth or otherwise
   represent data.  Ordinarily, users of the functional data analysis
   software will not need to call this function directly, but these notes
@@ -82,8 +81,8 @@ fd(coef=NULL, basisobj=NULL, fdnames=NULL)
 }
 \seealso{
   \code{\link{smooth.basis}}
+  \code{\link{smooth.fdPar}}
   \code{\link{smooth.basisPar}}
-  \code{\link{Data2fd}}
   \code{\link{density.fd}}
   \code{\link{create.bspline.basis}}
   \code{\link{arithmetic.fd}}
@@ -114,6 +113,7 @@ Error in fd(0) :
 
 ... because fd by default wants to create a cubic spline
 }
+
 ##
 ## Cubic spline:  4  basis functions
 ##
@@ -136,8 +136,10 @@ plot(f3)
 ##
 ## subset of an fd object
 ##
+
 gaitbasis3 <- create.fourier.basis(nbasis=5)
-gaitfd3    <- Data2fd(gait, basisobj=gaitbasis3)
+gaittime = (1:20)/21
+gaitfd3    <- smooth.basis(gaittime, gait, gaitbasis3)$fd
 gaitfd3[1]
 
 }

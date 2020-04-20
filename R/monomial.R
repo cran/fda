@@ -1,4 +1,4 @@
-monomial <- function(evalarg, exponents=1, nderiv=0)
+monomial <- function(evalarg, exponents=1, nderiv=0, argtrans=c(0,1))
 {
 #  MONOMIAL Values of monomials, or their derivatives.
 #  The powers of EVALARG are the NBASIS nonnegative integers in EXPONENTS.
@@ -8,14 +8,19 @@ monomial <- function(evalarg, exponents=1, nderiv=0)
 #                evaluated
 #  EXPONENTS ... array of nonnegative integer exponents of EVALARG
 #  NDERIV    ... order of derivative to be returned.
-#  Return is:
+  #  ARGTRANS  ... A vector of two constants for shifting and scaling the 
+  #                argument range.  In function MONOMIAL and MONOM, 
+  #                the EVALARG is transformed to 
+  #                [evalarg-argtrans(1))/evalarg(2);
+  #                Defaults to [0,1]
+  #  Return is:
 #  A matrix with length(EVALARG) rows and NBASIS columns containing
 #    the values of the monomials or their derivatives
 
-#  last modified 17 June 2011 by Jim Ramsay
-#  previously modified 2008.08.23 by Spencer Graves
+#  last modified 9 January 2020 by Jim Ramsay
 
 	evalarg <- as.vector(evalarg)
+	evalarg <- (evalarg - argtrans[1])/argtrans[2]
   n       <- length(evalarg)    
 
 	nbasis <- length(exponents)
@@ -45,14 +50,17 @@ monomial <- function(evalarg, exponents=1, nderiv=0)
 		}
 	} else {
     	for (ibasis in 1:nbasis) {
+    	  print(ibasis)
         	degree <- exponents[ibasis]
         	if (nderiv <= degree) {
             	fac <- degree
             	if (nderiv >= 2) {
             	    for (ideriv in 2:nderiv) {
-                	    fac <- fac*(degree-ideriv+1)
+                	    fac <- fac*(degree-ideriv)
            	      }
            	  }
+            	print(fac)
+            	print(degree-nderiv)
             	monommat[,ibasis] <- fac*evalarg^(degree-nderiv)
         	}
     	}

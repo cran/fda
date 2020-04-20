@@ -130,9 +130,8 @@ Fperm.fd(yfdPar, xfdlist, betalist, wt=NULL, nperm=200,
 \section{Side Effects}{
   a plot of the functional observations
 } \seealso{
-  \code{\link{fRegress}}
+  \code{\link{fRegress}},
   \code{\link{Fstat.fd}}
-%  \code{\link{tstat.fd}}
 }
 \examples{
 ##
@@ -182,8 +181,7 @@ F.res2 = Fperm.fd(annualprec, xfdlist, betalist, nperm=10)
 
 # First set up a basis system to hold the smooths
 
-# cut this example to reduce test time on CRAN
-if(!CRAN()){
+\dontrun{
 
 Knots  <- growth$age
 norder <- 6

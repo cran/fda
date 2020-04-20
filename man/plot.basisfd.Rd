@@ -14,7 +14,7 @@
     a basis object
   }
   \item{knots}{
-    logical:  If TRUE and x[['type']] == 'bslpine', the knot locations
+    logical:  If TRUE and x[['type']] == 'bspline', the knot locations
     are plotted using vertical dotted, red lines.  Ignored otherwise.
   }
   \item{axes}{
@@ -26,7 +26,7 @@
       }
       \item{list}{
 	a list used to create custom \code{axes} used to create axes via
-	\code{do.call(x$axes[[1]], x$axes[-1])}.  The primary example of
+	\code{x$axes[[1]]} and  \code{x$axes[-1]}.  The primary example of
 	this uses \code{list("axesIntervals", ...)}, e.g., with
 	\code{Fourier} bases to create \code{CanadianWeather} plots
       }

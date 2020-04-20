@@ -1,11 +1,10 @@
-eval.bifd <- function(sevalarg, tevalarg, bifd, sLfdobj = 0, tLfdobj = 0, 
-                            returnMatrix=FALSE) {
+eval.bifd <- function(sevalarg, tevalarg, bifd, sLfdobj = 0, tLfdobj = 0) {
 
   #  Evaluates a bi-functional data object BIFD at argument values in arrays
   #  SEVALARG and TEVALARG.  Differential operators SLFD and TLFD are
   #     applied to BIFD if present.
 
-  #  Last modified 7 May 2012 by Jim Ramsay
+  #  Last modified 6 January 2020 by Jim Ramsay
 
   if (!is.vector(sevalarg)) stop(
      "First argument is not a vector.")
@@ -39,9 +38,9 @@ eval.bifd <- function(sevalarg, tevalarg, bifd, sLfdobj = 0, tLfdobj = 0,
   snderiv <- sLfdobj$nderiv
   tnderiv <- tLfdobj$nderiv
 
-  sbasismat <- eval.basis(sevalarg,sbasisobj,sLfdobj,returnMatrix)
+  sbasismat <- eval.basis(sevalarg,sbasisobj,sLfdobj)
 
-  tbasismat <- eval.basis(tevalarg,tbasisobj,tLfdobj,returnMatrix)
+  tbasismat <- eval.basis(tevalarg,tbasisobj,tLfdobj)
 
   if (ndim == 2) {
     evalbifd <- sbasismat %*% coef %*% t(tbasismat)

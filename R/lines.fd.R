@@ -9,12 +9,14 @@ lines.fd <- function(x, Lfdobj=int2Lfd(0), nx=201, ...)
   #  The remaining optional arguments are the same as those available
   #     in the regular "lines" function.
   
-# Last modified 2008.07.05 by Spencer Graves
-  #  previously modified 2007.05.03 and 1 October 2005
+  # Last modified 16 January 2020
+  
   fdobj <- x
   
-  if (!inherits(fdobj,  "fd"))  stop(
-		"First argument is not a functional data object.")
+  if (!(is.fd(fdobj) || is.fdPar(fdobj)))  stop(
+		"First argument is neither a functional data or a functional parameter object.")
+  if (is.fdPar(fdobj)) fdobj <- fdobj$fd
+  
   if (!inherits(Lfdobj, "Lfd")) stop(
       "Second argument is not a linear differential operator.")
 

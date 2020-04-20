@@ -32,7 +32,7 @@
 }
 \usage{
 pda.fd(xfdlist, bwtlist=NULL,
-       awtlist=NULL, ufdlist=NULL, nfine=501, returnMatrix=FALSE)
+       awtlist=NULL, ufdlist=NULL, nfine=501)
 }
 \arguments{
   \item{xfdlist}{
@@ -123,10 +123,6 @@ pda.fd(xfdlist, bwtlist=NULL,
     five times the largest number of basis functions used to represent
     any variable in the system, if this number is larger.
   }
-  \item{returnMatrix}{
-    logical:  If TRUE,  a two-dimensional is returned using a
-    special class from the Matrix package.
-  }
 }
 
 \value{
@@ -161,7 +157,9 @@ pda.fd(xfdlist, bwtlist=NULL,
 ##
 ##  set up objects for examples
 ##
-#  constant basis for estimating weight functions
+
+#  set up basis objects
+#  constant basis object  for estimating weight functions
 cbasis = create.constant.basis(c(0,1))
 #  monomial basis: {1,t}  for estimating weight functions
 mbasis = create.monomial.basis(c(0,1),2)
@@ -173,11 +171,15 @@ cfd0   = fd(0,cbasis)
 cfdPar = fdPar(cfd0)
 mfd0   = fd(matrix(0,2,1),mbasis)
 mfdPar = fdPar(mfd0)
+
+#  fine mesh for plotting functions
 #  sampling points over [0,1]
 tvec = seq(0,1,len=101)
+
 ##
 ##  Example 1:  a single first order constant coefficient unforced equation
 ##     Dx = -4*x  for  x(t) = exp(-4t)
+
 beta    = 4
 xvec    = exp(-beta*tvec)
 xfd     = smooth.basis(tvec, xvec, xbasis)$fd
@@ -351,8 +353,10 @@ bwtlist    = list(
                 )
 awtlist = list(list(cfdPar), list(cfdPar))
 ufdlist = list(list(fd(1,cbasis)), list(fd(1,cbasis)))
+
 #  perform the principal differential analysis
 result = pda.fd(xfdlist, bwtlist, awtlist, ufdlist)
+
 # display weight functions for variables
 bwtlistout = result$bwtlist
 bwtfd11    = bwtlistout[[1]][[1]][[1]]$fd
@@ -374,8 +378,8 @@ print(round(bwtfd12$coefs,3))
 print(round(bwtfd22$coefs,3))
 #  display weight functions for forcing functions
 awtlistout = result$awtlist
-awtfd1     = awtlistout[[1]][[1]]$fd
-awtfd2     = awtlistout[[2]][[1]]$fd
+awtfd1     = awtlistout[[1]][[1]]
+awtfd2     = awtlistout[[2]][[1]]
 par(mfrow=c(2,1))
 plot(awtfd1)
 title("weight on forcing function in equation 1")
@@ -389,5 +393,4 @@ title("residual function for equation 1")
 plot(reslist[[2]])
 title("residual function for equation 2")
 }
-% docclass is function
 \keyword{smooth}

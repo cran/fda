@@ -2,11 +2,9 @@
 \alias{coef.fd}
 \alias{coef.fdPar}
 \alias{coef.fdSmooth}
-\alias{coef.Taylor}
 \alias{coefficients.fd}
 \alias{coefficients.fdPar}
 \alias{coefficients.fdSmooth}
-\alias{coefficients.Taylor}
 \title{
   Extract functional coefficients 
 }
@@ -20,11 +18,9 @@
 \method{coef}{fd}(object, ...)
 \method{coef}{fdPar}(object, ...)
 \method{coef}{fdSmooth}(object, ...)
-\method{coef}{Taylor}(object, ...)
 \method{coefficients}{fd}(object, ...)
 \method{coefficients}{fdPar}(object, ...)
 \method{coefficients}{fdSmooth}(object, ...)
-\method{coefficients}{Taylor}(object, ...)
 }
 \arguments{
   \item{object}{
@@ -63,7 +59,7 @@ stopifnot(all.equal(coef(fd.bspl1.1), coefficients(fd.bspl1.1)))
 }
 
 ##
-## coef.fdPar 
+## coef.basisPar 
 ##
 rangeval <- c(-3,3)
 #  set up some standard normal data
@@ -92,11 +88,6 @@ coef(girlGrowthSm)
 \dontshow{stopifnot(
 all.equal(coef(girlGrowthSm), coefficients(girlGrowthSm)) 
 )}
-
-##
-## coef.Taylor 
-##
-# coming soon.
 
 }
 \keyword{utilities}

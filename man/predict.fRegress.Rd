@@ -72,80 +72,80 @@
   \code{\link{fRegress}}
   \code{\link[stats]{predict}}
 }
-\examples{
-###
-###
-### vector response with functional explanatory variable
-###
-###
-##
-## example from help('lm')
-##
-ctl <- c(4.17,5.58,5.18,6.11,4.50,4.61,5.17,4.53,5.33,5.14)
-trt <- c(4.81,4.17,4.41,3.59,5.87,3.83,6.03,4.89,4.32,4.69)
-group <- gl(2,10,20, labels=c("Ctl","Trt"))
-weight <- c(ctl, trt)
-fRegress.D9 <- fRegress(weight ~ group)
+% \examples{
+% ###
+% ###
+% ### vector response with functional explanatory variable
+% ###
+% ###
+% ##
+% ## example from help('lm')
+% ##
+% ctl <- c(4.17,5.58,5.18,6.11,4.50,4.61,5.17,4.53,5.33,5.14)
+% trt <- c(4.81,4.17,4.41,3.59,5.87,3.83,6.03,4.89,4.32,4.69)
+% group <- gl(2,10,20, labels=c("Ctl","Trt"))
+% weight <- c(ctl, trt)
+% fRegress.D9 <- fRegress(weight ~ group)
 
-pred.fR.D9 <- predict(fRegress.D9)
-#  Now compare with 'lm'
-lm.D9 <- lm(weight ~ group)
-pred.lm.D9 <- predict(lm.D9)
+% pred.fR.D9 <- predict(fRegress.D9)
+% #  Now compare with 'lm'
+% lm.D9 <- lm(weight ~ group)
+% pred.lm.D9 <- predict(lm.D9)
 
-\dontshow{stopifnot(}
-all.equal(as.vector(pred.fR.D9), as.vector(pred.lm.D9))
-\dontshow{)}
+% \dontshow{stopifnot(}
+% all.equal(as.vector(pred.fR.D9), as.vector(pred.lm.D9))
+% \dontshow{)}
 
-##
-## vector response with functional explanatory variable
-##
-annualprec <- log10(apply(CanadianWeather$dailyAv[,,
-                             "Precipitation.mm"], 2,sum))
-smallbasis  <- create.fourier.basis(c(0, 365), 25)
-tempfd <- smooth.basis(day.5,
-       CanadianWeather$dailyAv[,,"Temperature.C"], smallbasis)$fd
-precip.Temp.f <- fRegress(annualprec ~ tempfd)
+% ##
+% ## vector response with functional explanatory variable
+% ##
+% annualprec <- log10(apply(CanadianWeather$dailyAv[,,
+                             % "Precipitation.mm"], 2,sum))
+% smallbasis  <- create.fourier.basis(c(0, 365), 25)
+% tempfd <- smooth.basis(day.5,
+       % CanadianWeather$dailyAv[,,"Temperature.C"], smallbasis)$fd
+% precip.Temp.f <- fRegress(annualprec ~ tempfd)
 
-#precip.Temp.p <- predict(precip.Temp.f, interval='confidence')
-\dontshow{stopifnot(}
-#class(precip.Temp.p) == 'matrix'
-\dontshow{)}
+% #precip.Temp.p <- predict(precip.Temp.f, interval='confidence')
+% \dontshow{stopifnot(}
+% #class(precip.Temp.p) == 'matrix'
+% \dontshow{)}
 
-## ***** not yet implemented *****
+% ## ***** not yet implemented *****
 
-##
-## Example using se.fit
-##
+% ##
+% ## Example using se.fit
+% ##
 
-#precip.Temp.p <- predict(precip.Temp.f, se.fit=TRUE)
+% #precip.Temp.p <- predict(precip.Temp.f, se.fit=TRUE)
 
-\dontshow{stopifnot(}
-#class(precip.Temp.p) == 'list'
-\dontshow{)}
+% \dontshow{stopifnot(}
+% #class(precip.Temp.p) == 'list'
+% \dontshow{)}
 
-## ***** not yet implemented *****
+% ## ***** not yet implemented *****
 
-###
-###
-### functional response with
-###            (concurrent) functional explanatory variable
-###
-###
-##
-##  predict knee angle from hip angle;  from demo('gait', package='fda')
-##
-(gaittime <- as.numeric(dimnames(gait)[[1]])*20)
-gaitrange <- c(0,20)
-gaitbasis <- create.fourier.basis(gaitrange, nbasis=21)
-harmaccelLfd <- vec2Lfd(c(0, (2*pi/20)^2, 0), rangeval=gaitrange)
-gaitfd <- smooth.basisPar(gaittime, gait,
-       gaitbasis, Lfdobj=harmaccelLfd, lambda=1e-2)$fd
-hipfd  <- gaitfd[,1]
-kneefd <- gaitfd[,2]
-knee.hip.f <- fRegress(kneefd ~ hipfd)
+% ###
+% ###
+% ### functional response with
+% ###            (concurrent) functional explanatory variable
+% ###
+% ###
+% ##
+% ##  predict knee angle from hip angle;  from demo('gait', package='fda')
+% ##
+% (gaittime <- as.numeric(dimnames(gait)[[1]])*20)
+% gaitrange <- c(0,20)
+% gaitbasis <- create.fourier.basis(gaitrange, nbasis=21)
+% harmaccelLfd <- vec2Lfd(c(0, (2*pi/20)^2, 0), rangeval=gaitrange)
+% gaitfd <- smooth.basisPar(gaittime, gait,
+       % gaitbasis, Lfdobj=harmaccelLfd, lambda=1e-2)$fd
+% hipfd  <- gaitfd[,1]
+% kneefd <- gaitfd[,2]
+% knee.hip.f <- fRegress(kneefd ~ hipfd)
 
-knee.hip.pred <- predict(knee.hip.f)
-plot(knee.hip.pred)
-}
+% knee.hip.pred <- predict(knee.hip.f)
+% plot(knee.hip.pred)
+% }
 \keyword{ models }
 

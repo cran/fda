@@ -1,5 +1,5 @@
 smooth.fdPar <- function(fdobj, Lfdobj=NULL,
-         lambda=0, estimate=TRUE, penmat=NULL){
+         lambda=1e-4, estimate=TRUE, penmat=NULL){
 ##
 ## 1.  fdPar
 ##
@@ -8,5 +8,5 @@ smooth.fdPar <- function(fdobj, Lfdobj=NULL,
 ##
 ## 2.  smooth.fd
 ##
-  smooth.fd(fdobj, fdP)
+  return(smooth.fd(fdobj, fdP))
 }

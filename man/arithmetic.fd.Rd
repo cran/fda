@@ -64,7 +64,7 @@ times.fd(e1, e2, basisobj=NULL)
 
 \seealso{
   \code{\link{basisfd}},
-  \code{\link{basisfd.product}}
+  \code{\link{basisfd.product}},
   \code{\link{exponentiate.fd}}
 }
 \examples{
@@ -86,12 +86,12 @@ all.equal(coef(parab4.5+parab4.5), coef2)
 bspl5.3 <- create.bspline.basis(breaks=c(0, 1/3, 1))
 plot(bspl5.3)
 x. <- seq(0, 1, .1)
-para4.5.3 <- smooth.basis(x., 4*(x.-0.5)^2, fdParobj=bspl5.3)[['fd']]
+para4.5.3 <- smooth.basis(x., 4*(x.-0.5)^2, fdParobj=bspl5.3)$fd
 plot(para4.5.3)
 
 bspl5.2 <- create.bspline.basis(breaks=c(0, 1/2, 1))
 plot(bspl5.2)
-para4.5.2 <- smooth.basis(x., 4*(x.-0.5)^2, fdParobj=bspl5.2)[['fd']]
+para4.5.2 <- smooth.basis(x., 4*(x.-0.5)^2, fdParobj=bspl5.2)$fd
 plot(para4.5.2)
 
 #str(para4.5.3+para4.5.2)
@@ -107,12 +107,12 @@ all.equal(coef(para4.5.3-para4.5.2), coef2.)
 ##
 quart <- para4.5.3*para4.5.2
 
-# interior knots of the sum
-# = union(interior knots of the summands);
-# ditto for difference and product.
-\dontshow{stopifnot(}
-all.equal(knots(quart), c(knots(para4.5.3), knots(para4.5.2)))
-\dontshow{)}
+% # interior knots of the sum
+% # = union(interior knots of the summands);
+% # ditto for difference and product.
+% \dontshow{stopifnot(}
+% all.equal(knots.fd(quart), c(knots.fd(para4.5.3), knots.fd(para4.5.2)))
+% \dontshow{)}
 
 # norder(quart) = norder(para4.5.2)+norder(para4.5.3)-1 = 7
 \dontshow{stopifnot(}

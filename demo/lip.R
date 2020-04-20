@@ -32,15 +32,15 @@ library(fda)
 ##
 ## 1.1.  Default smooth.basisPar
 ##
-lipfd3 <- smooth.basisPar(liptime, lip)$fd
+lipfd3   <- smooth.basisPar(liptime, lip)$fd
 
 names(lipfd3$fdnames) <- c("time(seconds)", "replications", "mm")
-#op <- par(mfrow=c(2,1), mar=c(5,5,4,2), pty="m", ask=FALSE)
+op <- par(mfrow=c(3,1), mar=c(5,5,4,2), pty="m", ask=FALSE)
 plot(lipfd3,        main="Lip Position", cex=1.2)
 plot(lipfd3, Lfd=1, ylab="mm / sec", main="Lip Velocity", cex=1.2)
 plot(lipfd3, Lfd=2, ylab="mm / sec / sec", main="Lip Acceleration",
      cex=1.2)
-#par(op)
+par(op)
 
 # PROBLEM:  lines too straight, especially position and velocity
 # WHY:      Too much smoothing.  
@@ -51,12 +51,12 @@ plot(lipfd3, Lfd=2, ylab="mm / sec / sec", main="Lip Acceleration",
 lipfd3.12 <- smooth.basisPar(liptime, lip, lambda=1e-12)$fd
 
 names(lipfd3.12$fdnames) <- c("time(seconds)", "replications", "mm")
-#op <- par(mfrow=c(2,1), mar=c(5,5,4,2), pty="m", ask=FALSE)
+op <- par(mfrow=c(3,1), mar=c(5,5,4,2), pty="m", ask=FALSE)
 plot(lipfd3.12,        main="Lip Position", cex=1.2)
 plot(lipfd3.12, Lfd=1, ylab="mm/sec", main="Lip Velocity", cex=1.2)
 plot(lipfd3.12, Lfd=2, ylab="mm/sec/sec", main="Lip Acceleration",
      cex=1.2)
-#par(op)
+par(op)
 
 # PROBLEM:  Acceleration not smooth at all ... 
 # WHY:      We used cubic splines for location,
@@ -67,16 +67,14 @@ plot(lipfd3.12, Lfd=2, ylab="mm/sec/sec", main="Lip Acceleration",
 ##
 ## 1.3.  Quintic basis (order = 6) 
 ## 
-#lipbasis <- create.bspline.basis(range(liptime), 31, 6) 
-#lipfd5 <- smooth.basisPar(liptime, lip, lipbasis, lambda=1e-12)$fd
 lipfd5 <- smooth.basisPar(liptime, lip, 6, lambda=1e-12)$fd
 names(lipfd5$fdnames) <- c("time(seconds)", "replications", "mm")
-#op <- par(mfrow=c(2,1), mar=c(5,5,4,2), pty="m", ask=FALSE)
+op <- par(mfrow=c(3,1), mar=c(5,5,4,2), pty="m", ask=FALSE)
 plot(lipfd5,        main="Lip Position", cex=1.2)
 plot(lipfd5, Lfd=1, ylab="mm / sec", main="Lip Velocity", cex=1.2)
 plot(lipfd5, Lfd=2, ylab="mm / sec / sec", main="Lip Acceleration",
      cex=1.2)
-#par(op)
+par(op)
 
 # PROBLEM:  Acceleration poorly smoothed
 # WHY:      The default smoothing operator = int2Lfd(2) = for location
@@ -88,18 +86,20 @@ plot(lipfd5, Lfd=2, ylab="mm / sec / sec", main="Lip Acceleration",
 lipfd <- smooth.basisPar(liptime, lip, 6, Lfdobj=int2Lfd(4),
                          lambda=1e-12)$fd
 names(lipfd$fdnames) <- c("time(seconds)", "replications", "mm")
-#op <- par(mfrow=c(2,1), mar=c(5,5,4,2), pty="m", ask=FALSE)
+op <- par(mfrow=c(3,1), mar=c(5,5,4,2), pty="m", ask=FALSE)
 plot(lipfd,        main="Lip Position", cex=1.2)
 plot(lipfd, Lfd=1, ylab="mm / sec", main="Lip Velocity", cex=1.2)
 plot(lipfd, Lfd=2, ylab="mm / sec / sec", main="Lip Acceleration",
      cex=1.2)
-#par(op)
+par(op)
 
 ##
 ## 1.5.  plotfit.fd?
 ##
+#  plot lip position data along with fit
 plotfit.fd(lip, liptime, lipfd)
 
+#  plot the residual: lip position data minus fit
 plotfit.fd(lip, liptime, lipfd, residual=TRUE, type='b',
            sortwrd=TRUE)
 
@@ -153,12 +153,14 @@ lipwarpfd  <- lipreglist$warpfd
 
 par(mfrow=c(1,2), pty="s")
 
+lipmeanfd <- mean(lipfd)
+
 plot(lipfd, main="Unregistered")
-lines.fd(lipmeanfd, lty=2)
+lines(lipmeanfd, lty=2)
 abline(v=lipmeanmarks,lty=2)
 
 plot(lipregfd, main="Registered")
-lines.fd(lipmeanfd, lty=2)
+lines(lipmeanfd, lty=2)
 abline(v=lipmeanmarks,lty=2)
 
 #  plot warping functions and deformations
@@ -172,6 +174,7 @@ matplot(liptime,defmat,type="l",lty=1,
         xlab="Normalized time", ylab="Warped Normalized time",
         main="Deformation Functions")
 abline(h=0,lty=2)
+
 ##
 ## 3.  Principal Components Analysis
 ##
@@ -187,19 +190,18 @@ plot.pca.fd(lippca.fd)
 lipeigvals <- lippca.fd[[2]]
 plot(1:19, log10(lipeigvals[1:19]), type="b",
      xlab="Eigenvalue Number", ylab="", main="Log10 Eigenvalues")
+
 ##
 ## 4.  Principal Differential Analysis
 ## 
-#  ---------------------------------------------------------------------
-#                    Principal differential analysis  
-#  ---------------------------------------------------------------------
 
 #  set up a second order linear differnetial equation solution
 
 liprange = range(liptime)
 
-pdabasisfd <- create.bspline.basis(liprange, nbasis=21)
-betafdPar  <- fdPar(pdabasisfd)
+nbasis     <- 21
+pdabasisfd <- create.bspline.basis(liprange, nbasis)
+betafdPar  <- fdPar(fd(matrix(0,nbasis,1),pdabasisfd))
 
 #  set up list of functional parameter objects for weight fns.
 

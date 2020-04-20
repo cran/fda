@@ -1,21 +1,22 @@
 varmx.cca.fd <- function(ccafd, nx=201)
 {
-#  VARMX_CCA  Apply varimax rotation to CCA weight functions
-#             and scores
-#  Arguments:
-#  CCAFD ... An object of the CCA.FD class produced by a call to
-#            function CCA.FD.
-#  CCAWTFD2 ... A functional parameter object for the canonical weight
-#                functions for the second set of functions.
-#  CCAVAR1  ... Canonical variate scores for first  set of functions.
-#  CCAVAR2  ... Canonical variate scores for second set of functions.
-#  Return:  Arguments after rotation.
-
-#  last modified 6 December 2012
+  #  VARMX_CCA  Apply varimax rotation to CCA weight functions
+  #             and scores
+  #  Arguments:
+  #  CCAFD ... An object of the CCA.FD class produced by a call to
+  #            function CCA.FD.
+  #  CCAWTFD2 ... A functional parameter object for the canonical weight
+  #                functions for the second set of functions.
+  #  CCAVAR1  ... Canonical variate scores for first  set of functions.
+  #  CCAVAR2  ... Canonical variate scores for second set of functions.
+  #  Return:  Arguments after rotation.
+  
+  #  last modified 16 January 2020
+  
+  if (!inherits(ccafd, "cca.fd")) stop("First argument is not a class cca.fd object.")
 
   ccawtfd1 <- ccafd[[1]]
   ccawtfd2 <- ccafd[[2]]
-  ccacorr  <- ccafd[[3]]
   ccavar1  <- ccafd[[4]]
   ccavar2  <- ccafd[[5]]
 
@@ -45,10 +46,11 @@ varmx.cca.fd <- function(ccafd, nx=201)
   canvarvalues[,,1] <- ccavar1
   canvarvalues[,,2] <- ccavar2
 
-  ccavarmxlist <- list(ccawtfd1, ccawtfd2, ccacorr, canvarvalues, rotmat)
-  names(ccavarmxlist) <- c("ccawtfd1", "ccawtfd2", "ccacorr",
-                           "ccavar1",  "ccavar2")
-  
+  ccavarmxlist <- list(weight1  = ccawtfd1, 
+                       weight2  = ccawtfd2, 
+                       variates = canvarvalues, 
+                       rotation = rotmat)
+                       
   class(ccavarmxlist) <- "cca.fd"
   
   return(ccavarmxlist)

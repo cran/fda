@@ -73,8 +73,7 @@ create.fourier.basis <- function (rangeval=c(0,1), nbasis=3,
 #  Returns
 #  BASISOBj  ... a functional data basis object of type "fourier"
 
-#  Last modified 2 November 2008 by Spencer Graves
-#  Previously modified 6 January 2008 by Jim Ramsay
+#  Last modified 20 April 2017 by Jim Ramsay
 
 #  Default basis for missing arguments
 
@@ -117,7 +116,7 @@ create.fourier.basis <- function (rangeval=c(0,1), nbasis=3,
 #  if ((period <= 0) || !is.numeric(period))
 #    stop ("Period must be positive number for a Fourier basis")
 ##
-## 3.  Increase NBASIS by one if even
+## 3.  Check NBASIS
 ##
   if(!is.numeric(nbasis))
     stop('nbasis must be numeric;  class(nbasis) = ', class(nbasis))
@@ -126,11 +125,6 @@ create.fourier.basis <- function (rangeval=c(0,1), nbasis=3,
   if((nbasis%%1) > 10*.Machine$double.eps)
     stop ("nBasis must be an integer.")
   nbasis <- ceiling(nbasis)
-  if (2*floor(nbasis/2) == nbasis){
-    warning('nbasis must be an odd integer; is ', nbasis,
-            ';  will be increased by 1')
-    nbasis <- nbasis + 1
-  }
 ##
 ## 4.  check DROPIND
 ##

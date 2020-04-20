@@ -2,7 +2,11 @@ center.fd <- function(fdobj)
 {
 #  remove mean function for functional observations
 
-#  Last modified 28 December 2012
+#  Last modified 16 January 2020
+
+if (!(is.fd(fdobj) || is.fdPar(fdobj))) 
+  stop("First argument is neither an fd or an fdPar object.")
+if (is.fdPar(fdobj)) fdobvj = fdobj$fd
 
 coef     <- as.array(fdobj$coefs)
 coefd    <- dim(coef)

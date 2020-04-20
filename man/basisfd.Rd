@@ -31,8 +31,11 @@ basisfd(type, rangeval, nbasis, params,
       \item{const, con, constant}{constant basis}
       \item{exp, expon, exponen, exponential}{exponential basis}
       \item{Fourier, fourier, Fou, fou}{Fourier basis}
+      \item{fdVariance, fdVar}
+      \item{FEM}
       \item{mon, monom, monomial}{monomial basis}
       \item{polyg, polygon, polygonal}{polygonal basis}
+      \item{polynomial, poly}
       \item{power, pow}{power basis}
     }
   }

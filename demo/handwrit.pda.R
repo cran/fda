@@ -1,7 +1,3 @@
-#  load the data
-
-load('../data/handwrit.rda')
-  
 #  array with coordinates and vector of times
 
 fdaarray = handwrit
@@ -27,8 +23,9 @@ xfdlist = list(Xfd, Yfd)
 
 #  basis and parameter object for weight functions
 
-fdabasis2 = create.bspline.basis(fdarange,norder=norder,nbasis=51)
-pdaPar = fdPar(fdabasis2,1,1e-8)
+nbasis    = 51
+fdabasis2 = create.bspline.basis(fdarange,norder=norder,nbasis=nbasis)
+pdaPar    = fdPar(fd(matrix(0,nbasis,1),fdabasis2),1,1e-8)
 
 #  set up a first order equation
 
@@ -52,22 +49,22 @@ bwtfd22    = bwtlistout[[2]][[2]][[1]]$fd
 
 par(mfrow=c(2,2))
 plot(bwtfd11)
-title("Weight for variable 1 in equation 1")
+title("Weight for variable X in equation 1")
 plot(bwtfd21)
-title("Weight for variable 2 in equation 1")
+title("Weight for variable Y in equation 1")
 plot(bwtfd12)
-title("Weight for variable 1 in equation 2")
+title("Weight for variable X in equation 2")
 plot(bwtfd22)
-title("Weight for variable 2 in equation 2")
+title("Weight for variable Y in equation 2")
 
 #  plot residual functions
 
 reslist = pdaList$resfdlist
 par(mfrow=c(2,1))
 plot(reslist[[1]])
-title("Residual function for variable 1")
+title("Residual function for variable X")
 plot(reslist[[2]])
-title("Residual function for variable 2")
+title("Residual function for variable Y")
 
 #  set up a second order equation
 
@@ -88,13 +85,13 @@ bwtfd12    = bwtlistout[[1]][[2]][[1]]$fd
 bwtfd22    = bwtlistout[[2]][[2]][[1]]$fd
 par(mfrow=c(2,2))
 plot(bwtfd11)
-title("Weight for variable 1 in equation 1")
+title("Weight for variable X in equation 1")
 plot(bwtfd21)
-title("Weight for variable 2 in equation 1")
+title("Weight for variable Y in equation 1")
 plot(bwtfd12)
-title("Weight for variable 1 in equation 2")
+title("Weight for variable X in equation 2")
 plot(bwtfd22)
-title("Weight for variable 2 in equation 2")
+title("Weight for variable y in equation 2")
 
 #  extract and plot the weight coefficients for DX and DY
 
@@ -105,19 +102,19 @@ bwtfd12    = bwtlistout[[1]][[2]][[2]]$fd
 bwtfd22    = bwtlistout[[2]][[2]][[2]]$fd
 par(mfrow=c(2,2))
 plot(bwtfd11)
-title("Weight for variable 1 in equation 1")
+title("Weight for variable X in equation 1")
 plot(bwtfd21)
-title("Weight for variable 2 in equation 1")
+title("Weight for variable Y in equation 1")
 plot(bwtfd12)
-title("Weight for variable 1 in equation 2")
+title("Weight for variable X in equation 2")
 plot(bwtfd22)
-title("Weight for variable 2 in equation 2")
+title("Weight for variable Y in equation 2")
 
 #  display residual functions
 
 reslist = pdaList$resfdlist
 par(mfrow=c(2,1))
 plot(reslist[[1]])
-title("Residual function for variable 1")
+title("Residual function for variable X")
 plot(reslist[[2]])
-title("Residual function for variable 2")
+title("Residual function for variable Y")

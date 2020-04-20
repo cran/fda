@@ -50,7 +50,7 @@ plotscores <- function(pcafd, scores = c(1, 2), xlab = NULL, ylab = NULL,
       zz <- loc
    else {
       if(is.na(loc) || is.null(loc) || loc == 0)
-         return(NULL)
+         return()
       zz <- locator(loc)
    }
    zzmat <- rbind(zz$x, zz$y)

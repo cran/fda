@@ -94,8 +94,8 @@ create.power.basis(rangeval=c(0, 1), nbasis=NULL, exponents=NULL,
     custom \code{axes}.  If this \code{axes} argument is not
     \code{NULL}, functions \code{plot.basisfd}, \code{plot.fd},
     \code{plot.fdSmooth} \code{plotfit.fd}, \code{plotfit.fdSmooth}, and
-    \code{plot.Lfd} will create axes via \code{do.call(x$axes[[1]],
-      x$axes[-1])}.  The primary example of this uses
+    \code{plot.Lfd} will create axes via \code{x$axes[[1]]} and
+      \code{x$axes[-1]}.  The primary example of this uses
     \code{list("axesIntervals", ...)}, e.g., with \code{Fourier} bases
     to create \code{CanadianWeather} plots
   }
@@ -113,7 +113,6 @@ create.power.basis(rangeval=c(0, 1), nbasis=NULL, exponents=NULL,
 }
 \seealso{
 \code{\link{basisfd}},
-\code{\link{create.basis}},
 \code{\link{create.bspline.basis}},
 \code{\link{create.constant.basis}},
 \code{\link{create.exponential.basis}},
@@ -122,13 +121,11 @@ create.power.basis(rangeval=c(0, 1), nbasis=NULL, exponents=NULL,
 \code{\link{create.polygonal.basis}},
 }
 \examples{
-
 #  Create a power basis over the interval [1e-7,1]
 #  with powers or exponents -1, -0.5, 0, 0.5 and 1
 basisobj <- create.power.basis(c(1e-7,1), 5, seq(-1,1,0.5))
 #  plot the basis
 plot(basisobj)
-
 }
 % docclass is function
 \keyword{smooth}

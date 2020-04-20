@@ -84,5 +84,4 @@ par(op)
 plot(daytemppcaobj$harmonics)
 plot(daytemppcaVarmx$harmonics)
 }
-% docclass is function
 \keyword{smooth}

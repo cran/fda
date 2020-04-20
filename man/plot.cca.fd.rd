@@ -60,9 +60,9 @@ round(ccafd0$ccacorr[1:6],3)
 #  plot the unrotated canonical weight functions
 plot.cca.fd(ccafd0)
 #  compute a VARIMAX rotation of the canonical variables
-ccafd <- varmx.cca.fd(ccafd0)
+ccafd1 <- varmx.cca.fd(ccafd0)
 #  plot the rotated canonical weight functions
-plot.cca.fd(ccafd)
+plot.cca.fd(ccafd1)
 
 }
 % docclass is function

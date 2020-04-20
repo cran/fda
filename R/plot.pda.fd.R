@@ -1,18 +1,19 @@
 plot.pda.fd = function(x, whichdim=1,npts=501,...)
 {
+  # Last modified 16 January 2020
+  
   # This basically plots the elements of bwtlist, allowing the user
   # to specify how the functions are collected.
-
-#  rangval = pdaList$resfdlist[[1]]$basis$rangeval
+  
+  if (!inherits(x, "pda.fd")) stop("First argument is not of class pda.fd.")
+  
   rangval = x$resfdlist[[1]]$basis$rangeval
 
-#  m = length(pdaList$resfdlist)
   m = length(x$resfdlist)
   tfine = seq(rangval[1],rangval[2],length.out=npts)
 
   whichdim=unique(sort(whichdim))
 
-#  bwtlist = pdaList$bwtlist
   bwtlist = x$bwtlist
 
   # Firstly the one-variable case, do we plot all the functions

@@ -1,4 +1,4 @@
-plotbeta = function(betaestlist, betastderrlist, argvals=NULL,
+plotbeta = function(betaestlist, betastderrlist=NULL, argvals=NULL,
                     xlab="", ...)
 {
 #  PLOTBETA plots a functional parameter along with confidence
@@ -10,7 +10,7 @@ plotbeta = function(betaestlist, betastderrlist, argvals=NULL,
 #                     for the standard error of the objects in
 #                     BETAESTLIST.
 
-#  Last modified 12 December 2008
+#  Last modified 6 January 2020
 
 #  check BETAESTLIST
 
@@ -24,14 +24,15 @@ if (!inherits(betaestlist, "list")) {
 
 #  check BETASTDERRLIST
 
-if (inherits(betastderrlist, "fd")) {
-    betastderrlist = list(betastderrlist)
-}
-
-if (!inherits(betastderrlist, "list")) {
-    stop("BETASTDERRLIST is not a list, or fd object.")
-}
-
+  if (!is.null(betastderrlist)){
+    if (inherits(betastderrlist, "fd")) {
+      betastderrlist = list(betastderrlist)
+    }
+    if (!inherits(betastderrlist, "list")) {
+      stop("BETASTDERRLIST is not a list, or fd object.")
+    }
+  }
+  
 #  get range
 
 if (is.fdPar(betaestlist[[1]])) {
@@ -63,21 +64,20 @@ for (j in 1:p) {
         "BETAESTLIST does not contain a functional parameter or data object.")
         }
     }
-    betastderr = eval.fd(argvals, betastderrlist[[j]])
-    betavecp   = betavec + 2*betastderr
-    betavecm   = betavec - 2*betastderr
-    zeroval  = c(0,0)
-    plot(argvals, betavec, type="l", xlab=xlab, ylab="",
-         xlim=rangeval, ylim=c(min(betavecm),max(betavecp)), ...)
-    lines(rangeval, zeroval,lty=3, col=2)
-        #fill([argvals   argvals(n-11)], ...
-        #     [betavecp   betavecm(n-11)], "w", "LineStyle", "--")
-    lines(argvals, betavec,  col=1, lwd=2)
-    lines(argvals, betavecp, col=1, lwd=1)
-    lines(argvals, betavecm, col=1, lwd=1)
-    lines(rangeval, zeroval, col=1, lty=3)
-    for (i in 1:n) {
-            lines(c(argvals[i],argvals[i]),c(betavecm[i],betavecp[i]))
+  zeroval  = c(0,0)
+  if (is.null(betastderrlist)) {
+      plot(argvals, betavec, type="l", xlab=xlab, ylab="",
+           xlim=rangeval, ylim=c(min(betavec),max(betavec)), ...)
+      lines(rangeval, zeroval, col=1, lty=3)
+    } else {
+      betastderr = eval.fd(argvals, betastderrlist[[j]])
+      betavecp   = betavec + 2*betastderr
+      betavecm   = betavec - 2*betastderr
+      plot(argvals, betavec, type="l", xlab=xlab, ylab="",
+           xlim=rangeval, ylim=c(min(betavecm),max(betavecp)), ...)
+      lines(rangeval, zeroval,lty=3, col=2)
+      lines(argvals, betavecp, col=1, lwd=1)
+      lines(argvals, betavecm, col=1, lwd=1)
     }
     title(paste("Regression function ",j))
 }

@@ -7,7 +7,7 @@ svd2 <- function(x, nu = min(n, p), nv = min(n, p), LINPACK = FALSE){
     n <- dx[1]
     p <- dx[2]
     svd.x <- try(svd(x, nu, nv, LINPACK))
-    if(inherits(svd.x, "try-error")){
+    if(class(svd.x)=="try-error"){
       nNA <- sum(is.na(x))
       nInf <- sum(abs(x)==Inf)
       if((nNA>0) || (nInf>0)){
@@ -36,7 +36,7 @@ svd2 <- function(x, nu = min(n, p), nv = min(n, p), LINPACK = FALSE){
       warning(msg)
 #
       svd.x <- try(svd(x, nu, nv, !LINPACK))
-      if(inherits(svd.x, "try-error")){
+      if(class(svd.x)=="try-error"){
 #        .xc <- .x2[1+!LINPACK]
 #        assign(.xc, x, envir=.GlobalEnv)
         stop("svd also failed using LINPACK = ", !LINPACK,

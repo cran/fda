@@ -26,7 +26,7 @@ create.polygonal.basis <- function(rangeval=NULL, argvals=NULL,
 #  Last modified 5 November 2008 by Spencer Graves
 #  Last modified 20 November 2005
 
-  type <- "polyg"
+  type <- "polygonal"
 ##
 ## 1.  Check rangeval & argvals
 ##

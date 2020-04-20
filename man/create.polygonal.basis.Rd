@@ -91,8 +91,8 @@ create.polygonal.basis(rangeval=NULL, argvals=NULL, dropind=NULL,
     custom \code{axes}.  If this \code{axes} argument is not
     \code{NULL}, functions \code{plot.basisfd}, \code{plot.fd},
     \code{plot.fdSmooth} \code{plotfit.fd}, \code{plotfit.fdSmooth}, and
-    \code{plot.Lfd} will create axes via \code{do.call(x$axes[[1]],
-      x$axes[-1])}.  The primary example of this uses
+    \code{plot.Lfd} will create axes via \code{x$axes[[1]]} and
+      \code{x$axes[-1]}.  The primary example of this uses
     \code{list("axesIntervals", ...)}, e.g., with \code{Fourier} bases
     to create \code{CanadianWeather} plots
   }
@@ -110,7 +110,6 @@ create.polygonal.basis(rangeval=NULL, argvals=NULL, dropind=NULL,
 \seealso{
 \code{\link{basisfd}},
 \code{\link{create.bspline.basis}},
-\code{\link{create.basis}},
 \code{\link{create.constant.basis}},
 \code{\link{create.exponential.basis}},
 \code{\link{create.fourier.basis}},

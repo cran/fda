@@ -854,7 +854,7 @@ gaitSmooth <- smooth.basis(gaittime, gait, gaitfdPar)
 gaitfd <- gaitSmooth$fd
 \dontrun{
   # by default creates multiple plots, asking for a click between plots
-  plotfit.fd(gait, gaittime, gaitfd)
+ plotfit.fd(gait, gaittime, gaitfd)
 }
 
 \dontshow{

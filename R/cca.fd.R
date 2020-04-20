@@ -164,4 +164,5 @@ names(ccafd) <- c("ccawtfd1", "ccawtfd2", "ccacorr",
 class(ccafd) <- "cca.fd"
 
 return(ccafd)
+
 }

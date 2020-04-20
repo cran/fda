@@ -103,7 +103,6 @@ fdPar(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
   \code{\link{pca.fd}},
   \code{\link{smooth.fdPar}},
   \code{\link{smooth.basis}},
-  \code{\link{smooth.basisPar}},
   \code{\link{smooth.monotone}},
   \code{\link{int2Lfd}}
 }

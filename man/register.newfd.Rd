@@ -85,6 +85,4 @@ Dlipfd = deriv.fd(lipfd,Lfdobj=1)
 
 Dlipregfd = register.newfd(Dlipfd,lipreglist$warpfd,type='direct')
 }
-
-% docclass is function
 \keyword{smooth}

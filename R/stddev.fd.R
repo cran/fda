@@ -6,11 +6,12 @@ stddev.fd <- function(fdobj)
   #  Return:
   #  STDFD ... a functional data object for the standard deviation functions
 
-  #  Last modified 20081004;  previously modified 26 February 2007
+  #  Last modified 16 January 2020
 
-  if (!(inherits(fdobj, "fd"))) stop(
-		"Argument  fdobj not a functional data object.")
-
+  if (!(is.fd(fdobj) || is.fdPar(fdobj)))  stop(
+    "First argument is neither a functional data or a functional parameter object.")
+  if (is.fdPar(fdobj)) fdobj <- fdobj$fd
+  
   coef     <- fdobj$coefs
   coefd    <- dim(coef)
   ndim     <- length(coefd)

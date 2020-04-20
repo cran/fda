@@ -8,7 +8,7 @@
   analysis on a bifurcation diagram to demonstrate stability.
 }
 \usage{
-pda.overlay(pdaList,nfine=501,ncoarse=11, returnMatrix=FALSE,...)
+pda.overlay(pdaList,nfine=501,ncoarse=11,...)
 }
 \arguments{
   \item{pdaList}{
@@ -19,10 +19,6 @@ pda.overlay(pdaList,nfine=501,ncoarse=11, returnMatrix=FALSE,...)
   }
   \item{ncoarse}{
     number of time markers to place along the plotted curve.
-  }
-  \item{returnMatrix}{
-    logical:  If TRUE,  a two-dimensional is returned using a
-    special class from the Matrix package.
   }
   \item{\dots}{
     other arguments for 'plot'.

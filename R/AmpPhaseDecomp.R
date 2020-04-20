@@ -1,4 +1,4 @@
-AmpPhaseDecomp <- function(xfd, yfd, hfd, rng=xrng, returnMatrix=FALSE)
+AmpPhaseDecomp <- function(xfd, yfd, hfd, rng=xrng)
 {
 #  Computes the amplitude-phase decomposition for a registration.
 
@@ -12,11 +12,8 @@ AmpPhaseDecomp <- function(xfd, yfd, hfd, rng=xrng, returnMatrix=FALSE)
 #  MS.pha ... mean square for amplitude variation 
 #  RSQR   ... squared correlation measure of prop. phase variation 
 #  C      ... constant C
-#  RETURNMATRIX ... If False, a matrix in sparse storage model can be returned
-#               from a call to function BsplineS.  See this function for
-#               enabling this option.
 
-#  Last modified 8 May 2012 by Jim Ramsay
+#  Last modified 6 January 2020 by Jim Ramsay
 
 xbasis  <- xfd$basis
 nxbasis <- xbasis$nbasis
@@ -29,9 +26,9 @@ if (rng[1] >= rng[2]) stop("Elements of rng are not increasing.")
 tfine   <- seq(rng[1],rng[2],len=nfine)
 delta   <- tfine[2] - tfine[1]
 
-Dhfine  <- eval.fd(tfine, hfd, 1, returnMatrix)
-xfine   <- eval.fd(tfine, xfd, 0, returnMatrix)
-yfine   <- eval.fd(tfine, yfd, 0, returnMatrix)
+Dhfine  <- eval.fd(tfine, hfd, 1)
+xfine   <- eval.fd(tfine, xfd, 0)
+yfine   <- eval.fd(tfine, yfd, 0)
 mufine  <- apply(xfine, 1, mean)
 etafine <- apply(yfine, 1, mean)
 

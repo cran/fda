@@ -40,7 +40,7 @@ library(fda)
 #  function fRegress.  In general, it is better use a time interval
 #  that assigns roughly one time unit to each inter-knot interval.
 
-(gaittime <- as.numeric(dimnames(gait)[[1]])*20)
+gaittime  <- as.matrix((0:19)+0.5)
 gaitrange <- c(0,20)
 
 #  display ranges of gait for each variable

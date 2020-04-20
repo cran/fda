@@ -549,10 +549,11 @@ all.equal(TempRgn, TempRgn.f)
 
 ##
 ##  predict knee angle from hip angle;  from demo('gait', package='fda')
+
 ##
 ## formula interface
 ##
-(gaittime <- as.numeric(dimnames(gait)[[1]])*20)
+gaittime  <- as.matrix((1:20)/21)
 gaitrange <- c(0,20)
 gaitbasis <- create.fourier.basis(gaitrange, nbasis=21)
 harmaccelLfd <- vec2Lfd(c(0, (2*pi/20)^2, 0), rangeval=gaitrange)
@@ -562,13 +563,11 @@ hipfd  <- gaitfd[,1]
 kneefd <- gaitfd[,2]
 
 knee.hip.f <- fRegress(kneefd ~ hipfd)
-%knee.hip.mdl <- fRegress(kneefd ~ hipfd, method='m')
 
 ##
 ## manual set-up
 ##
 #  set up the list of covariate objects
-%conbasis <- create.constant.basis(c(0,20))
 const  <- rep(1, dim(kneefd$coef)[2])
 xfdlist  <- list(const=const, hipfd=hipfd)
 
@@ -579,9 +578,9 @@ betalist  <- list(const=fdPar(beta0), hipfd=fdPar(beta1))
 
 fRegressout <- fRegress(kneefd, xfdlist, betalist)
 
-\dontshow{stopifnot(}
+#\dontshow{stopifnot(}
 all.equal(fRegressout, knee.hip.f)
-\dontshow{)}
+#\dontshow{)}
 
 #See also the following demos:
 

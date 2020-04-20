@@ -1,8 +1,7 @@
-predict.posfd <- function(object, newdata=NULL, Lfdobj=0, 
-                          returnMatrix=FALSE, ...){
+predict.posfd <- function(object, newdata=NULL, Lfdobj=0, ...){
 #  Last modified  7 May 2012 by Jim Ramsay
   if (is.null(newdata)) newdata <- object$argvals
-  evalPos <- eval.posfd(newdata, object$Wfdobj, Lfdobj, returnMatrix=FALSE)
+  evalPos <- eval.posfd(newdata, object$Wfdobj, Lfdobj)
 #
   evalPos
 }
@@ -16,7 +15,7 @@ residuals.posfd <- function(object, ...){
   object$y-pred
 }
 
-eval.posfd <- function(evalarg, Wfdobj, Lfdobj=int2Lfd(0), returnMatrix=FALSE)
+eval.posfd <- function(evalarg, Wfdobj, Lfdobj=int2Lfd(0))
 {
 #  Evaluates a value or a derivative of a positive functional
 #  data object.
@@ -34,9 +33,6 @@ eval.posfd <- function(evalarg, Wfdobj, Lfdobj=int2Lfd(0), returnMatrix=FALSE)
 #  LFDOBJ  ... A linear differential operator object
 #              applied to the functions that are evaluated.
 #              Default is INT2LFD(0).
-#  RETURNMATRIX ... If FALSE, a matrix in sparse storage model can be returned
-#               from a call to function BsplineS.  See this function for
-#               enabling this option.
 #
 #  Returns:  An array of function values corresponding to the
 #              argument values in EVALARG
@@ -88,14 +84,14 @@ if (length(evalarg[index]) > 0) evalarg <- evalarg[!index]
 index <- evalarg > rangeval[2]+1e-10
 if (length(evalarg[index]) > 0) evalarg <- evalarg[!index]
 
-basismat <- getbasismatrix(evalarg, basisobj, 0, returnMatrix)
+basismat <- getbasismatrix(evalarg, basisobj, 0)
 fdvec    <- exp(basismat %*% coef)
 
 #  If a differential operator has been defined in LFDOBJ, compute
 #  the derivative values
 
 if (nderiv > 0) {
-     Lbasismat <- eval.basis(evalarg, basisobj, Lfdobj, returnMatrix)
+     Lbasismat <- eval.basis(evalarg, basisobj, Lfdobj)
      evalarray <- fdvec*(Lbasismat %*% coef)
 } else evalarray <- fdvec
 

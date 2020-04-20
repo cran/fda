@@ -19,13 +19,11 @@
   the next page unless ask==FALSE.
 }
 \usage{
-%\method{plotfit}{fd}(y, argvals, fdobj, rng = NULL, index = NULL,)
 plotfit.fd(y, argvals, fdobj, rng = NULL, index = NULL,
       nfine = 101, residual = FALSE, sortwrd = FALSE, titles=NULL,
       ylim=NULL, ask=TRUE, type=c("p", "l")[1+residual],
       xlab=NULL, ylab=NULL, sub=NULL, col=1:9, lty=1:9, lwd=1,
       cex.pch=1, axes=NULL, ...)
-%\method{plotfit}{fdSmooth}(y, argvals, fdSm, rng = NULL, index = NULL,)
 plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
       nfine = 101, residual = FALSE, sortwrd = FALSE, titles=NULL,
       ylim=NULL, ask=TRUE, type=c("p", "l")[1+residual],
@@ -79,10 +77,6 @@ plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
     If TRUE and if 'y' has more levels than the max length of col, lty,
     lwd and cex.pch, the user must confirm page change before the next
     plot will be created.
-    %The number of lines / cases per plot is
-    %controled by the maximum of the lengths of col, lty, lwd and cex.pch
-    %(see below), except that if length(dim(x))>2, a separate plot is
-    %created for each level of the third dimension of x.
   }
   \item{type}{
     type of plot desired, as described with \code{\link{plot}}.  If
@@ -124,14 +118,13 @@ plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
 
     \itemize{
       \item{logical}{
-	whether axes should be drawn on the plot
+	     whether axes should be drawn on the plot
       }
       \item{list}{
-	a list used to create custom \code{axes} used to create axes via
-	\code{do.call(x$axes[[1]], x$axes[-1])}.  The primary example of
+	      a list used to create custom \code{axes} used to create axes via
+	      \code{x$axes[[1]]} and \code{}x$axes[-1])}.  The primary example of
 	this uses \code{list("axesIntervals", ...)}, e.g., with
 	\code{Fourier} bases to create \code{CanadianWeather} plots
-      }
     }
   }
   \item{\dots }{
@@ -142,8 +135,8 @@ plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
 \details{
   \code{plotfit} plots discrete data along with a functional data object
   for fitting the data.  It is designed to be used after something like
-  \code{Data2fd}, \code{smooth.fd}, \code{smooth.basis} or
-  \code{smoothe.basisPar} to check the fit of the data offered by the
+  \code{smooth.fd}, \code{smooth.basis} or
+  \code{smooth.fdPar} to check the fit of the data offered by the
   \code{fd} object.
 
   \code{plotfit.fdSmooth} calls \code{plotfit} for its 'fd' component.
@@ -156,9 +149,9 @@ plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
   \code{plotfit.fdSmooth}).  If only one observation or variable is to
   be plotted, \code{y} must include 'drop = TRUE', as, e.g., y[, 2, 3,
   drop=TRUE].  If \code{y} or fdobj[['coef']] does not have dimnames on
-  its second or third dimension, subsetting is acheived by taking the
+  its second or third dimension, subsetting is achieved by taking the
   first few colums so the second or third dimensions match.  This is
-  acheived using checkDims3(y, fdobj[['coef']], defaultNames =
+  achieved using checkDims3(y, fdobj[['coef']], defaultNames =
   fdobj[['fdnames']]]).
 }
 \value{
@@ -184,21 +177,20 @@ plotfit.fdSmooth(y, argvals, fdSm, rng = NULL, index = NULL,
 \seealso{
   \code{\link{plot}},
   \code{\link{plot.fd}},
-  \code{\link{lines.fd}}
+  \code{\link{lines.fd}},
   \code{\link{plot.fdSmooth}},
-  \code{\link{lines.fdSmooth}}
-  \code{\link{par}}
-  \code{\link{smooth.fd}}
-  \code{\link{smooth.basis}}
-  \code{\link{smooth.basisPar}}
-  \code{\link{Data2fd}}
+  \code{\link{lines.fdSmooth}},
+  \code{\link{par}},
+  \code{\link{smooth.fd}},
+  \code{\link{smooth.basis}},
+  \code{\link{smooth.basisPar}},
   \code{\link{checkDims3}}
 }
 \examples{
 #  set up a Fourier basis for smoothing temperature data
 daybasis65 <- create.fourier.basis(c(0, 365), 65,
                     axes=list("axesIntervals"))
-#  smooth the average temperature data using function Data2fd
+#  smooth the average temperature data using function smooth.basis
 Daytempfd <- with(CanadianWeather, smooth.basis(day.5,
          dailyAv[,,"Temperature.C"], daybasis65)$fd )
 daytempfd <- with(CanadianWeather, smooth.basis(day.5,
@@ -247,15 +239,15 @@ with(CanadianWeather, plotfit.fd(dailyAv[, , "Temperature.C"],
 #  The gait data are bivariate, and this code illustrates how plotfit.fd
 #  deals with the plotting of two variables at the same time
 #  First define normalized times and their range
-gaittime  <- as.numeric(dimnames(gait)[[1]])*20
+gaittime  <- (0:19) + 0.5
 gaitrange <- c(0,20)
 #  Define the harmonic acceleration differential operator
 harmaccelLfd <- vec2Lfd(c(0, (2*pi/20)^2, 0), rangeval=gaitrange)
 #  Set up basis for representing gait data.
 gaitbasis <- create.fourier.basis(gaitrange, nbasis=21)
 #  Smooth the data
-gaitfd <- smooth.basisPar(gaittime, gait,
-       gaitbasis, Lfdobj=harmaccelLfd, lambda=1e-2)$fd
+gaitfd <- smooth.basisPar(gaittime, gait, gaitbasis, 
+                          Lfdobj=harmaccelLfd, lambda=1e-2)$fd
 #  Assign names to the data
 names(gaitfd$fdnames) <- c("Normalized time", "Child", "Angle")
 gaitfd$fdnames[[3]] <- c("Hip", "Knee")

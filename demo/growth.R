@@ -223,7 +223,7 @@ children <- 1:ncasem
 for (icase in children) {
    hgt     <- hgtm[,icase]
    smoothList <-
-		smooth.monotone(age, hgt, wgt, growfdPar, zmat,
+		smooth.monotone(age, hgt, growfdPar, wgt, zmat,
 		                conv=0.001, dbglev=0)
    Wfd     <- smoothList$Wfdobj
    beta    <- smoothList$beta
@@ -235,7 +235,7 @@ for (icase in children) {
    RMSE   <- sqrt(mean((hgt - hgthat)^2*wgt)/mean(wgt))
    RMSEm[icase] <- RMSE
    cat(c(icase, iternum),paste("  ",round(Flist$f,4),
-       "  ",round(RMSE, 4)))
+       "  ",round(RMSE, 4),"\n"))
 }
 
 # Females:
@@ -248,7 +248,7 @@ children <- 1:ncasef
 for (icase in children) {
    hgt    <- hgtf[,icase]
    smoothList <-
-		smooth.monotone(age, hgt, wgt, growfdPar, zmat,
+		smooth.monotone(age, hgt, growfdPar, wgt, zmat,
 		                 conv=0.001, dbglev=0)
    Wfd     <- smoothList$Wfd
    beta    <- smoothList$beta
@@ -260,7 +260,7 @@ for (icase in children) {
    RMSE   <- sqrt(mean((hgt - hgthat)^2*wgt)/mean(wgt))
    RMSEf[icase] <- RMSE
    cat(c(icase, iternum),paste("  ",round(Flist$f,4),
-       "  ",round(RMSE, 4)))
+       "  ",round(RMSE, 4),"\n"))
 }
 
 #  -------------  plot the results  --------------------
@@ -368,66 +368,4 @@ for (i in children) {
           xlab="Clock year", ylab="Biological Year")
     abline(0,1,lty=2)
 }
-
-#  -----------------------------------------------------------------------
-###
-###
-### 4.  Monotone smooth of short term height measurements 
-###
-###
-#  ---------------- input the data  ----------------------------------
-
-temp <- scan("../data/onechild.txt",0)
-n    <- 83
-data <- matrix(temp, n, 2)
-day  <- data[,1]
-hgt  <- data[,2]
-wgt  <- rep(1,n)
-zmat <- matrix(1,n,1)
-
-#  set up the basis
-
-nbasis   <- 33
-hgtbasis <- create.bspline.basis(c(day[1], day[n]), nbasis)
-
-#  set up the functional data object for W <- log Dh
-
-cvec0 <- rep(0,nbasis)
-Wfd   <- fd(cvec0, hgtbasis)
-
-#  set parameters for the monotone smooth
-
-lambda  <- 1e-2
-WfdPar  <- fdPar(Wfd, 2, lambda)
-
-#  --------------   carry out the monotone smooth  ---------------
-
-smoothList   <- smooth.monotone(day, hgt, wgt, WfdPar, zmat)
-
-names(smoothList)
-Wfd     <- smoothList$Wfd
-beta    <- smoothList$beta
-Flist   <- smoothList$Flist
-iternum <- smoothList$iternum
-
-#  plot the function W <- log Dh
-
-op <- par(mfrow=c(1,1),pty="s",ask=FALSE)
-plot(Wfd)
-#par(op)
-
-#  plot the data plus smooth
-
-dayfine  <- seq(day[1],day[n],len=151)
-yhat     <- beta[1] + beta[2]*eval.monfd(day,Wfd)
-yhatfine <- beta[1] + beta[2]*eval.monfd(dayfine,Wfd)
-plot(day, hgt, xlab="Day", ylab="Centimeters")
-lines(dayfine, yhatfine, lwd=2)
-
-#  plot growth velocity
-
-Dhgt <- beta[2]*eval.monfd(dayfine, Wfd, 1)
-plot(dayfine, Dhgt, type="l", lwd=2,
-     xlab="Day", ylab="Centimeters/day")
-
 

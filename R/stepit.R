@@ -1,16 +1,17 @@
 stepit <- function(linemat, ips, dblwrd, MAXSTEP) {
 #STEPIT computes next step size in line search algorithm
+  
 #  Arguments:
 #  LINEMAT:  Row 1 contains step values
 #            Row 2 contains slope values
 #            Row 3 contains function values
 #  IPS:      If 1, previous slope was positive
-#  DBLWRD:   Vector of length 2:  dblwrd[1] T means step halved
-#                                 dblwrd[2] T means step doubled
+#  DBLWRD:   Vector of length 2:  dblwrd[1] TRUE means step halved
+#                                 dblwrd[2] TRUE means step doubled
 #  MAXSTEP:  maximum size of step
 
-#  Last modified 4 March 2014 by Jim Ramsay
-
+#  Last modified 29 June 2018 by Jim Ramsay
+  
 #  Wolfe condition 1
 test1.1 = linemat[3,5] <= linemat[3,1] + linemat[1,5]*linemat[2,1]/20
 #  Wolfe condition 2
@@ -31,7 +32,7 @@ if ((test1 || !test3) && test2) {
    linemat[1,5] = min(c(linemat[1,5]/2, MAXSTEP))
    linemat[,2] = linemat[,1]
    linemat[,3] = linemat[,1]
-   dblwrd = c(1, 0)
+   dblwrd[1] = TRUE
    ind = 2
    return(list(linemat = linemat, ips = ips, ind = ind, dblwrd = dblwrd))
 }
@@ -67,7 +68,7 @@ if (test3) {
            }
    }
    linemat[1,5] = min(c(linemat[1,5], MAXSTEP))
-   dblwrd = c(0,0)
+   dblwrd = rep(FALSE,2)
    ind = 2
    return(list(linemat = linemat, ips = ips, ind = ind, dblwrd = dblwrd))
 }
@@ -100,7 +101,7 @@ if (ips == 1) {
            }
    }
    linemat[1,5] = min(c(linemat[1,5], MAXSTEP))
-   dblwrd = c(0,0)
+   dblwrd = rep(FALSE,2)
    ind = 2
    return(list(linemat = linemat, ips = ips, ind = ind, dblwrd = dblwrd))
 }
@@ -121,7 +122,7 @@ if ((linemat[2,3] - linemat[2,2]) * (linemat[1,3] - linemat[1,2]) > 0) {
                    (linemat[2,3] - linemat[2,2]))
    }
    linemat[1,5] = min(c(linemat[1,5], MAXSTEP))
-   dblwrd = c(0,0)
+   dblwrd = rep(FALSE,2)
    ind = 2
    return(list(linemat = linemat, ips = ips, ind = ind, dblwrd = dblwrd))
 } else {
@@ -133,7 +134,7 @@ if ((linemat[2,3] - linemat[2,2]) * (linemat[1,3] - linemat[1,2]) > 0) {
    } else {
            linemat[1,5] = 2 * linemat[1,5]
            linemat[1,5] = min(c(linemat[1,5], MAXSTEP))
-           dblwrd = c(0,1)
+           dblwrd[2] = TRUE
            ind = 2
            return(
              list(linemat = linemat, ips = ips, ind = ind, dblwrd = dblwrd))

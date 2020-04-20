@@ -17,7 +17,7 @@ function. It must be strictly increasing and smooth.
 }
 \usage{
 landmarkreg(fdobj, ximarks, x0marks=xmeanmarks,
-            WfdPar, monwrd=FALSE, ylambda=1e-10, returnMatrix=FALSE)
+            WfdPar, monwrd=FALSE, ylambda=1e-10)
 }
 \arguments{
   \item{fdobj}{
@@ -42,7 +42,7 @@ landmarkreg(fdobj, ximarks, x0marks=xmeanmarks,
   }
   \item{monwrd}{
     A logical value:  if \code{TRUE}, the warping function is estimated
-    using a monotone smoothing methhod; otherwise, a regular smoothing
+    using a monotone smoothing method; otherwise, a regular smoothing
     method is used, which is not guaranteed to give strictly monotonic
     warping functions.
   }
@@ -53,10 +53,6 @@ landmarkreg(fdobj, ximarks, x0marks=xmeanmarks,
     that are not seen in the unregistered versions.  In this case,
     this parameter should be increased to the point where they
     disappear.
-  }
-  \item{returnMatrix}{
-    logical:  If TRUE,  a two-dimensional is returned using a
-    special class from the Matrix package.
   }
 }
 \value{
@@ -82,7 +78,7 @@ landmarkreg(fdobj, ximarks, x0marks=xmeanmarks,
   by increasing the smoothing parameter defining \code{WfdPar}.  Not
   much curvature is usually required in the warping functions, so a
   rather low power basis, usually B-splines, is suitable for defining
-  the functional paramter argument \code{WfdPar}.  A registration with
+  the functional parameter argument \code{WfdPar}.  A registration with
   a few prominent landmarks is often a good preliminary to using the
   more sophisticated but more lengthy process in \code{register.fd}.
 }
@@ -135,21 +131,7 @@ regDens   <- landmarkreg(fdobj, landmark[1:k,], WfdPar=WfdPar, monwrd=TRUE)
 
 warpfdobj <- regDens$warpfd
 warpedX   <- as.matrix(eval.fd(warpfdobj, argvals))
+matplot(argvals, warpedX, type="l")
 funs      <- apply(warpedX, 2, approxfun, argvals)
-## newDat <- list()
-## for (i in 1:length(funs))
-##   newDat[[names(funs)[i]]] <- data.frame(data=funs[[i]](x[[i]][,1]),
-##                                          which=names(funs)[i])
-## visualization
-## lattice::densityplot(~ data | which, sampleData,
-##                    layout=c(1,5), col="#A6CEE3", n=120,
-##                     main="Original data set")
-## dev.new()
-## lattice::densityplot( ~ data | which, layout=c(1,length(newDat)),
-##                      do.call(rbind, newDat), col="#A6CEE3", n=120,
-##                      main="After warping")
-
-
-## }
-% docclass is function
+}
 \keyword{smooth}

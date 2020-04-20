@@ -23,7 +23,7 @@ create.fourier.basis(rangeval=c(0, 1), nbasis=3,
     up to the nearest odd integer to preserve the pairing of sine and
     cosine functions.  An even number of basis functions  only makes
     sense when there are always only an even number of observations at
-    equally spaced points;  that case can be accomodated using dropind =
+    equally spaced points;  that case can be accommodated using dropind =
     nbasis-1 (because the bases are \code{const}, \code{sin},
     \code{cos}, ...).
   }
@@ -93,8 +93,8 @@ create.fourier.basis(rangeval=c(0, 1), nbasis=3,
     custom \code{axes}.  If this \code{axes} argument is not
     \code{NULL}, functions \code{plot.basisfd}, \code{plot.fd},
     \code{plot.fdSmooth} \code{plotfit.fd}, \code{plotfit.fdSmooth}, and
-    \code{plot.Lfd} will create axes via \code{do.call(x$axes[[1]],
-      x$axes[-1])}.  The primary example of this is to create
+    \code{plot.Lfd} will create axes via \code{x$axes[[1]]} and
+      \code{x$axes[-1]}.  The primary example of this is to create
     \code{CanadianWeather} plots using \code{list("axesIntervals")}
   }
 }

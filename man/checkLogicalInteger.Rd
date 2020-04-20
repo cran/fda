@@ -85,12 +85,6 @@ checkLogicalInteger(x, length., warnOnly=FALSE)
 \author{
   Spencer Graves
 } 
-\seealso{
-  \code{\link[ifultools]{checkVectorType}},
-  \code{\link[ifultools]{checkRange}}
-  \code{\link[ifultools]{checkScalarType}}
-  \code{\link[ifultools]{isVectorAtomic}}
-}
 \examples{
 ##
 ## checkLogical

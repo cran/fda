@@ -1,37 +1,41 @@
-#exportPattern("^[^\\.]")
-
-## Quick and dirty: {just to confirm that it is sufficient}
-
 export(AmpPhaseDecomp,
-       argvalsy.swap,
-       plus.fd, minus.fd, times.fd,
        as.array3,
        as.fd,
        as.POSIXct1970,
-       axisIntervals, axesIntervals,
+       axisIntervals, 
+       axesIntervals,
        bifd,
        bifdPar,
-       boxplot.fd, boxplot.fdPar, boxplot.fdSmooth,
+       boxplot.fd, 
+       boxplot.fdPar, 
+       boxplot.fdSmooth,
        bsplinepen,
        bsplineS,
        cca.fd,
        center.fd,
-       checkDim3, checkDims3,
-       checkLogical, checkNumeric, checkLogicalInteger,
-       constraintCheck, lmWinsor1, lmWinsor2,
+       checkDim3, 
+       checkDims3,
+       checkLogical, 
+       checkNumeric, 
+       checkLogicalInteger,
        cor.fd,
+       covPACE,
        CRAN,
-       create.bspline.basis, create.bspline.irregular,
+       create.bspline.basis, 
        create.constant.basis,
        create.exponential.basis,
        create.fourier.basis,
        create.monomial.basis,
        create.polygonal.basis,
        create.power.basis,
-       CSTR2in, CSTR2, CSTRfitLS, CSTRfn, CSTRres, CSTRsse,
+       CSTR2in, 
+       CSTR2, 
+       CSTRfitLS, 
+       CSTRfn, 
+       CSTRres, 
+       CSTRsse,
        cycleplot.fd,
        Data2fd,
-#       dayOfYear, dayOfYearShifted, day.5, daysPerMonth, 
        density.fd,
        deriv.fd,
        df2lambda,
@@ -50,16 +54,13 @@ export(AmpPhaseDecomp,
        exponpen,
        fd, fbplot,
        fd2list,
-       fdaMatlabPath,
        fdlabels,
        fdPar,
-       file.copy2,
        fourier,
        fourierpen,
        Fperm.fd,
        fRegress,
        fRegress.CV,
-       fRegress.numeric,
        fRegress.stderr,
        Fstat.fd,
        geigen,
@@ -75,25 +76,24 @@ export(AmpPhaseDecomp,
        is.fdPar,
        is.fdSmooth,
        is.Lfd,
-       knots.fd, knots.fdSmooth, knots.basisfd,
        lambda2df,
        lambda2gcv,
        landmarkreg,
        Lfd,
        lines.fdSmooth,
        linmod,
-       lmeWinsor,
-       lmWinsor,
-       matplot, matplot.default,
+       matplot, 
+       matplot.default,
        mean.fd,
+       minus.fd, 
        monfn,
        monomial,
        monomialpen,
-#       monthBegin.5, monthEnd, monthEnd.5, monthMid, month.abb, monthLetters, 
        norder, norder.bspline,
        objAndNames,
        odesolv,
        pca.fd,
+	     pcaPACE,
        pda.fd,
        pda.overlay,
        phaseplanePlot,
@@ -101,9 +101,11 @@ export(AmpPhaseDecomp,
        plot.fd,
        plot.pca.fd,
        plotbeta,
-       plotfit.fd, plotfit.fdSmooth,
+       plotfit.fd, 
+       plotfit.fdSmooth,
        plotreg.fd,
        plotscores,
+       plus.fd, 
        polyg,
        polygpen,
        powerbasis,
@@ -111,135 +113,112 @@ export(AmpPhaseDecomp,
        ppBspline,
        project.basis,
        quadset,
-       readHMD,
+	     reconsCurves,
        register.fd,
-       register.fd0,
        register.newfd,
-       sd.fd, std.fd, stdev.fd, stddev.fd,
+	     scoresPACE,
+       sd.fd, 
+       std.fd, 
+       stdev.fd, 
+       stddev.fd,
        smooth.basis,
-       smooth.basisPar,
        smooth.bibasis,
        smooth.fd,
+       smooth.basisPar,
        smooth.fdPar,
        smooth.monotone,
        smooth.morph,
        smooth.pos,
+	     smooth.basis.sparse,
+	     smooth.sparse.mean,
+	     sparse.list,
+	     sparse.mat,
        svd2,
        symsolve,
        "[.fd",
-       TaylorSpline,
+       times.fd,
        tperm.fd,
+       trapzmat,
        var.fd,
        varmx,
        varmx.cca.fd,
        varmx.pca.fd,
        vec2Lfd, 
-#       weeks, 
        wtcheck,
        zerofind )
 
-#importFrom(base, mean, coefficients)
-importFrom(graphics, boxplot)
-importFrom(splines, spline.des)
-importFrom("grDevices", "dev.new")
-importFrom("graphics", "abline", "axis", "hist", "legend", "lines",
-             "locator", "matlines", "mtext", "par", "plot", "points",
-             "polygon", "text", "title")
-importFrom("stats", "approx", "coef", "cov", "deriv", "dist", "fitted",
-             "formula", "integrate", "knots", "lsfit", "model.frame",
-             "model.matrix", "na.fail", "na.pass", "optimize", "predict",
-             "predict.lm", "quantile", "terms", "var")
-importFrom("utils", "read.table")
+import("graphics")
+import("stats")
+import("splines")
+import("Matrix")
 
-#import(DierckxSpline)
-#import(zoo)
-import(Matrix)
-#import(graphics)
-#import(rpart)
-#importFrom(RCurl, getURL)
+importFrom("grDevices", "dev.new", "heat.colors")
+importFrom("utils", "data")
 
-S3method("==", basisfd)
-S3method('+', fd)
-S3method('-', fd)
-S3method('*', fd)
-S3method('*', basisfd)
-S3method('[', fd)
-S3method('^', fd)
-S3method(as.fd, fdSmooth)
-S3method(as.fd, dierckx)
-S3method(as.fd, 'function')
-S3method(as.fd, smooth.spline)
-S3method(boxplot, fd)
-S3method(boxplot, fdPar)
-S3method(boxplot, fdSmooth)
-S3method(coef, fd)
-S3method(coef, fdPar)
-S3method(coef, fdSmooth)
-S3method(coef, Taylor)
+S3method("==",         basisfd)
+S3method('*',          basisfd)
+S3method(summary,      basisfd)
+S3method(norder,       basisfd)
+S3method(plot,         basisfd)
+S3method(predict,      basisfd)
+S3method('+',          fd)
+S3method('-',          fd)
+S3method('*',          fd)
+S3method('[',          fd)
+S3method('^',          fd)
+S3method(as.fd,        fdSmooth)
+S3method(as.fd,        'function')
+S3method(as.fd,        smooth.spline)
+S3method(boxplot,      fd)
+S3method(coef,         fd)
 S3method(coefficients, fd)
+S3method(density,      fd)
+S3method(deriv,        fd)
+S3method(lines,        fd)
+S3method(mean,         fd)
+S3method(norder,       fd)
+S3method(plot,         fd)
+S3method(predict,      fd)
+S3method(sqrt,         fd)
+S3method(sum,          fd)
+S3method(summary,      fd)
+S3method(fRegress,     fd)
+S3method(boxplot,      fdPar)
+S3method(coef,         fdPar)
 S3method(coefficients, fdPar)
+S3method(plot,         fdPar)
+S3method(predict,      fdPar)
+S3method(summary,      fdPar)
+S3method(fRegress,     fdPar)
+S3method(coef,         fdSmooth)
+S3method(boxplot,      fdSmooth)
 S3method(coefficients, fdSmooth)
-S3method(coefficients, Taylor)
-S3method(density, fd)
-S3method(deriv, fd)
-S3method(df.residual, fRegress)
-S3method(fitted, fdSmooth)
-S3method(fitted, monfd)
-S3method(fitted, posfd)
-S3method(fRegress, formula)
-S3method(fRegress, character)
-S3method(fRegress, CV)
-S3method(fRegress, fd)
-S3method(fRegress, fdPar)
-S3method(fRegress, numeric)
-S3method(fRegress, stderr)
-S3method(knots, basisfd)
-S3method(knots, fd)
-S3method(knots, fdSmooth)
-#S3method("knots", "default", ".knots_default")
-
-S3method(lines, fd)
-S3method(lines, fdSmooth)
-S3method(matplot, Date)
-S3method(matplot, default)
-S3method(matplot, POSIXct)
-S3method(matplot, numeric)
-S3method(mean, fd)
-S3method(norder, bspline)
-S3method(norder, default)
-S3method(norder, fd)
-S3method(norder, basisfd)
-S3method(plot, basisfd)
-S3method(plot, cca.fd)
-S3method(plot, fd)
-S3method(plot, fdPar)
-S3method(plot, fdSmooth)
-S3method(plot, Lfd)
-S3method(plot, lmWinsor)
-S3method(plot, pca.fd)
-S3method(plot, pda.fd)
-S3method(predict, fRegress)
-S3method(predict, lmeWinsor)
-S3method(predict, lmWinsor)
-S3method(predict, basisfd)
-S3method(predict, fd)
-S3method(predict, fdPar)
-S3method(predict, fdSmooth)
-S3method(predict, monfd)
-S3method(predict, posfd)
-S3method(residuals, posfd)
-S3method(residuals, fdSmooth)
-S3method(residuals, monfd)
-S3method(residuals, fRegress)
-S3method(sqrt, fd)
-S3method(sum, fd)
-S3method(summary, basisfd)
-S3method(summary, bifd)
-S3method(summary, fd)
-S3method(summary, fdPar)
-S3method(summary, Lfd)
-S3method(TaylorSpline, fd)
-S3method(TaylorSpline, fdPar)
-S3method(TaylorSpline, fdSmooth)
-S3method(TaylorSpline, dierckx)
+S3method(fitted,       fdSmooth)
+S3method(lines,        fdSmooth)
+S3method(residuals,    fdSmooth)
+S3method(plot,         fdSmooth)
+S3method(predict,      fdSmooth)
+S3method(plot,         Lfd)
+S3method(summary,      Lfd)
+S3method(fitted,       monfd)
+S3method(residuals,    monfd)
+S3method(predict,      monfd)
+S3method(fRegress,     numeric)
+S3method(fRegress,     stderr)
+S3method(fRegress,     CV)
+S3method(matplot,      numeric)
+S3method(fitted,       posfd)
+S3method(predict,      posfd)
+S3method(residuals,    posfd)
+S3method(matplot,      Date)
+S3method(fRegress,     character)
+S3method(fRegress,     formula)
+S3method(matplot,      default)
+S3method(matplot,      POSIXct)
+S3method(norder,       bspline)
+S3method(norder,       default)
+S3method(plot,         cca.fd)
+S3method(plot,         pca.fd)
+S3method(plot,         pda.fd)
+S3method(summary,      bifd)
 

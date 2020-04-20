@@ -23,14 +23,12 @@ getbasismatrix <- function(evalarg, basisobj, nderiv=0, returnMatrix=FALSE) {
 #            of number of evaluation points.
 #  BASISOBJ...A basis object
 #  NDERIV ... A nonnegative integer indicating a derivative to be evaluated.
-#  RETURNMATRIX...If False, a matrix in sparse storage model can be returned
-#             from a call to function BsplineS.  See this function for
-#             enabling this option.
 
 #
 #  Note that the first two arguments may be interchanged.
 #
-#  Last modified 19 March 2014
+
+#  Last modified 6 January 2020
 
 ##
 ##  Exchange the first two arguments if the first is an BASIS.FD object
@@ -56,14 +54,14 @@ getbasismatrix <- function(evalarg, basisobj, nderiv=0, returnMatrix=FALSE) {
     stop('as.numeric(evalarg) contains ', nNA,
          ' NA', c('', 's')[1+(nNA>1)],
          ';  class(evalarg) = ', class(Evalarg))
-
-#  check basisobj
-
+##
+##  check BASISOBJ
+##
   if (!(inherits(basisobj, "basisfd")))
       stop("Second argument is not a basis object.")
-
-#  search for stored basis matrix
-
+##
+##  search for stored basis matrix and return it if found
+##
   if (!(length(basisobj$basisvalues) == 0 || is.null(basisobj$basisvalues))) {
     #  one or more stored basis matrices found,
     #  check that requested derivative is available
@@ -86,24 +84,29 @@ getbasismatrix <- function(evalarg, basisobj, nderiv=0, returnMatrix=FALSE) {
           }
       }
     }
-#   dimnames
+    #   dimnames
     dimnames(basismat) <- list(NULL, basisobj$names)
 
     if (OK){
-        if((!returnMatrix) && (length(dim(basismat)) == 2)){
+        if(length(dim(basismat)) == 2){
             return(as.matrix(basismat))
         }
         return(basismat)
     }
   }
-
+##
+##  compute the basis matrix and return it
+##
 #  Extract information about the basis
-
   type     <- basisobj$type
   nbasis   <- basisobj$nbasis
   params   <- basisobj$params
   rangeval <- basisobj$rangeval
   dropind  <- basisobj$dropind
+
+##
+##  Select basis and evaluate it at EVALARG values
+##
 
 #  -----------------------------  B-spline basis  -------------------
 
@@ -114,8 +117,13 @@ getbasismatrix <- function(evalarg, basisobj, nderiv=0, returnMatrix=FALSE) {
    	    breaks   <- c(rangeval[1], params, rangeval[2])
       }
    	norder   <- nbasis - length(breaks) + 2
-   	basismat <- bsplineS(evalarg, breaks, norder, nderiv, returnMatrix)
-
+   	basismat <- bsplineS(evalarg, breaks, norder, nderiv)
+   	# The following lines call spline.des in the base R system.  
+   	# This is slightly slower than the above call to bsplineS
+    # nbreaks  <- length(breaks)
+    # knots    <- c(rep(rangeval[1],norder), breaks(2:(nbreaks-1)),
+    #               rep(rangeval[2],norder))
+    # basismat <- spline.des(knots, evalarg, norder, nderiv, sparse=TRUE)
 #  -----------------------------  Constant basis  --------------------
 
   } else if (type == "const") {
@@ -139,7 +147,7 @@ getbasismatrix <- function(evalarg, basisobj, nderiv=0, returnMatrix=FALSE) {
 
 #  -----------------------------  Polygonal basis  -------------------
 
-  } else if (type == "polyg") {
+  } else if (type == "polygonal") {
     basismat  <- polyg(evalarg, params)
 
 #  -----------------------------  Power basis  -------------------
@@ -163,7 +171,7 @@ getbasismatrix <- function(evalarg, basisobj, nderiv=0, returnMatrix=FALSE) {
   }
     
 
-  if((!returnMatrix) && (length(dim(basismat)) == 2)){
+  if (length(dim(basismat)) == 2){
     #  coerce basismat to be nonsparse
       return(as.matrix(basismat))
   } else {

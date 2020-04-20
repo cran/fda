@@ -8,11 +8,9 @@
 #  can be found in the file canadian-weather.R, set up in 2008 by 
 #  Spencer Graves.
 
-#  Last modified 17 November 2008
+#  Last modified 10 January 2020
 
-load("weatherdata")
-
-station <- weatherdata$station
+station <- CanadianWeather$station
 
 #  names for (climate zones
 
@@ -38,6 +36,15 @@ zmat[pacindex,3] <- 1
 zmat[conindex,4] <- 1
 zmat[artindex,5] <- 1
 
+#  labels for weather zones
+
+zlabels <- vector("list",5)
+zlabels[[1]] <- "Constant"
+zlabels[[2]] <- "Atlantic"
+zlabels[[3]] <- "Pacific"
+zlabels[[4]] <- "Continental"
+zlabels[[5]] <- "Arctic"
+
 #  attach a row of 0, 1, 1, 1, 1 to force zone
 #  effects to sum to zero, and define first regression
 #  function as grand mean for (all stations
@@ -53,11 +60,12 @@ zmat   <- rbind(zmat, z36)
 #  We use a more compact basis here to avoid storage allocation
 #  problems that arise when 365 basis functions are used.
 
-dayrange   <- c(0,365)
-daybasis65 <- create.fourier.basis(dayrange, 65)
-daytime    <- weatherdata$daytime
-tempav     <- weatherdata$tempav
-smoothList <- smooth.basis(daytime, tempav, daybasis65)
+daytime  <- (0:364) + 0.5
+dayrange <- c(0,365)
+daybasis15 <- create.fourier.basis(dayrange, 15)
+smoothList <- with(CanadianWeather, smooth.basis(daytime,
+                   dailyAv[,,"Temperature.C"],
+                   daybasis15, fdnames=list("Day", "Station", "Deg C")))
 daytempfd  <- smoothList$fd
 tempy2cMap <- smoothList$y2cMap
 
@@ -66,7 +74,7 @@ daytempfd$fdnames <- list(NULL, station, NULL)
 #  revise YFDOBJ by adding a zero function
 
 coef   <- daytempfd$coefs
-coef36 <- cbind(coef,matrix(0,65,1))
+coef36 <- cbind(coef,matrix(0,15,1))
 daytempfd$coefs <- coef36
 
 p <- 5
@@ -97,11 +105,6 @@ for (j in 1:p) betalist[[j]] <- betafdPar
 
 fRegressList <- fRegress(daytempfd, xfdlist, betalist)
 
-# try to get a cross-validated score
-
-res.cv = fRegress.CV(daytempfd,xfdlist,betalist,whichobs=1:35)
-
-
 #  plot regression functions
 
 betaestlist <- fRegressList$betaestlist
@@ -109,8 +112,8 @@ betaestlist <- fRegressList$betaestlist
 par(mfrow=c(3,2))
 for (j in 1:p) {
 	betaestParfdj <- betaestlist[[j]]
-	plot(betaestParfdj$fd, xlab="Day", ylab="Temp.",
-	     main=zonenames[j])
+	plot(betaestParfdj$fd, xlab="Day", ylab="Temperature (deg C)")
+	title(zlabels[[j]])
 }
 
 #  set up predicted functions
@@ -140,7 +143,7 @@ plot(daytime, stddevE, type="l",
 #  Repeat regression, this time outputting results for
 #  confidence intervals
 
-stderrList <- fRegress.stderr(fRegressList, tempy2cMap, SigmaE)
+stderrList <- fRegressStderr(fRegressList, tempy2cMap, SigmaE)
 
 betastderrlist <- stderrList$betastderrlist
 
@@ -152,6 +155,7 @@ for (j in 1:p) {
 	plot(daytime, betastderrj,
 	        type="l",lty=1, xlab="Day", ylab="Reg. Coeff.",
 	        main=zonenames[j])
+	title(zlabels[[j]])
 }
 
 #  plot regression functions with confidence limits
@@ -165,12 +169,13 @@ for (j in 1:p) {
 	matplot(daytime, cbind(betaj, betaj+2*betastderrj, betaj-2*betastderrj),
 	        type="l",lty=c(1,4,4), xlab="Day", ylab="Reg. Coeff.",
 	        main=zonenames[j])
+	title(zlabels[[j]])
 }
 
 #  set up a functional data object for the temperature residuals
  
 lambda   <- 1e5
-fdParobj <- fdPar(daybasis65, harmaccelLfd, lambda)
+fdParobj <- fdPar(daybasis15, harmaccelLfd, lambda)
  
 smoothList <- smooth.basis(daytime, tempresmat, fdParobj)
 
@@ -234,6 +239,7 @@ for (j in 1:p) {
 	betaestParfdj <- betaestlist[[j]]
 	plot(betaestParfdj$fd, xlab="Day", ylab="Prec.",
 	     main=zonenames[j])
+	title(zlabels[[j]])
 }
 
 #  set up predicted functions
@@ -263,7 +269,7 @@ plot(daytime, stddevE, type="l",
 #  Repeat regression, this time outputting results for
 #  confidence intervals
 
-stderrList <- fRegress.stderr(fRegressList, precy2cMap, SigmaE)
+stderrList <- fRegressStderr(fRegressList, precy2cMap, SigmaE)
 
 betastderrlist <- stderrList$betastderrlist
 
@@ -275,6 +281,7 @@ for (j in 1:p) {
 	plot(daytime, betastderrj,
 	        type="l",lty=1, xlab="Day", ylab="Reg. Coeff.",
 	        main=zonenames[j])
+	title(zlabels[[j]])
 }
 
 #  plot regression functions with confidence limits
@@ -288,6 +295,7 @@ for (j in 1:p) {
 	matplot(daytime, cbind(betaj, betaj+2*betastderrj, betaj-2*betastderrj),
 	        type="l",lty=c(1,4,4), xlab="Day", ylab="Reg. Coeff.",
 	        main=zonenames[j])
+	title(zlabels[[j]])
 }
 
 #  set up a functional data object for the precipitation residuals

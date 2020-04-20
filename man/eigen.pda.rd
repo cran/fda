@@ -31,7 +31,7 @@ eigen.pda(pdaList,plotresult=TRUE,npts=501,...)
   oscillatory behavior. Positive real eigenvalues indicate exponential increase,
   negative real eigenvalues correspond to exponential decay. If the principle
   differential analysis also included the estimation of a forcing function, the
-  limitting stable points are also tracked.
+  limiting stable points are also tracked.
 }
 \value{
   Returns a list with elements
@@ -82,12 +82,12 @@ pdaParlist = list(pdaPar, pdaPar)
 
 bwtlist = list( list(pdaParlist,pdaParlist), list(pdaParlist,pdaParlist) )
 
-#  do the second order pda
+% #  do the second order pda
 
-pdaList = pda.fd(xfdlist, bwtlist)
+% pdaList = pda.fd(xfdlist, bwtlist)
 
-# plot the results
+% # plot the results
 
-eigres = eigen.pda(pdaList)
+% eigres = eigen.pda(pdaList)
 }
 \keyword{smooth}

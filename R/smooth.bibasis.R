@@ -40,7 +40,7 @@ smooth.bibasis <- function (sarg, targ, y, fdPars, fdPart, fdnames=NULL,
 #   PENMAT...  the penalty matrix.
 #   Y2CMAP...  the matrix mapping the data to the coefficients.
 
-# last modified 8 May 2012 by Jim Ramsay
+# last modified 13 April 2020 by Jim Ramsay
 
 #  ---------------------------------------------------------------------
 #                      Check argments
@@ -123,10 +123,8 @@ if (ns*nt > snbasis*tnbasis || lambdas > 0 || lambdat > 0) {
     #  The following code is for the coefficients completely determined
 
     Bmat  = crossprod(basismat,basismat)
-    Bmat0 = Bmat
 
     #  set up right side of equations
-
 
     Dmat = crossprod(basismat,ymat)
 
@@ -134,7 +132,7 @@ if (ns*nt > snbasis*tnbasis || lambdas > 0 || lambdat > 0) {
 
     if (lambdas > 0) {
       penmats  = eval.penalty(sbasis, Lfds)
-      Bnorm   = sqrt(sum(c(Bmat0)^2))
+      Bnorm   = sqrt(sum(c(Bmat)^2))
       pennorm = sqrt(sum(c(penmats)^2))
       condno  = pennorm/Bnorm
       if (lambdas*condno > 1e12) {
@@ -143,12 +141,12 @@ if (ns*nt > snbasis*tnbasis || lambdas > 0 || lambdat > 0) {
                       "to prevent overflow"))
       }
       Imat = diag(rep(nt,1))
-      Bmat = Bmat0 + lambdas*kronecker(Imat,penmats)
+      Bmat = Bmat + lambdas*kronecker(Imat,penmats)
     }
 
     if (lambdat > 0) {
       penmatt  = eval.penalty(tbasis, Lfdt)
-      Bnorm   = sqrt(sum(c(Bmat0)^2))
+      Bnorm   = sqrt(sum(c(Bmat)^2))
       pennorm = sqrt(sum(c(penmatt)^2))
       condno  = pennorm/Bnorm
       if (lambdat*condno > 1e12) {
@@ -157,7 +155,7 @@ if (ns*nt > snbasis*tnbasis || lambdas > 0 || lambdat > 0) {
                       "to prevent overflow"))
       }
       Imat = diag(rep(ns,1))
-      Bmat = Bmat0 + lambdat*kronecker(penmatt,Imat)
+      Bmat = Bmat + lambdat*kronecker(penmatt,Imat)
     }
 
     #  compute inverse of Bmat
@@ -192,7 +190,7 @@ if (ns*nt > snbasis*tnbasis || lambdas > 0 || lambdat > 0) {
 
     #  compute degrees of freedom of smooth
 
-    BiB0 = Bmatinv %*% Bmat0
+    BiB0 = Bmatinv %*% Bmat
 
     df = sum(diag(BiB0))
 

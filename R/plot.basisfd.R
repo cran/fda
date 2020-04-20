@@ -2,23 +2,21 @@ plot.basisfd <- function(x, knots=TRUE, axes=NULL, ...) {
   basisobj <- x
 #  plot a basis object
 
-# last modified July 3, 2012 by Spencer Graves for Date and POSIXct
-# previously modified 26 May 2012 by Jim Ramsay
-##
-##  check BASISOBJ
-##
+# last modified 26 May 2012 by Jim Ramsay
+
+#  check BASISOBJ
+
   if (!inherits(basisobj, "basisfd"))
     stop("argument x is not a basis object.")
-##
-## Check dots
-##
+#
   dot.args <- list(...)
   {
     if(is.null(axes)){
       if(is.null(x$axes)){
         dot.args$axes <- TRUE
         axFun <- FALSE
-      } else {
+      }
+      else {
         if(!inherits(x$axes, 'list'))
           stop('x$axes must be a list;  class(x$axes) = ',
                class(x$axes))
@@ -31,11 +29,13 @@ plot.basisfd <- function(x, knots=TRUE, axes=NULL, ...) {
         dot.args$axes <- FALSE
         axFun <- TRUE
       }
-    } else{
+    }
+    else{
       if(is.logical(axes)){
         dot.args$axes <- axes
         axFun <- FALSE
-      } else {
+      }
+      else{
         if(!inherits(axes, 'list'))
           stop('axes must be a logical or a list;  class(axes) = ',
                class(axes))
@@ -53,9 +53,7 @@ plot.basisfd <- function(x, knots=TRUE, axes=NULL, ...) {
 
   if(is.null(dot.args$xlab))dot.args$xlab <- ''
   if(is.null(dot.args$ylab))dot.args$ylab <- ''
-##
-## get basis info
-##
+
   nbasis   <- basisobj$nbasis
 
   if(is.null(dot.args$type))dot.args$type <- 'l'
@@ -66,13 +64,11 @@ plot.basisfd <- function(x, knots=TRUE, axes=NULL, ...) {
   nx       <- max(501,10*nbasis)
 
   {
-    if(is.null(dot.args$xlim)){
-        rangex <- basisobj$rangeval
-    } else {
+    if(is.null(dot.args$xlim))rangex <- basisobj$rangeval
+    else {
       rangex <- dot.args$xlim
-# shrink rangex so it does not exceed basisobj$rangeval
       rangex[1] <- max(basisobj$rangeval[1], dot.args$xlim[1])
-      rangex[2] <- min(basisobj$rangeval[2], dot.args$xlim[2])
+      rangex[2] <- min(rangex[2], dot.args$xlim[2])
     }
   }
 
@@ -96,18 +92,11 @@ plot.basisfd <- function(x, knots=TRUE, axes=NULL, ...) {
 #           xlim=c(argvals[1],argvals[nx]),
 #           ylim=, ...)
 
-  dot.args$x <- range(argvals)
-  dot.args$y <- range(basismat)
-  type <- dot.args$type
-  dot.args$type <- 'n'
-
-#  do.call('matplot', dot.args)
-  do.call(plot, dot.args)
-#
   dot.args$x <- argvals
   dot.args$y <- basismat
-  dot.args$type <- type
-  do.call(matlines, dot.args)
+
+  do.call('matplot', dot.args)
+
 # knots?
   if(knots && (x$type=='bspline'))
     abline(v=knots(x), lty='dotted', col='red')

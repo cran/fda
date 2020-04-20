@@ -1,6 +1,5 @@
 register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=NULL,
-                    conv=1e-4, iterlim=20, dbglev=1, periodic=FALSE, crit=2,
-                    returnMatrix=FALSE)
+                    conv=1e-4, iterlim=20, dbglev=1, periodic=FALSE, crit=2)
 {
 #REGISTERFD registers a set of curves YFD to a target function Y0FD.
 #  Arguments are:
@@ -34,14 +33,7 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=NULL,
 #              The periodic option should ONLY be used with a Fourier
 #              basis for the target function Y0FD, the functions to be
 #              registered, YFD.
-#  CRIT    ... if 1 least squares,
-#              if 2 log eigenvalue ratio,
-#              if 3 least squares using residual y0 - yi*dhdt
-#              Default is 2.
-#  RETURNMATRIX ... If False, a matrix in sparse storage model can be returned
-#               from a call to function BsplineS.  See this function for
-#               enabling this option.
-#                Default:  0
+#  CRIT    ... If 1 least squares, if 2 log eigenvalue ratio.  Default is 1.
 #  Returns:
 
 #  REGLIST ...  A list with fields:
@@ -53,7 +45,7 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=NULL,
 #    REGLIST$Y0FD   ... Argument Y0FD
 #    REGLIST$YFD    ... Argument YFD
 
-#  Last modified 14 November 2012 by Jim Ramsay
+#  Last modified 6 January 2020 by Jim Ramsay
 
 ##
 ## 1.  Check y0fd and yfd
@@ -260,18 +252,18 @@ for (icurve in 1:ncurve) {
 
   #  evaluate curve to be registered at fine mesh
 
-  yfine  <- matrix(eval.fd(xfine, yfdi, 0, returnMatrix),nfine,nvar)
+  yfine  <- matrix(eval.fd(xfine, yfdi, 0),nfine,nvar)
 
   #  evaluate target curve at fine mesh
 
-  y0fine <- matrix(eval.fd(xfine, y0fdi, 0, returnMatrix),nfine,nvar)
+  y0fine <- matrix(eval.fd(xfine, y0fdi, 0),nfine,nvar)
 
   #  evaluate objective function for starting coefficients
 
   #  first evaluate warping function and its derivative at fine mesh
 
-  ffine  <-   monfn(xfine, Wfdi, basislist, returnMatrix)
-  Dffine <- mongrad(xfine, Wfdi, basislist, returnMatrix)
+  ffine  <-   monfn(xfine, Wfdi, basislist)
+  Dffine <- mongrad(xfine, Wfdi, basislist)
   fmax   <- ffine[nfine]
   Dfmax  <- Dffine[nfine,]
   hfine  <- xlo + width*ffine/fmax
@@ -286,12 +278,12 @@ for (icurve in 1:ncurve) {
   #  compute initial criterion value and gradient
 
   Flist <- regfngrad(xfine, y0fine, Dhfine, yregfdi, Wfdi,
-                     Kmat, periodic, crit, returnMatrix)
+                     Kmat, periodic, crit)
 
   #  compute the initial expected Hessian
 
   if (crit == 2) {
-     D2hwrtc <- monhess(xfine, Wfdi, basislist, returnMatrix)
+     D2hwrtc <- monhess(xfine, Wfdi, basislist)
      D2fmax  <- D2hwrtc[nfine,]
      fmax2 <- fmax*fmax
      fmax3 <- fmax*fmax2
@@ -312,7 +304,7 @@ for (icurve in 1:ncurve) {
   }
 
   hessmat <- reghess(xfine, y0fine, Dhfine, D2hwrtc, yregfdi,
-                     Kmat, periodic, crit, returnMatrix)
+                     Kmat, periodic, crit)
 
   #  evaluate the initial update vector for correcting the initial cvec
 
@@ -350,8 +342,8 @@ for (icurve in 1:ncurve) {
   for (iter in 1:iterlim) {
       iternum <- iternum + 1
       #  set logical parameters
-      dblwrd <- c(FALSE,FALSE)
-      limwrd <- c(FALSE,FALSE)
+      dblwrd <- rep(FALSE,2)
+      limwrd <- rep(FALSE,2)
       ind <- 0
       ips <- 0
       #  compute slope
@@ -408,8 +400,8 @@ for (icurve in 1:ncurve) {
         cvectmp[1] <- 0
         Wfdtmpi <- Wfdnewi
         Wfdtmpi[[1]] <- cvectmp
-        ffine  <-   monfn(xfine, Wfdtmpi, basislist, returnMatrix)
-        Dffine <- mongrad(xfine, Wfdtmpi, basislist, returnMatrix)
+        ffine  <-   monfn(xfine, Wfdtmpi, basislist)
+        Dffine <- mongrad(xfine, Wfdtmpi, basislist)
         fmax   <- ffine[nfine]
         Dfmax  <- Dffine[nfine,]
         hfine  <- xlo + width*ffine/fmax
@@ -419,7 +411,7 @@ for (icurve in 1:ncurve) {
         #  register curves given current Wfdi
         yregfdi <- regyfn(xfine, yfine, hfine, yfdi, Wfdnewi, periodic)
         Flist    <- regfngrad(xfine, y0fine, Dhfine, yregfdi, Wfdnewi,
-                             Kmat, periodic, crit, returnMatrix)
+                             Kmat, periodic, crit)
         linemat[3,5] <- Flist$f
         #  compute new directional derivative
         linemat[2,5] <- sum(deltac*Flist$grad)
@@ -490,7 +482,7 @@ for (icurve in 1:ncurve) {
            cvectmp <- cvec
            cvectmp[1] <- 0
            Wfdtmpi[[1]] <- cvectmp
-           D2hwrtc <- monhess(xfine, Wfdtmpi, basislist, returnMatrix)
+           D2hwrtc <- monhess(xfine, Wfdtmpi, basislist)
            D2fmax  <- D2hwrtc[nfine,]
            #  normalize 2nd derivative
            fmax2 <- fmax*fmax
@@ -511,7 +503,7 @@ for (icurve in 1:ncurve) {
            D2hwrtc <- NULL
         }
         hessmat <- reghess(xfine, y0fine, Dhfine, D2hwrtc, yregfdi,
-                           Kmat, periodic, crit, returnMatrix)
+                           Kmat, periodic, crit)
         #  update the line search direction vector
         result   <- linesearch(Flist, hessmat, dbglev)
         deltac   <- result[[1]]
@@ -587,7 +579,7 @@ return(reglist)
 #  ----------------------------------------------------------------
 
 regfngrad <- function(xfine, y0fine, Dhwrtc, yregfd, Wfd,
-                      Kmat, periodic, crit, returnMatrix=FALSE)
+                      Kmat, periodic, crit=FALSE)
 {
   y0dim <- dim(y0fine)
   if (length(y0dim) == 3) nvar <- y0dim[3] else nvar <- 1
@@ -601,8 +593,8 @@ regfngrad <- function(xfine, y0fine, Dhwrtc, yregfd, Wfd,
   } else {
      Dhwrtc[,1] <- 0
   }
-  yregmat  <- eval.fd(xfine, yregfd, 0, returnMatrix)
-  Dyregmat <- eval.fd(xfine, yregfd, 1, returnMatrix)
+  yregmat  <- eval.fd(xfine, yregfd, 0)
+  Dyregmat <- eval.fd(xfine, yregfd, 1)
 
   #  loop through variables computing function and gradient values
 
@@ -620,7 +612,7 @@ regfngrad <- function(xfine, y0fine, Dhwrtc, yregfd, Wfd,
       res  <- y0ivar - ywrthi
       Fval <- Fval + aa - 2*bb + cc
       gvec <- gvec - 2*crossprod(Dywrtc, res)/nfine
-    } else if (crit == 2) {
+    } else {
       ee   <- aa + cc
       ff   <- aa - cc
       dd   <- sqrt(ff^2 + 4*bb^2)
@@ -629,14 +621,6 @@ regfngrad <- function(xfine, y0fine, Dhwrtc, yregfd, Wfd,
       Dcc  <- 2.0 * crossprod(Dywrtc, ywrthi)/nfine
       Ddd  <- (4*bb*Dbb - ff*Dcc)/dd
       gvec <- gvec + (Dcc - Ddd)
-      # } else if (crit == 3) {
-        #  least squares with root Dh weighting criterion
-        #  dhdt not defined here ... fix later
-      # res  = y0ivar - ywrthi*sqrt(dhdt)
-      # Fval = Fval + mean(res^2)
-      # gvec = gvec - 2*crossprod(Dywrtc, res)/nfine
-    } else {
-      stop("Invalid value for fitting criterion CRIT.")
     }
   }
   if (!is.null(Kmat)) {
@@ -663,7 +647,7 @@ regfngrad <- function(xfine, y0fine, Dhwrtc, yregfd, Wfd,
 #  ---------------------------------------------------------------
 
 reghess <- function(xfine, y0fine, Dhfine, D2hwrtc, yregfd,
-                    Kmat, periodic, crit, returnMatrix=FALSE)
+                    Kmat, periodic, crit=FALSE)
 {
 	#cat("\nreghess")
   y0dim <- dim(y0fine)
@@ -678,8 +662,8 @@ reghess <- function(xfine, y0fine, Dhfine, D2hwrtc, yregfd,
   } else {
      Dhfine[,1] <- 0
   }
-  yregmat  <- eval.fd(yregfd, xfine, 0, returnMatrix)
-  Dyregmat <- eval.fd(yregfd, xfine, 1, returnMatrix)
+  yregmat  <- eval.fd(yregfd, xfine, 0)
+  Dyregmat <- eval.fd(yregfd, xfine, 1)
   if (nvar > 1) {
 	   y0fine   <- y0fine[,1,]
 	   yregmat  <- yregmat[,1,]
@@ -687,7 +671,7 @@ reghess <- function(xfine, y0fine, Dhfine, D2hwrtc, yregfd,
   }
 
   if (crit == 2) {
-     D2yregmat <- eval.fd(yregfd, xfine, 2, returnMatrix)
+     D2yregmat <- eval.fd(yregfd, xfine, 2)
      if (nvar > 1) D2yregmat <- D2yregmat[,1,]
      if (periodic) {
         D2hwrtc[,1] <- 0

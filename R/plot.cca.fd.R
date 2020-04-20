@@ -7,7 +7,7 @@ plot.cca.fd <- function(x, cexval = 1, ...)
 # last modified 2007 May 3 by Spencer Graves
 #  Previously modified 20 March 2006
 
-  ccafd <- x
+ccafd <- x
 
 if (!(inherits(ccafd, "cca.fd"))) stop("First argument not of CCA.FD class.")
 

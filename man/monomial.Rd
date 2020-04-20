@@ -7,7 +7,7 @@
 Computes the values of the powers of argument t.
 }
 \usage{
-monomial(evalarg, exponents, nderiv=0)
+monomial(evalarg, exponents=1, nderiv=0, argtrans=c(0,1))
 }
 \arguments{
 \item{evalarg}{
@@ -20,6 +20,10 @@ powers to be computed.
 \item{nderiv}{
 a nonnegative integer specifying the order of derivative to be
 evaluated.
+}
+\item{argtrans}{
+Linearly transform an argument before constructing a basis.
+The first element is the shift in value and the second the scale factor.
 }
 }
 \value{

@@ -1,4 +1,4 @@
-quadset <- function(nquad=5, basisobj=NULL, breaks, returnMatrix=FALSE){
+quadset <- function(nquad=5, basisobj=NULL, breaks){
 
 # last modified 8 May 2012 by Jim Ramsay
 
@@ -62,12 +62,12 @@ quadset <- function(nquad=5, basisobj=NULL, breaks, returnMatrix=FALSE){
   quadwts <- as.vector(quadwts.)
   quadvals <- cbind(quadpts=quadpts, quadwts=quadwts)
 
-  if(is.null(basisobj))return(quadvals)
+  if(is.null(basisobj)) return(quadvals)
 #
   basisobj$quadvals <- quadvals
   values <- vector("list", 2)
   for( ivalue in 1:2){
-    values[[ivalue]] <- eval.basis(quadpts, basisobj, ivalue-1, returnMatrix)
+    values[[ivalue]] <- eval.basis(quadpts, basisobj, ivalue-1)
   }
   basisobj$values <- values
   basisobj

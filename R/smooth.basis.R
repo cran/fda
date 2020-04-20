@@ -111,6 +111,12 @@ smooth.basis <- function(argvals=1:n, y, fdParobj,
   dima <- dim(argvals)
   nda  <- length(dima)
   if (ndy < nda) stop("argvals has ", nda, " dimensions  y has only ", ndy)
+  
+#  check that the first dimensions of argvals and y match
+  
+  if (dima[1] != dim(y)[1]) 
+     stop("Lengths of first dimensions of argvals and y do not match.")
+  
 ##
 ##  select which version of smooth.basis to use, according to dim. of argvals
 ##  are all dimensions of argvals equal to the first nda of those of y?

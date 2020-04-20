@@ -82,20 +82,16 @@ phaseplanePlot(evalarg, fdobj, Lfdobj1=1, Lfdobj2=2,
   \code{\link{eval.fd}}
   \code{\link{plot.fd}}
   \code{\link{nondurables}}
-  \code{\link[zoo]{index}}
 }
 \examples{
 goodsbasis <- create.bspline.basis(rangeval=c(1919,2000),
                                    nbasis=161, norder=8)
 LfdobjNonDur <- int2Lfd(4)
-
-library(zoo)
-logNondurSm <- smooth.basisPar(argvals=index(nondurables),
-                y=log10(coredata(nondurables)), fdobj=goodsbasis,
+argvals = seq(1919,2000,len=length(nondurables))
+logNondurSm <- smooth.basisPar(argvals,
+                y=log10(nondurables), fdobj=goodsbasis,
                 Lfdobj=LfdobjNonDur, lambda=1e-11)
 phaseplanePlot(1964, logNondurSm$fd)
-
 }
-% docclass is function
 \keyword{smooth}
 \keyword{hplot}

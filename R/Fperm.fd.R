@@ -22,6 +22,7 @@ Fperm.fd <- function(yfdPar, xfdlist, betalist, wt=NULL,
   }
 
   yhat <- fRegressList$yhatfdobj
+  if(is.null(yhat)){ yhat = fRegressList$yhat }
   if(is.list(yhat) && ('fd' %in% names(yhat))) yhat <- yhat$fd
 
   tFstat <- Fstat.fd(yfdPar,yhat,argvals)
@@ -43,8 +44,10 @@ Fperm.fd <- function(yfdPar, xfdlist, betalist, wt=NULL,
 
     fRegressList <- fRegress(tyfdPar, xfdlist, betalist)
 
-    yhat <- fRegressList$yhatfdobj
-    if(is.list(yhat) && ('fd' %in% names(yhat))) yhat <- yhat$fd
+    if(is.fd(yhat)){
+		yhat <- fRegressList$yhatfdobj
+		if(is.list(yhat) && ('fd' %in% names(yhat))) yhat <- yhat$fd
+	} else{ yhat = fRegressList$yhat }
 
     tFstat = Fstat.fd(tyfdPar,yhat,argvals)
 

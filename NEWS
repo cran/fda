@@ -1,3 +1,6 @@
+Release 5.1.3 fixes some bugs.  
+
+
 Software and datasets to support three books:
 
 James O. Ramsay, Giles Hooker, and Spencer Graves
@@ -9,92 +12,11 @@ _______ (2002) 'Applied Functional Data Analysis' (Springer)
 James O. Ramsay, Giles Hooker, and Spencer Graves (2009)
       'Functional Data Analysis with R and Matlab' (Springer)
 
-Release 2.2.1 contained corrections to fRegress and inprod.
-
-Release 2.2.0 was released in Oct. 2009 as the working version to
-accompany 'Functional Data Analysis with R and Matlab' (Springer)
-
-Release 2.1.2 fixed problems with linmod among others and
-completed script files for Ramsay, Hooker and Graves.
-
-Release 2.1.1 added partial script files for
-Ramsay, Hooker and Graves, and fixed some bugs.
-
-Release 2.1.0 made 'fRegress' much easier to use by adding
-a formula interface to handle the laborious setup.  To do
-this and maintain backward compatibility, 'fRegress' is now
-a generic function with a 'formula' and other methods.
-
-Release 2.0.5 introduced 'predict', 'fitted', and 'residual'
-methods as wrappers for various 'eval.*' functions where
-that seemed appropriate.  This was suggested by Soren
-Hosgaard.
-
-Release 2.0.4 introduced changes to make the syntax for all
-the 'create.*.basis' function calls more consistent.  This
-included added names for all the basis functions to make it
-easier to understand how 'fda' works.
-
-Release 2.0.2 and 2.0.3 fixed bugs in "+.fd" and "-.fd" and
-other places like 'plotfit.fd'.  Release 2.0.3 also introduced
-changes to 'create.bspline.basis' and 'create.fourier.basis'
-to make them more consistent and easier to use.
-
-Release 2.0.1 added a map to CanadianWeather.Rd showing the
-location of each weather station by region.
-
-Release 2.0.0 added 'coef' generic functions to extract the
-coefficients from objects of class 'fd', 'fdPar', and 'fdSmooth'.
-Also, the 'coef' component in objects of class 'fdSmooth' was
-removed as it was redundant with 'fd$coefs'.  In addition,
-functions 'Fperm.fd' and and 'tperm.fd' were added, and a bug
-was fixed in the addition of functional data objects.
-
-Release 1.2.4 fixes a few bugs and adds defaults to
-'smooth.basis' and 'smooth.basisPar' to make them easier to use.
-The output of 'smooth.basis' and 'smooth.basisPar' now have class
-'fdSmooth', with methods for 'plot', 'lines', and 'plotfit'.
-There have also been improvements to the 'plotfit' function and
-the 'CanadianWeather' data.  Also, a function 'norder' has been
-added, which returns the order of a B-spline.
-
-Release 1.2.3 adds to previous versions a script to create most
-of the figures of chapter 6 of "Applied Functional Data Analysis"
-by Ramsay and Silverman.  Other changes offer simpler calls to
-time warping / registration and functional principal component
-functions.
-
-############################
-Release 1.1.7 provides improved documentation and modifications
-to some data sets.  Major modifications from previous releases:
-
-MINOR INCOMPATIBILITIES WITH PREVIOUS VERSIONS:
-
-	  1.  The 'daily' data set now has a more descriptive name,
-'CanadianWeather', and some enhancements;  see the help page.
-
-	  2.  The 'melanoma' data set has been modified to match
-the object of the same name in the 'lattice' package.  Accordingly,
-the 'index' column has been deleted and the column name 'melanoma'
-has been changed to 'incidence'.
-
-
-ENHANCEMENTS
-
-	  1.  New functions 'smooth.basisPar' and 'smooth.fdPar'
-simplify common analysis flows that follow an isolated call to
-'dfPar' with a call to either 'smooth.basis' or 'smooth.fd';  these
-tasks can now be performed in one step rather than two.
-
-	  2.  A new function 'phaseplanePlot' simplifies the
-process of plotting "Acceleration" vs. "Velocity".
-
-	  3.  A new function 'axisIntervals' facilitates labeling
-months and quarters on plots.
-
-	  4.  A 'scripts' subdirectory now includes partial scripts
-to replicate some of the analyses in the books.
-
-	  5.  There have been numerous enhancements to help pages.
-
-
+Release 5.1.1 updates the package to conform to current CRAN requirements.  
+Changes are:
+1.  function Data2fd has been temporarily removed.  We are considering whether
+its contribution to the package is useful given the smoothing function
+smooth.basis.
+2.  functions fRegress.CV and fRgress.stderr have been changed to
+fRegressCV and fRegressStderr to avoid collisons with S3 methods.
+These functions are not methods for function fRegress.

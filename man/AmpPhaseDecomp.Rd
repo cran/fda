@@ -12,7 +12,7 @@
   variation in the unregistered functions is due to  phase.
 }
 \usage{
-AmpPhaseDecomp(xfd, yfd, hfd, rng=xrng, returnMatrix=FALSE)
+AmpPhaseDecomp(xfd, yfd, hfd, rng=xrng)
 }
 \arguments{
   \item{xfd}{
@@ -31,10 +31,6 @@ AmpPhaseDecomp(xfd, yfd, hfd, rng=xrng, returnMatrix=FALSE)
     decomposition is to be computed.  Both values must be within the
     range of the functional data objects in the argument.  By default
     the whole range of the functional data objects is used.
-  }
-  \item{returnMatrix}{
-    logical:  If TRUE,  a two-dimensional is returned using a
-    special class from the Matrix package.
   }
 }
 \details{

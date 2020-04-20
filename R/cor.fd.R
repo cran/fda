@@ -2,7 +2,14 @@ cor.fd <- function(evalarg1, fdobj1, evalarg2=evalarg1, fdobj2=fdobj1)
 {
   #  compute correlation matrix / matrices for functional observations
 
-  #  Last modified 25 February 2007 by Spencer Graves
+  #  Last modified 16 January 2010 
+  
+  if (!(is.fd(fdobj1) || is.fdPar(fdobj1))) 
+    stop("Second argument is neither an fd object or an fdPar object")
+  
+  if (!(is.fd(fdobj2) || is.fdPar(fdobj2))) 
+    stop("Fourth argument is neither an fd object or an fdPar object")
+  
 ##
 ## 1.  Compute var1 = bivariate data object for variance(fdobj1)
 ##
@@ -10,6 +17,7 @@ cor.fd <- function(evalarg1, fdobj1, evalarg2=evalarg1, fdobj2=fdobj1)
 ##
 ## 2.  Evaluate var1 at evalarg1 
 ##
+  print(class(var1))
   evalVar1 <- eval.bifd(evalarg1, evalarg1, var1)
 ##
 ## 3.  If missing(fdobj2) convert evalVar1 to correlations 

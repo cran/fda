@@ -76,36 +76,9 @@ precfd5 <- with(CanadianWeather, smooth.basis(day.5,
 str(tempPrecVar3.5 <- var.fd(tempfd3, precfd5))
 
 ##
-## Example with 2 variables, same bases
-##
-gaitbasis3 <- create.fourier.basis(nbasis=3)
-str(gaitfd3 <- Data2fd(gait, basisobj=gaitbasis3))
-str(gaitVar.fd3 <- var.fd(gaitfd3))
-
-
-# Check the answers with manual computations 
-all.equal(var(t(gaitfd3$coefs[,,1])), gaitVar.fd3$coefs[,,,1])
-# TRUE
-all.equal(var(t(gaitfd3$coefs[,,2])), gaitVar.fd3$coefs[,,,3])
-# TRUE
-all.equal(var(t(gaitfd3$coefs[,,2]), t(gaitfd3$coefs[,,1])),
-          gaitVar.fd3$coefs[,,,2])
-# TRUE
-
-# NOTE:
-dimnames(gaitVar.fd3$coefs)[[4]]
-# [1] Hip-Hip
-# [2] Knee-Hip 
-# [3] Knee-Knee
-# If [2] were "Hip-Knee", then
-# gaitVar.fd3$coefs[,,,2] would match 
-#var(t(gaitfd3$coefs[,,1]), t(gaitfd3$coefs[,,2]))
-# *** It does NOT.  Instead, it matches:  
-#var(t(gaitfd3$coefs[,,2]), t(gaitfd3$coefs[,,1])),
-
-##
 ## The following produces contour and perspective plots
 ##
+
 # Evaluate at a 53 by 53 grid for plotting
 
 daybasis65 <- create.fourier.basis(rangeval=c(0, 365), nbasis=65)

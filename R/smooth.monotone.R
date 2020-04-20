@@ -1,7 +1,6 @@
 smooth.monotone <- function(argvals, y, WfdParobj, wtvec=rep(1,n),
                             zmat=NULL, conv=.0001, iterlim=50,
-                            active=rep(TRUE,nbasis), dbglev=1,
-                            returnMatrix=FALSE)
+                            active=rep(TRUE,nbasis), dbglev=1)
 {
 #  Smooths the relationship of Y to ARGVALS using weights in WTVEC by
 #  fitting a monotone function of the form
@@ -58,9 +57,6 @@ smooth.monotone <- function(argvals, y, WfdParobj, wtvec=rep(1,n),
 #  DBGLEV  ...  Controls the level of output on each iteration.  If 0,
 #               no output, if 1, output at each iteration, if higher,
 #               output at each line search iteration. 1 by default.
-#  RETURNMATRIX ... If False, a matrix in sparse storage model can be returned
-#               from a call to function BsplineS.  See this function for
-#               enabling this option.
 
 #  Returns are:
 #  WFD     ...  Functional data object for W.
@@ -95,14 +91,16 @@ smooth.monotone <- function(argvals, y, WfdParobj, wtvec=rep(1,n),
 #  FLIST and Y2CMAP objects are indexed linear with curves varying
 #  inside variables.
 
-# last modified 11 May 2012 by Spencer Graves
+# last modified 6 January 2020 by Jim Ramsay
 
-#  check ARGVALS
-
-argvals <- argcheck(argvals)
-n       <- length(argvals)
-onesobs <- matrix(1,n,1)
-
+  #  check ARGVALS
+  
+  if (!is.numeric(argvals)) stop("ARGVALS is not numeric.")
+  argvals <- as.vector(argvals)
+  if (length(argvals) < 2) stop("ARGVALS does not contain at least two values.")
+  n       <- length(argvals)
+  onesobs <- matrix(1,n,1)
+  
 #  at least three points are necessary for monotone smoothing
 
 if (n < 3) stop('ARGVALS does not contain at least three values.')
@@ -208,7 +206,7 @@ for (ivar in 1:nvar) {
   #  Compute initial function and gradient values
 
   result <- fngrad.smooth.monotone(yi, argvals, zmat, wtvec, cveci, lambda,
-                                   basisobj, Kmat, inact, basislist, returnMatrix)
+                                   basisobj, Kmat, inact, basislist)
   Flisti <- result[[1]]
   betai  <- result[[2]]
   Dyhat  <- result[[3]]
@@ -276,8 +274,8 @@ for (ivar in 1:nvar) {
   for (iter in 1:iterlim) {
       iternum <- iternum + 1
       #  initialize logical variables controlling line search
-      dblwrd <- c(FALSE,FALSE)
-      limwrd <- FALSE
+      dblwrd <- rep(FALSE,2)
+      limwrd <- rep(FALSE,2)
       stpwrd <- FALSE
       ind    <- 0
       ips    <- 0
@@ -337,8 +335,7 @@ for (ivar in 1:nvar) {
         #  compute new function value and gradient
         cvecnew <- cveci + linemat[1,5]*deltac
         result  <- fngrad.smooth.monotone(yi, argvals, zmat, wtvec, cvecnew, lambda,
-                                          basisobj, Kmat, inact, basislist,
-                                          returnMatrix)
+                                          basisobj, Kmat, inact, basislist)
         Flisti  <- result[[1]]
         betai   <- result[[2]]
         Dyhat   <- result[[3]]
@@ -461,7 +458,7 @@ if (is.null(zmat)) {
   rangeval <- basisobj$rangeval
   narg     <- 10*nbasis+1
   evalarg  <- seq(rangeval[1], rangeval[2], len=narg)
-  hmat     <- eval.monfd(evalarg, Wfdobj, 0, returnMatrix)
+  hmat     <- eval.monfd(evalarg, Wfdobj, 0)
   if (ndim == 2) {
     yhatmat <- matrix(0,narg,ncurve)
     for (icurve in 1:ncurve) {
@@ -512,8 +509,7 @@ linesearch.smooth.monotone <- function(Flisti, hessmat, dbglev)
 #  ----------------------------------------------------------------
 
 fngrad.smooth.monotone <- function(yi, argvals, zmat, wtvec, cveci, lambda,
-                                   basisobj, Kmat, inact, basislist,
-                                   returnMatrix=FALSE)
+                                   basisobj, Kmat, inact, basislist)
 {
   if (!is.null(zmat)) {
     ncov   <- ncol(zmat)
@@ -525,8 +521,8 @@ fngrad.smooth.monotone <- function(yi, argvals, zmat, wtvec, cveci, lambda,
   n      <- length(argvals)
   nbasis <- basisobj$nbasis
   Wfdobj <- fd(cveci, basisobj)
-  h      <- monfn(argvals, Wfdobj, basislist, returnMatrix)
-  Dyhat  <- mongrad(argvals, Wfdobj, basislist, returnMatrix)
+  h      <- monfn(argvals, Wfdobj, basislist)
+  Dyhat  <- mongrad(argvals, Wfdobj, basislist)
   if (!is.null(zmat)) {
     xmat <- cbind(zmat,h)
   } else {

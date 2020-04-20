@@ -1,13 +1,14 @@
-zerobasis = function(k) {
-#  sets up a k by k-1 matrix with orthonormal columns
-#  using the first k non-constant fourier basis function
-#  values at 0.5, ..., k-0.5
-fourierbasis = create.fourier.basis(k,k);
-tk           = 0:(k-1) + 0.5
-fbasmat      = eval.basis(tk, fourierbasis)
-zerobasmat   = fbasmat[,2:k]
-return(zerobasmat)
+zerobasis <- function(k) {
+# ZEROBASIS constructes a K by K-1 matrix that maps an unrestricted matrix B with K - 1 rows by 
+#  the linear transformation ZEROBASIS %*% B = C into the subspace of matrices with K rows having #  column sums equal to zero.  
+#  The matrix has orthonormal columns, so that crossprod(ZEROBASIS) is the identity matrix
+#  of order K - 1.
+
+  tk <- 0:(k-1) + 0.5
+  fbasis     <- create.fourier.basis(k,k)
+  fbasmat    <- eval.basis(tk, fbasis)
+  fbasmat    <- fbasmat[,2:k]
+  fbasnorm   <- sqrt(apply(fbasmat^2,2,sum))
+  zerobasmat <- fbasmat/outer(rep(1,k),fbasnorm)
+  return(zerobasmat)
 }
-
-
-

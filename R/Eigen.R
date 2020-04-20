@@ -1,5 +1,4 @@
-Eigen <- function(x, symmetric, only.values = FALSE,
-      valuenames ){
+Eigen <- function(x, symmetric, only.values = FALSE, valuenames ){
 ##
 ## 1.  symmetric?  
 ##

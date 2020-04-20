@@ -12,7 +12,7 @@
 }
 \usage{
 smooth.pos(argvals, y, WfdParobj, wtvec=rep(1,n),
-           conv=.0001, iterlim=50, dbglev=1, returnMatrix=FALSE)
+           conv=.0001, iterlim=50, dbglev=1)
 }
 \arguments{
   \item{argvals}{
@@ -56,10 +56,6 @@ smooth.pos(argvals, y, WfdParobj, wtvec=rep(1,n),
     level, and 2 full output.  If either level 1 or 2 is specified, it
     can be helpful to turn off the output buffering feature of S-PLUS.
   }
-  \item{returnMatrix}{
-    logical:  If TRUE,  a two-dimensional is returned using a
-    special class from the Matrix package.
-  }
 }
 \value{
   an object of class \code{posfd}, being a list with 4 components:
@@ -78,10 +74,6 @@ smooth.pos(argvals, y, WfdParobj, wtvec=rep(1,n),
   }
   \item{argvals, y}{
     the corresponding input arguments
-  }
-  \item{returnMatrix}{
-    logical:  If TRUE,  a two-dimensional is returned using a
-    special class from the Matrix package.
   }
 }
 \seealso{

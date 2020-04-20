@@ -47,7 +47,7 @@ cor.fd(evalarg1, fdobj1, evalarg2=evalarg1, fdobj2=fdobj1)
 
   With one or two functional data objects, fdobj1 and possibly fdobj2,
   the value is a matrix of dimensions length(evalarg1) by length(evalarg2) giving the
-  correlations at those points of fdobj1 if missing(fdojb2) or of
+  correlations at those points of fdobj1 if missing(fdobj2) or of
   correlations between eval.fd(evalarg1, fdobj1) and eval.fd(evalarg2,
   fdobj2).
 
@@ -113,8 +113,9 @@ par(op)
 
 # Correlations and cross correlations
 # in a bivariate functional data object
-gaitbasis5 <- create.fourier.basis(nbasis=5)
-gaitfd5 <- Data2fd(gait, basisobj=gaitbasis5)
+gaittime   <- (1:20)/21
+gaitbasis5 <- create.fourier.basis(c(0,1),nbasis=5)
+gaitfd5    <- smooth.basis(gaittime, gait, gaitbasis5)$fd
 
 gait.t3 <- (0:2)/2
 (gaitCor3.5 <- cor.fd(gait.t3, gaitfd5))

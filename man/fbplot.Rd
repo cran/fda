@@ -31,7 +31,7 @@ fbplot(fit, x = NULL, method = "MBD", depth = NULL, plot = TRUE,
   }
   \item{x}{
     For \code{fbplot}, \code{x} is the x coordinates of curves. Defaults
-    to 1:p where p is the number of x coodinates.
+    to 1:p where p is the number of x coordinates.
 
     For \code{boxplot.fd}, \code{boxplot.fdPar} and
     \code{boxplot.fdSmooth}, \code{x} is an object of class \code{fd},
@@ -73,7 +73,7 @@ fbplot(fit, x = NULL, method = "MBD", depth = NULL, plot = TRUE,
   }
   \item{fullout}{
     logical for plotting outlying curves. If FALSE (the default) then
-    only the part outside the box is plotted. If TRUE, complete outling
+    only the part outside the box is plotted. If TRUE, complete outlying
     curves are plotted.
   }
   \item{factor}{
@@ -90,7 +90,7 @@ fbplot(fit, x = NULL, method = "MBD", depth = NULL, plot = TRUE,
   }
 }
 \details{
-  For functional data, the band depth (BD) or modifed band depth (MBD)
+  For functional data, the band depth (BD) or modified band depth (MBD)
   allows for ordering a sample of curves from the center outwards and,
   thus, introduces a measure to define functional quantiles and the
   centrality or outlyingness of an observation. A smaller rank is
@@ -100,7 +100,7 @@ fbplot(fit, x = NULL, method = "MBD", depth = NULL, plot = TRUE,
   band. The method "Both" uses "BD2" first  and then uses "MBD" to break
   ties.  The method "Both" uses BD2 first and then uses MBD to break
   ties.  The computation is carried out by the fast algorithm proposed
-  by Sun et al. (2012).
+  by Sun et. al. (2012).
 %%  ~~ If necessary, more details than the description above ~~
 }
 \value{
@@ -159,33 +159,36 @@ t.cov=cov.fun(d.matrix,1,1,1)
 L=chol(t.cov)
 mu=4*t
 e=matrix(rnorm(n*p),p,n)
-y=mu+t(L)\%*\%e
+ydata  = mu+t(L)\%*\%e
 
 #functional boxplot
-fbplot(y,method='MBD',ylim=c(-11,15))
+fbplot(ydata,method='MBD',ylim=c(-11,15))
 
 # The same using boxplot.fd
-boxplot.fd(y, method='MBD', ylim=c(-11, 15))
+boxplot.fd(ydata, method='MBD', ylim=c(-11, 15))
 
 # same with default ylim
-boxplot.fd(y)
+boxplot.fd(ydata)
 
 ##
 ## 2.  as an fd object
 ##
-Y <- Data2fd(y)
-boxplot(Y)
+T      = dim(ydata)[1]
+time   = seq(0,T,len=T)
+ybasis = create.bspline.basis(c(0,T), 23)
+Yfd    = smooth.basis(time, ydata, ybasis)$fd
+boxplot(Yfd)
 
 ##
 ## 3.  as an fdPar object
 ##
-Ypar <- fdPar(Y)
+Ypar <- fdPar(Yfd)
 boxplot(Ypar)
 
 ##
 ## 4.  Smoothed version
 ##
-Ysmooth <- smooth.fdPar(Y)
+Ysmooth <- smooth.fdPar(Yfd)
 boxplot(Ysmooth)
 
 ##

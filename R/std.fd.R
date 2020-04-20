@@ -9,9 +9,10 @@ std.fd <- function(fdobj)
   #  Last modified 2007.11.28 by Spencer Graves
   #  Previously modified 26 February 2007
 
-  if (!(inherits(fdobj, "fd"))) stop(
-		"Argument  fdobj not a functional data object.")
-
+  if (!(is.fd(fdobj) || is.fdPar(fdobj)))  stop(
+    "First argument is neither a functional data or a functional parameter object.")
+  if (is.fdPar(fdobj)) fdobj <- fdobj$fd
+  
   coef     <- fdobj$coefs
   coefd    <- dim(coef)
   ndim     <- length(coefd)

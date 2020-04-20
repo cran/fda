@@ -45,8 +45,9 @@ plotreg.fd(reglist)
   \code{\link{register.fd}}
 }
 \examples{
+\dontrun{
 #  register and plot the angular acceleration of the gait data
-gaittime  <- as.numeric(dimnames(gait)[[1]])*20
+gaittime  <- seq(0.05, 0.95, 0.1)*20
 gaitrange <- c(0,20)
 #  set up a fourier basis object
 gaitbasis <- create.fourier.basis(gaitrange, nbasis=21)
@@ -81,6 +82,7 @@ gaitreglist <- register.fd(D2gaitmeanfd, D2gaitfd[1:nBoys], WarpfdPar,
 plotreg.fd(gaitreglist)
 #  display horizonal shift values
 print(round(gaitreglist$shift,1))
+}
 }
 % docclass is function
 \keyword{smooth}

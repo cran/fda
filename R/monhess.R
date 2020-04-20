@@ -1,4 +1,4 @@
-monhess <- function(x, Wfd, basislist, returnMatrix=FALSE)
+monhess <- function(x, Wfd, basislist)
 {
 #  MONHESS evaluates the second derivative of monotone fn. wrt coefficients
 #  The function is of the form h[x] <- (D^{-1} exp Wfd)(x)
@@ -14,11 +14,8 @@ monhess <- function(x, Wfd, basislist, returnMatrix=FALSE)
 #  Returns:
 #  D2H   values of D2 h wrt c
 #  TVAL  Arguments used for trapezoidal approximation to integral
-#  RETURNMATRIX ... If False, a matrix in sparse storage model can be returned
-#               from a call to function BsplineS.  See this function for
-#               enabling this option.
 
-#  Last modified 9 May 2012 by Jim Ramsay
+#  Last modified 6 January 2020 by Jim Ramsay
 
 #  set some constants
 
@@ -58,7 +55,7 @@ iter  <- 1
 xiter <- rangeval
 tval  <- xiter
 if (is.null(basislist[[iter]])) {
-    bmat <- getbasismatrix(tval, basis, 0, returnMatrix)
+    bmat <- getbasismatrix(tval, basis, 0)
     basislist[[iter]] <- bmat
 } else {
     bmat <- basislist[[iter]]
@@ -86,7 +83,7 @@ for (iter in 2:JMAX) {
    xiter <- seq(rangeval[1]+del/2, rangeval[2]-del/2, del)
    tval  <- c(tval, xiter)
    if (is.null(basislist[[iter]])) {
-      bmat <- getbasismatrix(xiter, basis, 0, returnMatrix)
+      bmat <- getbasismatrix(xiter, basis, 0)
       basislist[[iter]] <- bmat
    } else {
       bmat <- basislist[[iter]]

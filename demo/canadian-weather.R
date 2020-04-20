@@ -122,7 +122,7 @@ sort(unique(round(diff(sort(round(unique(
      CanadianWeather$dailyAv[,,"Precipitation.mm"]), 5) )),5)) )
 # Obviously, the 0's are problems ... but ignore them
 # The real point is that these numbers are all
-# to the nearest tenth of a milimeter,
+# to the nearest tenth of a millimeter,
 # & the 0 differences are created by anomolies in 'unique'
 table(CanadianWeather$dailyAv[,,"Precipitation.mm"])
 
@@ -281,11 +281,11 @@ for (i in 1:length(CanadianWeather$place) ) {
   with(CanadianWeather, plot(day.5, dailyAv[,i,"Temperature.C"],
        type="p", xlim=c(0, 365), col=1, xlab="Day", ylab="",
          main=paste(place[i],"temperature")) )
-  lines.fd(daytempSm[i])
+  lines(daytempSm[i])
   with(CanadianWeather, plot(day.5, dailyAv[,i,"log10precip"],
        type="p", xlim=c(0, 365), col=1, xlab="Day", ylab="",
          main=paste(place[i],"precipitation")) )
-  lines.fd(dayprecfdSm[i])
+  lines(dayprecfdSm[i])
 # Uncomment the following line 'par(ask=TRUE)'
 #  to plot the cuves one at a time
 # Otherwise, they fly by faster than the eye can see.
@@ -907,6 +907,15 @@ zmat[pacindex,3] <- 1
 zmat[conindex,4] <- 1
 zmat[artindex,5] <- 1
 
+#  labels for weather zones
+
+zlabels <- vector("list",5)
+zlabels[[1]] <- "Constant"
+zlabels[[2]] <- "Atlantic"
+zlabels[[3]] <- "Pacific"
+zlabels[[4]] <- "Continental"
+zlabels[[5]] <- "Arctic"
+
 #  attach a row of 0, 1, 1, 1, 1 to force zone
 #  effects to sum to zero, and define first regression
 #  function as grand mean for (all stations
@@ -956,6 +965,7 @@ for (j in 1:p) {
 	betaestParfdj <- betaestlist[[j]]
 	plot(betaestParfdj$fd, xlab="Day", ylab="Temp.",
 	     main=zonenames[j])
+	title(zlabels[[j]])
 }
 
 #  plot predicted functions
@@ -987,7 +997,7 @@ plot(day.5, stddevE, type="l",
 #  Repeat regression, this time outputting results for
 #  confidence intervals
 
-stderrList <- fRegress.stderr(fRegressList, y2cMap, SigmaE)
+stderrList <- fRegressStderr(fRegressList, y2cMap, SigmaE)
 
 betastderrlist <- stderrList$betastderrlist
 
@@ -999,6 +1009,7 @@ for (j in 1:p) {
 	plot(day.5, betastderrj,
 	        type="l",lty=1, xlab="Day", ylab="Reg. Coeff.",
 	        main=zonenames[j])
+	title(zlabels[[j]])
 }
 par(op)
 
@@ -1013,6 +1024,7 @@ for (j in 1:p) {
 	matplot(day.5, cbind(betaj, betaj+2*betastderrj, betaj-2*betastderrj),
 	        type="l",lty=c(1,4,4), xlab="Day", ylab="Reg. Coeff.",
 	        main=zonenames[j])
+	title(zlabels[[j]])
 }
 par(op)
 
@@ -1148,7 +1160,7 @@ contour(SigmaE)
 
 #  repeat regression analysis to get confidence intervals
 
-stderrList <- fRegress.stderr(fRegressList, y2cMap, SigmaE)
+stderrList <- fRegressStderr(fRegressList, y2cMap, SigmaE)
 
 betastderrlist <- stderrList$betastderrlist
 
@@ -1165,6 +1177,7 @@ for (j in 1:p) {
 	plot(day.5, betastderrj,
 	        type="l",lty=1, xlab="Day", ylab="Reg. Coeff.",
 	        main=prednames[j])
+	title(zlabels[[j]])
 }
 par(op)
 
@@ -1180,6 +1193,7 @@ for (j in 1:p) {
 	matplot(day.5, cbind(betaj, betaj+2*betastderrj, betaj-2*betastderrj),
 	        type="l",lty=c(1,4,4), xlab="Day", ylab="Reg. Coeff.",
 	        main=prednames[j])
+	title(zlabels[[j]])
 }
 par(op)
 
@@ -1273,7 +1287,7 @@ for (ilam in 1:nlam) {
     betafdPar2   <- betalisti[[2]]
     betafdPar2$lambda <- lambda
     betalisti[[2]] <- betafdPar2
-    SSE.CV[ilam]   <- fRegress.CV(annualprec, xfdlist, betalisti)
+    SSE.CV[ilam]   <- fRegressCV(annualprec, xfdlist, betalisti)
     print(c(ilam, loglam[ilam], SSE.CV[ilam]))
 }
 
@@ -1331,7 +1345,7 @@ SigmaE <- SigmaE*diag(rep(1,35))
 
 #  recompute the analysis to get confidence limits
 
-stderrList <- fRegress.stderr(fRegressList, NULL, SigmaE)
+stderrList <- fRegressStderr(fRegressList, NULL, SigmaE)
 
 betastderrlist <- stderrList$betastderrlist
 

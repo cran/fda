@@ -9,11 +9,11 @@ spanned by the values of a set of basis functions.  This amounts to
 a least squares regression of the data on to the values of the basis
 functions.  A small penalty can be applied to deal with situations in
 which the number of basis functions exceeds the number of basis points.
-This function is used with function \code{data2fd}, and is not
-normally used directly in a functional data analysis.
+This function is not normally used in a functional data analysis to
+smooth data, since function \code{smooth.basis} is provided for that job.
 }
 \usage{
-project.basis(y, argvals, basisobj, penalize=FALSE, returnMatrix=FALSE)
+project.basis(y, argvals, basisobj, penalize=FALSE)
 }
 \arguments{
 \item{y}{
@@ -31,10 +31,6 @@ a logical variable.  If TRUE, a small roughness penalty is applied
 to ensure that the linear equations defining the least squares
 solution are linearly independent or nonsingular.
 }
-\item{returnMatrix}{
-logical:  If TRUE,  a two-dimensional is returned using a
-special class from the Matrix package.
-}
 }
 \value{
 the matrix of coefficients defining the least squares approximation.
@@ -43,7 +39,7 @@ columns as there are curves, and if the data are multivariate, as many
 layers as there are functions.
 }
 \seealso{
-\code{\link{Data2fd}}
+\code{\link{smooth.basis}}
 }
 % docclass is function
 \keyword{smooth}

@@ -1,8 +1,8 @@
-norder <- function(x, ...)UseMethod("norder")
+norder         <- function(x, ...) UseMethod("norder")
 
-norder.fd <- function(x, ...)norder.bspline(x$basis)
+norder.fd      <- function(x, ...) norder.bspline(x$basis)
 
-norder.basisfd <- function(x, ...)norder.bspline(x)
+norder.basisfd <- function(x, ...) norder.bspline(x)
 
 norder.default <- function(x, ...){
 #

@@ -8,7 +8,7 @@
   Smooth data already converted to a functional data object, fdobj,
   using criteria consolidated in a functional data parameter object,
   fdParobj.  For example, data may have been converted to a functional
-  data object using function \code{Data2fd} using a fairly large set of
+  data object using function \code{smooth.basis} using a fairly large set of
   basis functions.  This 'fdobj' is then smoothed as specified in
   'fdParobj'.
 }
@@ -30,7 +30,6 @@ a functional data object.
 }
 \seealso{
 \code{\link{smooth.basis}},
-\code{\link{Data2fd}}
 }
 \examples{
 

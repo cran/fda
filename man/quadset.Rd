@@ -7,7 +7,7 @@
   Set up quadrature points and weights for Simpson's rule.
 }
 \usage{
-quadset(nquad=5, basisobj=NULL, breaks, returnMatrix=FALSE)
+quadset(nquad=5, basisobj=NULL, breaks)
 }
 \arguments{
   \item{nquad}{
@@ -24,10 +24,6 @@ quadset(nquad=5, basisobj=NULL, breaks, returnMatrix=FALSE)
     defined, and the final value must be the end point.  If this is not
     supplied, and 'basisobj' is of type 'bspline', the knots are used as
     these values.
-  }
-  \item{returnMatrix}{
-    logical:  If TRUE,  a two-dimensional is returned using a
-    special class from the Matrix package.
   }
 }
 \details{

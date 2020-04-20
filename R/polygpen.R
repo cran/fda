@@ -17,7 +17,8 @@ if (!(inherits(basisobj, "basisfd"))) stop(
 Lfdobj <- int2Lfd(Lfdobj)
 
 type <- basisobj$type
-if (type != "polyg") stop("BASISOBJ not of type polyg")
+if (type != "polyg" && type != "polygonal") 
+stop("BASISOBJ not of type polyg or polygonal")
 
 nderiv <- Lfdobj$nderiv
 

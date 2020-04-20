@@ -32,8 +32,7 @@ smooth.morph <- function(x, y, WfdPar, wt=rep(1,nobs),
 #  ITERNUM   ...  number of iterations
 #  ITERHIST  ...  ITERNUM+1 by 5 array containing iteration history
 
-# last modified 13 may 2012 by Spencer Graves
-# previously modified 2 May 2012 by Jim Ramsay
+# last modified 29 June 2018 by Jim Ramsay
 
 #  initialize some arrays
 
@@ -153,8 +152,8 @@ smooth.morph <- function(x, y, WfdPar, wt=rep(1,nobs),
       # if (dbglev == 0 && iterlim > 1) cat(".")
       iternum <- iternum + 1
       #  initialize logical variables controlling line search
-      dblwrd <- c(0,0)
-      limwrd <- c(0,0)
+      dblwrd <- rep(FALSE,2)
+      limwrd <- rep(FALSE,2)
       stpwrd <- 0
       ind    <- 0
       ips    <- 0

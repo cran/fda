@@ -6,16 +6,13 @@
   Get subdirectories 
 }
 \description{
-  If you want only subfolders and no files,
-  use \code{dirs}.  With \code{recursive} =
-  FALSE, \code{\link{dir}} returns both
-  folders and files.  With \code{recursive} =
-  TRUE, it returns only files.  
+  If you want only subfolders and no files, use \code{dirs}.  
+  With \code{recursive} = FALSE, \code{\link{dir}} returns both folders
+  and files.  With \code{recursive} = TRUE, it returns only files.  
 }
 \usage{
-dirs(path='.', pattern=NULL, exclude=NULL, 
-  all.files=FALSE, full.names=FALSE, 
-  recursive=FALSE, ignore.case=FALSE) 
+dirs(path='.', pattern=NULL, exclude=NULL, all.files=FALSE,
+     full.names=FALSE, recursive=FALSE, ignore.case=FALSE) 
 }
 \arguments{
   \item{path, all.files, full.names, recursive, ignore.case}{
@@ -48,20 +45,12 @@ dirs(path='.', pattern=NULL, exclude=NULL,
   \code{\link{dir}},
   \code{\link{file.info}}
 }
-\examples{
-path2fdaM <- system.file('Matlab/fdaM', package='fda')
-dirs(path2fdaM)
-dirs(path2fdaM, full.names=TRUE)
-dirs(path2fdaM, recursive=TRUE)
-dirs(path2fdaM, exclude='^@|^private$', recursive=TRUE)
+% \examples{
+% dirs(path2fdaM)
+% dirs(path2fdaM, full.names=TRUE)
+% dirs(path2fdaM, recursive=TRUE)
+% dirs(path2fdaM, exclude='^@|^private$', recursive=TRUE)
 
-# Directories to add to Matlab path
-# for R.matlab and fda
-R.matExt <- system.file('externals', package='R.matlab')
-fdaM <- dirs(path2fdaM, exclude='^@|^private$', full.names=TRUE,
-              recursive=TRUE)  
-add2MatlabPath <- c(R.matExt, path2fdaM, fdaM) 
-
-}
+% }
 \keyword{IO}% at least one, from doc/KEYWORDS
 

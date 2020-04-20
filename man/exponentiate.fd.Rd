@@ -72,7 +72,7 @@ exponentiate.fd(e1, e2, tolint=.Machine$double.eps^0.75,
 
       e1.2 <- predict(e1, Time)^e2
 
-      fd1.2 <- Data2fd(Time, e1.2, outBasis)
+      fd1.2 <- smooth.basis(Time, e1.2, outBasis)$
 
       d1.2 <- (e1.2 - predict(fd1.2, Time))
 
@@ -119,41 +119,41 @@ plot(fdsinsin) # good
 all.equal(fdsin2, fdsinsin)
 \dontshow{)}
 
-##
-## sqrt(sin2)
-##
-plot(fdsin2)
-fdsin. <- sqrt(fdsin2)
-plot(fdsin, main='fdsin and sqrt(fdsin^2)')
-lines(fdsin., col='red')
-# fdsin is positive and negative
-# fdsin. = sqrt(fdsin^2)
-# has trouble, because it wants to be smooth
-# but theoretically has a discontinuous first derivative at 0.5
+% ##
+% ## sqrt(sin2)
+% ##
+% plot(fdsin2)
+% fdsin. <- sqrt(fdsin2)
+% plot(fdsin, main='fdsin and sqrt(fdsin^2)')
+% lines(fdsin., col='red')
+% # fdsin is positive and negative
+% # fdsin. = sqrt(fdsin^2)
+% # has trouble, because it wants to be smooth
+% # but theoretically has a discontinuous first derivative at 0.5
 
-fdsin.5.2 <- fdsin.^2
-resin <- fdsin2-fdsin.5.2
-plot(resin)
-\dontshow{stopifnot(}
-max(abs(resin$coefs))<0.01
-\dontshow{)}
+% fdsin.5.2 <- fdsin.^2
+% resin <- fdsin2-fdsin.5.2
+% plot(resin)
+% \dontshow{stopifnot(}
+% max(abs(resin$coefs))<0.01
+% \dontshow{)}
 
-##
-## x^2, x = straight line f(x)=x
-##
-bspl1 <- create.bspline.basis(norder=2)
-x <- fd(0:1, bspl1)
-plot(x)
+% ##
+% ## x^2, x = straight line f(x)=x
+% ##
+% bspl1 <- create.bspline.basis(norder=2)
+% x <- fd(0:1, bspl1)
+% plot(x)
 
-x2 <- x^2
-plot(x2)
+% x2 <- x^2
+% plot(x2)
 
-er.x <- x-sqrt(x2)
-er.x$coefs
-max(er.x$coefs)
-\dontshow{stopifnot(}
-max(abs(er.x$coefs))<10*.Machine$double.eps
-\dontshow{)}
+% er.x <- x-sqrt(x2)
+% er.x$coefs
+% max(er.x$coefs)
+% \dontshow{stopifnot(}
+% max(abs(er.x$coefs))<10*.Machine$double.eps
+% \dontshow{)}
 
 }
 % docclass is function

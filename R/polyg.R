@@ -32,7 +32,7 @@ polyg <- function(x, argvals, nderiv=0)
   nbasis <- length(argvals)
 
   knots <- c(argvals[1], argvals, argvals[nbasis])
-  basismat <- splines::spline.des(knots, x, 2, derivs)$design
+  basismat <- spline.des(knots, x, 2, derivs)$design
 
   return (basismat)
 }

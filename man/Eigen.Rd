@@ -8,8 +8,7 @@
   and dimnames to the eigenvectors.  
 }
 \usage{
-Eigen(x, symmetric, only.values = FALSE, 
-      valuenames )
+Eigen(x, symmetric, only.values = FALSE, valuenames)
 }
 \arguments{
   \item{x}{
@@ -40,7 +39,7 @@ Eigen(x, symmetric, only.values = FALSE,
 \details{
   1.  Check 'symmetric'  
 
-  2.  ev <- eigen(x, symmetric, only.values = FALSE);
+  2.  ev <- eigen(x, symmetric, only.values = FALSE, EISPACK = FALSE);
   see \code{\link{eigen}} for more details.  
 
   3.  rNames = rownames(x);  if this is NULL, rNames = if(symmetric)

@@ -92,10 +92,10 @@ create.monomial.basis(rangeval=c(0, 1), nbasis=NULL,
     custom \code{axes}.  If this \code{axes} argument is not
     \code{NULL}, functions \code{plot.basisfd}, \code{plot.fd},
     \code{plot.fdSmooth} \code{plotfit.fd}, \code{plotfit.fdSmooth}, and
-    \code{plot.Lfd} will create axes via \code{do.call(x$axes[[1]],
-      x$axes[-1])}.  The primary example of this uses
+    \code{plot.Lfd} will create axes via \code{x$axes[[1]]} and
+      \code{x$axes[-1]}.  The primary example of this uses
     \code{list("axesIntervals", ...)}, e.g., with \code{Fourier} bases
-    to create \code{CanadianWeather} plots
+    to create \code{CanadianWeather} plots.
   }
 }
 \value{
@@ -140,5 +140,4 @@ AmRev.ct <- as.POSIXct1970(c('1776-07-04', '1789-04-30'))
 BspRev1.ct <- create.monomial.basis(AmRev.ct)
 
 }
-% docclass is function
 \keyword{smooth}

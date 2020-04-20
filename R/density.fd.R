@@ -1,7 +1,7 @@
 density <- function(x, ...)UseMethod('density')
 
 density.fd <- function(x, WfdParobj, conv=0.0001, iterlim=20,
-                      active=1:nbasis, dbglev=1, returnMatrix=FALSE, ...) {
+                      active=1:nbasis, dbglev=1, ...) {
 # DENSITYFD estimates the density of a sample of scalar observations.
 
 #  These observations may be one of two forms:
@@ -20,9 +20,6 @@ density.fd <- function(x, WfdParobj, conv=0.0001, iterlim=20,
 #  ITERLIM   ... iteration limit for scoring iterations
 #  ACTIVE    ... indices among 1:NBASIS of parameters to optimize
 #  DBGLEV    ... level of output of computation history
-#  RETURNMATRIX ... If False, a matrix in sparse storage model can be returned
-#               from a call to function BsplineS.  See this function for
-#               enabling this option.
 
 #  Returns:
 #  A list containing
@@ -38,7 +35,7 @@ density.fd <- function(x, WfdParobj, conv=0.0001, iterlim=20,
 #  exponentiate the resulting vector, and then divide by the normalizing
 #  constant C.
 
-# last modified 3 March 2014 by Jim Ramsay
+# last modified 6 January 2020 by Jim Ramsay
 
 #  check WfdParobj
 
@@ -118,7 +115,7 @@ if (lambda > 0) Kmat <- lambda*getbasispenalty(basisobj, Lfdobj)
 #  evaluate log likelihood
 #    and its derivatives with respect to these coefficients
 
-result <- loglfnden(x, f, basisobj, cvec0, returnMatrix)
+result <- loglfnden(x, f, basisobj, cvec0)
 logl   <- result[[1]]
 Dlogl  <- result[[2]]
 
@@ -135,7 +132,7 @@ gvec0 <- t(zeromat) %*% as.matrix(gvec)
 
 #  compute the initial expected Hessian
 
-hmat <- Varfnden(x, basisobj, cvec0, returnMatrix)
+hmat <- Varfnden(x, basisobj, cvec0)
 if (lambda > 0) hmat <- hmat + 2*Kmat
 hmat0 = t(zeromat) %*% hmat %*% zeromat
 
@@ -165,7 +162,7 @@ iterhist[1,]  <- status
 if (iterlim == 0) {
     Flist     <- Foldstr
     iterhist <- iterhist[1,]
-    C        <- normden.phi(basisobj, cvec0, returnMatrix=returnMatrix)
+    C        <- normden.phi(basisobj, cvec0)
     return( list(Wfdobj=Wfdobj, C=C, Flist=Flist, iternum=iternum,
                    iterhist=iterhist) )
 }
@@ -181,8 +178,8 @@ linemat <- matrix(0,3,5)
 for (iter in 1:iterlim) {
    	iternum <- iternum + 1
   	#  take optimal stepsize
-	  dblwrd <- c(0,0)
-	  limwrd <- c(0,0)
+	  dblwrd <- rep(FALSE,2)
+	  limwrd <- rep(FALSE,2)
   	stpwrd <- 0
 	  ind    <- 0
 	  #  compute slope
@@ -242,7 +239,7 @@ for (iter in 1:iterlim) {
         }
         cvecnew <- cvec + linemat[1,5]*deltac
         #  compute new function value and gradient
-	      result  <- loglfnden(x, f, basisobj, cvecnew, returnMatrix)
+	      result  <- loglfnden(x, f, basisobj, cvecnew)
 	      logl    <- result[[1]]
 	      Dlogl   <- result[[2]]
         Flist$f <- -logl
@@ -292,14 +289,14 @@ for (iter in 1:iterlim) {
 
      	if (abs(Flist$f-Foldstr$f) < conv) {
           iterhist <- iterhist[1:(iternum+1),]
-  	      C <- normden.phi(basisobj, cvec, returnMatrix=returnMatrix)
+  	      C <- normden.phi(basisobj, cvec)
 	        denslist <- list("Wfdobj" = Wfdobj, "C" = C, "Flist" = Flist,
 			                     "iternum" = iternum, "iterhist" = iterhist)
 	        return( denslist )
      	}
      	if (Flist$f >= Foldstr$f) break
      	#  compute the Hessian
-     	hmat <- Varfnden(x, basisobj, cvec, returnMatrix)
+     	hmat <- Varfnden(x, basisobj, cvec)
      	if (lambda > 0) hmat <- hmat + 2*Kmat
       hmat0 <- t(zeromat) %*% hmat %*% zeromat
      	#  evaluate the update vector
@@ -314,7 +311,7 @@ for (iter in 1:iterlim) {
 		#  end of iterations
   	}
       #  compute final normalizing constant
- 	C <- normden.phi(basisobj, cvec, returnMatrix=returnMatrix)
+ 	C <- normden.phi(basisobj, cvec)
 	denslist <- list("Wfdobj" = Wfdobj, "C" = C, "Flist" = Flist,
 			             "iternum" = iternum, "iterhist" = iterhist)
  	return( denslist )
@@ -322,7 +319,7 @@ for (iter in 1:iterlim) {
 
 #  -----------------------------------------------------------------------------
 
-loglfnden <- function(x, f, basisobj, cvec, returnMatrix=FALSE) {
+loglfnden <- function(x, f, basisobj, cvec=FALSE) {
 	#  Computes the log likelihood and its derivative with
 	#    respect to the coefficients in CVEC
    	N       <- length(x)
@@ -331,29 +328,29 @@ loglfnden <- function(x, f, basisobj, cvec, returnMatrix=FALSE) {
    	fsum    <- sum(f)
    	nobs    <- length(x)
    	phimat  <- getbasismatrix(x, basisobj)
-   	Cval    <- normden.phi(basisobj, cvec, , returnMatrix=returnMatrix)
+   	Cval    <- normden.phi(basisobj, cvec, )
    	logl    <- sum((phimat %*% cvec) * f - fsum*log(Cval)/N)
-    EDw     <- expectden.phi(basisobj, cvec, Cval, returnMatrix=returnMatrix)
+    EDw     <- expectden.phi(basisobj, cvec, Cval)
    	Dlogl   <- apply((phimat - outer(rep(1,nobs),EDw))*fmat,2,sum)
 	return( list(logl, Dlogl) )
 }
 
 #  -----------------------------------------------------------------------------
 
-Varfnden <- function(x, basisobj, cvec, returnMatrix=FALSE) {
+Varfnden <- function(x, basisobj, cvec=FALSE) {
 	#  Computes the expected Hessian
    	nbasis  <- basisobj$nbasis
    	nobs    <- length(x)
-   	Cval    <- normden.phi(basisobj, cvec, returnMatrix=returnMatrix)
-   	EDw     <- expectden.phi(basisobj, cvec, Cval, returnMatrix=returnMatrix)
-   	EDwDwt  <- expectden.phiphit(basisobj, cvec, Cval, returnMatrix=returnMatrix)
+   	Cval    <- normden.phi(basisobj, cvec)
+   	EDw     <- expectden.phi(basisobj, cvec, Cval)
+   	EDwDwt  <- expectden.phiphit(basisobj, cvec, Cval)
    	Varphi  <- nobs*(EDwDwt - outer(EDw,EDw))
 	return(Varphi)
 }
 
 #  -----------------------------------------------------------------------------
 
-normden.phi <- function(basisobj, cvec, JMAX=15, EPS=1e-7, returnMatrix=FALSE) {
+normden.phi <- function(basisobj, cvec, JMAX=15, EPS=1e-7) {
 
 #  Computes integrals of
 #      p(x) = exp phi"(x) %*% cvec
@@ -380,7 +377,7 @@ normden.phi <- function(basisobj, cvec, JMAX=15, EPS=1e-7, returnMatrix=FALSE) {
   	x  <- rng
   	nx <- length(x)
   	ox <- matrix(1,nx,1)
-  	fx <- getbasismatrix(x, basisobj, returnMatrix=returnMatrix)
+  	fx <- getbasismatrix(x, basisobj)
   	wx <- fx %*% cvec
   	wx[wx < -50] <- -50
   	px <- exp(wx)
@@ -397,7 +394,7 @@ normden.phi <- function(basisobj, cvec, JMAX=15, EPS=1e-7, returnMatrix=FALSE) {
     	} else {
       		x <- seq(rng[1]+del/2, rng[2], del)
     	}
-    	fx <- getbasismatrix(x, basisobj, returnMatrix=returnMatrix)
+    	fx <- getbasismatrix(x, basisobj)
     	wx <- fx %*% cvec
     	wx[wx < -50] <- -50
     	px <- exp(wx)
@@ -422,7 +419,7 @@ normden.phi <- function(basisobj, cvec, JMAX=15, EPS=1e-7, returnMatrix=FALSE) {
 #  -----------------------------------------------------------------------------
 
 expectden.phi <- function(basisobj, cvec, Cval=1, nderiv=0,
-                     JMAX=15, EPS=1e-7, returnMatrix=FALSE) {
+                     JMAX=15, EPS=1e-7) {
     #  Computes expectations of basis functions with respect to density
     #      p(x) <- Cval^{-1} exp t(c)*phi(x)
     #  by numerical integration using Romberg integration
@@ -449,14 +446,14 @@ expectden.phi <- function(basisobj, cvec, Cval=1, nderiv=0,
     x  <- rng
     nx <- length(x)
     ox <- matrix(1,nx,nx)
-    fx <- getbasismatrix(x, basisobj, 0, returnMatrix)
+    fx <- getbasismatrix(x, basisobj, 0)
     wx <- fx %*% cvec
     wx[wx < -50] <- -50
     px <- exp(wx)/Cval
     if (nderiv == 0) {
     	Dfx <- fx
     } else {
-    	Dfx <- getbasismatrix(x, basisobj, 1, returnMatrix)
+    	Dfx <- getbasismatrix(x, basisobj, 1)
     }
     sumj <- t(Dfx) %*% px
     smat[1,]  <- width*as.vector(sumj)/2
@@ -474,14 +471,14 @@ expectden.phi <- function(basisobj, cvec, Cval=1, nderiv=0,
         x <- seq(rng[1]+del/2, rng[2], del)
     	}
     	nx <- length(x)
-    	fx <- getbasismatrix(x, basisobj, 0, returnMatrix)
+    	fx <- getbasismatrix(x, basisobj, 0)
     	wx <- fx %*% cvec
     	wx[wx < -50] <- -50
     	px <- exp(wx)/Cval
     	if (nderiv == 0) {
         Dfx <- fx
     	} else {
-        Dfx <- getbasismatrix(x, basisobj, 1, returnMatrix)
+        Dfx <- getbasismatrix(x, basisobj, 1)
     	}
     	sumj <- t(Dfx) %*% px
     	smat[j,] <- (smat[j-1,] + width*as.vector(sumj)/tnm)/2
@@ -506,8 +503,7 @@ expectden.phi <- function(basisobj, cvec, Cval=1, nderiv=0,
 #  -----------------------------------------------------------------------------
 
 expectden.phiphit <- function(basisobj, cvec, Cval=1, nderiv1=0, nderiv2=0,
-                              JMAX=15, EPS=1e-7,
-                              returnMatrix=FALSE) {
+                              JMAX=15, EPS=1e-7) {
 
 #  Computes expectations of cross product of basis functions with
 #  respect to density
@@ -534,19 +530,19 @@ expectden.phiphit <- function(basisobj, cvec, Cval=1, nderiv1=0, nderiv2=0,
   	#  the first iteration uses just the }points
   	x  <- rng
   	nx <- length(x)
-  	fx <- getbasismatrix(x, basisobj, 0, returnMatrix)
+  	fx <- getbasismatrix(x, basisobj, 0)
   	wx <- fx %*% cvec
   	wx[wx < -50] <- -50
   	px <- exp(wx)/Cval
   	if (nderiv1 == 0) {
     	Dfx1 <- fx
   	} else {
-    	Dfx1 <- getbasismatrix(x, basisobj, 1, returnMatrix)
+    	Dfx1 <- getbasismatrix(x, basisobj, 1)
   	}
   	if (nderiv2 == 0) {
     	Dfx2 <- fx
   	} else {
-    	Dfx2 <- getbasismatrix(x, basisobj, 2, returnMatrix)
+    	Dfx2 <- getbasismatrix(x, basisobj, 2)
   	}
   	oneb <- matrix(1,1,nbasis)
   	sumj <- t(Dfx1) %*% ((px %*% oneb) * Dfx2)
@@ -564,19 +560,19 @@ expectden.phiphit <- function(basisobj, cvec, Cval=1, nderiv1=0, nderiv2=0,
       		x <- seq(rng[1]+del/2, rng[2], del)
     	}
     	nx <- length(x)
-    	fx <- getbasismatrix(x, basisobj, 0, returnMatrix)
+    	fx <- getbasismatrix(x, basisobj, 0)
     	wx <- fx %*% cvec
     	wx[wx < -50] <- -50
     	px <- exp(wx)/Cval
     	if (nderiv1 == 0) {
       		Dfx1 <- fx
     	} else {
-      		Dfx1 <- getbasismatrix(x, basisobj, 1, returnMatrix)
+      		Dfx1 <- getbasismatrix(x, basisobj, 1)
     	}
     	if (nderiv2 == 0) {
       		Dfx2 <- fx
     	} else {
-      		Dfx2 <- getbasismatrix(x, basisobj, 2, returnMatrix)
+      		Dfx2 <- getbasismatrix(x, basisobj, 2)
     	}
     	sumj <- t(Dfx1) %*% ((px %*% oneb) * Dfx2)
     	smat[j,,] <- (smat[j-1,,] + width*as.matrix(sumj)/tnm)/2

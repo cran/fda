@@ -8,8 +8,7 @@
   functional data object to be evaluated.
 }
 \usage{
-eval.bifd(sevalarg, tevalarg, bifd, sLfdobj=0, tLfdobj=0,
-          returnMatrix=FALSE)
+eval.bifd(sevalarg, tevalarg, bifd, sLfdobj=0, tLfdobj=0)
 }
 \arguments{
   \item{sevalarg}{
@@ -34,10 +33,6 @@ eval.bifd(sevalarg, tevalarg, bifd, sLfdobj=0, tLfdobj=0,
     object.  If present, the derivative or the value of applying the
     operator to the object as a function of the second argument \code{t}
     is evaluated rather than the functions themselves.
-  }
-  \item{returnMatrix}{
-    logical:  If TRUE,  a two-dimensional is returned using a
-    special class from the Matrix package.
   }
 }
 \value{

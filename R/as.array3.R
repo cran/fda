@@ -5,7 +5,9 @@ as.array3 <- function(x){
   dimx <- dim(x)
   ndim <- length(dimx)
 #   If dimension is already 3
-  if (ndim==3) return(x)
+  if (ndim==3) {
+    return(x)
+  }
 #   Otherwise, set up an error message dimension higher than 3
   xName <- substring(deparse(substitute(x)), 1, 22) 
   if (ndim>3)

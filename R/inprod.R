@@ -1,5 +1,5 @@
 inprod <- function(fdobj1, fdobj2=NULL, Lfdobj1=int2Lfd(0), Lfdobj2=int2Lfd(0),
-                   rng = range1, wtfd = 0, returnMatrix=FALSE)
+                   rng = range1, wtfd = 0)
 {
 
 #  computes matrix of inner products of functions by numerical
@@ -24,15 +24,12 @@ inprod <- function(fdobj1, fdobj2=NULL, Lfdobj1=int2Lfd(0), Lfdobj2=int2Lfd(0),
 #  WTFD   A functional data object defining a weight
 #  JMAX   maximum number of allowable iterations
 #  EPS    convergence criterion for relative stop
-#  RETURNMATRIX ... If False, a matrix in sparse storage model can be returned
-#               from a call to function BsplineS.  See this function for
-#               enabling this option.
 
 #  Return:
 #  A matrix of NREP1 by NREP2 of inner products for each possible pair
 #  of functions.
 
-#  Last modified 24 December 2012 by Jim Ramsay
+#  Last modified 6 January 2020 by Jim Ramsay
 
 #  Check FDOBJ1 and get no. replications and basis object
 
@@ -84,8 +81,8 @@ if (rng[1] < range1[1] || rng[2] > range1[2]) stop(
 #  (5) there is no weight function
 #  (6) RNG is equal to the range of the two bases.
 
-if (inherits(fdobj1,"fd")            && 
-    inherits(fdobj2,"fd")            &&
+if (is.fd(fdobj1)                    && 
+    is.fd(fdobj2)                    &&
     type1 == "bspline"               && 
     type2 == "bspline"               &&
     is.eqbasis(basisobj1, basisobj2) &&
@@ -138,6 +135,7 @@ if (length(knotmult) > 0) {
 }
 
 #  check for either coefficient array being zero
+
 if ((all(c(coef1) == 0) || all(c(coef2) == 0)))
 	return(matrix(0,nrep1,nrep2))
 
@@ -171,16 +169,15 @@ for (irng  in  2:nrng) {
     s <- array(0,c(JMAXP,nrep1,nrep2))
     sdim <- length(dim(s))
     #  the first iteration uses just the endpoints
-    fx1 <- eval.fd(rngi, fdobj1, Lfdobj1, returnMatrix)
-    fx2 <- eval.fd(rngi, fdobj2, Lfdobj2, returnMatrix)
+    fx1 <- eval.fd(rngi, fdobj1, Lfdobj1)
+    fx2 <- eval.fd(rngi, fdobj2, Lfdobj2)
     #  multiply by values of weight function if necessary
     if (!is.numeric(wtfd)) {
-        wtd <- eval.fd(rngi, wtfd, 0, returnMatrix)
+        wtd <- eval.fd(rngi, wtfd, 0)
         fx2 <- matrix(wtd,dim(wtd)[1],dim(fx2)[2]) * fx2
     }
-    s[1,,] <- width*as.numeric(crossprod(fx1,fx2))/2
+    s[1,,] <- width*matrix(crossprod(fx1,fx2),nrep1,nrep2)/2
     tnm  <- 0.5
-    iter <- 1
 
     #  now iterate to convergence
 
@@ -192,13 +189,13 @@ for (irng  in  2:nrng) {
             del <- width/tnm
             x   <- seq(rngi[1]+del/2, rngi[2]-del/2, del)
         }
-        fx1 <- eval.fd(x, fdobj1, Lfdobj1, returnMatrix)
-        fx2 <- eval.fd(x, fdobj2, Lfdobj2, returnMatrix)
+        fx1 <- eval.fd(x, fdobj1, Lfdobj1)
+        fx2 <- eval.fd(x, fdobj2, Lfdobj2)
         if (!is.numeric(wtfd)) {
-            wtd <- eval.fd(wtfd, x, 0, returnMatrix)
+            wtd <- eval.fd(wtfd, x, 0)
             fx2 <- matrix(wtd,dim(wtd)[1],dim(fx2)[2]) * fx2
         }
-        chs <- width*as.numeric(crossprod(fx1,fx2))/tnm
+        chs <- width*matrix(crossprod(fx1,fx2),nrep1,nrep2)/tnm
         s[iter,,] <- (s[iter-1,,] + chs)/2
         if (iter >= 5) {
             ind <- (iter-4):iter
@@ -242,12 +239,11 @@ for (irng  in  2:nrng) {
         h[iter+1]   <- 0.25*h[iter]
         if (iter == JMAX) warning("Failure to converge.")
     }
-
     inprodmat <- inprodmat + ss
 
 }
 
-if((!returnMatrix) && (length(dim(inprodmat)) == 2)) {
+if(length(dim(inprodmat) == 2)) {
     #  coerce inprodmat to be nonsparse
     return(as.matrix(inprodmat))
 } else {
@@ -260,26 +256,29 @@ if((!returnMatrix) && (length(dim(inprodmat)) == 2)) {
 #  -------------------------------------------------------------------------------
 
 fdchk <- function(fdobj) {
-
-    #  check the class of FDOBJ and extract coefficient matrix
-
-    if (inherits(fdobj, "fd")) coef  <- fdobj$coefs
-    else
-	  if (inherits(fdobj, "basisfd")) {
-    	    coef  <- diag(rep(1,fdobj$nbasis - length(fdobj$dropind)))
-    	    fdobj <- fd(coef, fdobj)
-	  }
-    else stop("FDOBJ is not an FD object.")
-
-    #  extract the number of replications and basis object
-
-    coefd <- dim(as.matrix(coef))
-    if (length(coefd) > 2) stop("Functional data object must be univariate")
-    nrep     <- coefd[2]
-    basisobj <- fdobj$basis
-
-    return(list(nrep, fdobj))
-
+  
+  #  check the class of FDOBJ and extract coefficient matrix
+  
+  if (inherits(fdobj, "fd")) {
+    coef  <- fdobj$coefs
+  } else {
+    if (inherits(fdobj, "basisfd")) {
+      coef  <- diag(rep(1,fdobj$nbasis - length(fdobj$dropind)))
+      fdobj <- fd(coef, fdobj)
+    } else { 
+      stop("FDOBJ is not an FD object.")
+    }
+  }
+  
+  #  extract the number of replications and basis object
+  
+  coefd <- dim(as.matrix(coef))
+  if (length(coefd) > 2) stop("Functional data object must be univariate")
+  nrep     <- coefd[2]
+  basisobj <- fdobj$basis
+  
+  return(list(nrep, fdobj))
+  
 }
 
 #  -------------------------------------------------------------------------------
@@ -290,12 +289,14 @@ knotmultchk <- function(basisobj, knotmult) {
         # Look for knot multiplicities in first basis
         params  <- basisobj$params
         nparams <- length(params)
-        if (nparams > 1) {
-            for (i in 2:nparams) {
-                if (params[i] == params[i-1]) {
-                    knotmult <- c(knotmult, params[i])
-                }
-            }
+        norder  <- basisobj$nbasis - nparams
+        if (norder == 1) {
+        	knotmult <- c(knotmult, params)
+        } else {
+          if (nparams > 1) {
+            for (i in 2:nparams) 
+                if (params[i] == params[i-1]) knotmult <- c(knotmult, params[i])
+          }
         }
     }
     return(knotmult)

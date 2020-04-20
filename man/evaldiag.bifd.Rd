@@ -6,7 +6,7 @@
 \description{
 Bivariate function data objects are functions of
 two arguments, $f(s,t)$.  It can be useful to evaluate
-the function for argument values satisying $s=t$, such
+the function for argument values satisfying $s=t$, such
 as evaluating the univariate variance function given the
 bivariate function that defines the variance-covariance
 function or surface.  A linear differential operator can
@@ -14,8 +14,7 @@ be applied to function $f(s,t)$ considered as a univariate
 function of either object holding the other object fixed.
 }
 \usage{
-evaldiag.bifd(evalarg, bifdobj, sLfd=int2Lfd(0),
-                                tLfd=int2Lfd(0), returnMatrix=FALSE)
+evaldiag.bifd(evalarg, bifdobj, sLfd=int2Lfd(0), tLfd=int2Lfd(0))
 }
 \arguments{
 \item{evalarg}{
@@ -31,10 +30,6 @@ object.
 \item{tLfd}{
 either a nonnegative integer or a linear differential operator
 object.
-}
-\item{returnMatrix}{
-logical:  If TRUE,  a two-dimensional is returned using a
-special class from the Matrix package.
 }
 }
 \value{
