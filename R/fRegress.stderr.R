@@ -5,7 +5,7 @@ fRegress.stderr <- function(y, y2cMap, SigmaE, returnMatrix=FALSE, ...) {
 #
 #  Arguments:
 #
-#  FREGRESSLIST ... a list object produced by function FREGRESS.  This
+#  Y            ... a list object produced by function FREGRESS.  This
 #                   is indicated by Y in the arguments since R syntax
 #                   requires all of tghe fRegress family of functions to
 #                   use this notation.
@@ -31,18 +31,14 @@ fRegress.stderr <- function(y, y2cMap, SigmaE, returnMatrix=FALSE, ...) {
 #               from a call to function BsplineS.  See this function for
 #               enabling this option.
 
-#  Last modified 8 May 2012 by Jim Ramsay
-
-#  generic argument y is actually fRegressList
-
-fRegressList <- y
+#  Last modified 13 July 2020 by Jim Ramsay
 
 #  get number of independent variables
 
-  xfdlist  <- fRegressList$xfdlist
-  yfdPar   <- fRegressList$yfdPar
-  betalist <- fRegressList$betalist
-  Cmatinv  <- fRegressList$Cmatinv
+  xfdlist  <- y$xfdlist
+  yfdPar   <- y$yfdPar
+  betalist <- y$betalist
+  Cmatinv  <- y$Cmatinv
 
   p <- length(xfdlist)
 

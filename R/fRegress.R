@@ -56,7 +56,7 @@ fRegress <- function(y, xfdlist, betalist, wt=NULL,
 #    wt          ... weights for observations
 #    df          ... degrees of freedom for fit
 
-#  Last modified 28 December 2012 by Jim Ramsay
+#  Last modified 17 June 2020 by Jim Ramsay
 
 arglist <- fRegressArgCheck(y, xfdlist, betalist, wt)
 
@@ -113,12 +113,27 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
     Cmat <- matrix(0,ncoef,ncoef)
     Dmat <- rep(0,ncoef)
 
+    #  ------------------------------------------------------------------------
+    #  Compute the symmetric positive definite matrix CMAT and
+    #  the column matrix DMAT.  CMAT contains weighted inner products of
+    #  bases for each pair of terms plus, for lambda > 0, a roughness penalty
+    #  matrix to ensure that the estimated coefficient functions will be smooth
+    #  The weight vector is the point-wise product of the associated functional
+    #  covariates.  
+    #  Dmat contains for each covariate the weighted integral of the basis 
+    #  functions, with the weight function being the covariate function
+    #  pointwise multiplied the dependent variate yobj.
+    #  The estimated coefficients functions are defined by the solution
+    #  CMAT %*% COEF = DMAT.
+    #  ------------------------------------------------------------------------
+    
     #  loop through rows of CMAT
 
     mj2 <- 0
     for (j in 1:p) {
         betafdParj <- betalist[[j]]
         if (betafdParj$estimate) {
+            #  get jth beta basis
             betafdj    <- betafdParj$fd
             betabasisj <- betafdj$basis
             ncoefj     <- betabasisj$nbasis
@@ -127,6 +142,7 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
             mj2    <- mj2 + ncoefj
             indexj <- mj1:mj2
             #  compute right side of equation DMAT
+            #  compute weight function for DMAT
             xfdj <- xfdlist[[j]]
             if (wtconst) {
                 xyfdj <- xfdj*yfdobj
@@ -134,6 +150,7 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
                 xyfdj <- (xfdj*wt)*yfdobj
             }
             wtfdj <- sum(xyfdj)
+            #  Compute jth component of DMAT
             Dmatj <- inprod(betabasisj,onesfd,0,0,rangeval,wtfdj)
             Dmat[indexj] <- Dmatj
             #  loop through columns of CMAT
@@ -141,6 +158,7 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
             for (k in 1:j) {
                 betafdPark <- betalist[[k]]
                 if (betafdPark$estimate) {
+                    #  get the kth basis
                     betafdk    <- betafdPark$fd
                     betabasisk <- betafdk$basis
                     ncoefk     <- betabasisk$nbasis
@@ -148,7 +166,7 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
                     mk1 <- mk2 + 1
                     mk2 <- mk2 + ncoefk
                     indexk <- mk1:mk2
-                    #  set up two weight functions
+                    #  set up weight function for CMAT component
                     xfdk <- xfdlist[[k]]
                     if (wtconst) {
                         xxfdjk <- xfdj*xfdk
@@ -156,13 +174,14 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
                         xxfdjk <- (xfdj*wt)*xfdk
                     }
                     wtfdjk <- sum(xxfdjk)
+                    #  compute the inner product
                     Cmatjk <- inprod(betabasisj, betabasisk, 0, 0,
                                      rangeval, wtfdjk)
                     Cmat[indexj,indexk] <- Cmatjk
                     Cmat[indexk,indexj] <- t(Cmatjk)
                 }
             }
-            #  attach penalty term to diagonal block
+            #  attach penalty term to diagonal block if required
             lambdaj <- betafdParj$lambda
             if (lambdaj > 0) {
                 Rmatj <- betafdParj$penmat
@@ -176,12 +195,13 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
         }
     }
 
+    #  ensure symmetry
+    
     Cmat <- (Cmat+t(Cmat))/2
 
     #  check Cmat for singularity
 
     eigchk(Cmat)
-
 
     #  solve for coefficients defining BETA
 
@@ -216,7 +236,7 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
     tfine     <- seq(rangeval[1], rangeval[2], len=nfine)
     yhatmat <- matrix(0,nfine,N)
     for (j in 1:p) {
-	  xfdj       <- xfdlist[[j]]
+	      xfdj       <- xfdlist[[j]]
         xmatj      <- eval.fd(tfine, xfdj, 0, returnMatrix)
         betafdParj <- betaestlist[[j]]
         betafdj    <- betafdParj$fd
@@ -230,6 +250,9 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
     #  -----------------------------------------------------------------------
     #        Compute pointwise standard errors of regression coefficients
     #               if both y2cMap and SigmaE are supplied.
+    #        y2cMap is supplied by the smoothing of the data that defined
+    #        the dependent variable.
+    #        SigmaE has to be computed from a previous analysis of the data.
     #  -----------------------------------------------------------------------
 
     if (!(is.null(y2cMap) || is.null(SigmaE))) {
@@ -324,7 +347,7 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
                  bvar           = bvar,
                  c2bMap         = c2bMap)
 
- }
+ }  #  end of the functional dependent variable analysis
 
  #  -------------------------------------------------------------------
 
@@ -470,7 +493,7 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
         for (j in 1:p) {
 	      betafdParj <- betalist[[j]]
             betabasisj <- betafdParj$fd$basis
-	      ncoefj     <- betabasisj$nbasis
+	          ncoefj     <- betabasisj$nbasis
             mj1        <- mj2 + 1
             mj2        <- mj2 + ncoefj
             indexj     <- mj1:mj2
@@ -509,7 +532,8 @@ if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
                  betastderrlist = betastderrlist,
                  bvar           = bvar,
                  c2bMap         = c2bMap)
- }
+    
+ }  #  end of the scalar dependent data analysis
 
  return(fRegressList)
 

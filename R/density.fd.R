@@ -35,7 +35,7 @@ density.fd <- function(x, WfdParobj, conv=0.0001, iterlim=20,
 #  exponentiate the resulting vector, and then divide by the normalizing
 #  constant C.
 
-# last modified 6 January 2020 by Jim Ramsay
+# last modified 13 July 2020 by Jim Ramsay
 
 #  check WfdParobj
 
@@ -381,7 +381,8 @@ normden.phi <- function(basisobj, cvec, JMAX=15, EPS=1e-7) {
   	wx <- fx %*% cvec
   	wx[wx < -50] <- -50
   	px <- exp(wx)
-  	smat[1]  <- width*sum(px)/2
+  	smat    <- matrix(0,JMAXP,1)
+  	smat[1] <- width*sum(px)/2
   	tnm <- 0.5
   	j   <- 1
 
@@ -440,7 +441,6 @@ expectden.phi <- function(basisobj, cvec, Cval=1, nderiv=0,
     h <- matrix(1,JMAXP,1)
     h[2] <- 0.25
     #  matrix SMAT contains the history of discrete approximations to the integral
-    smat <- matrix(0,JMAXP,nbasis)
     sumj <- matrix(0,1,nbasis)
     #  the first iteration uses just the }points
     x  <- rng
@@ -456,6 +456,7 @@ expectden.phi <- function(basisobj, cvec, Cval=1, nderiv=0,
     	Dfx <- getbasismatrix(x, basisobj, 1)
     }
     sumj <- t(Dfx) %*% px
+    smat <- matrix(0,JMAXP,nbasis)
     smat[1,]  <- width*as.vector(sumj)/2
     tnm <- 0.5
     j   <- 1
@@ -485,9 +486,9 @@ expectden.phi <- function(basisobj, cvec, Cval=1, nderiv=0,
     	if (j >= 5) {
         ind <- (j-4):j
         temp <- smat[ind,]
-	  result <- polintarray(h[ind],temp,0)
-	  ss  <- result[[1]]
-	  dss <- result[[2]]
+	      result <- polintarray(h[ind],temp,0)
+	      ss  <- result[[1]]
+	      dss <- result[[2]]
         if (!any(abs(dss) > EPS*max(abs(ss)))) {
           #  successful convergence
           return(ss)
@@ -525,8 +526,6 @@ expectden.phiphit <- function(basisobj, cvec, Cval=1, nderiv1=0, nderiv2=0,
   	JMAXP <- JMAX + 1
   	h <- matrix(1,JMAXP,1)
   	h[2] <- 0.25
-  	#  matrix SMAT contains history of discrete approximations to the integral
-  	smat <- array(0,c(JMAXP,nbasis,nbasis))
   	#  the first iteration uses just the }points
   	x  <- rng
   	nx <- length(x)
@@ -546,6 +545,7 @@ expectden.phiphit <- function(basisobj, cvec, Cval=1, nderiv1=0, nderiv2=0,
   	}
   	oneb <- matrix(1,1,nbasis)
   	sumj <- t(Dfx1) %*% ((px %*% oneb) * Dfx2)
+  	smat <- array(0,c(JMAXP,nbasis,nbasis))
   	smat[1,,]  <- width*as.matrix(sumj)/2
   	tnm <- 0.5
   	j   <- 1

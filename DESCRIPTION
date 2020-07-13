@@ -1,13 +1,13 @@
 Package: fda
-Version: 5.1.4
-Date: 2020-04-19
+Version: 5.1.5
+Date: 2020-07-13
 Title: Functional Data Analysis
 Author: J. O. Ramsay <ramsay@psych.mcgill.ca> [aut,cre], 
  Spencer Graves <spencer.graves@effectivedefense.org> [ctb], 
  Giles Hooker <gjh27@cornell.edu>  [ctb]
 Maintainer: J. O. Ramsay <ramsay@psych.mcgill.ca>
 Depends: R (>= 3.5), Matrix
-Suggests: deSolve, R.matlab, lattice
+Suggests: deSolve, lattice
 Description: These functions were developed to support functional data
  analysis as described in Ramsay, J. O. and Silverman, B. W.
  (2005) Functional Data Analysis. New York: Springer and in 
@@ -21,6 +21,6 @@ License: GPL (>= 2)
 URL: http://www.functionaldata.org
 LazyData: true
 NeedsCompilation: no
-Packaged: 2020-04-19 21:54:17 UTC; jamesramsay
+Packaged: 2020-07-13 15:39:41 UTC; jimramsay
 Repository: CRAN
-Date/Publication: 2020-04-20 17:30:03 UTC
+Date/Publication: 2020-07-13 18:10:05 UTC

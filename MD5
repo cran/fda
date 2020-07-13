@@ -1,6 +1,5 @@
-37a021b59bd3d65117d8f812d1ab3902 *DESCRIPTION
-b26ccf52d753d883785481966c9398da *NAMESPACE
-b34d5dd6302fd8c7467272fbd0d3d576 *NEWS
+52ce9bab1f8b4bbf643caa1dfdfc8a06 *DESCRIPTION
+4ce0061c52ccde70ad20914728d7f3ea *NAMESPACE
 a0fb7b504779b47cba75cfecfc668540 *R/AmpPhaseDecomp.R
 41419a07fe723ba594969037e5826ee7 *R/CRAN.R
 d3945e00b122b0f0d58294e61dbcaed0 *R/CSTR2.R
@@ -41,7 +40,7 @@ d8526c86c695fcfcac8af4cb7eb86c41 *R/create.fdVar.basis.R
 15f30fa57e992b390f40c640d24cf23b *R/create.polynomial.basis.R
 0615ddceddad467ba75355c858c20441 *R/create.power.basis.R
 10260134b4ad43a636e57016485e7d67 *R/cycleplot.fd.R
-ff303d99591c474c776dca19b34636a8 *R/density.fd.R
+6f7a0757374d7eb52224b3cb4bf275b8 *R/density.fd.R
 1b838c704f972eb680d9520e99bc2be3 *R/deriv.fd.R
 32fc99498ff726d31c0f3cad3f500889 *R/derivchk.R
 045243b5ce89202c17b238a12bfa9b8b *R/derivs.R
@@ -60,11 +59,11 @@ dd86462874b19d3c31fcde8cea869247 *R/evaldiag.bifd.R
 bc4d0e77bab8b3aa8d1dfcf7ba3d122a *R/exponentiate.fd.R
 b524760d366d1a17e6c5eea8f7ba5cd7 *R/exponpen.R
 ad9ab41eecce832474a1bdab89a492af *R/fRegress.CV.R
-8024815bcd360e298f3657d1d3e17846 *R/fRegress.R
+666706d9c2edf03a2cb01446a4c9c1e0 *R/fRegress.R
 b0aca4e7cffa4217e05626f7347be792 *R/fRegress.fdPar.R
 405ce49f8f0775f617c99ec882feb9f8 *R/fRegress.formula.R
 f613143fcdfef262102ae93b8bb4b793 *R/fRegress.numeric.R
-cfcb8b2789e49ccc57fd5cdf3c7d31d0 *R/fRegress.stderr.R
+965ee5cc6df40eff4a445f179d426b63 *R/fRegress.stderr.R
 410beed58dbd3fe877cb3d421717eb70 *R/fRegressArgCheck.R
 1907295776025f62e326b41019638f60 *R/fbplot.R
 969901bba07225c8e121d8f71436e757 *R/fd.R
@@ -74,6 +73,7 @@ fc40ceb98e9b24a2c67718256492c9c2 *R/fdPar.R
 c267876bd2f2defaffcbd291fa897f76 *R/fdlabels.R
 c2177efc038d6d52f99414726ad1e524 *R/fourier.R
 8184b374439ff5a797c378a8d4c60fc4 *R/fourierpen.R
+4944e56f1fd5707bcd243589e5e1ef4c *R/funcint.R
 93b2da7829d2b42644dec8f2fc0507c7 *R/geigen.R
 8e3d46fdfa30511e06437562b6ec2503 *R/getbasismatrix.R
 e4985909bc8d7f3a14f28b4166dfb6e3 *R/getbasispenalty.R
@@ -143,7 +143,7 @@ c8b8f0f09c85fb6fefd4e54cee164893 *R/scoresPACE.R
 e26dd87f6c755500591e3bee54a944b8 *R/smooth.basis.R
 91cb2256cc99220911e8219f40301578 *R/smooth.basis.glm.R
 b5e74b5258213d5dc31f61d45f5591f3 *R/smooth.basis.sparse.R
-ce23e24c9f0a749f679f1b60f413db3a *R/smooth.basis1.R
+c3020ad76e6ea57958a011075a09c376 *R/smooth.basis1.R
 2b0bbcf65c2891076c7066799a3b7b4b *R/smooth.basisPar.R
 188afca28a3c521a487dfc83e6e85aed *R/smooth.bibasis.R
 e815296837c412e929e69312679114ff *R/smooth.fd.R
@@ -235,7 +235,7 @@ a6e8efb63df7f94cdb40a610cbd95823 *man/checkLogicalInteger.Rd
 dee69ec129749d79dab71bbe0037a9b6 *man/cor.fd.Rd
 3a9d37d770b4b7f845959e3498a41aea *man/covPACE.Rd
 07385035b23b63eba732faef948662b9 *man/create.basis.Rd
-2fe31169e6b9d046c9c679ff84a54bd6 *man/create.bspline.basis.Rd
+cd56265dd3fc8f5c9865f0e3b592013d *man/create.bspline.basis.Rd
 eb81b9488be92bfe9a44d1314cc574c3 *man/create.constant.basis.Rd
 d66fa7aac49a07c608dd9c79a6c1ca53 *man/create.exponential.basis.Rd
 74193b50f5cb61da4996b52ad207d7d9 *man/create.fourier.basis.Rd
@@ -328,7 +328,7 @@ a6b267b2f75f99545a40ad410efa0cfa *man/plotreg.fd.rd
 7f5edfd4983187a09fbd35ef0116f601 *man/powerbasis.Rd
 c7ea73fe61c0c525b823066cb832a03d *man/powerpen.Rd
 53a94920ede806eefcf2e050b4676778 *man/ppBspline.Rd
-fceb08a8f6aab791379677c901fe6b1b *man/predict.fRegress.Rd
+faec7fcbc50272326cb48d6238876361 *man/predict.fRegress.Rd
 66dedd311609a63f371509b2389b0a6e *man/project.basis.Rd
 edd7c200fbe338d40e31aff583fd2395 *man/quadset.Rd
 585510ee4313b64fdfcf87000944b146 *man/reconsCurves.Rd

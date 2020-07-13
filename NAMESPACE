@@ -111,6 +111,11 @@ export(AmpPhaseDecomp,
        powerbasis,
        powerpen,
        ppBspline,
+       predict.basisfd, 
+       predict.fd, 
+       predict.fdPar, 
+       predict.fRegress, 
+       predict.fdSmooth, 
        project.basis,
        quadset,
 	     reconsCurves,
@@ -166,9 +171,6 @@ S3method('-',          fd)
 S3method('*',          fd)
 S3method('[',          fd)
 S3method('^',          fd)
-S3method(as.fd,        fdSmooth)
-S3method(as.fd,        'function')
-S3method(as.fd,        smooth.spline)
 S3method(boxplot,      fd)
 S3method(coef,         fd)
 S3method(coefficients, fd)
@@ -190,6 +192,7 @@ S3method(plot,         fdPar)
 S3method(predict,      fdPar)
 S3method(summary,      fdPar)
 S3method(fRegress,     fdPar)
+S3method(as.fd,        fdSmooth)
 S3method(coef,         fdSmooth)
 S3method(boxplot,      fdSmooth)
 S3method(coefficients, fdSmooth)
@@ -198,21 +201,24 @@ S3method(lines,        fdSmooth)
 S3method(residuals,    fdSmooth)
 S3method(plot,         fdSmooth)
 S3method(predict,      fdSmooth)
+S3method(predict,      fRegress)
 S3method(plot,         Lfd)
 S3method(summary,      Lfd)
 S3method(fitted,       monfd)
 S3method(residuals,    monfd)
 S3method(predict,      monfd)
+S3method(as.fd,        'function')
+S3method(as.fd,        smooth.spline)
 S3method(fRegress,     numeric)
 S3method(fRegress,     stderr)
 S3method(fRegress,     CV)
+S3method(fRegress,     character)
+S3method(fRegress,     formula)
 S3method(matplot,      numeric)
 S3method(fitted,       posfd)
 S3method(predict,      posfd)
 S3method(residuals,    posfd)
 S3method(matplot,      Date)
-S3method(fRegress,     character)
-S3method(fRegress,     formula)
 S3method(matplot,      default)
 S3method(matplot,      POSIXct)
 S3method(norder,       bspline)

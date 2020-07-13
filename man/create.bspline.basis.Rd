@@ -166,12 +166,6 @@ create.bspline.basis(rangeval=NULL, nbasis=NULL, norder=4,
   valley or an abrupt change of level, but only a few knots are required
   where the curve is changing very slowly.
 
-  This function automatically includes \code{norder} replicates of the
-  end points rangeval.  By contrast, the analogous functions
-  \link[splines]{splineDesign} and \link[splines]{spline.des} in the
-  \code{splines} package do NOT automatically replicate the end points.
-  To compare answers, the end knots must be replicated manually when
-  using \link[splines]{splineDesign} or \link[splines]{spline.des}.
 }
 \value{
   a basis object of the type \code{bspline}

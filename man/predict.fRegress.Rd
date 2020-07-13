@@ -12,26 +12,34 @@
      level = 0.95, ...)
 }
 \arguments{
-  \item{ object }{
-    Object of class inheriting from \code{lmWinsor}
+  \item{object}{
+    Object of class inheriting from \code{fRegress}
   }
-  \item{ newdata }{
+  \item{newdata}{
     Either NULL or a list matching object\$xfdlist.
 
     If(is.null(newdata)) predictions <- object\$yhatfdobj
 
-    If newdata is a list, predictions = the sum of either newdata[i] *
-    betaestfdlist[i] if object\$yfdobj has class \code{fd} or inprod(
-    newdata[i], betaestfdlist[i]) if class(object\$yfdobj) =
+    If newdata is a list, predictions = the sum of either 
+    
+    newdata[i] * betaestfdlist[i] if object\$yfdobj has class \code{fd} 
+    
+    or 
+    
+    inprod(newdata[i], betaestfdlist[i]) if class(object\$yfdobj) =
     \code{numeric}.
   }
-  \item{ se.fit}{
+  \item{se.fit}{
     a switch indicating if standard errors of predictions are required
+    
+    NOTE:  se.fit = TRUE is NOT IMPLEMENTED YET.  
   }
   \item{interval}{
     type of prediction (response or model term)
+    
+    NOTE:  Only "interval = 'none'" has been implemented so far.  
   }
-  \item{ level }{ Tolerance/confidence level }
+  \item{level}{Tolerance/confidence level}
   \item{\dots}{
     additional arguments for other methods
   }
@@ -72,80 +80,92 @@
   \code{\link{fRegress}}
   \code{\link[stats]{predict}}
 }
-% \examples{
-% ###
-% ###
-% ### vector response with functional explanatory variable
-% ###
-% ###
-% ##
-% ## example from help('lm')
-% ##
-% ctl <- c(4.17,5.58,5.18,6.11,4.50,4.61,5.17,4.53,5.33,5.14)
-% trt <- c(4.81,4.17,4.41,3.59,5.87,3.83,6.03,4.89,4.32,4.69)
-% group <- gl(2,10,20, labels=c("Ctl","Trt"))
-% weight <- c(ctl, trt)
-% fRegress.D9 <- fRegress(weight ~ group)
+\examples{
+###
+###
+### vector response with functional explanatory variable
+### vector response with vector explanatory variable
+###
+###
+##
+## example from help('lm')
+##
+ctl <- c(4.17,5.58,5.18,6.11,4.50,4.61,5.17,4.53,5.33,5.14)
+trt <- c(4.81,4.17,4.41,3.59,5.87,3.83,6.03,4.89,4.32,4.69)
+group <- gl(2,10,20, labels=c("Ctl","Trt"))
+weight <- c(ctl, trt)
+fRegress.D9 <- fRegress(weight ~ group)
 
-% pred.fR.D9 <- predict(fRegress.D9)
-% #  Now compare with 'lm'
-% lm.D9 <- lm(weight ~ group)
-% pred.lm.D9 <- predict(lm.D9)
+pred.fR.D9 <- predict(fRegress.D9)
+#  Now compare with 'lm'
+lm.D9 <- lm(weight ~ group)
+pred.lm.D9 <- predict(lm.D9)
 
-% \dontshow{stopifnot(}
-% all.equal(as.vector(pred.fR.D9), as.vector(pred.lm.D9))
-% \dontshow{)}
+\dontshow{stopifnot(}
+all.equal(as.vector(pred.fR.D9), as.vector(pred.lm.D9))
+\dontshow{)}
 
-% ##
-% ## vector response with functional explanatory variable
-% ##
-% annualprec <- log10(apply(CanadianWeather$dailyAv[,,
-                             % "Precipitation.mm"], 2,sum))
-% smallbasis  <- create.fourier.basis(c(0, 365), 25)
-% tempfd <- smooth.basis(day.5,
-       % CanadianWeather$dailyAv[,,"Temperature.C"], smallbasis)$fd
-% precip.Temp.f <- fRegress(annualprec ~ tempfd)
+##
+## vector response with functional explanatory variable
+##
+annualprec <- log10(apply(CanadianWeather$dailyAv[,,
+                   "Precipitation.mm"], 2,sum))
+smallbasis  <- create.fourier.basis(c(0, 365), 25)
+tempfd <- smooth.basis(day.5,
+   CanadianWeather$dailyAv[,,"Temperature.C"], smallbasis)$fd
+precip.Temp.f <- fRegress(annualprec ~ tempfd)
 
-% #precip.Temp.p <- predict(precip.Temp.f, interval='confidence')
-% \dontshow{stopifnot(}
-% #class(precip.Temp.p) == 'matrix'
-% \dontshow{)}
+precip.Temp.p <- predict(precip.Temp.f)
 
-% ## ***** not yet implemented *****
+# plot response vs. fitted 
+plot(annualprec, precip.Temp.p)
 
-% ##
-% ## Example using se.fit
-% ##
+\dontshow{
+\dontrun{
+# The following does not yet work, because  
+# the confidence interval option has not yet been coded.  
+precip.Temp.p <- predict(precip.Temp.f, interval='confidence')
+\dontshow{stopifnot(}
+class(precip.Temp.p) == 'matrix'
+\dontshow{)}
 
-% #precip.Temp.p <- predict(precip.Temp.f, se.fit=TRUE)
+## ***** not yet implemented *****
 
-% \dontshow{stopifnot(}
-% #class(precip.Temp.p) == 'list'
-% \dontshow{)}
+##
+## Example using se.fit
+##
 
-% ## ***** not yet implemented *****
+precip.Temp.p <- predict(precip.Temp.f, se.fit=TRUE)
 
-% ###
-% ###
-% ### functional response with
-% ###            (concurrent) functional explanatory variable
-% ###
-% ###
-% ##
-% ##  predict knee angle from hip angle;  from demo('gait', package='fda')
-% ##
-% (gaittime <- as.numeric(dimnames(gait)[[1]])*20)
-% gaitrange <- c(0,20)
-% gaitbasis <- create.fourier.basis(gaitrange, nbasis=21)
-% harmaccelLfd <- vec2Lfd(c(0, (2*pi/20)^2, 0), rangeval=gaitrange)
-% gaitfd <- smooth.basisPar(gaittime, gait,
-       % gaitbasis, Lfdobj=harmaccelLfd, lambda=1e-2)$fd
-% hipfd  <- gaitfd[,1]
-% kneefd <- gaitfd[,2]
-% knee.hip.f <- fRegress(kneefd ~ hipfd)
+\dontshow{stopifnot(}
+class(precip.Temp.p) == 'list'
+\dontshow{)}
 
-% knee.hip.pred <- predict(knee.hip.f)
-% plot(knee.hip.pred)
-% }
-\keyword{ models }
+## ***** not yet implemented *****
+
+###
+###
+### functional response with
+###            (concurrent) functional explanatory variable
+###
+###
+##
+##  predict knee angle from hip angle;  from demo('gait', package='fda')
+##
+(gaittime <- as.numeric(dimnames(gait)[[1]])*20)
+gaitrange <- c(0,20)
+gaitbasis <- create.fourier.basis(gaitrange, nbasis=21)
+harmaccelLfd <- vec2Lfd(c(0, (2*pi/20)^2, 0), rangeval=gaitrange)
+gaitfd <- smooth.basisPar(gaittime, gait,
+       gaitbasis, Lfdobj=harmaccelLfd, lambda=1e-2)$fd
+hipfd  <- gaitfd[,1]
+kneefd <- gaitfd[,2]
+knee.hip.f <- fRegress(kneefd ~ hipfd)
+
+knee.hip.pred <- predict(knee.hip.f)
+plot(knee.hip.pred)
+}
+}
+}
+\keyword{ models}
 
