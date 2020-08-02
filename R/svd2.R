@@ -1,4 +1,5 @@
 svd2 <- function(x, nu = min(n, p), nv = min(n, p), LINPACK = FALSE){
+    if(LINPACK) warning("LINPACK = TRUE ignored in fda2::svd2")
 # svd sometimes fails with a cryptic error message.
 # In such cases, store the matrix in '.svd.error.matrix'
 # and try again with !LAPACK.
@@ -6,7 +7,7 @@ svd2 <- function(x, nu = min(n, p), nv = min(n, p), LINPACK = FALSE){
     dx <- dim(x)
     n <- dx[1]
     p <- dx[2]
-    svd.x <- try(svd(x, nu, nv, LINPACK))
+    svd.x <- try(svd(x, nu, nv))
     if(class(svd.x)=="try-error"){
       nNA <- sum(is.na(x))
       nInf <- sum(abs(x)==Inf)
@@ -33,15 +34,15 @@ svd2 <- function(x, nu = min(n, p), nv = min(n, p), LINPACK = FALSE){
                    " with n = ", n, ' and p = ', p,
                    ";  x stored in '", tf, "'",
                    sep="")
-      warning(msg)
+    stop(msg)
 #
-      svd.x <- try(svd(x, nu, nv, !LINPACK))
-      if(class(svd.x)=="try-error"){
+#      svd.x <- try(svd(x, nu, nv!LINPACK))
+#      if(class(svd.x)=="try-error"){
 #        .xc <- .x2[1+!LINPACK]
 #        assign(.xc, x, envir=.GlobalEnv)
-        stop("svd also failed using LINPACK = ", !LINPACK,
-             ";  x stored in '", tf, "'")
-      }
+#        stop("svd also failed using LINPACK = ", !LINPACK,
+#             ";  x stored in '", tf, "'")
+#      }
     }
     svd.x
 }

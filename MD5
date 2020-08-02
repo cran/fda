@@ -1,4 +1,4 @@
-52ce9bab1f8b4bbf643caa1dfdfc8a06 *DESCRIPTION
+3bbe3088aaf2b585db35053f2d84d167 *DESCRIPTION
 4ce0061c52ccde70ad20914728d7f3ea *NAMESPACE
 a0fb7b504779b47cba75cfecfc668540 *R/AmpPhaseDecomp.R
 41419a07fe723ba594969037e5826ee7 *R/CRAN.R
@@ -159,7 +159,7 @@ a4448b96639f479b9d6bec91d5dae9cc *R/sparse.list.R
 b9cd5058607759d8d2c17ee815be55ea *R/stepchk.R
 bcbb299c3cbe992b0e0355e44b8b5d83 *R/stepit.R
 3314308032855b74807e8adc1265cc2e *R/subscript.R
-643897a996794017715bea2cbba5ada6 *R/svd2.R
+09e98875ebab4e5a4924850f1ed32e51 *R/svd2.R
 3318d915ef29f63d0c22739eaf6c69d2 *R/symsolve.R
 61fbf6549b80e88c341fb7287bec03aa *R/tperm.fd.R
 e9d4794be564b87d3529a3b43efdad3a *R/trapzmat.R
