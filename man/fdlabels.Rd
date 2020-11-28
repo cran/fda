@@ -13,7 +13,7 @@ fdlabels(fdnames, nrep, nvar)
 }
 \arguments{
   \item{fdnames}{
-    a list of lenght 3 with xlabel, casenames, and ylabels.  
+    a list of length 3 with xlabel, casenames, and ylabels.  
   }
   \item{nrep}{ integer number of cases or observations }
   \item{nvar}{integer number of variables }

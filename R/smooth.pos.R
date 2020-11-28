@@ -76,6 +76,7 @@ smooth.pos <- function(argvals, y, WfdParobj, wtvec=rep(1,n), conv=1e-4,
   
   #  check Y
   
+  y = as.matrix(y)
   ychk   <- ycheck(y, n)
   y      <- ychk$y
   ncurve <- ychk$ncurve
@@ -360,14 +361,14 @@ smooth.pos <- function(argvals, y, WfdParobj, wtvec=rep(1,n), conv=1e-4,
 PENSSEfun <- function(argvals, yi, basisobj, cveci, Kmat, wtvec) {
   #  Computes the log likelihood and its derivative with
   #    respect to the coefficients in CVEC
-  N       <- length(argvals)
+  n       <- length(argvals)
   nbasis  <- basisobj$nbasis
   phimat  <- getbasismatrix(argvals, basisobj, 0)
   Wvec    <- phimat %*% cveci
   EWvec   <- exp(Wvec)
   res     <- yi - EWvec
   PENSSE  <- mean(wtvec*res^2) + t(cveci) %*% Kmat %*% cveci
-  DPENSSE <- -2*crossprod(phimat,wtvec*res*EWvec)/N + 2*Kmat %*% cveci
+  DPENSSE <- -2*crossprod(phimat,wtvec*res*EWvec)/n + 2*Kmat %*% cveci
   return( list(PENSSE, DPENSSE) )
 }
 
@@ -375,15 +376,12 @@ PENSSEfun <- function(argvals, yi, basisobj, cveci, Kmat, wtvec) {
 
 PENSSEhess <- function(argvals, yi, basisobj, cveci, Kmat, wtvec) {
   #  Computes the expected Hessian
-  n       <- length(argvals)
-  nbasis  <- basisobj$nbasis
-  phimat  <- getbasismatrix(argvals, basisobj, 0)
-  Wvec    <- phimat %*% cveci
-  EWvec   <- exp(Wvec)
-  res     <- yi - EWvec
-  temp    <- wtvec*res*EWvec
-  Dres    <- matrix(temp,n,nbasis) * phimat
-  D2PENSSE  <- 2*crossprod(Dres)/n + 2*Kmat
+  n        <- length(argvals)
+  nbasis   <- basisobj$nbasis
+  phimat   <- getbasismatrix(argvals, basisobj, 0)
+  Wvec     <- phimat %*% cveci
+  EWvec    <- exp(Wvec)
+  D2PENSSE <- 2*t(phimat) %*% diag(as.numeric(wtvec*EWvec^2)) %*% phimat/n + 2*Kmat
   return(D2PENSSE)
 }
 

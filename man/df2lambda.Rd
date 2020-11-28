@@ -9,7 +9,7 @@ smoothing parameter $lambda$ that directly multiplies the penalty.
 However, it can be difficult to interpret or choose this value, and it
 is often easier to determine the roughness by choosing a value that is
 equivalent of the degrees of freedom used by the smoothing procedure.
-This function converts a degrees of freedom value into a multipler
+This function converts a degrees of freedom value into a multiplier
 $lambda$.
 }
 \usage{
@@ -18,7 +18,7 @@ df2lambda(argvals, basisobj, wtvec=rep(1, n), Lfdobj=0,
 }
 \arguments{
 \item{argvals}{
-a vector containing rgument values associated with the values to
+a vector containing argument values associated with the values to
 be smoothed.
 }
 \item{basisobj}{

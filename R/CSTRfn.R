@@ -171,7 +171,7 @@ CSTRfn <- function(parvec, datstruct, fitstruct,
 #
 #    Dcoef <- (lm.fit(Dres0, res0)$coefficients)
 #
-    Dres.svd <- svd2(Dres0)
+    Dres.svd <- svd(Dres0)
     ikeep <- with(Dres.svd, which(d > eps*max(d)))
     Dres.rank <- length(ikeep)
     if(Dres.rank < min(dim(Dres0)))
@@ -263,7 +263,7 @@ CSTRfn <- function(parvec, datstruct, fitstruct,
 #  Smat = Zmat*inv(Zmat'*Zmat + Rfac'*Rfac)*Zmat'
 # Use singular value decomposition so we never have to worry about
 # ill conditioning.
-  Zsvd <- svd2(Zmat)
+  Zsvd <- svd(Zmat)
 # Zmat = with(Zsvd, u %*% diag(d) %*% t(v))
 # so Z'Z+R'R = v d^2 v' + R'R
 #          = v %*% (d^2 + (R%*%v)'(R%*%v))

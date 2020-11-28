@@ -15,12 +15,6 @@
   and not sampling covariances.
 }
 \usage{
-#fRegress.stderr(y, y2cMap, SigmaE, returnMatrix=FALSE, ...)
-
-#NOTE:  The following is required by CRAN rules that
-# function names like "as.numeric" must follow the documentation
-# standards for S3 generics, even when they are not.
-# Please ignore the following line:
 \method{fRegress}{stderr}(y, y2cMap, SigmaE, returnMatrix=FALSE, ...)
 }
 \arguments{
@@ -51,9 +45,8 @@
   }
   \item{\dots}{
     optional arguments not used by \code{fRegress.stderr} but needed for
-    superficial compatibability with \code{fRegress} methods.
+    superficial compatibility with \code{fRegress} methods.
   }
-
 }
 \value{
 a named list of length 3 containing:

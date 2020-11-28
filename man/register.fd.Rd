@@ -119,7 +119,7 @@ register.fd(y0fd=NULL, yfd=NULL, WfdParobj=NULL,
   }
 }
 \details{
-  The warping function that smoothly and monotonely transforms the
+  The warping function that smoothly and monotonically transforms the
   argument is defined by \code{Wfd} is the same as that defines the
   monotone smoothing function in for function \code{smooth.monotone.}
   See the help file for that function for further details.

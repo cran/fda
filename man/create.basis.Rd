@@ -20,7 +20,7 @@
   Power bases support the use of negative and fractional powers, while
   monomial bases are restricted only to nonnegative integer exponents.
 
-  The polygonal basis is essentialy a B-spline of order 2, degree 1.
+  The polygonal basis is essentially a B-spline of order 2, degree 1.
 
   The following summarizes arguments used by some or all of the current
   \code{create.basis} functions:

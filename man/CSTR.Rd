@@ -267,7 +267,7 @@ CSTRsse(par, datstruct, fitstruct, CSTRbasis, lambda)
 
   CSTRres provides an interface between 'nls' and 'CSTRfn'.  It gets the
   parameters to be estimated via the official function arguments, kref,
-  EoverR, a, and / or b.  The subset of these paramters to estimate must
+  EoverR, a, and / or b.  The subset of these parameters to estimate must
   be specified both directly in the function call to 'nls' and
   indirectly via fitstruct[["estimate"]].  CSTRres gets the other CSTRfn
   arguments (datstruct, fitstruct, CSTRbasis, and lambda) via the 'data'
@@ -372,7 +372,7 @@ CSTRsse(par, datstruct, fitstruct, CSTRbasis, lambda)
     sum(res*res) from CSTRfd(...).  This allows us to use 'optim' or
     'nlminb' with the CSTR model.  This can also be used to obtain
     starting values for 'nls' in cases where 'nls' fails to converge
-    from the initiall provided starting values.  Apart from 'par', the
+    from the initial provided starting values.  Apart from 'par', the
     other arguments 'datstruct', 'fitstruct', 'CSTRbasis', and 'lambda',
     must be passed via '...' in 'optim' or 'nlminb'.
   }

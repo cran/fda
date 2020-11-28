@@ -11,7 +11,7 @@
 \format{
   a 3-dimensional array of dimensions (601, 50, 3) containing 601
   observations of (x, y, z) coordinates of the tip of a pen at 2.5
-  millisecond intervals for each of 50 repitions of writing 'Statistical
+  millisecond intervals for each of 50 repititions of writing 'Statistical
   Science' in simplified Chinese.
 }
 \details{
@@ -23,7 +23,7 @@
   was normalized to this interval for all 50 records.  The script
   requires 50 strokes, with an average time of 120 milliseconds per
   stroke.  These raw data were shifted and rotated so the numbers more
-  accruately reflected \code{x} and \code{y} coordinates relative to the
+  accurately reflected \code{x} and \code{y} coordinates relative to the
   drawn characters plus vertical distance from the paper.
 }
 %\source{}

@@ -63,7 +63,7 @@ smooth.basis1 <- function (argvals=1:n, y, fdParobj,
   #   PENMAT  the penalty matrix.
   #   Y2CMAP  the matrix mapping the data to the coefficients.
   #
-  # last modified 26 June 2020 by Jim Ramsay
+  # last modified 7 August 2020 by Jim Ramsay
   
   #  This version of smooth.basis, introduced in March 2011, permits ARGVALS
   #  to be a matrix, with the same dimensions as the first two dimensions of Y
@@ -260,7 +260,7 @@ smooth.basis1 <- function (argvals=1:n, y, fdParobj,
       Bmat    <- (Bmat+t(Bmat))/2
       Lmat    <- try(chol(Bmat), silent=TRUE)
       if (inherits(Lmat, "try-error")) {
-        Beig <- eigen(Bmat, symmetric=TRUE)
+        Beig  <- eigen(Bmat, symmetric=TRUE)
         BgoodEig <- (Beig$values>0)
         Brank <- sum(BgoodEig)
         if (Brank<dim(Bmat)[1])

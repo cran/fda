@@ -47,9 +47,9 @@ bsplineS <- function (x, breaks, norder=4, nderiv=0, returnMatrix=FALSE)
   nbasis <- nbreaks + norder - 2
   if (nbasis >= norder) {
       if (nbasis > 1) {
-  	    basismat <- Matrix(spline.des(knots, x, norder, derivs)$design)
+  	    basismat <- Matrix(splines::spline.des(knots, x, norder, derivs)$design)
       } else {
-  	    basismat <- as.matrix(spline.des(knots, x, norder, derivs)$design)
+  	    basismat <- as.matrix(splines::spline.des(knots, x, norder, derivs)$design)
       }
       if((!returnMatrix) && (length(dim(basismat)) == 2)){
           return(as.matrix(basismat))

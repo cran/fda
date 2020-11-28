@@ -70,12 +70,13 @@ varmx.pca.fd <- function(pcafd, nharm=scoresd[2], nx=501)
   
   rotharmfd <- harmfd
   rotharmfd$coefs <- rotharmcoef
-  
-  rotpcafd <- pcafd
+   
+  rotpcafd           <- pcafd
   rotpcafd$harmonics <- rotharmfd
   rotpcafd$varprop   <- propvar
   rotpcafd$scores    <- rotharmscrs
   rotpcafd$rotmat    <- rotm
+  rotpcafd$values   <- rotharmvar
   
   return(rotpcafd)
 }

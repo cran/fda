@@ -26,7 +26,7 @@
 %\details{}
 \source{
   Hermanussen, M., Thiel, C., von Bueren, E., de los Angeles Rol. de
-  Lama, M., Perez Romero, A., Ariznavarreta Ruiz, C., Burmeister, J.,
+  Lama, M., Perez Romero, A., Arizonavarreta Ruiz, C., Burmeister, J.,
   Tresguerras, J. A. F. (1998) Micro and macro perspectives in auxology:
   Findings and considerations upon the variability of short term and
   individual growth and the stability of population derived parameters,

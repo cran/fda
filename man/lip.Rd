@@ -19,11 +19,11 @@ liptime
   \itemize{
     \item{lip}{
       a matrix of dimension c(51, 20) giving the position of the lower
-      lip every 7 milliseconds for 350 miliseconds.
+      lip every 7 milliseconds for 350 milliseconds.
     }
     \item{lipmarks}{
       a matrix of dimension c(20, 2) giving the positions of the
-      'leftElbow' and 'rightElbow' in each of the 20 repitions of the
+      'leftElbow' and 'rightElbow' in each of the 20 repetitions of the
       syllable 'bob'.
     }
     \item{liptime}{

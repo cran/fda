@@ -35,7 +35,7 @@ density.fd <- function(x, WfdParobj, conv=0.0001, iterlim=20,
 #  exponentiate the resulting vector, and then divide by the normalizing
 #  constant C.
 
-# last modified 13 July 2020 by Jim Ramsay
+# last modified 3 July 2020 by Jim Ramsay
 
 #  check WfdParobj
 
@@ -381,8 +381,8 @@ normden.phi <- function(basisobj, cvec, JMAX=15, EPS=1e-7) {
   	wx <- fx %*% cvec
   	wx[wx < -50] <- -50
   	px <- exp(wx)
-  	smat    <- matrix(0,JMAXP,1)
-  	smat[1] <- width*sum(px)/2
+  	smat <- matrix(0,JMAXP,1)
+  	smat[1]  <- width*sum(px)/2
   	tnm <- 0.5
   	j   <- 1
 
@@ -526,6 +526,7 @@ expectden.phiphit <- function(basisobj, cvec, Cval=1, nderiv1=0, nderiv2=0,
   	JMAXP <- JMAX + 1
   	h <- matrix(1,JMAXP,1)
   	h[2] <- 0.25
+  	#  matrix SMAT contains history of discrete approximations to the integral
   	#  the first iteration uses just the }points
   	x  <- rng
   	nx <- length(x)

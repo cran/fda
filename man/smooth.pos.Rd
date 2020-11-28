@@ -26,7 +26,7 @@ smooth.pos(argvals, y, WfdParobj, wtvec=rep(1,n),
     Function value array (the values to be fit).  If the functional data
     are univariate, this array will be an N by NCURVE matrix, where N is
     the number of observed curve values for each curve and NCURVE is the
-    number of curves observed.  If the functional data are muliivariate,
+    number of curves observed.  If the functional data are multivariate,
     this array will be an N by NCURVE by NVAR matrix, where NVAR the
     number of functions observed per case.  For example, for the gait
     data, NVAR = 2, since we observe knee and hip angles.

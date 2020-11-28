@@ -151,7 +151,7 @@ smooth.basis(argvals=1:n, y, fdParobj, wtvec=NULL, fdnames=NULL,
   typical choice of derivative order is 2, whose square is often called
   the local curvature of the function.  Since a rough function has high
   curvature over most of the function's range, the integrated square of
-  of the second derivature quantifies the total curvature of the function,
+  of the second derivative quantifies the total curvature of the function,
   and hence its roughness.  The second factor is a positive constant called
   the bandwidth of smoothing parameter, and given the variable name
   \code{lambda} here.
@@ -223,7 +223,7 @@ smooth.basis(argvals=1:n, y, fdParobj, wtvec=NULL, fdnames=NULL,
   }
   \item{beta}{
     the regression coefficients associated with covariate variables.
-    These are vector, matrix or array objects dependeing on whether
+    These are vector, matrix or array objects depending on whether
     there is a single curve, multiple curves or multiple curves and
     variables, respectively.
   }

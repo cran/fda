@@ -16,8 +16,8 @@ daily
 \format{
   'CanadianWeather' and 'daily' are lists containing essentially the
   same data.  'CanadianWeather' may be preferred for most purposes;
-  'daily' is included primarily for compatability with scripts written
-  before the other format became available and for compatability with
+  'daily' is included primarily for compatibility with scripts written
+  before the other format became available and for compatibility with
   the Matlab 'fda' code.
   \itemize{
     \item{CanadianWeather}{
@@ -62,7 +62,7 @@ daily
 	    }
 	    \item{monthlyPrecip}{
 	      A matrix of dimensions (12, 35) giving the average daily
-	      precipitation in milimeters for each month of the year.
+	      precipitation in millimeters for each month of the year.
 	    }
 	    \item{geogindex}{
 	      Order the weather stations from East to West to North

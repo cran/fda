@@ -45,7 +45,7 @@ handwritTime
   the observed scripts across replications.  by contrast, a
   second order equation was found to be completely inadequate.
 
-  An interesting suprise in the results is the role placed by
+  An interesting surprise in the results is the role placed by
   a 120 millisecond cycle such that sharp features such as cusps
   correspond closely to this period.  This 110-120 msec cycle
   seems is usually seen in human movement data involving rapid

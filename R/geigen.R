@@ -13,7 +13,7 @@ geigen <- function(Amat, Bmat, Cmat)
   #  LMAT   ... p by s matrix L
   #  MMAT   ... q by s matrix M
 
-  #  last modified 2007 to use svd2;  previous mod 18 May 2001
+  #  last modified 9 November 2020 to use svd
 
   Bdim <- dim(Bmat)
   Cdim <- dim(Cmat)
@@ -34,12 +34,12 @@ geigen <- function(Amat, Bmat, Cmat)
   Cfacinv <- solve(Cfac)
   Dmat <- t(Bfacinv) %*% Amat %*% Cfacinv
   if (p >= q) {
-    result <- svd2(Dmat)
+    result <- svd(Dmat)
     values <- result$d
     Lmat <- Bfacinv %*% result$u
     Mmat <- Cfacinv %*% result$v
   } else {
-    result <- svd2(t(Dmat))
+    result <- svd(t(Dmat))
     values <- result$d
     Lmat <- Bfacinv %*% result$v
     Mmat <- Cfacinv %*% result$u

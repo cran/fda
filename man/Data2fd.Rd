@@ -170,7 +170,7 @@ Data2fd(argvals=NULL, y=NULL, basisobj=NULL, nderiv=NULL,
     Matrices or arrays of regression 
     coefficients are then estimated that
     define the impacts of each of these 
-    covariates for each cueve and each
+    covariates for each curve and each
     variable.
   }
   \item{method}{

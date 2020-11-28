@@ -62,7 +62,7 @@ as.fd(x, ...)
   \emph{Applied Functional Data Analysis}, Springer, New York.
 
   \code{spline} entry in \emph{Wikipedia}
-  \url{http://en.wikipedia.org/wiki/Spline_(mathematics)}
+  \url{https://en.wikipedia.org/wiki/Spline_(mathematics)}
 }
 \author{Spencer Graves}
 \seealso{

@@ -4,7 +4,7 @@
   Does the range of the input contain 0?  
 }
 \description{
-  Returns TRUE if range of the argument includes 0 and FALSES if not.  
+  Returns TRUE if range of the argument includes 0 and FALSE if not.  
 }
 \usage{
   zerofind(fmat)

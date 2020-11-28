@@ -81,7 +81,7 @@ exponentiate.fd(e1, e2, tolint=.Machine$double.eps^0.75,
       Else if(outBasis$nbasis<maxbasis) increase the size of outBasis
       and try again.
 
-      Else write a warining with the max(abs(d1.2)) and return fd1.2.
+      Else write a warning with the max(abs(d1.2)) and return fd1.2.
     }
   }
 }

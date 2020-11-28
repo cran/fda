@@ -31,7 +31,7 @@
 \details{
   The interior knots of a \code{bspline} basis are stored in the
   \code{params} component.  The remaining knots are in the
-  \code{rangeval} component, with mulltiplicity norder(Fn).
+  \code{rangeval} component, with multiplicity norder(Fn).
 }
 \value{
   Numeric vector.  If 'interior' is TRUE, this is the \code{params}

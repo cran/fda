@@ -26,7 +26,7 @@ Eigen(x, symmetric, only.values = FALSE, valuenames)
   }
   \item{valuenames}{
     character vector of length nrow(x) or a character string that can be
-    extended to that length by appening 1:nrow(x).
+    extended to that length by appending 1:nrow(x).
 
     The default depends on symmetric and whether
     \code{\link{rownames}} == \code{\link{colnames}}:  If

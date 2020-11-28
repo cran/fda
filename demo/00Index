@@ -1,12 +1,13 @@
-canadian-weather  daily temperature and precipitation for 35 stations
-gait	 	  knee and hip angle during 39 gait cycles
-goodsindex 	  nondurable goods manufacturing index
-growth		  heights of male and female children
-handwrit 	  20 registered scripts "fda"
-handwrit.pda      Principal differential analysis of scripts "fda"
-lip 	 	  lower lip position while saying "bob"
-pinch 	 	  pinch force records
-growthsetup	  set up for growthreg and growthsmooth
-growthreg	  registration of growth curves
-growthsmooth	  smoothing growth curves
-weatherANOVA	  functional ANOVA using the Canadian Weather data
+canadian-weather daily temperature and precipitation for 35 stations
+gait	 	         knee and hip angle during 39 gait cycles
+goodsindex 	     nondurable goods manufacturing index
+growth		       heights of male and female children
+handwrit 	       20 registered scripts "fda"
+handwrit.pda     Principal differential analysis of scripts "fda"
+lip 	 	         lower lip position while saying "bob"
+pinch 	 	       pinch force records
+growthsetup	     set up for growthreg and growthsmooth
+growthreg	       registration of growth curves
+growthsmooth	   smoothing growth curves
+weatherANOVA	   functional ANOVA using the Canadian Weather data
+ElectricDemand   functional regression of electricity demand on temperature
