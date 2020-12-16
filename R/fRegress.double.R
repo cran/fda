@@ -37,7 +37,7 @@ fRegress.double <- function(y, xfdlist, betalist, wt=NULL,
   #               enabling this option.
   #
   #  Returns LIST  ... A list containing seven members with names:
-  #    yfdPar      ... first  argument of 
+  #    yfdobj      ... first  argument of 
   #    xfdlist     ... second argument of 
   #    betalist    ... third  argument of 
   #    betaestlist ... estimated regression functions
@@ -51,19 +51,23 @@ fRegress.double <- function(y, xfdlist, betalist, wt=NULL,
   #  as predict(List).  In this call List can be any object of the
   #  "".
   
-  # Last modified 5 November 2020 by Jim Ramsay
+  # Last modified 16 December 2020 by Jim Ramsay
   
   #  check Y and compute sample size N
   
   if (!inherits(y, "numeric")) stop("Y is not a numeric vector.")
     
   #  ----------------------------------------------------------------
-  #                   YFDPAR is scalar or multivariate
+  #                   yfdobj is scalar or multivariate
   #  ----------------------------------------------------------------
     
+  #  As of 2020, if yfd is an fdPar object, it is converted to an fd object.
+  #  The added structure of the fdPar class is not used in any of the fRegress codes.
+  #  The older versions of fda package used yfdPar as the name for the first member.
+
   arglist <- fRegressArgCheck(y, xfdlist, betalist, wt)
   
-  yfdPar   <- arglist$yfdPar
+  yfdobj   <- arglist$yfd
   xfdlist  <- arglist$xfdlist
   betalist <- arglist$betalist
   wt       <- arglist$wt
@@ -232,7 +236,7 @@ fRegress.double <- function(y, xfdlist, betalist, wt=NULL,
   #  -----------------------------------------------------------------------
   
   fRegressList <-
-    list(yfdPar         = y,
+    list(yfdobj         = y,
          xfdlist        = xfdlist,
          betalist       = betalist,
          betaestlist    = betaestlist,

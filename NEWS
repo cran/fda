@@ -1,4 +1,3 @@
-fda Version 5.1.7:  A fairly extensive revision of the code associated with fRegress.R was completed, 
-with corresponding changes in the example code in fRegress.Rd.  Function predict.fRegress.R was amended 
-following a complaint from a user.  Utility function svd2 used in geigen.R and CSTRfn.R was reverted to 
-R function svd().
+fda Version 5.1.9:  A fix of version 5.1.8 for the fRegress functions so that there
+is a smooth transition to using fRegress.stderr() and fRegress.CV() after an analysis
+using the other fRegress functions.

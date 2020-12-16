@@ -7,12 +7,13 @@ fRegress.CV <- function(y, xfdlist, betalist, wt=NULL, CVobs=1:N,
 # generalized cross validation scores are now returned by fRegress
 # when scalar responses are used.
 
-# last modified 28 July 2012 by Jim Ramsay
+# last modified 16 December 2020 by Jim Ramsay
 
 #  check the arguments
 
 argList  <- fRegressArgCheck(y, xfdlist, betalist, wt)
-yfdPar   <- argList$yfdPar
+
+yfdobj   <- argList$yfd
 xfdlist  <- argList$xfdlist
 betalist <- argList$betalist
 wt       <- argList$wt
@@ -25,11 +26,11 @@ M <- length(CVobs)
 
 #  branch to either scalar or functional dependent variable
 
-if (inherits(yfdPar, "numeric"))  {
+if (inherits(yfdobj, "numeric"))  {
 
     #  scalar dependent variable case
 
-    yvec   <- yfdPar
+    yvec   <- yfdobj
     SSE.CV <- 0
     errfd  <- c()
     for (m in 1:M) {
@@ -79,7 +80,7 @@ if (inherits(yfdPar, "numeric"))  {
 
     #  functional dependent variable case
 
-    yfd      <- yfdPar$fd
+    yfd      <- yfdobj
     SSE.CV   <- 0
     errcoefs <- c()
     for(m in 1:length(CVobs)){
@@ -120,7 +121,7 @@ if (inherits(yfdPar, "numeric"))  {
     errfd <- fd(errcoefs,errfdi$basis)
     names(errfd$fdnames)[[3]] <- "Xval Errors"
 }
-return(list(SSE.CV=SSE.CV,errfd.cv=errfd))
+return(list(SSE.CV=SSE.CV, errfd.cv=errfd))
 }
 
 

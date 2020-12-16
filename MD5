@@ -1,6 +1,6 @@
-7126348a66170f71117a5f6317f0be75 *DESCRIPTION
+5cab4dfb72e79f732e5d828d8cc9cec1 *DESCRIPTION
 e68a72a3b218a8067114c75ab598c063 *NAMESPACE
-85f8e95f4f46a5d34157851619d125f5 *NEWS
+94e52737200a725faebfdadc8dcad1df *NEWS
 a0fb7b504779b47cba75cfecfc668540 *R/AmpPhaseDecomp.R
 41419a07fe723ba594969037e5826ee7 *R/CRAN.R
 d3945e00b122b0f0d58294e61dbcaed0 *R/CSTR2.R
@@ -60,12 +60,12 @@ dd86462874b19d3c31fcde8cea869247 *R/evaldiag.bifd.R
 934f546fb7ea036e6a8df2fa3ecabc70 *R/expon.R
 bc4d0e77bab8b3aa8d1dfcf7ba3d122a *R/exponentiate.fd.R
 b524760d366d1a17e6c5eea8f7ba5cd7 *R/exponpen.R
-ad9ab41eecce832474a1bdab89a492af *R/fRegress.CV.R
-e1f740eca5b16a392b655d5dc4ca52f0 *R/fRegress.R
-85a04c2f552cafa62135945f3d13f5a8 *R/fRegress.double.R
+4a5f2bf45108211112b57de3ce3a8e81 *R/fRegress.CV.R
+acea4115ae3e8446b2b68349d7d1861f *R/fRegress.R
+94e3a35c5e0a156e4c25bec237c4b942 *R/fRegress.double.R
 86c44dd8fa45061e91088a54a22ae1ba *R/fRegress.formula.R
-578f18b59a7aa1ed7efbd7ec43501f4c *R/fRegress.stderr.R
-b332973496904d42a1242eabd75ff0b4 *R/fRegressArgCheck.R
+11155cb78cc5528a22ace3460cf8af8a *R/fRegress.stderr.R
+910a120609a3d1369de51881a2bff07c *R/fRegressArgCheck.R
 1907295776025f62e326b41019638f60 *R/fbplot.R
 969901bba07225c8e121d8f71436e757 *R/fd.R
 fba540718564e9a0c5f52903f0d1abe9 *R/fd2list.R
@@ -263,7 +263,7 @@ bc783c018de50d3e548bcd8f3e33c72c *man/expon.Rd
 1a4c996afd02830f4d9059b1cdecf5de *man/exponentiate.fd.Rd
 200afedecbc43a33f71392ec08af6864 *man/exponpen.Rd
 4c00453de919033c2cfc227b779a0b66 *man/fRegress.CV.Rd
-5a8f13b3987e4d6fb24c97299745b3f8 *man/fRegress.Rd
+38ee7f29b98251d9ca936fa0865eecb6 *man/fRegress.Rd
 2cb55864d54aab9690f4a90b27f3e0b5 *man/fRegress.stderr.Rd
 b5bfb9962c4fa6c4739fe41718e77af4 *man/fbplot.Rd
 e8a381dff684a7c2e5332521ab565971 *man/fd.Rd

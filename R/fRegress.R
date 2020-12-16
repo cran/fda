@@ -68,9 +68,13 @@ fRegress.fd <- function(y, xfdlist, betalist, wt=NULL,
   
   if (is.fdPar(y)) y <- y$fd
   
+  #  As of 2020, if yfd is an fdPar object, it is converted to an fd object.
+  #  The added structure of the fdPar class is not used in any of the fRegress codes.
+  #  The older versions of fda package used yfdPar as the name for the first member.
+  
   arglist <- fRegressArgCheck(y, xfdlist, betalist, wt)
   
-  yfdobj   <- arglist$yfd
+  yfdobj   <- arglist$yfd  # the older version used yfdPar as the name.
   xfdlist  <- arglist$xfdlist
   betalist <- arglist$betalist
   wt       <- arglist$wt

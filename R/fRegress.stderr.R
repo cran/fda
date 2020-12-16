@@ -33,11 +33,11 @@ fRegress.stderr <- function (y, y2cMap, SigmaE, returnMatrix = FALSE, ...)
   #  C2BMAP         ... the matrix mapping from response variable coefficients
   #                     to coefficients for regression coefficients
   
-  #  Last modified 10 August 2020
+  #  Last modified 16 December 2020
   
   #  retrieve objects from y
   
-  yfdPar         <- y$yfdPar
+  yfdobj         <- y$yfdobj
   xfdlist        <- y$xfdlist
   betalist       <- y$betalist
   betaestlist    <- y$betaestlist
@@ -65,25 +65,27 @@ fRegress.stderr <- function (y, y2cMap, SigmaE, returnMatrix = FALSE, ...)
     ncoef <- ncoef + ncoefj
   }
   
-  if (inherits(yfdPar, "fdPar") || inherits(yfdPar, "fd")) {
+  if (inherits(yfdobj, "fdPar") || inherits(yfdobj, "fd")) {
     
     #  ----------------------------------------------------------------
-    #           YFDPAR is functional for a functional parameter
+    #           yfdobj is functional data object
     #  ----------------------------------------------------------------
     
-    if (inherits(yfdPar, "fd")) 
-      yfdPar <- fdPar(yfdPar)
+    #  As of 2020, if yfdobj is an fdPar object, it is converted to an fd object.
+    #  The added structure of the fdPar class is not used in any of the fRegress codes.
+    #  The older versions of fda package used yfdPar as the name for the first member.
+    
+    if (inherits(yfdobj, "fdPar")) yfdobj <- yfdobj$fd
     
     #  get number of replications and basis information for YFDPAR
     
-    yfd <- yfdPar$fd
-    N <- dim(yfd$coefs)[2]
-    ybasisobj <- yfdPar$fd$basis
-    rangeval <- ybasisobj$rangeval
-    ynbasis <- ybasisobj$nbasis
-    ninteg <- max(501, 10 * ynbasis + 1)
-    tinteg <- seq(rangeval[1], rangeval[2], len = ninteg)
-    deltat <- tinteg[2] - tinteg[1]
+    N         <- dim(yfdobj$coefs)[2]
+    ybasisobj <- yfdobj$basis
+    rangeval  <- ybasisobj$rangeval
+    ynbasis   <- ybasisobj$nbasis
+    ninteg    <- max(501, 10 * ynbasis + 1)
+    tinteg    <- seq(rangeval[1], rangeval[2], len = ninteg)
+    deltat    <- tinteg[2] - tinteg[1]
     
     ybasismat <- eval.basis(tinteg, ybasisobj, 0, returnMatrix)
     
@@ -181,10 +183,10 @@ fRegress.stderr <- function (y, y2cMap, SigmaE, returnMatrix = FALSE, ...)
   else {
     
     #  ----------------------------------------------------------------
-    #                   YFDPAR is scalar or multivariate
+    #                   yfdobj is scalar or multivariate
     #  ----------------------------------------------------------------
     
-    ymat <- as.matrix(yfdPar)
+    ymat <- as.matrix(yfdobj)
     N <- dim(ymat)[1]
     Zmat <- NULL
     for (j in 1:p) {
@@ -268,11 +270,13 @@ fRegress.stderr <- function (y, y2cMap, SigmaE, returnMatrix = FALSE, ...)
   
   #  return output object of class fRegress
   
-  fRegressList <- list(yfdPar = y$yfdPar, xfdlist = y$xfdlist, 
-                       betalist = y$betalist, betaestlist = y$betaestlist, yhatfdobj = y$yhatfdobj, 
-                       Cmat = y$Cmat, Dmat = y$Dmat, Cmatinv = y$Cmatinv, wt = y$wt, 
-                       df = y$df, y2cMap = y2cMap, SigmaE = SigmaE, betastderrlist = betastderrlist, 
-                       YhatStderr = YhatStderr, Bvar = Bvar, c2bMap = c2bMap)
+  fRegressList <- list(yfdobj = y$yfdobj, xfdlist = y$xfdlist, 
+                       betalist = y$betalist, betaestlist = y$betaestlist, 
+                       yhatfdobj = y$yhatfdobj, Cmat = y$Cmat, Dmat = y$Dmat, 
+                       Cmatinv = y$Cmatinv, wt = y$wt, 
+                       df = y$df, y2cMap = y2cMap, SigmaE = SigmaE, 
+                       betastderrlist = betastderrlist, YhatStderr = YhatStderr, 
+                       Bvar = Bvar, c2bMap = c2bMap)
   
   class(fRegressList) = "fRegress"
   return(fRegressList)
