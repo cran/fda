@@ -43,20 +43,21 @@ fdPar <- function(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
 #  Return:
 #  FDPAROBJ ... A functional parameter object
 
-#  Last modified 22 December 2012 by Jim Ramsay
+#  Last modified 16 April 2021 by Jim Ramsay
 
 #  ----------------------------------------------------------------------
 #                            Default fdPar objects
 #  ----------------------------------------------------------------------
 
   if(!inherits(fdobj, 'fd')) {
+    #  the first argument is not an fd object
     if (is.null(fdobj)) {
     #  fdPar called without arguments
       fdobj = fd()
     }  else {
       if (inherits(fdobj, "basisfd")) {
         #  if the first argument is a basis object, convert it to
-        #  a default FD object with an empty coefficient matrix.
+        #  a default FD object with an zero square coefficient matrix.
         nbasis  <- fdobj$nbasis
         dropind <- fdobj$dropind
         nbasis  <- nbasis - length(dropind)
@@ -79,6 +80,9 @@ fdPar <- function(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
       else stop("First argument is neither a functional data object ",
                 "nor a basis object.")
     }
+  } else {
+    # the first object is an fd object, and we need nbasis later
+    nbasis <- fdobj$basis$nbasis
   }
 
 #  ----------------------------------------------------------------------

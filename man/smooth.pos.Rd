@@ -11,8 +11,7 @@
   is $exp[W(t)]$.
 }
 \usage{
-smooth.pos(argvals, y, WfdParobj, wtvec=rep(1,n),
-           conv=.0001, iterlim=50, dbglev=1)
+smooth.pos(argvals, y, WfdParobj, wtvec=rep(1,n),conv=.0001, iterlim=50, dbglev=1)
 }
 \arguments{
   \item{argvals}{
@@ -72,11 +71,11 @@ smooth.pos(argvals, y, WfdParobj, wtvec=rep(1,n),
     (3) \bold{norm}: the norm of the gradient vector at the optimal
     solution.
   }
-  \item{argvals, y}{
-    the corresponding input arguments
-  }
+  \item{argvals}{the corresponding input arguments}
+  \item{y}{the corresponding input arguments}
 }
 \seealso{
+  \code{\link{smooth.surp}},
   \code{\link{smooth.monotone}},
   \code{\link{smooth.morph}}
 }

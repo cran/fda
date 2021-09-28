@@ -68,7 +68,7 @@ smooth.monotone(argvals, y, WfdParobj, wtvec=rep(1,n),
     error sum of squares.
   }
   \item{active}{
-    a logical vector specifying which coefficients defining $W(t)$ are
+    a logical vector specifying which coefficients defining W(t) are
     estimated.  Normally, the first coefficient is fixed.
   }
   \item{dbglev}{
@@ -80,42 +80,42 @@ smooth.monotone(argvals, y, WfdParobj, wtvec=rep(1,n),
 }
 
 \details{
-  The smoothing function  $f(argvals)$ is determined by three objects
+  The smoothing function  f(argvals) is determined by three objects
   that need to be estimated from the data:
 
   \itemize{
-    \item $W(argvals)$, a functional data object that is first
+    \item W(argvals), a functional data object that is first
         exponentiated and then the result integrated.  This is the heart
-	of the monotone smooth.  The closer $W(argvals)$ is to zero, the
+	of the monotone smooth.  The closer W(argvals) is to zero, the
 	closer the monotone smooth becomes a straight line.  The closer
-	$W(argvals)$ becomes a constant, the more the monotone smoother
-	becomes an exponential function.  It is assumed that $W(0) = 0.$
+	W(argvals) becomes a constant, the more the monotone smoother
+	becomes an exponential function.  It is assumed that W(0) = 0.
 
-	\item $b0$, an intercept term that determines the value of the
-	smoothing function at $argvals = 0$.
+	\item b0, an intercept term that determines the value of the
+	smoothing function at argvals = 0.
 
-	\item $b1$, a regression coefficient that determines the slope
-	of the smoothing function at $argvals = 0$.
+	\item b1, a regression coefficient that determines the slope
+	of the smoothing function at argvals = 0.
   }
 
-  In addition, it is possible to have the intercept $b0$
+  In addition, it is possible to have the intercept b0
   depend in turn on the values of one or more covariates through the
   design matrix \code{Zmat} as follows:
-  $b0 = Z c$. In this case, the single
+  b0 = Z c. In this case, the single
   intercept coefficient is replaced by the regression coefficients
-  in vector $c$ multiplying the design matrix.
+  in vector c multiplying the design matrix.
 }
 \value{
   an object of class \code{monfd}, which is a list with the following 5
   components:
 
   \item{Wfdobj}{
-    a functional data object defining function $W(argvals)$ that
+    a functional data object defining function W(argvals) that
     optimizes the fit to the data of the monotone function that it
     defines.
   }
   \item{beta}{
-    The regression coefficients $b_0$ and $b_1$ for each smoothed
+    The regression coefficients b_0 and b_1 for each smoothed
     curve.
 
     If the curves are univariate and

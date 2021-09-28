@@ -27,12 +27,12 @@ smooth.monotone <- function(argvals, y, WfdParobj, wtvec=rep(1,n),
 #               curves.  If this is not the case, you will need to
 #               run this function inside one or more loops, smoothing
 #               each curve separately.
-#  Y       ...  Function value array (the values to be fit).
+#  y       ...  Function value array (the values to be fit).
 #               If the functional data are univariate, this array will
 #               be an N by NCURVE matrix, where N is the number of
 #               observed curve values for each curve and NCURVE is the
 #               number of curves observed.
-#               If the functional data are muliivariate, this array will
+#               If the functional data are mulivariate, this array will
 #               be an N by NCURVE by NVAR matrix, where NVAR the number
 #               of functions observed per case.  For example, for the
 #               gait data, NVAR = 2, since we observe knee and hip
@@ -128,7 +128,19 @@ nbasis   <- basisobj$nbasis  #  number of basis functions
 #  set up initial coefficient array
 
 coef0    <- Wfdobj$coefs
-
+if( length(dim(coef0)) == 2 & nvar != 1 ){
+	coef0 = array(0,c(nbasis,ncurve,nvar))
+}
+if( length(dim(coef0)) == 2 & ncol(coef0) != ncurve ){
+	coef0 = matrix(0,nbasis,ncurve)	
+}
+if( length(dim(coef0)) == 3 & (all.equal(dim(coef0)[2:3],c(ncurve,nvar))!=TRUE) ){
+	coef0 = array(0,c(nbasis,ncurve,nvar))	
+}
+# Note that we could be more carefull about this and try to adapt coefficients
+# if they have something like the right shape, but I'm not sure we can do
+# so in any reasonable way. 
+	
 #  check WTVEC
 
 wtvec <- wtcheck(n, wtvec)$wtvec

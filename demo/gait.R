@@ -214,82 +214,20 @@ par(op)
 
 #  compute proportions of variance associated with each angle
 
-#  compute the harmonic scores associated with each angle
-
-gaitscores = gaitpca.fd$scores
-
-#  compute the values of the harmonics at time values for each angle
-
 gaitharmmat = eval.fd(gaittime, gaitpca.fd$harmonics)
 hipharmmat  = gaitharmmat[,,1]
 kneeharmmat = gaitharmmat[,,2]
 
-#  we need the values of the two mean functions also
+# then we want to find the total size of each
 
-gaitmeanvec = eval.fd(gaittime, gaitmeanfd)
-hipmeanvec  = gaitmeanvec[,,1]
-kneemeanvec = gaitmeanvec[,,2]
+hipharmL2 = apply(hipharmmat^2,2,mean)
+kneeharmL2 = apply(kneeharmmat^2,2,mean)
 
-#  the values of the smooths of each angle less each mean function
+hippropvar2 = hipharmL2/(hipharmL2+kneeharmL2)
+kneepropvar2 = 1-hippropvar2
 
-gaitsmtharray = eval.fd(gaittime, gaitfd)
-hipresmat  = gaitsmtharray[,,1] - outer( hipmeanvec,rep(1,39))
-kneeresmat = gaitsmtharray[,,2] - outer(kneemeanvec,rep(1,39))
-
-#  the variances of the residuals of the smooth angles from their means
-
-hipvar  = mean( hipresmat^2)
-kneevar = mean(kneeresmat^2)
-
-print(paste("Variances of fits by the means:",
-            round(c(hipvar, kneevar),1)))
-
-#  compute the fits to the residual from the mean achieved by the PCA
-
-hipfitarray  = array(NA, c(nrow(hipharmmat ),nrow(gaitscores),ncol(gaitscores)))
-kneefitarray = array(NA, c(nrow(kneeharmmat),nrow(gaitscores),ncol(gaitscores)))
-for (isc in 1:2) {
-               hipfitarray[,,isc]  = hipharmmat  %*% t(gaitscores[,,isc])
-               kneefitarray[,,isc] = kneeharmmat %*% t(gaitscores[,,isc])
-}
-
-#  compute the variances of the PCA fits
-
-hipfitvar  = c()
-kneefitvar = c()
-for (isc in 1:2) {
-            hipfitvar  = c(hipfitvar,  mean( hipfitarray[,,isc]^2))
-            kneefitvar = c(kneefitvar, mean(kneefitarray[,,isc]^2))
-}
-
-#  compute percentages relative to the total PCA fit variance
-#  these percentages will add to 100
-
-hippropvar1 = c()
-kneepropvar1 = c()
-for (isc in 2) {
-            hippropvar1  = c(hippropvar1,  hipfitvar[isc]/(hipfitvar[isc] +
-                                           kneefitvar[isc]))
-            kneepropvar1 = c(kneepropvar1, kneefitvar[isc]/(hipfitvar[isc]+
-                                           kneefitvar[isc]))
-}
-
-print(paste("Percentages of fits for the PCA:",
-            round(100*c(hippropvar1, kneepropvar1),1)))
-
-#  compute percentages relative to the total mean fit variance
-#  these percentages will add to the total percentage of fit
-#  accounted for by the pca, which will typically be less than 100
-
-hippropvar2  = c()
-kneepropvar2 = c()
-for (isc in 1:2) {
-            hippropvar2  = c(hippropvar2,  hipfitvar[isc] /(hipvar+kneevar))
-            kneepropvar2 = c(kneepropvar2, kneefitvar[isc]/(hipvar+kneevar))
-}
-
-print((paste("Percentages of fits for the PCA:",
-             round(100*c(hippropvar2, kneepropvar2),1))))
+print("Percentages of fits for the PCA:")
+print(round(100*cbind(hippropvar2, kneepropvar2),1))
 
 #  --------------------------------------------------------------
 #           Canonical correlation analysis

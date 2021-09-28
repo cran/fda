@@ -62,7 +62,7 @@ varmx.pca.fd <- function(pcafd, nharm=scoresd[2], nx=501)
   
   #  compute proportions of variance
   
-  rotharmvar <- apply(rotharmscrs^2,2,sum)
+  rotharmvar <- apply(rotharmscrs^2,2,mean)
   varsum  <- sum(rotharmvar)
   propvar <- sum(pcafd$varprop)*rotharmvar/varsum
   
