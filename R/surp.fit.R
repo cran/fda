@@ -1,13 +1,14 @@
-surp.fit <- function(x, dataList) {
+surp.fit <- function(x, surpList) {
   
-  argvals <- dataList$argvals 
-  Wbin    <- dataList$Wbin 
-  wtvec   <- dataList$wtvec 
-  Kmat    <- dataList$Kmat
-  Zmat    <- dataList$Zmat 
-  Phimat  <- dataList$Phimat 
+  argvals <- surpList$argvals 
+  Wbin    <- surpList$Wbin 
+  wtvec   <- surpList$wtvec 
+  Kmat    <- surpList$Kmat
+  Zmat    <- surpList$Zmat 
+  Phimat  <- surpList$Phimat 
+  
   n       <- length(argvals)
-  M       <- dataList$M
+  M       <- surpList$M
   K       <- dim(Phimat)[2]
   Bmat    <- matrix(x, K, M-1)
   

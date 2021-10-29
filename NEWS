@@ -1,3 +1,0 @@
-fda Version 5.1.9:  A fix of version 5.1.8 for the fRegress functions so that there
-is a smooth transition to using fRegress.stderr() and fRegress.CV() after an analysis
-using the other fRegress functions.

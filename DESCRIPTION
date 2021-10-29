@@ -1,6 +1,6 @@
 Package: fda
-Version: 5.4.0
-Date: 2021-09-27
+Version: 5.5.0
+Date: 2021-10-28
 Title: Functional Data Analysis
 Author: J. O. Ramsay <ramsay@psych.mcgill.ca> [aut,cre], 
  Spencer Graves <spencer.graves@effectivedefense.org> [ctb], 
@@ -21,6 +21,6 @@ License: GPL (>= 2)
 URL: http://www.functionaldata.org
 LazyData: true
 NeedsCompilation: no
-Packaged: 2021-09-28 00:02:52 UTC; jimramsay
+Packaged: 2021-10-29 14:44:23 UTC; jimramsay
 Repository: CRAN
-Date/Publication: 2021-09-28 04:50:08 UTC
+Date/Publication: 2021-10-29 15:40:02 UTC

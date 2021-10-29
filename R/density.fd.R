@@ -1,7 +1,7 @@
 density <- function(x, ...)UseMethod('density')
 
 density.fd <- function(x, WfdParobj, conv=0.0001, iterlim=20,
-                      active=1:nbasis, dbglev=1, ...) {
+                      active=1:nbasis, dbglev=0, ...) {
 # DENSITYFD estimates the density of a sample of scalar observations.
 
 #  These observations may be one of two forms:
@@ -279,11 +279,13 @@ for (iter in 1:iterlim) {
 	    Wfdobj$coefs <- cvec
      	status <- c(iternum, Flist$f, -logl, Flist$norm)
      	iterhist[iter+1,] <- status
-	    cat("      ")
-	    cat(format(iternum))
-	    cat("    ")
-	    cat(format(status[2:4]))
-	    cat("\n")
+     	if (dbglev > 0) {
+	      cat("      ")
+	      cat(format(iternum))
+	      cat("    ")
+	      cat(format(status[2:4]))
+	      cat("\n")
+     	}
 
      	#  test for convergence
 

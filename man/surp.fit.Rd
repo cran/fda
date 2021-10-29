@@ -10,11 +10,11 @@
   by function \code{smooth.surp} in package \code{TestGardener.}
 }
 \usage{
-surp.fit(x, dataList)
+surp.fit(x, surpList)
 }
 \arguments{
   \item{x}{The parameter vector, which is the vectorized form of the K by M-1   coefficient matrix for the functional data object.}
-  \item{dataList}{
+  \item{surpList}{
   A named list object containing objects essential to evaluating the fitting 
   criterion.  See \code{smooth.surp.R} for the composition of this list.
   }

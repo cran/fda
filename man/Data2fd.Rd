@@ -243,7 +243,7 @@ Data2fd(argvals=NULL, y=NULL, basisobj=NULL, nderiv=NULL,
 }
 \references{
   Ramsay, James O., and Silverman, 
-  Bernard W. (2006), \emph{Functional
+  Bernard W. (2005), \emph{Functional
     Data Analysis, 2nd ed.}, Springer, New York.
 
   Ramsay, James O., and Silverman, 

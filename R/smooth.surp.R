@@ -87,7 +87,7 @@ smooth.surp <- function(argvals, Wbin, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
   Wbasis   <- WfdPar$fd$basis
   Wnbasis  <- Wbasis$nbasis
   Wlambda  <- WfdPar$lambda
-  Wpenalty <- eval.penalty(WfdPar)
+  Wpenalty <- eval.penalty(Wbasis, WfdPar$Lfd)
   
   #  Check BMAT0, the WNBASIS by M-1 coefficient matrix
   
@@ -135,7 +135,7 @@ smooth.surp <- function(argvals, Wbin, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
   
   #  Set up list object for data required by PENSSEfun
   
-  dataList <- list(argvals=argvals, Wbin=Wbin, wtvec=wtvec, Kmat=Kmat,
+  surpList <- list(argvals=argvals, Wbin=Wbin, wtvec=wtvec, Kmat=Kmat,
                    Zmat=Zmat, Phimat=Phimat, M=M)
   #  --------------------------------------------------------------------
   #              loop through variables and curves
@@ -145,7 +145,7 @@ smooth.surp <- function(argvals, Wbin, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
   #    and its derivatives with respect to these coefficients
   
   xold <- matrix(Bmat0, Wnbasis*(M-1),1)
-  result    <- surp.fit(xold, dataList)
+  result    <- surp.fit(xold, surpList)
   PENSSE    <- result[[1]]
   DPENSSE   <- result[[2]]
   D2PENSSE  <- result[[3]]
@@ -196,12 +196,12 @@ smooth.surp <- function(argvals, Wbin, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
     iternum <- iternum + 1
     #  take optimal stepsize
     lnsrch_result <- 
-      lnsrch(xold, fold, gvec, pvec, surp.fit, dataList, STEPMAX)
+      lnsrch(xold, fold, gvec, pvec, surp.fit, surpList, STEPMAX)
     x     <- lnsrch_result$x
     check <- lnsrch_result$check
     if (check) stop("lnsrch failure")
     Bmatnew <- matrix(x,Wnbasis,M-1)
-    func_result <- surp.fit(Bmatnew, dataList)
+    func_result <- surp.fit(Bmatnew, surpList)
     f     <- func_result[[1]]
     gvec  <- func_result[[2]]
     hmat  <- func_result[[3]]

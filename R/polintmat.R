@@ -1,5 +1,5 @@
 polintmat <- function(xa, ya, x) {
-#  Polynomial extrapolion for a converging sequence
+#  Polynomial extrapolation for a converging sequence
 #  YA is an 3-D array with 1st D same as XA
   n     <- length(xa)
   dimya <- dim(as.array(ya))

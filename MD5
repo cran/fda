@@ -1,6 +1,5 @@
-fc12651e43c127082e319a1e556bcce8 *DESCRIPTION
-0e4440d7280014835bbbb0adb1595bbd *NAMESPACE
-94e52737200a725faebfdadc8dcad1df *NEWS
+97a32da7b9540fd1f323679c16f72710 *DESCRIPTION
+441d2223fdbdaac24dc90cda4b0d77ec *NAMESPACE
 a0fb7b504779b47cba75cfecfc668540 *R/AmpPhaseDecomp.R
 41419a07fe723ba594969037e5826ee7 *R/CRAN.R
 d3945e00b122b0f0d58294e61dbcaed0 *R/CSTR2.R
@@ -41,7 +40,7 @@ d8526c86c695fcfcac8af4cb7eb86c41 *R/create.fdVar.basis.R
 15f30fa57e992b390f40c640d24cf23b *R/create.polynomial.basis.R
 0615ddceddad467ba75355c858c20441 *R/create.power.basis.R
 10260134b4ad43a636e57016485e7d67 *R/cycleplot.fd.R
-ead8c32d9fdf0337f43b5b71f9300c36 *R/density.fd.R
+98e50548665a85cf58fad913d7e4d4f8 *R/density.fd.R
 1b838c704f972eb680d9520e99bc2be3 *R/deriv.fd.R
 32fc99498ff726d31c0f3cad3f500889 *R/derivchk.R
 045243b5ce89202c17b238a12bfa9b8b *R/derivs.R
@@ -101,7 +100,7 @@ f6e5ef54af7fd7175a465025728c5355 *R/knots.fd.R
 c091f2bef96cbc42fb8d103efbf38997 *R/landmarkreg.R
 d2d624369cb9d1fb3474e112340bfe9a *R/lines.fd.R
 2b9c34a37a3e9d20a694da92de70bbb9 *R/linmod.R
-5f0e773faf8dc2c80aa4782d959a5e0b *R/lnsrch.R
+14ec68d349ccd75708dd0bc19902490b *R/lnsrch.R
 cbf6876d622cd0913006f002e90afd98 *R/matplot.R
 9c25df5db8113c2de7dd65b565357b6d *R/monfn.R
 20749103334afb5a434607b1b8ea7fad *R/mongrad.R
@@ -125,7 +124,7 @@ d6e024e5df35cfea40fe52dfa8902e8f *R/plotbeta.R
 8eab3d7afeabb014ffb2ef9a0f4dc843 *R/plotfit.fd.R
 4234b3151b9e9f96f2f87563a0c522d7 *R/plotreg.fd.R
 9eeb81b80870b8254bc4f105252d1320 *R/plotscores.R
-0d44ec04fa80dae8f45673fb87cfc1af *R/polintmat.R
+8a7a31fe859b7b3dbfce628a10afb830 *R/polintmat.R
 34d968743c5a0fb9ce148b8b062a0951 *R/polyg.R
 778810376ea365a67471748a52f7b8f7 *R/polygpen.R
 6c9750cc8ad0a06a31fb9798e48e4bce *R/polynom.R
@@ -153,9 +152,10 @@ e815296837c412e929e69312679114ff *R/smooth.fd.R
 1fe585d4318f4c8f32550e3c6b21185c *R/smooth.fdPar.R
 5bfa68914681854af4656c611f981d9f *R/smooth.monotone.R
 7dc180b7aa3ae4966b0b6e8d696f46d8 *R/smooth.morph.R
+46a9753bd1401ec30310db3af0c42b7e *R/smooth.morph2.R
 1d288926d765cfaaafea67f299c7dc61 *R/smooth.pos.R
 4437540bd68d814eb7534dd4d4ea1936 *R/smooth.sparse.mean.R
-f69173d06163d3882c8f26a45c858039 *R/smooth.surp.R
+ca25778d195caff232db4ece4a10e538 *R/smooth.surp.R
 a4448b96639f479b9d6bec91d5dae9cc *R/sparse.list.R
 5575c909666d3f95b145ef12a7046b07 *R/sparse.mat.R
 3252a1c627382612f45d357759517ee5 *R/std.fd.R
@@ -163,7 +163,7 @@ a4448b96639f479b9d6bec91d5dae9cc *R/sparse.list.R
 b9cd5058607759d8d2c17ee815be55ea *R/stepchk.R
 bcbb299c3cbe992b0e0355e44b8b5d83 *R/stepit.R
 3314308032855b74807e8adc1265cc2e *R/subscript.R
-1e3616b16e93b4cc4581ab863fe01580 *R/surp.fit.R
+91d2081217eb09908588795768a0ef5c *R/surp.fit.R
 3318d915ef29f63d0c22739eaf6c69d2 *R/symsolve.R
 61fbf6549b80e88c341fb7287bec03aa *R/tperm.fd.R
 e9d4794be564b87d3529a3b43efdad3a *R/trapzmat.R
@@ -209,6 +209,7 @@ efa4cb1b7e740d37067b928eec0453b4 *demo/handwrit.pda.R
 7006b34d1d51ae9f40b09765ebe5a934 *demo/lip.R
 d105b37b07354742fde36d3dc353ca73 *demo/pinch.R
 8e76e0a08ae07527e5e4be9692927bbf *demo/weatherANOVA.R
+8bddb60eab519efa4c9d35b7de524e92 *inst/NEWS.Rd
 99f468aaffc5c316ac507f67d8d0c4f4 *inst/scripts/afda-ch01.R
 f118ee5220a59ec1fbaffef3a655e353 *inst/scripts/afda-ch02.R
 ae2a4ca4fcde53e144894d49f701577f *inst/scripts/afda-ch03.R
@@ -238,7 +239,7 @@ c95656fac6e752bbc8eca84ff9044df9 *inst/scripts/fdarm-ch11.R
 e4fdf22c0251fbd2753b073c209d1985 *man/CRAN.Rd
 4478be47e79198db683eb821a0d1e305 *man/CSTR.Rd
 f39f5660dca694b9f44a4a7238c307fc *man/CanadianWeather.Rd
-298e201236f361b8c0aa185e0bfb5caa *man/Data2fd.Rd
+21c4ed6fb7c4c1c34c03623695cc955c *man/Data2fd.Rd
 93d0b6347c94c2d27eaa0ca5263c45cf *man/Eigen.Rd
 62290bdf25575097016ac1f0d564e227 *man/ElectricDemand.Rd
 5d796f84d0151d1c2cb514b42a87bde5 *man/Fperm.fd.Rd
@@ -276,7 +277,7 @@ ea3f015285d56d2ca8c77fed7308d63a *man/create.polygonal.basis.Rd
 0acb984db1aedbfde5369747e19d3c36 *man/create.power.basis.Rd
 d11b8c2c0a1b0e37fa8dbc61b156a6f7 *man/cycleplot.fd.Rd
 bb37fe9802d4abd477e037ce30d22031 *man/dateAccessories.Rd
-ac54b74f83e4c30468f835d9558d2395 *man/density.fd.Rd
+cb044696a16303fdb06ec3c8783048ae *man/density.fd.Rd
 002c5abe2125c5d211e911ea69098047 *man/deriv.fd.Rd
 412f8fa2987ace5358710924e1743eea *man/df.residual.fRegress.Rd
 48f2e5c45fcfbbd1e2672156136bd42b *man/df2lambda.Rd
@@ -335,7 +336,9 @@ edc0241adc76c183020e1a78aead468e *man/linmod.Rd
 5b5294b84e6e01289d1d44e6a7962834 *man/matplot.Rd
 f851b18eff9fb8f3ad61b457d77d72cf *man/mean.fd.Rd
 512a20a759ad04b4286b70f841db8351 *man/melanoma.Rd
-71c56e0ffe31908adc6169508d09efc2 *man/monfn.Rd
+8d682cf6769351570f6d7a967d857f1e *man/monfn.Rd
+fea530c8ddcd7c6439871f2d26671464 *man/mongrad.Rd
+40fc2bfad0567492fcd5e90bc5537954 *man/monhess.Rd
 66dc8e93519d2792983d20e52d24a0a8 *man/monomial.Rd
 bea3bcd5e7169a2165b6d9c71e0c7d5f *man/monomialpen.Rd
 811aa76f3a95681b5abc44524bb19dd2 *man/nondurables.Rd
@@ -358,6 +361,7 @@ defaa4153acf97291f1f032e9f9c3c40 *man/plot.pca.fd.Rd
 242418038d44afe5c3603402a33c3ad9 *man/plotfit.fd.Rd
 a6b267b2f75f99545a40ad410efa0cfa *man/plotreg.fd.rd
 7c73103c14baeedce08c87e1d4552737 *man/plotscores.Rd
+5ec64d46be48b7d848c108d000b936d8 *man/polintmat.Rd
 384b620598e6b1b575104cef13554c89 *man/polyg.Rd
 7351d0f46bbcc4c0ec36e6e67ef1784a *man/polygpen.Rd
 7f5edfd4983187a09fbd35ef0116f601 *man/powerbasis.Rd
@@ -379,7 +383,8 @@ a1a5dfb8689bf7e953a5b7380fdbbe88 *man/smooth.basis.Rd
 5c9d527e85ad6420869eaa73d411cefa *man/smooth.fd.Rd
 10c95700ff5eec55e07f758d6cb64359 *man/smooth.fdPar.Rd
 0873eadba8a671eb3c02fda1ba35d5c5 *man/smooth.monotone.Rd
-67c940985d8eb4594cbaab7cea1fdaa9 *man/smooth.morph.Rd
+ecb738997b91ba47e9fab350f61f4468 *man/smooth.morph.Rd
+1d6f10027ecbd09cd75720ff6314cde1 *man/smooth.morph2.Rd
 5c79acd0dd89b0d56a504af6bdd4df7d *man/smooth.pos.Rd
 3efc68879af29af558e4101daf16590c *man/smooth.sparse.mean.Rd
 2b1d3c26c13eed2fc5e2cd953a62e494 *man/smooth.surp.Rd
@@ -393,7 +398,7 @@ fa33c16f0c10143e96e1dbb36a6a74bb *man/summary.basisfd.Rd
 04ad30057f7ffaab3be58ed84015438b *man/summary.bifd.Rd
 2456392e806e15ea94166b72d58d8ee5 *man/summary.fd.Rd
 4454f88f94e0d80f73ba71a0e1bc8f46 *man/summary.fdPar.Rd
-d6298779aaf3ca64bef849d432287fc2 *man/surp.fit.Rd
+87a27db4cdb69030b23473a491908209 *man/surp.fit.Rd
 651ae52e63a6e0a463bf6a5a733e283a *man/symsolve.Rd
 be57a243ee5da94aa2c4740e7245c811 *man/tperm.fd.Rd
 8b333ad7ef3d1e363e537ecef111c218 *man/trapzmat.Rd

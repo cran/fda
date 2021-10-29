@@ -11,7 +11,15 @@ lnsrch <- function (xold, fold, g, p, func, dataList, stpmax,
         p <- p*(stpmax/psum)
     }
     slope <- sum(g*p)
-    if (dbglev > 1) print(c(0,0,slope,fold))
+    if (dbglev > 1) {
+      cat("\n")
+      cat("      ")
+      cat(0)
+      cat("      ")
+      cat(round(slope,5))
+      cat("      ")
+      cat(round(fold,5))
+    } 
     if (slope >= 0) {
         stop('Initial slope not negative.')
     }
@@ -35,7 +43,15 @@ lnsrch <- function (xold, fold, g, p, func, dataList, stpmax,
         result <- func(x, dataList)
         f <- result$PENSSE
         g <- result$DPENSSE
-        if (dbglev > 1) print(c(iter,alam,f))
+        if (dbglev > 1) {
+          cat("\n")
+          cat("      ")
+          cat(iter)
+          cat("      ")
+          cat(round(slope,5))
+              cat("      ")
+              cat(round(fold,5))
+        }
         #  -----------------------------------------------
         #  convergence on x change.
         if (alam < alamin) {

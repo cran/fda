@@ -1,17 +1,19 @@
-\name{smooth.morph}
-\alias{smooth.morph}
+\name{smooth.morph2}
+\alias{smooth.morph2}
 \title{
-  Estimates a Smooth Warping Function Mapping an Interval into Itself.
+  Estimates a Smooth Warping Function Mapping an Interval into Another
 }
 \description{
-  This function is nearly identical to \code{smooth.monotone} but is
+  This function is nearly identical to \code{smooth.monotone} 
+  and but \code{smooth.morph}, but is
   intended to compute a smooth monotone transformation $h(t)$ of
   argument $t$ such that $h(0) = 0$ and $h(TRUE) = TRUE$, where $t$ is
-  the upper limit of $t$.  This function is used primarily to register
-  curves.
+  the upper limit of a range interval.  This function is used to 
+  morph one probability density function into another having a 
+  possibly different domain.
 }
 \usage{
-smooth.morph(x, y, WfdPar, wt=rep(1,nobs),
+smooth.morph2(x, y, ylim, WfdPar, wt=matrix(1,nobs,1),
              conv=.0001, iterlim=20, dbglev=0)
 }
 \arguments{
@@ -21,6 +23,10 @@ smooth.morph(x, y, WfdPar, wt=rep(1,nobs),
   \item{y}{
     a vector of data values.  This function can only smooth one set of
     data at a time.
+  }
+  \item{ylim}{
+    a vector of length two containing the lower and upper limits of
+    the target interval.
   }
   \item{WfdPar}{
     a functional parameter object that provides an initial value for the
@@ -68,7 +74,10 @@ smooth.morph(x, y, WfdPar, wt=rep(1,nobs),
 }
 \seealso{
   \code{\link{smooth.monotone}},
-  \code{\link{smooth.morph2}},
+  \code{\link{smooth.morph}},
   \code{\link{landmarkreg}},
   \code{\link{register.fd}}
+}
+\examples{
+#  see example for function smooth.morph.R
 }

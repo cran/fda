@@ -1,7 +1,9 @@
 \name{monfn}
 \alias{monfn}
-\title{Evaluates a monotone function}
-\description{Evaluates a monotone function}
+\title{Evaluate the a monotone function}
+\description{Evaluate a monotone function defined as the indefinite integral of
+$exp(W(t))$ where $W$ is a function defined by a basis expansion.  Function $W$
+is the logarithm of the derivative of the monotone function.}
 \usage{
   monfn(argvals, Wfdobj, basislist=vector("list", JMAX), returnMatrix=FALSE)
 }
@@ -24,8 +26,26 @@
   where \eqn{D^{-1}} means taking the indefinite integral. The interval over
   which the integration takes places is defined in the basis object in Wfdobj.
 }
+\references{
+  Ramsay, James O., Hooker, G. and Graves, S. (2009), \emph{Functional
+    Data Analysis with R and Matlab}, Springer, New York.
+    
+  Ramsay, James O., and Silverman, 
+  Bernard W. (2005), \emph{Functional
+    Data Analysis, 2nd ed.}, Springer, New York.
+
+  Ramsay, James O., and Silverman, 
+  Bernard W. (2002), \emph{Applied
+    Functional Data Analysis}, Springer, New York.
+}
+\author{
+  J. O. Ramsay
+}
 \seealso{
-  \code{\link{landmarkreg}}
+  \code{\link{mongrad}},
+  \code{\link{landmarkreg}},
+  \code{\link{smooth.morph}},
+  \code{\link{smooth.morph2}}
 }
 \examples{
 
