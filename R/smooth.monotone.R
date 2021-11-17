@@ -91,7 +91,7 @@ smooth.monotone <- function(argvals, y, WfdParobj, wtvec=rep(1,n),
 #  FLIST and Y2CMAP objects are indexed linear with curves varying
 #  inside variables.
 
-# last modified 6 January 2020 by Jim Ramsay
+# last modified 16 November 2021 by Jim Ramsay
 
   #  check ARGVALS
   
@@ -115,7 +115,7 @@ ndim   <- ychk$ndim
 
 #  check WfdParobj and get LAMBDA
 
-WfdParobj <- fdParcheck(WfdParobj)
+WfdParobj <- fdParcheck(WfdParobj,ncurve)
 lambda    <- WfdParobj$lambda
 
 #  the starting values for the coefficients are in FD object WFDOBJ

@@ -135,9 +135,10 @@ fRegress.double <- function(y, xfdlist, betalist, wt=NULL,
   
   betacoef <- Cmatinv %*% Dmat
   
-  #  compute degrees of freedom measure
-  
-  df <- sum(diag(Zmat %*% Cmatinv %*% t(Zmat)))
+#    df <- sum(diag(Zmat %*% Cmatinv %*% t(Zmat)))
+
+    hatvals = diag(Zmat %*% Cmatinv %*% t(Zmat))
+    df <- sum(hatvals)
   
   #  set up fdPar object for BETAESTFDPAR
   
@@ -185,6 +186,11 @@ fRegress.double <- function(y, xfdlist, betalist, wt=NULL,
     }
   }
   yhatfdobj <- yhatmat
+  
+    # Calculate OCV and GCV scores
+
+    OCV = sum( (ymat-yhatmat)^2/(1-hatvals)^2 )
+    GCV = sum( (ymat-yhatmat)^2 )/( (sum(1-hatvals))^2 )
   
   #  -----------------------------------------------------------------------
   #        Compute pointwise standard errors of regression coefficients
@@ -246,6 +252,8 @@ fRegress.double <- function(y, xfdlist, betalist, wt=NULL,
          Cmatinv        = Cmatinv,
          wt             = wt,
          df             = df,
+		 GCV			= GCV,
+		 OCV			= OCV,
          y2cMap         = y2cMap,
          SigmaE         = SigmaE,
          betastderrlist = betastderrlist,

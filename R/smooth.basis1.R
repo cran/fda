@@ -63,7 +63,7 @@ smooth.basis1 <- function (argvals=1:n, y, fdParobj,
   #   PENMAT  the penalty matrix.
   #   Y2CMAP  the matrix mapping the data to the coefficients.
   #
-  # last modified 7 August 2020 by Jim Ramsay
+  # last modified 16 November 2021 by Jim Ramsay
   
   #  This version of smooth.basis, introduced in March 2011, permits ARGVALS
   #  to be a matrix, with the same dimensions as the first two dimensions of Y
@@ -101,7 +101,7 @@ smooth.basis1 <- function (argvals=1:n, y, fdParobj,
   
   #  check fdParobj
   
-  fdParobj <- fdParcheck(fdParobj)
+  fdParobj <- fdParcheck(fdParobj, nrep)
   
   fdobj    <- fdParobj$fd
   lambda   <- fdParobj$lambda

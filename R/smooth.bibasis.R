@@ -40,7 +40,7 @@ smooth.bibasis <- function (sarg, targ, y, fdPars, fdPart, fdnames=NULL,
 #   PENMAT...  the penalty matrix.
 #   Y2CMAP...  the matrix mapping the data to the coefficients.
 
-# last modified 13 April 2020 by Jim Ramsay
+# last modified 16 Novembeer 2021 by Jim Ramsay
 
 #  ---------------------------------------------------------------------
 #                      Check argments
@@ -76,14 +76,14 @@ if (length(ydim) == 2) {
 
   #  check FDPARS, FDPART and BASES, LBFDOBJ"S and LAMBDA"S
 
-fdPars  = fdParcheck(fdPars)
+fdPars  = fdParcheck(fdPars,nsurf)
 fdobjs  = fdPars$fd
 sbasis  = fdobjs$basis
 snbasis = sbasis$nbasis - length(sbasis$dropind)
 lambdas = fdPars$lambda
 Lfds    = fdPars$Lfd
 
-fdPart  = fdParcheck(fdPart)
+fdPart  = fdParcheck(fdPart,nsurf)
 fdobjt  = fdPart$fd
 tbasis  = fdobjt$basis
 tnbasis = tbasis$nbasis - length(tbasis$dropind)

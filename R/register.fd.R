@@ -45,7 +45,7 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=NULL,
 #    REGLIST$Y0FD   ... Argument Y0FD
 #    REGLIST$YFD    ... Argument YFD
 
-#  Last modified 6 January 2020 by Jim Ramsay
+#  Last modified 16 November 2021 by Jim Ramsay
 
 ##
 ## 1.  Check y0fd and yfd
@@ -142,9 +142,9 @@ register.fd <- function(y0fd=NULL, yfd=NULL, WfdParobj=NULL,
       Wfd0      <- fd(matrix(0,2,ncurve),wbasis)
       WfdParobj <- fdPar(Wfd0)
   }
-  WfdParobj <- fdParcheck(WfdParobj)
-  Wfd0   <- WfdParobj$fd
-  wcoef  <- Wfd0$coefs
+  WfdParobj <- fdParcheck(WfdParobj, ncurve)
+  Wfd0      <- WfdParobj$fd
+  wcoef     <- Wfd0$coefs
   if (is.vector(wcoef)) wcoef <- as.matrix(wcoef)
   wbasis <- Wfd0$basis
   wtype  <- wbasis$type

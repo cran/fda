@@ -311,7 +311,7 @@ fRegress.formula <- function(y, data=NULL, betalist=NULL,
         if(is.numeric(xfdlist[[i]])) {
           #  if xfdlist[[i]] is numeric, basis is set up using that  of dependent variable y
           if(is.numeric(y)) {
-            bbasis        <- create.constant.basis(trng)
+            bbasis        <- create.constant.basis(c(0,1))
             bfd           <- fd(basisobj=bbasis)
             betalist[[i]] <- fdPar(bfd)
           } else {

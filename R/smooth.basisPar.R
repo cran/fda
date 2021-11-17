@@ -43,6 +43,7 @@ smooth.basisPar <- function(argvals, y, fdobj=NULL, Lfdobj=NULL,
 ##
   fdP <- fdPar(fdobj, Lfdobj=Lfdobj, lambda=lambda,
                estimate=estimate, penmat=penmat)
+  
 ##
 ## 3.  smooth.basis:  carry out smoothing by a call to smooth.basis and
 ##     return the smoothList object that this function returns

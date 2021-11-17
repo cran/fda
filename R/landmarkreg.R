@@ -25,7 +25,7 @@ landmarkreg <- function(fdobj, ximarks, x0marks=xmeanmarks,
 #  WFD     ... a functional data object for the W functions defining the
 #              warping functions
 
- #  Last modified 6 January 2020 by Jim Ramsay
+ #  Last modified 16 November 2021  by Jim Ramsay
 
   #  check FDOBJ
 
@@ -48,6 +48,7 @@ landmarkreg <- function(fdobj, ximarks, x0marks=xmeanmarks,
   type     <- basisobj$type
   nbasis   <- basisobj$nbasis
   rangeval <- basisobj$rangeval
+  fdobj    <- fd(matrix(0,nbasis,ncurve),basisobj)
   fdParobj <- fdPar(basisobj, 2, ylambda)
 
   #  check landmarks
@@ -71,12 +72,13 @@ landmarkreg <- function(fdobj, ximarks, x0marks=xmeanmarks,
     rangex    <- basisobj$rangeval
     wnbasis   <- length(x0marks) + 2
     wbasis    <- create.bspline.basis(rangex, wnbasis)
-    WfdParobj <- fdPar(wbasis)
+    wfd       <- fd(matrix(0,wnbasis,ncurve))
+    WfdParobj <- fdPar(wfd)
   }
 
   #  check WFDPAR
 
-  WfdPar <- fdParcheck(WfdPar)
+  WfdPar <- fdParcheck(WfdPar, ncurve)
 
   #  set up WFD0 and WBASIS
 

@@ -60,7 +60,7 @@ smooth.pos <- function(argvals, y, WfdParobj, wtvec=rep(1,n), conv=1e-4,
   #  FLIST objects are indexed linear with curves varying inside
   #  variables.
   
-  #  Last modified 6 January 2020 by Jim Ramsay
+  #  Last modified 16 November 2021 by Jim Ramsay
   
   #  check ARGVALS
   
@@ -85,7 +85,7 @@ smooth.pos <- function(argvals, y, WfdParobj, wtvec=rep(1,n), conv=1e-4,
   
   #  check WfdParobj and get LAMBDA
   
-  WfdParobj <- fdParcheck(WfdParobj)
+  WfdParobj <- fdParcheck(WfdParobj,curve)
   lambda    <- WfdParobj$lambda
   
   #  the starting values for the coefficients are in FD object WFDOBJ
