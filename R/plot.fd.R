@@ -186,7 +186,7 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
     if (!ask) {
       matplot(y, fdmat, type="l",
               xlim=xlim,   ylim=ylim,
-              xlab=xlab, ylab=ylab, axes=Axes)
+              xlab=xlab, ylab=ylab, axes=Axes, ...)
       if(axFun)
         do.call(axList[[1]], axList[-1])
       #   Ramsay 2008.08.26
