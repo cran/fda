@@ -691,7 +691,7 @@ CSTRfn <- function(parvec, datstruct, fitstruct,
 
 #    DcDtheta <- D2GDc2\D2GDc
     DcDtheta <- try(solve(D2GDc2, D2GDc))
-    if(class(DcDtheta)=="try-error"){
+    if(inherits(DcDtheta,"try-error")) {
 #
       D2GDc2.eig <- eigen(D2GDc2, symmetric=TRUE)
       Dc.ev <- D2GDc2.eig$values

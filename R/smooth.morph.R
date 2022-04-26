@@ -1,122 +1,150 @@
-smooth.morph <- function(x, y, WfdPar, wt=rep(1,nobs),
-                         conv=.0001, iterlim=20, dbglev=0)
-{
-#SMOOTH_MORPH smooths the relationship of Y to X
-#  by fitting a monotone fn.  f(argvals) = b_0 + b_1 D^{-1} exp W(t)
-#     where  W  is a function defined over the same range as ARGVALS,
-#  W + ln b_1 = log Df and w = D W = D^2f/Df.
-#  b_0 and b_1 are chosen so that f(t_1) = y_1 and f(t_n) = y_n.
-#  The fitting criterion is penalized mean squared error:
-#    PENSSE(lambda) = \sum [y_i - f(t_i)]^2 +
-#                     \lambda * \int [L W]^2
-#  W(x) is expanded by the basis in functional data object Wfd.
-
-#  Arguments:
-#  X       ...  vector of argument values
-#  Y       ...  vector of function values to be fit
-#  WFDPAR  ...  functional parameter object for W(x).  The coefficient array
-#          for WFDPAROBJ$FD has a single column, and these are the starting
-#          values for the iterative minimization of mean squared error.
-#  WT      ...  a vector of weights
-#  CONV    ...  convergence criterion, 0.0001 by default
-#  ITERLIM ...  maximum number of iterations, 20 by default
-#  DBGLEV  ...  Controls the level of output on each iteration.  If 0,
-#               no output, if 1, output at each iteration, if higher, output
-#               at each line search iteration. 1 by default.
-
-#  Returns a list containing:
-#  WFDOBJ    ...  functional data object for W(x).  Its coefficients are
-#                   those that optimize fit.
-#  FLIST     ...  List containing final criterion value, gradient, and
-#                 gradient norm.
-#  ITERNUM   ...  number of iterations
-#  ITERHIST  ...  ITERNUM+1 by 5 array containing iteration history
-
-# last modified 29 June 2018 by Jim Ramsay
-
-#  initialize some arrays
-
-  x      <- as.vector(x)
-  nobs   <- length(x)         #  number of observations
-
-#  check WfdPar
-
-  if (!(inherits(WfdPar, "fdPar"))) stop(
-		"Argument WFDPAROBJ is not a functional data object.")
-
-#  extract information from WfdPar
-
+smooth.morph <- function(x, y, ylim, WfdPar,   
+                         conv=1e-4, iterlim=20, dbglev=0) {
+  #  SMOOTH_MORPH smooths the relationship of Y to X 
+  #  by fitting a monotone fn.  f(x) <- b_0 + b_1 D^{-1} exp W(t)
+  #     where  W  is a function defined over the same range as X,
+  #  W + ln b_1 <- log Df and w <- D W <- D^2f/Df.
+  #  b_0 and b_1 are chosen so that values of f
+  #  are within the interval [ylim[1],ylim[2]].
+  #  The fitting criterion is penalized mean squared stop:
+  #    PENSSE(lambda) <- \sum [y_i - f(t_i)]^2 +
+  #                     \lambda * \int [L W]^2 
+  #  W(x) is expanded by the basis in functional data object Wfdobj.
+  #
+  #  Arguments are 
+  #  X         argument value array
+  #  Y         data array containing the the values to be fit
+  #  YLIM      Ordinate value limits. The values of the estimated function
+  #               range between these limits.  The abscissa range is 
+  #               defined in WfdPar.
+  #  WFDPAR   A functional parameter or fdPar object.  This object 
+  #               contains the specifications for the functional data
+  #               object to be estimated by smoothing the data.  See
+  #               comment lines in function fdPar for details.
+  #               The functional data object WFD in FDPAROBJ is used
+  #               to initialize the optimization process.
+  #               It's coefficient array has a single column, and these 
+  #               are the starting values for the iterative minimization 
+  #               of mean squared stop.
+  #               This argument may also be either a FD object, or a 
+  #               BASIS object.  In this case, the smoothing parameter 
+  #               LAMBDA is set to 0.
+  #  WT        a vector of weights
+  #  CONV      convergence criterion, 0.0001 by default
+  #  ITERLIM   maximum number of iterations, 20 by default
+  #  DBGLEV    Controls the level of output on each iteration.  If 0,
+  #               no output, if 1, output at each iteration, if higher, 
+  #               output at each line search iteration. 1 by default.
+  #
+  #  Returns are:
+  #  WFD       Functional data object for W.  It's coefficient vector
+  #               contains the optimized coefficients.
+  
+  #  last modified 3 April 2022 by Jim Ramsay
+  
+  nobs <- length(x)        #  number of observations
+  wt=matrix(1,nobs,1)
+  wt[nobs] <- 10
+  
+  # check consistency of x and y and convert to column matrices
+  
+  if (length(y) != nobs) {
+    stop('Arguments X and Y are not of same length')
+  }
+  
+  if (!is.matrix(x)) x <- matrix(x,nobs,1)
+  if (!is.matrix(y)) y <- matrix(y,nobs,1)
+  
+  #  check ylim for not being numeric
+  
+  if (!is.numeric(ylim)) {
+    print("The third argument ylim is not numeric.  This argument
+          should be a vector of length 2 containing the boundaries of
+          the target interval.")
+    stop("This argument has been added to allow morphs between two unequal invervals.")
+  }
+  
+  #  check ylim for not having two strictly increasing numbers
+  
+  if (length(ylim) != 2 || ylim[1] >= ylim[2])
+    stop("Argument ylim does not containing two strictly increasing numbers.")
+  
+  #  check WfdPar
+  
+  if (!is.fdPar(WfdPar)) {
+    if (is.fd(WfdPar)) {
+      WfdPar <- fdPar(WfdPar)
+    } else {
+      stop(paste("WFDPAR is not a functional parameter object,", 
+                 "and not a functional data object."))
+    }
+  }
+  
+  #  -----------------------------------------------------
+  #      extract information from WfdPar
+  #  -----------------------------------------------------
+  
   Wfdobj   <- WfdPar$fd
-  Lfdobj   <- WfdPar$Lfd
-  lambda   <- WfdPar$lambda
-
-#  check LFDOBJ
-
-  Lfdobj   <- int2Lfd(Lfdobj)
-
-#  extract further information
-
-  basisobj <- Wfdobj$basis     #  basis for W(x)
-  nbasis   <- basisobj$nbasis  #  number of basis functions
-  type     <- basisobj$type
-  rangeval <- basisobj$rangeval
-  cvec     <- Wfdobj$coefs
-  ncvec    <- length(cvec)
-
-  if (type == "bspline" || type == "fourier") {
-      active <- c(FALSE, rep(TRUE, nbasis-1))
-  } else {
-      active <- rep(TRUE, nbasis)
+  Wbasis   <- Wfdobj$basis      #  basis for Wfdobj
+  Wnbasis  <- Wbasis$nbasis      #  no. basis functions
+  Wrange   <- Wbasis$rangeval
+  Wtype    <- Wbasis$type
+  xlim     <- Wbasis$rangeval
+  WLfdobj  <- int2Lfd(WfdPar$Lfd)
+  Wlambda  <- WfdPar$lambda
+  if (any(wt < 0)) { 
+    stop("One or more weights are negative.") 
   }
-
-#  check some arguments
-
-  if (any(diff(x) <= 0)) stop("Arguments are not strictly increasing.")
-  if (x[1] < rangeval[1] | x[nobs] > rangeval[2]) stop(
-		"Argument values are out of range.")
-  if (any(wt < 0))  stop("One or more weights are negative.")
-  if (all(wt == 0)) stop("All weights are zero.")
-
-#  set up some variables
-
-  wtroot <- sqrt(wt)
-  climit <- c(-100*rep(1,nbasis), 100*rep(1,nbasis))
-  inact  <- !active   #  indices of inactive coefficients
-
-#  set up cell for storing basis function values
-
-  JMAX <- 15
-  basislist <- vector("list", JMAX)
-
-#  initialize matrix Kmat defining penalty term
-
-  if (lambda > 0) {
-      Kmat <- lambda*getbasispenalty(basisobj, Lfdobj)
-  } else {
-      Kmat <- NULL
+  
+  cvec <- Wfdobj$coef   #  initial coefficients
+  Zmat <- fda::zerobasis(length(cvec))
+  bvec <- t(Zmat) %*% cvec
+  cvec <- Zmat %*% bvec
+  
+  #  check range of x
+  
+  if (x[1] < xlim[1] || x[nobs] > xlim[2]) {
+    stop("Values in are out of bounds.")
   }
-
-#  Compute initial function and gradient values
-
-  fngradlist <- fngrad.smooth.morph(y, x, wt, Wfdobj, lambda,
-                                    Kmat, inact, basislist)
-  Flist <- fngradlist[[1]]
-  Dyhat <- fngradlist[[2]]
-
-#  compute the initial expected Hessian
-
-  hessmat <- hesscal.smooth.morph(Dyhat, wtroot, lambda, Kmat, inact)
-
-#  evaluate the initial update vector for correcting the initial cvec
-
-  result   <- linesearch.smooth.morph(Flist, hessmat, dbglev)
-  deltac   <- result[[1]]
-  cosangle <- result[[2]]
-
-#  initialize iteration status arrays
-
+  
+  #  initialize matrix Kmat defining penalty term
+  
+  if (Wlambda > 0) {
+    Kmat <- Wlambda*eval.penalty(Wbasis, WLfdobj)
+  } else {
+    Kmat  <- matrix(0,Wnbasis,Wnbasis)
+  }
+  
+  #  load objects into morphList, used in fngrad_morph
+  
+  morphList <- list(x=x, y=y, xlim=xlim, ylim=ylim, wt=wt, Kmat=Kmat, 
+                    Wlambda=Wlambda, Wbasis=Wbasis)
+  
+  #  -----------------------------------------------------
+  #       Compute initial function and gradient values
+  #  -----------------------------------------------------
+  
+  fnList <- fngrad_morph(bvec, morphList, Zmat)   
+  f    <- fnList$f
+  grad <- fnList$grad 
+  hmat <- fnList$hmat
+  norm <- fnList$norm
+  
+  #  compute initial badness of fit measures
+  
+  fold    <- f
+  cvecold <- cvec
+  
+  #  evaluate the initial update vector 
+  
+  pvec <- -solve(hmat,grad)
+  
+  #  -----------------------------------------------------
+  #  initialize iteration status arrays
+  #  -----------------------------------------------------
+  
   iternum <- 0
-  status  <- c(iternum, Flist$f, Flist$norm)
+  status <- c(iternum, fold, norm)
   if (dbglev >= 1) {
     cat("\nIter.   PENSSE   Grad Length")
     cat("\n")
@@ -126,235 +154,285 @@ smooth.morph <- function(x, y, WfdPar, wt=rep(1,nobs),
     cat("      ")
     cat(round(status[3],4))
   }
-  # if (dbglev == 0 && iterlim > 1)
-  #       cat("Progress:  Each dot is an iteration\n")
-
   iterhist <- matrix(0,iterlim+1,length(status))
   iterhist[1,]  <- status
-  if (iterlim == 0)
-    return ( list( "Wfdobj" = Wfdobj, "Flist" = Flist,
-                 "iternum" = iternum, "iterhist" = iterhist ) )
-
-#  -------  Begin iterations  -----------
-
-  MAXSTEPITER <- 10
-  MAXSTEP     <- 100
-  trial       <- 1
-  reset       <- FALSE
-  linemat     <- matrix(0,3,5)
-  cvecold     <- cvec
-  Foldlist    <- Flist
-  dbgwrd      <- dbglev >= 2
-
-  for (iter in 1:iterlim)
-  {
-
-      # if (dbglev == 0 && iterlim > 1) cat(".")
-      iternum <- iternum + 1
-      #  initialize logical variables controlling line search
-      dblwrd <- rep(FALSE,2)
-      limwrd <- rep(FALSE,2)
-      stpwrd <- 0
-      ind    <- 0
-      ips    <- 0
-      #  compute slope at 0 for line search
-      linemat[2,1] <- sum(deltac*Flist$grad)
-      #  normalize search direction vector
-      sdg     <- sqrt(sum(deltac^2))
-      deltac  <- deltac/sdg
-      linemat[2,1] <- linemat[2,1]/sdg
-      # initialize line search vectors
-      linemat[,1:4] <- outer(c(0, linemat[2,1], Flist$f),rep(1,4))
-      stepiter <- 0
-      if (dbglev >= 2) {
-          cat("\n")
-          cat(paste("                 ", stepiter, "  "))
-          cat(format(round(t(linemat[,1]),6)))
-          cat("\n")
+  
+  #  -----------------------------------------------------
+  #  -------------  Begin main iterations  ---------------
+  #  -----------------------------------------------------
+  
+  STEPMAX <- 10
+  itermax <- 20
+  TOLX    <- 1e-10
+  fold    <- f
+  
+  #  -----------------------------------------------------
+  #  --------  beginning of optimization loop  -----------
+  #  -----------------------------------------------------
+  
+  for (iter in 1:iterlim) {
+    iternum <- iternum + 1
+    #  line search
+    bvecold <- t(Zmat) %*% cvecold
+    lnsrchList <- lnsrch_morph(bvecold, fold, grad, pvec, fngrad_morph, 
+                                morphList, Zmat, STEPMAX, itermax, TOLX, 
+                                dbglev)
+    bvec   <- lnsrchList$x
+    check  <- lnsrchList$check
+    fnList <- fngrad_morph(bvec, morphList, Zmat)   
+    f    <- fnList$f
+    grad <- fnList$grad 
+    hmat <- fnList$hmat
+    norm <- fnList$norm
+    cvec <- Zmat %*% bvec
+    status <- c(iternum, f, norm)
+    iterhist[iter+1,] <- status
+    if (dbglev >= 1) {
+      cat("\n")
+      cat(iternum)
+      cat("        ")
+      cat(round(status[2],4))
+      cat("      ")
+      cat(round(status[3],4))
+    }
+    if (abs(f-fold) < conv) {
+      break
+    }
+    if (f >= fold) { 
+      warning("Current function value does not decrease fit.")
+      cat("\n")
+      break 
+    }
+    #  evaluate the update vector
+    pvec <- -solve(hmat,grad)
+    cosangle <- -t(grad) %*% pvec/sqrt(sum(grad^2)*sum(pvec^2))
+    if (cosangle < 0) {
+      if (dbglev > 1) {
+        print("cos(angle) negative") 
       }
-      #  return with error condition if initial slope is nonnegative
-      if (linemat[2,1] >= 0) {
-        if (dbgwrd >= 2) print("Initial slope nonnegative.")
-        ind <- 3
-        break
-      }
-      #  return successfully if initial slope is very small
-      if (linemat[2,1] >= -1e-7) {
-        if (dbglev >= 2) print("Initial slope too small")
-        ind <- 0
-        break
-      }
-      #  first step set to trial
-      linemat[1,5]  <- trial
-      #  Main iteration loop for linesearch
-      cvecnew <- cvec
-      Wfdnew  <- Wfdobj
-      for (stepiter in 1:MAXSTEPITER)
-      {
-      #  ensure that step does not go beyond limits on parameters
-        limflg  <- FALSE
-        #  check the step size
-        result <-
-              stepchk(linemat[1,5], cvec, deltac, limwrd, ind,
-                      climit, active, dbgwrd)
-        linemat[1,5] <- result[[1]]
-        ind          <- result[[2]]
-        limwrd       <- result[[3]]
-        if (linemat[1,5] <= 1e-7)
-        {
-          #  Current step size too small ... terminate
-          if (dbglev >= 2) {
-            print("Stepsize too small")
-#            print(avec[5])
-            print(linemat[1, 5])
-          }
-          if (limflg) ind <- 1 else ind <- 4
-          break
-        }
-        #  compute new function value and gradient
-        cvecnew <- cvec + linemat[1,5]*deltac
-        Wfdnew$coefs <- as.matrix(cvecnew)
-        fngradlist   <- fngrad.smooth.morph(y, x, wt, Wfdnew, lambda,
-                                          Kmat, inact, basislist)
-        Flist <- fngradlist[[1]]
-        Dyhat <- fngradlist[[2]]
-        linemat[3,5] <- Flist$f
-        #  compute new directional derivative
-        linemat[2,5] <- sum(deltac*Flist$grad)
-        if (dbglev >= 2) {
-          cat(paste("                 ", stepiter, "  "))
-          cat(format(round(t(linemat[,5]),6)))
-          cat("\n")
-        }
-        #  compute next line search step, also test for convergence
-        result  <- stepit(linemat, ips, dblwrd, MAXSTEP)
-        linemat <- result[[1]]
-        ips     <- result[[2]]
-        ind     <- result[[3]]
-        dblwrd  <- result[[4]]
-        trial   <- linemat[1,5]
-        #  ind == 0  mean convergence
-        if (ind == 0 | ind == 5) break
-     }
-     #  end iteration loop
-     cvec    <- cvecnew
-     Wfdobj  <- Wfdnew
-     #  check that function value has not increased
-     if (Flist$f > Foldlist$f) {
-        # if it has, terminate iterations with a message
-        if (dbglev >= 2) {
-          cat("Criterion increased: ")
-          cat(format(round(c(Foldlist$f, Flist$f),4)))
-          cat("\n")
-        }
-        #  reset parameters and fit
-        cvec         <- cvecold
-        Wfdobj$coefs <- cvec
-        Flist        <- Foldlist
-        deltac       <- -Flist$grad
-        if (reset) {
-          # This is the second time in a row that
-          #  this has happened ... quit
-          if (dbglev >= 2) cat("Reset twice, terminating.\n")
-          return ( list( "Wfdobj" = Wfdobj, "Flist" = Flist,
-                         "iternum" = iternum, "iterhist" = iterhist ) )
-        } else {
-          reset <- TRUE
-        }
-     } else {
-       if (abs(Foldlist$f - Flist$f) < conv) {
-	       # cat("\n")
-	       break
-       }
-       cvecold  <- cvec
-       Foldlist <- Flist
-       hessmat  <- hesscal.smooth.morph(Dyhat, wtroot, lambda, Kmat, inact)
-       #  udate the line search direction
-       result   <- linesearch.smooth.morph(Flist, hessmat, dbglev)
-       deltac   <- result[[1]]
-       cosangle <- result[[2]]
-       reset    <- FALSE
-     }
-     #  store iteration status
-     status <- c(iternum, Flist$f, Flist$norm)
-     iterhist[iter+1,] <- status
-     if (dbglev >= 1) {
-        cat("\n")
-        cat(iternum)
-        cat("        ")
-        cat(round(status[2],4))
-        cat("      ")
-        cat(round(status[3],4))
-     }
+      pvec <- -grad
+    }
+    fold <- f
+    cvecold <- cvec
   }
-  return ( list( "Wfdobj" = Wfdobj, "Flist" = Flist,
-                 "iternum" = iternum, "iterhist" = iterhist ) )
+  
+  #  -----------------------------------------------------
+  #         construct output objects
+  #  -----------------------------------------------------
+  
+  Wfdobj  <- fd(cvec, Wbasis)
+  
+  xfine   <- as.matrix(seq(xlim[1],xlim[2],len=101))
+  ywidth  <- ylim[2] - ylim[1]
+  hfine   <- matrix(monfn(xfine, Wfdobj), 101, 1)
+  hmax    <- monfn(xlim[2], Wfdobj)
+  hmin    <- monfn(xlim[1], Wfdobj)
+  hwidth  <- hmax - hmin
+  hfine   <- (ylim[1] - hmin) + hfine*(ywidth/hwidth)
+  
+  return(list(Wfdobj=Wfdobj, f=f, grad=grad, hmat=hmat, norm=norm, hfine=hfine, 
+              iternum=iternum, iterhist=iterhist))
+  
 }
 
-#  ----------------------------------------------------------------
+#  ------------------------------------------------------------------------
 
-linesearch.smooth.morph <- function(Flist, hessmat, dbglev)
-{
-  deltac   <- -symsolve(hessmat,Flist$grad)
-  cosangle <- -sum(Flist$grad*deltac)/sqrt(sum(Flist$grad^2)*sum(deltac^2))
-  if (dbglev >= 2) {
-    cat(paste("\nCos(angle) =",format(round(cosangle,4))))
-    if (cosangle < 1e-7) {
-      if (dbglev >=2)  cat("\nCosine of angle too small\n")
-      deltac <- -Flist$grad
+fngrad_morph <- function(bvec, morphList, Zmat) {
+  #  -----------------------------------------------------
+  #  extract data from morphList
+  #  -----------------------------------------------------
+  cvec     <- Zmat %*% bvec
+  x        <- morphList$x
+  y        <- morphList$y
+  xlim     <- morphList$xlim
+  ylim     <- morphList$ylim
+  wt       <- morphList$wt
+  Kmat     <- morphList$Kmat
+  Wlambda  <- morphList$Wlambda
+  Wbasis   <- morphList$Wbasis
+  Wnbasis  <- Wbasis$nbasis
+  Wfdobj   <- fd(cvec, Wbasis)
+  #  -----------------------------------------------------
+  #             compute fitting criterion f
+  #  -----------------------------------------------------
+  #  compute unnormalized monotone function values hraw
+  
+  nobs  <- length(x)
+  hraw  <- matrix(monfn(  x, Wfdobj),nobs,1)
+  #  adjust functions and derivatives for normalization
+  hmax    <- monfn(  xlim[2], Wfdobj) 
+  hmin    <- monfn(  xlim[1], Wfdobj) 
+  #  width of hraw
+  hwidth  <- hmax - hmin
+  #  width of target interval
+  ywidth  <- ylim[2] - ylim[1]
+  #  normalized h varying horizontally over base interval and 
+  #  vertically over target interval
+  h   <- (ylim[1] - hmin) + hraw*(ywidth/hwidth)
+  #  compute least squares fitting criterion
+  res <- y - h
+  f   <- mean(res^2*wt)
+  #  -----------------------------------------------------
+  #             compute fitting gradient grad
+  #  -----------------------------------------------------
+  #  un-normalized partial derivative of un-normalized h Dh
+  Dhraw   <- matrix(mongrad(x, Wfdobj),nobs,Wnbasis)
+  #  range of un-normalized gradient
+  Dhmax   <- matrix(mongrad(xlim[2], Wfdobj), 1, Wnbasis)
+  Dhmin   <- matrix(mongrad(xlim[1], Wfdobj), 1, Wnbasis)
+  Dhwidth <- Dhmax - Dhmin
+  #  normalized gradient
+  Dh    <- ywidth*(Dhraw*hwidth - hraw %*% Dhwidth)/hwidth^2
+  #  gradient of fitting function is computed
+  temp  <- Dh*(wt %*% matrix(1,1,Wnbasis))
+  grad  <- -2*t(temp) %*% res/nobs
+  #  apply regularization if needed
+  if (Wlambda > 0) {
+    grad <- grad +           2 * Kmat  %*%  cvec
+    f    <- f    + t(cvec)  %*%  Kmat  %*%  cvec
+  }
+  #  map parameter space into fitting space
+  grad <- t(Zmat) %*% grad
+  norm <- sqrt(sum(grad^2))   #  gradient norm
+  #  -----------------------------------------------------
+  #        compute fitting Hessian hmat
+  #  -----------------------------------------------------
+  wtroot  <- sqrt(wt)
+  temp <- Dh * (wtroot %*% matrix(1,1,Wnbasis))
+  hmat <- 2*t(temp) %*% temp/nobs
+  #  apply regularization if needed
+  if (Wlambda > 0) { 
+    hmat <- hmat + 2*Kmat 
+  }
+  #  map parameter hessian into fitting hessian
+  hmat <- t(Zmat) %*% hmat %*% Zmat
+  
+  return(list(f=f, grad=grad, hmat=hmat, norm=norm, h=h, Dh=Dh))
+  
+}
+
+#  ------------------------------------------------------------------------
+
+lnsrch_morph <- function(xold, fold, g, p, func, dataList, 
+                          Zmat, stpmax, itermax=20, TOLX=1e-10, dbglev=0) {
+  #  LNSRCH computes an approximately optimal parameter vector X given
+  #  an initial parameter vector XOLD, an initial function value FOLD
+  #  and an initial gradient vector G.  
+  
+  #  Arguments:
+  #  XOLD      Initial parameter value
+  #  FOLD      Initial function value
+  #  G         Initial gradient value
+  #  P         Search direction vector
+  #  FUNC      Function object computing a function value and gradient
+  #              vector
+  #  DATALIST  List object used in function object FUNC
+  #  STPMAX    Maximum step size
+  #  ITERMAX   Maximum number of iterations
+  #  TOLX      Tolerance for stop
+  #  DBGLEV    Debugging output value:  none if 0, function value if 1,
+  #              if greater than one, current step value, slope and
+  #              function value.
+  
+  #  Last modified 12 February 2022
+  
+  #  set initial constants
+  n <- length(xold)
+  check <- FALSE
+  f2    <- 0
+  alam2 <- 0
+  ALF   <- 1e-4
+  psum  <- sqrt(sum(p^2))
+  #  scale if attempted step is too big
+  if (psum > stpmax) {
+    p <- p*(stpmax/psum)
+  }
+  #  compute slope
+  slope <- sum(g*p)
+  # if (dbglev > 1) {
+  #   status <- c(0, 0, slope, fold)
+  #   cat("#10.f #10.4f #10.4f #10.4f\n", status)
+  # }
+  # check that initial slope is negative
+  if (slope >= 0) {
+    stop("Initial slope not negative.")
+  }
+  # compute lambdamin
+  test <- 0
+  for (i in 1:n) {
+    temp <- abs(p[i])/max(abs(xold[i]),1)
+    if (temp > test) {
+      test <- temp
     }
   }
-  return(list(deltac, cosangle))
-}
-
-#  ----------------------------------------------------------------
-
-fngrad.smooth.morph <- function(y, x, wt, Wfdobj, lambda,
-                                   Kmat, inact, basislist)
-{
-  nobs   <- length(x)
-  width  <- y[nobs] - y[1]
-  cvec   <- Wfdobj$coefs
-  nbasis <- length(cvec)
-  h      <- monfn(x, Wfdobj)
-  Dyhat  <- mongrad(x, Wfdobj)
-  #  adjust h and Dyhat for normalization
-  hmax   <- h[nobs]
-  Dymax  <- Dyhat[nobs,]
-  Dyhat  <- width*(hmax*Dyhat - outer(h, Dymax))/hmax^2
-  h      <- y[1] + width*h/hmax
-  #  update residuals and function values
-  res    <- y - h
-  f      <- mean(res^2*wt)
-  temp   <- Dyhat*outer(wt,rep(1,nbasis))
-  grad   <- -2*crossprod(temp,res)/nobs
-  if (lambda > 0) {
-    grad <- grad +         2 * Kmat %*% cvec
-    f    <- f    + t(cvec) %*% Kmat %*% cvec
+  alamin <- TOLX/test
+  #  always try full Newton step first with step size 1
+  alam   <- 1
+  #  start of iteration loop
+  iter <- 0
+  while (iter <= itermax) {
+    iter <- iter + 1
+    x <- xold + alam*p
+    #  -------------  function evaluation  -----------
+    funcList <- func(x, dataList, Zmat)
+    f    <- funcList$f
+    gtmp <- funcList$grad
+    slp <- sum(gtmp*p)
+    # if (dbglev > 1) {
+    #   status <- [iter, alam, slp, f]
+    #   cat("#10.f #10.4f #10.4f #10.4f\n", status)
+    # }
+    #  -----------------------------------------------
+    #  convergence on x change.
+    if (alam < alamin) {
+      x <- xold
+      check <- TRUE
+      return(list(x=x, check=check))
+    } else {
+      #  sufficient function decrease
+      if (f <= fold + ALF*alam*slope) {
+        return(list(x=x, check=check))
+      }
+      #  backtrack
+      if (alam == 1) {
+        #  first time
+        tmplam <- -slope/(2*(f-fold-slope))
+      } else {
+        #  subsequent backtracks
+        rhs1 <- f  - fold - alam *slope
+        rhs2 <- f2 - fold - alam2*slope
+        a <- (rhs1/alam^2 - rhs2/alam2^2)/(alam-alam2)
+        b <- (-alam2*rhs1/alam^2 + alam*rhs2/(alam*alam2))/(alam-alam2)
+        if (a == 0) {
+          tmplam <- -slope/(2*b)
+        } else {
+          disc <- b^2 - 3*a*slope
+          if (disc < 0) {
+            tmplam <- 0.5*alam
+          } else {
+            if (b <= 0) {
+              tmplam <- (-b+sqrt(disc))/(3*a)
+            } else {
+              tmplam <- -slope/(b+sqrt(disc))
+            }
+          }
+          if (tmplam > 0.5*alam) {
+            # lambda <= 0.5 lambda1
+            tmplam <- 0.5*alam
+          }
+        }
+      }
+      alam2 <- alam
+      f2    <- f
+      #  lambda > 0.1 lambda1
+      alam <- max(tmplam, 0.1*alam)
+    }
+    #  try again
+    
   }
-  if (any(inact)) grad[inact] <- 0
-  norm <- sqrt(sum(grad^2)) #  gradient norm
-  Flist <- list("f"=f,"grad"=grad,"norm"=norm)
-  return(list(Flist, Dyhat))
+  
+  return(list(x=x, check=check))
+  
 }
 
-#  ----------------------------------------------------------------
 
-hesscal.smooth.morph <- function(Dyhat, wtroot, lambda, Kmat, inact)
-{
-  Dydim   <- dim(Dyhat)
-  nobs    <- Dydim[1]
-  nbasis  <- Dydim[2]
-  temp    <- Dyhat*(wtroot %*% matrix(1,1,nbasis))
-  hessmat <- 2*crossprod(temp)/nobs
-  #  adjust for penalty
-  if (lambda > 0) hessmat <- hessmat + 2*Kmat
-  #  adjust for inactive coefficients
-  if (any(inact)) {
-    eyemat               <- diag(rep(1,nbasis))
-    hessmat[inact,     ] <- 0
-    hessmat[     ,inact] <- 0
-    hessmat[inact,inact] <- eyemat[inact,inact]
-  }
-  return(hessmat)
-}

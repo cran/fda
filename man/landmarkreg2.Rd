@@ -1,7 +1,8 @@
-\name{landmarkreg}
-\alias{landmarkreg}
+\name{landmarkreg2}
+\alias{landmarkreg2}
 \title{
-  Landmark Registration of Functional Observations
+  Landmark Registration of Functional Observations with Differing 
+  Ranges
 }
 \description{
 It is common to see that among a set of functions certain prominent
@@ -23,8 +24,8 @@ warping function must be strictly monotonic, and we have found that using
 \code{smooth.morph} ensures monotonicity.
 }
 \usage{
-landmarkreg(unregfd, ximarks, x0marks=xmeanmarks,
-            WfdPar=NULL, ylambda=1e-10)
+landmarkreg2(unregfd, ximarks, x0marks, x0lim, 
+             WfdPar=NULL, WfdPar0=NULL, ylambda=1e-10)
 }
 \arguments{
   \item{unregfd}{
@@ -45,9 +46,17 @@ landmarkreg(unregfd, ximarks, x0marks=xmeanmarks,
     used.
     Object x0marks may also be a vector.
   }
+  \item{x0lim}{
+    A vector of length 2 containing the lower and upper boundary of 
+    the interval containing \code{x0marks}.
+  }
   \item{WfdPar}{
     a functional parameter object defining the warping functions that
     transform time in order to register the curves.
+  }
+  \item{WfdPar0}{
+    a functional parameter object defining the inverse warping functions 
+    that transform time in order to register the curves.
   }
   \item{ylambda}{
     Smoothing parameter controlling the smoothness of the registered
@@ -100,56 +109,7 @@ landmarkreg(unregfd, ximarks, x0marks=xmeanmarks,
 }
 \seealso{
   \code{\link{register.fd}},
-  \code{\link{landmarkreg2}},
+  \code{\link{landmarkreg}},
   \code{\link{smooth.morph}}
-}
-\examples{
-#See the analysis for the lip data in the examples.
-
-## setting parameters
-library(lattice)
-data(landmark.reg.expData) ## containing an simple object called sampleData
-
-# Preferred:
-# eps <- .Machine$double.eps
-# to reduce compute time:
-eps <- 1000*.Machine$double.eps
-from <- -1.0187
-to   <-  9.4551
-# Preferred:
-# nb <- 201
-# to reduce compute time:
-nb <- 31
-nbreaks <- 11
-## assign landmarks
-landmark <- matrix(c(0.4999, 0.657, 0.8141, 0.5523, 0.5523,
-                     3.3279, 3.066, 3.0137, 3.2231, 3.2231),
-                   ncol=2)
-wbasis <- create.bspline.basis(rangeval=c(from, to),
-	                       norder=4, breaks=seq(from, to, len=nbreaks))
-Wfd0   <- fd(matrix(0,wbasis$nbasis,1),wbasis)
-WfdPar <- fdPar(Wfd0, 1, 1e-4)
-## get the density of the data
-x <- split(sampleData, factor(sampleData$which))
-# to save time, reduce the number of curves from 5 to 3
-k <- 3
-densY <- sapply(x[1:k], function(z){
-            r <- range(z[, 1])
-            z <- z[, 1]
-            z <- z[z>r[1]+eps & z<r[2]-eps]
-            density(z, from=from, to=to, n=nb, na.rm=TRUE)$y
-        })
-
-argvals <- seq(from, to, len=nb)
-fdobj   <- smooth.basis(argvals, densY, wbasis,
-                   fdnames = c("x", "samples", "density"))$fd
-#  the target landmark values, x0marks, here default to
-#  the row-wise mean of matrix landmark
-regDens   <- landmarkreg(fdobj, landmark[1:k,], WfdPar=WfdPar)
-
-warpfdobj <- regDens$warpfd
-warpedX   <- as.matrix(eval.fd(warpfdobj, argvals))
-matplot(argvals, warpedX, type="l")
-funs      <- apply(warpedX, 2, approxfun, argvals)
 }
 \keyword{smooth}

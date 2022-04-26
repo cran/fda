@@ -65,7 +65,7 @@ getbasismatrix <- function(evalarg, basisobj, nderiv=0, returnMatrix=FALSE) {
   if (!(length(basisobj$basisvalues) == 0 || is.null(basisobj$basisvalues))) {
     #  one or more stored basis matrices found,
     #  check that requested derivative is available
-    if (!is.vector(basisvalues)) stop("BASISVALUES is not a vector.")
+    if (!is.vector(basisobj$basisvalues)) stop("BASISVALUES is not a vector.")
     basisvalues <- basisobj$basisvalues
     nvalues     <- length(basisvalues)
     #  search for argvals match

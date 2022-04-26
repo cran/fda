@@ -13,7 +13,7 @@ scoresPACE <- function(data, time, covestimate, PC){
   phi = lapply(indexes, function(x) eval.fd(x,PC$harmonics))
   
   
-  if(class(covestimate$cov.estimate) == "bifd"){
+  if(inherits(covestimate$cov.estimate, "bifd")) {
     nvar = 1
     mean.point = matrix(eval.fd(time, covestimate$meanfd),nrow = nrow(eval.fd(time, covestimate$meanfd)),ncol = nvar)
     data.var.mat = (apply(datamat,2, function(x) x - mean.point))^2 #data given as matrix

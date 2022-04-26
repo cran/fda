@@ -95,7 +95,7 @@ create.bspline.basis <- function (rangeval=NULL, nbasis=NULL,
 #  Returns
 #  BASISFD ...a functional data basis object
 
-#  Last modified  11 February 2015 by Jim Ramsay
+#  Last modified  19 November 2021 by Jim Ramsay
 
 #  -------------------------------------------------------------------------
 #  Default basis for missing arguments:  A B-spline basis over [0,1] of

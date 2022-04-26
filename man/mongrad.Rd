@@ -43,6 +43,5 @@ defining $W$.
   \code{\link{monfn}},
   \code{\link{monhess}},
   \code{\link{landmarkreg}},
-  \code{\link{smooth.morph}},
-  \code{\link{smooth.morph2}}
+  \code{\link{smooth.morph}}
 }

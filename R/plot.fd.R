@@ -17,7 +17,8 @@ plot.fdPar <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
 
 plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
                     xlim=NULL, ylim=NULL, xlab=NULL,
-                    ylab=NULL, ask=FALSE, nx=NULL, axes=NULL, ...) {
+                    ylab=NULL, ask=FALSE, nx=NULL, axes=NULL, 
+                    ...) {
   
   #  -----------------------------------------------------------------------
   #       plot for fd class
@@ -40,7 +41,7 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
   #    must be set up before calling plot by using something such as
   #    par(mfrow=c(1,nvar),pty="s")
   
-  # last modified 16 January 2020
+  # last modified 2022-02-18 by Spencer Graves
   
   ##
   ## 1.  Basic checks
@@ -186,7 +187,8 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
     if (!ask) {
       matplot(y, fdmat, type="l",
               xlim=xlim,   ylim=ylim,
-              xlab=xlab, ylab=ylab, axes=Axes)
+              xlab=xlab, ylab=ylab, axes=Axes, 
+              ...)
       if(axFun)
         do.call(axList[[1]], axList[-1])
       #   Ramsay 2008.08.26
@@ -230,7 +232,8 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
       for (ivar in 1:nvar) {
         matplot (y, fdmat[,,ivar], type="l",
                  xlim=xlim, ylim=ylim,
-                 xlab=xlab, ylab=ylab, ask=FALSE, axes=Axes, ...)
+                 xlab=xlab, ylab=ylab, ask=FALSE, axes=Axes, 
+                 ...)
         if(axFun)
           do.call(axList[[1]], axList[-1])
         if (!is.null(varnames)) title(varnames[ivar])
@@ -253,7 +256,7 @@ plot.fd <- function(x, y, Lfdobj=0, href=TRUE, titles=NULL,
           if(axFun)
             do.call(axList[[1]], axList[-1])
           if (!is.null(casenames)) titlestr = casenames[irep]
-          else                     titlestr = paste("Case",irep)
+          else                  titlestr = paste("Case",irep)
           if (!is.null(varnames)) {
             titlestr = paste(titlestr,"  ",varnames[ivar])
           } else {

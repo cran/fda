@@ -55,7 +55,7 @@ plot.pca.fd <- function(x, nx = 128, pointplot = TRUE, harm = 0,
 #        
       iharm <- harm[jharm] 
       if(expand == 0) {
-        fac <- sqrt(pcafd$values[iharm])
+        fac <- 2*sqrt(pcafd$values[iharm])
       } else {
         fac <- expand
       }
@@ -123,7 +123,7 @@ plot.pca.fd <- function(x, nx = 128, pointplot = TRUE, harm = 0,
         iharm <- harm[jharm]
 #        
         fac <- {
-          if (expand == 0) sqrt(pcafd$values[iharm]) 
+          if (expand == 0) 2*sqrt(pcafd$values[iharm]) 
           else expand
         }
         

@@ -61,18 +61,4 @@ x <- seq(0,1,0.1)
 norder <- 4
 #  compute the 11 by 8 matrix of basis function values
 basismat <- bsplineS(x, breaks, norder)
-
-# use sparse Matrix representation to save memory
-Basismat <- bsplineS(x, breaks, norder, returnMatrix=TRUE)
-
-# check
-\dontshow{stopifnot(}
-class(Basismat)=='dgCMatrix'
-\dontshow{)}
-
-\dontshow{stopifnot(}
-all.equal(basismat, as.matrix(Basismat))
-\dontshow{)}
-
 }
-\keyword{smooth}

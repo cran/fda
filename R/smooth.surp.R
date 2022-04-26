@@ -60,7 +60,7 @@ smooth.surp <- function(argvals, Wbin, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
   #  FLIST objects are indexed linear with curves varying inside
   #  variables.
   
-  #  Last modified 16 November 2021 by Jim Ramsay
+  #  Last modified 23 March 2022 by Jim Ramsay
   
   #  check ARGVALS, a vector of length n
   
@@ -107,7 +107,6 @@ smooth.surp <- function(argvals, Wbin, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
   #  Set up the transformation from dimension M-1 to M
   #  where M-vectors sum to zero
   
-  M <- dim(Bmat0)[2] + 1
   if (M == 2) {
     root2 <- sqrt(2)
     Zmat <- matrix(1/c(root2,-root2),2,1)
@@ -156,11 +155,6 @@ smooth.surp <- function(argvals, Wbin, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
   gvec <- DPENSSE
   hmat <- D2PENSSE
   
-  # print("gvec0:")
-  # print(round(t(gvec0),4))
-  # print("hmat0[1:10,1:10]:")
-  # print(round(hmat0[1:10,1:10],4))
-  
   Flist <- list(f = fold, grad = gvec, norm = sqrt(mean(gvec^2)))
   
   Foldlist <- Flist
@@ -168,8 +162,6 @@ smooth.surp <- function(argvals, Wbin, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
   #  evaluate the initial update vector for correcting the initial bmat
   
   pvec   <- -solve(hmat,gvec)
-  # print("pvec:")
-  # print(round(t(pvec),4))
   cosangle <- -sum(gvec*pvec)/sqrt(sum(gvec^2)*sum(pvec^2))
   
   #  initialize iteration status arrays
@@ -200,16 +192,22 @@ smooth.surp <- function(argvals, Wbin, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
     x     <- lnsrch_result$x
     check <- lnsrch_result$check
     if (check) stop("lnsrch failure")
+    #  set up new Bmat and evaluate function, gradient and hessian
     Bmatnew <- matrix(x,Wnbasis,M-1)
     func_result <- surp.fit(Bmatnew, surpList)
     f     <- func_result[[1]]
     gvec  <- func_result[[2]]
     hmat  <- func_result[[3]]
+    SSE   <- func_result[[4]]
+    DSSE  <- func_result[[5]]
+    D2SSE <- func_result[[6]]
+    #  set up list object for current fit
     Flist$f    <- f
     Flist$grad <- gvec
     Flist$norm <- sqrt(mean(gvec^2))
     xold <- x
     fold <- f
+    #  display results at this iteration if dbglev > 0
     status <- c(iternum, Flist$f, Flist$norm)
     if (dbglev > 0) {
       cat("\n")
@@ -221,11 +219,12 @@ smooth.surp <- function(argvals, Wbin, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
     }
     #  test for convergence
     if (abs(Flist$f - Foldlist$f) < conv) {
-      # cat("\n")
       break
     }
+    #  also terminate iterations if new fit is worse than old
     if (Flist$f >= Foldlist$f) break
-    #  evaluate the update vector
+    #  set up objects for new iteration
+    #  evaluate the update vector using Newton Raphson direction
     pvec <- -solve(hmat,gvec)
     cosangle  <- -sum(gvec*pvec)/sqrt(sum(gvec^2)*sum(pvec^2))
     if (cosangle < 0) {
@@ -233,18 +232,122 @@ smooth.surp <- function(argvals, Wbin, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
       pvec <- -gvec
     }
     Foldlist <- Flist
-    #  end of iteration loop
   }
+  
+  #  end of iteration loop, output results
   
   Bmat <- matrix(xold, Wnbasis, M-1)
   Wfd  <- fda::fd(Bmat, Wbasis)
+  surpResult <- surp.fit(Bmat, surpList)
   
-  result <- list(Wfd=Wfd, Bmat=Bmat)
+  PENSSE   <- surpResult$PENSSE
+  DPENSSE  <- surpResult$DPENSSE 
+  D2PENSSE <- surpResult$D2PENSSE
+  SSE      <- surpResult$SSE
+  DSSE     <- surpResult$DSSE
+  D2SSE    <- surpResult$D2SSE
+  DvecSmatDvecB <- surpResult$DvecSmatDvecB
+
+  result <- list(Wfd=Wfd, Bmat=Bmat, f=f, gvec=gvec, hmat=hmat,
+                 PENSSE=PENSSE, DPENSSE=DPENSSE, D2PENSSE=D2PENSSE,
+                 SSE=SSE, DSSE=DSSE, D2SSE=D2SSE,
+                 DvecSmatDvecB=DvecSmatDvecB)
   
   return(result)
 }
 
 # ------------------------------------------------------------------
+
+surp.fit <- function(x, surpList) {
+  
+  #  This function is called within smooth.surp() to
+  #  evaluate fit at each iteration
+  
+  #  extract objects from surpList
+  
+  argvals <- surpList$argvals 
+  Wbin    <- surpList$Wbin 
+  wtvec   <- surpList$wtvec 
+  Kmat    <- surpList$Kmat
+  Zmat    <- surpList$Zmat 
+  Phimat  <- surpList$Phimat 
+  
+  # set up dimensions and Bmat
+  
+  n       <- length(argvals)
+  M       <- surpList$M
+  K       <- dim(Phimat)[2]
+  Bmat    <- matrix(x, K, M-1)
+  
+  #  compute fit, gradient and hessian
+  
+  logM     <- log(M)
+  onewrd   <- all(wtvec == 1)
+  Xmat     <- Phimat %*% Bmat %*% t(Zmat)
+  expXmat  <- M^Xmat
+  sumexpXmat <- as.matrix(apply(expXmat,1,sum))
+  Pmat     <- expXmat/(sumexpXmat %*% matrix(1,1,M))
+  Smat     <- -Xmat + (log(sumexpXmat) %*% matrix(1,1,M))/logM
+  Rmat     <- Wbin - Smat
+  vecBmat  <- matrix(Bmat,K*(M-1),1,byrow=TRUE)
+  vecRmat  <- matrix(Rmat,n*M,    1,byrow=TRUE)
+  vecKmat  <- kronecker(diag(rep(1,M-1)),Kmat)
+  fitscale <- 1
+  #  compute raw fit and its penalized version
+  if (!onewrd) {
+    vecwtmat <- diag(rep(wtvec,M))
+    SSE <- t(vecRmat) %*% vecwtmat %*% vecRmat
+  } else {
+    SSE <- crossprod(vecRmat)
+  }
+  PENSSE   <- SSE/fitscale + t(vecBmat) %*% vecKmat %*% vecBmat
+  #  compute raw gradient and its penalized version
+  DvecXmatDvecB <- kronecker(Zmat,Phimat)
+  DvecSmatDvecX <- matrix(0,n*M,n*M)
+  m2 <- 0
+  for (m in 1:M) {
+    m1 <- m2 + 1
+    m2 <- m2 + n
+    m4 <- 0
+    for (l in 1:M) {
+      m3 <- m4 + 1
+      m4 <- m4 + n
+      diagPl <- diag(Pmat[,l])
+      DvecSmatDvecX[m1:m2,m3:m4] <- diagPl
+    }
+  }
+  DvecSmatDvecX <- DvecSmatDvecX - diag(rep(1,n*M))
+  DvecSmatDvecB <- DvecSmatDvecX %*% DvecXmatDvecB
+  if (!onewrd) {
+    DSSE <- -2*t(DvecSmatDvecB) %*% vecwtmat %*% vecRmat
+  } else {
+    DSSE <- -2*t(DvecSmatDvecB) %*% vecRmat
+  }
+  DPENSSE  <- DSSE/fitscale + 2*vecKmat %*% vecBmat
+  #  compute raw hessian and its penalized version
+  if (!onewrd) {
+    D2SSE <- 2*t(DvecSmatDvecB) %*% vecwtmat %*% DvecSmatDvecB
+  } else {
+    D2SSE <- 2*crossprod(DvecSmatDvecB)
+  }
+  D2PENSSE <- D2SSE/fitscale + 2*vecKmat
+  
+  #  return list object containing raw and penalized fit data
+  
+  return(list(
+    PENSSE   = PENSSE, 
+    DPENSSE  = DPENSSE, 
+    D2PENSSE = D2PENSSE,
+    SSE      = SSE,
+    DSSE     = DSSE,
+    D2SSE    = D2SSE,
+    DvecSmatDvecB = DvecSmatDvecB)
+  )
+  
+}
+
+# ------------------------------------------------------------------
+
 ycheck <- function(y, n) {
   
   #  check Y

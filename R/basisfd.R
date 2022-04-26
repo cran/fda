@@ -20,6 +20,7 @@ basisfd <- function(type, rangeval, nbasis, params, dropind=vector("list",0),
   #             "power" "pow"
   #  RANGEVAL...an array of length 2 containing the lower and upper
   #             boundaries for (the rangeval of argument values
+  #             If basis is of FEM type, rangeval is not used
   #  NBASIS ... the number of basis functions
   #  PARAMS ... If the basis is "fourier", this is a single number indicating
   #               the period.  That is, the basis functions are periodic on
@@ -145,7 +146,7 @@ basisfd <- function(type, rangeval, nbasis, params, dropind=vector("list",0),
   
   #  if first argument is a basis object, return
   
-  if (class(type)=="basisfd"){
+  if (inherits(type,"basisfd")) {
     basisobj <- type
     return(basisobj)
   }
@@ -212,13 +213,15 @@ basisfd <- function(type, rangeval, nbasis, params, dropind=vector("list",0),
     stop("'type' unrecognizable.")
   }
   
-  #  check rangeval
+  #  check rangeval if the object is not of type FEM
   
-  rangeval = as.vector(rangeval)
-  if (!is.numeric(rangeval)) stop("Argument rangeval is not numeric.")
-  if (length(rangeval) != 2) stop("Argument rangeval is not of length 2.")
-  if (!(rangeval[2] > rangeval[1]))
-    stop("Argument rangeval is not strictly increasing.")
+  if (!type == "FEM") {
+    rangeval = as.vector(rangeval)
+    if (!is.numeric(rangeval)) stop("Argument rangeval is not numeric.")
+    if (length(rangeval) != 2) stop("Argument rangeval is not of length 2.")
+    if (!(rangeval[2] > rangeval[1]))
+      stop("Argument rangeval is not strictly increasing.")
+  }
   
   #  check nbasis
   

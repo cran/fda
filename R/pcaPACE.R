@@ -44,7 +44,7 @@ pcaPACE <- function(covestimate, nharm = 2, harmfdPar=NULL, cross = TRUE)
   
   #  set up cross product and penalty matrices
   
-  if(class(covestimate$cov.estimate) == "bifd"){
+  if(inherits(covestimate$cov.estimate, "bifd")) {
     Wmat = covestimate$cov.estimate$coefs
     nvar = 1
     basisobj = covestimate$cov.estimate$sbasis

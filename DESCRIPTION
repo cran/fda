@@ -1,13 +1,13 @@
 Package: fda
-Version: 5.5.1
-Date: 2021-11-16
+Version: 6.0.3
+Date: 2022-04-22
 Title: Functional Data Analysis
 Author: J. O. Ramsay <ramsay@psych.mcgill.ca> [aut,cre], 
  Spencer Graves <spencer.graves@effectivedefense.org> [ctb], 
  Giles Hooker <gjh27@cornell.edu>  [ctb]
 Maintainer: J. O. Ramsay <ramsay@psych.mcgill.ca>
-Depends: R (>= 3.5), splines, Matrix, fds, deSolve
-Suggests: lattice
+Depends: R (>= 3.5), splines, fds, deSolve
+Suggests: rmarkdown, knitr, lattice
 Description: These functions were developed to support functional data
  analysis as described in Ramsay, J. O. and Silverman, B. W.
  (2005) Functional Data Analysis. New York: Springer and in 
@@ -21,6 +21,7 @@ License: GPL (>= 2)
 URL: http://www.functionaldata.org
 LazyData: true
 NeedsCompilation: no
-Packaged: 2021-11-17 14:18:30 UTC; jimramsay
+VignetteBuilder: knitr
+Packaged: 2022-04-26 13:18:59 UTC; jimramsay
 Repository: CRAN
-Date/Publication: 2021-11-17 15:50:02 UTC
+Date/Publication: 2022-04-26 21:10:03 UTC

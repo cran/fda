@@ -16,4 +16,5 @@ fdParcheck = function(fdParobj, ncurve=NULL) {
     }
   }
   return(fdParobj)
+  
 }

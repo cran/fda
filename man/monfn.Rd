@@ -44,8 +44,7 @@ is the logarithm of the derivative of the monotone function.}
 \seealso{
   \code{\link{mongrad}},
   \code{\link{landmarkreg}},
-  \code{\link{smooth.morph}},
-  \code{\link{smooth.morph2}}
+  \code{\link{smooth.morph}}
 }
 \examples{
 
@@ -74,7 +73,7 @@ meanmarks <- c(rangeval[1], tbreaks[8], tbreaks[13], rangeval[2])
 cmarks <- c(rangeval[1], tbreaks[6], tbreaks[16], rangeval[2])
 
 ## Establish a B-basis object for the warping function
-Wfd = smooth.morph(x=meanmarks, y=cmarks, WfdPar=WfdPar)$Wfdobj
+Wfd = smooth.morph(x=meanmarks, y=cmarks, ylim=rangeval, WfdPar=WfdPar)$Wfdobj
 
 ## Estimate the warping function
 h = monfn(tbreaks, Wfd)
