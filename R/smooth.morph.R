@@ -40,7 +40,7 @@ smooth.morph <- function(x, y, ylim, WfdPar,
   #  WFD       Functional data object for W.  It's coefficient vector
   #               contains the optimized coefficients.
   
-  #  last modified 3 April 2022 by Jim Ramsay
+  #  last modified 3 June 2022 by Jim Ramsay
   
   nobs <- length(x)        #  number of observations
   wt=matrix(1,nobs,1)
@@ -104,7 +104,7 @@ smooth.morph <- function(x, y, ylim, WfdPar,
   #  check range of x
   
   if (x[1] < xlim[1] || x[nobs] > xlim[2]) {
-    stop("Values in are out of bounds.")
+    stop("Values in x are out of bounds.")
   }
   
   #  initialize matrix Kmat defining penalty term

@@ -72,9 +72,9 @@ create.exponential.basis(rangeval=c(0,1), nbasis=NULL, ratevec=NULL,
     "values", respectively for these.  You would then assign them to
     \code{basisvalues} with code such as the following:
 
-    basisobj\$basisvalues <- vector("list",1)
+    basisobj$basisvalues <- vector("list",1)
 
-    basisobj\$basisvalues[[1]] <- list(args=evalargs,
+    basisobj$basisvalues[[1]] <- list(args=evalargs,
     values=basismat)
   }
   \item{names}{

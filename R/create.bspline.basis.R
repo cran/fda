@@ -114,21 +114,6 @@ create.bspline.basis <- function (rangeval=NULL, nbasis=NULL,
 
   type        <- "bspline"
 
-#  if (nargs()==0) {
-#    rangeval    <- c(0,1)
-#    nbasis      <- 2
-#    params      <- NULL
-#    dropind     <- NULL
-#    quadvals    <- NULL
-#    values      <- NULL
-#    basisvalues <- NULL
-#    basisobj  <- list(type=type, rangeval=rangeval, nbasis=nbasis,
-#                  params=params, dropind=dropind,   quadvals=quadvals,
-#                  values=values, basisvalues=basisvalues, names=names)
-#    oldClass(basisobj) <- "basisfd"
-#    return(basisobj)
-#  }
-
 #  ------------------------------------------------------------------------
 #                     Set up non-default basis
 #  ------------------------------------------------------------------------
@@ -194,10 +179,6 @@ create.bspline.basis <- function (rangeval=NULL, nbasis=NULL,
              rangeval)
       rangeval = c(0,rangeval)
   }
-#  if (!rangechk(rangeval)) stop("Argument 'rangeval' is not correct.")
-#  if(!is.vector(rangeval))
-#    stop('rangeval is not a vector;  class(rangeval) = ',
-#         class(rangeval))
 # rangeval too long ???
   if(length(rangeval)>2){
     if(!is.null(breaks))

@@ -2,7 +2,7 @@ as.POSIXct1970 <- function(x, tz="GMT", ...){
 #
   if(!is.numeric(x)){
     Px <- try(as.POSIXct(x, tz=tz, ...))
-    if(class(Px)[1]=='try-error'){
+    if(inherits(Px,'try-error')){
       nx <- length(x)
       Px <- rep(as.POSIXct1970(0), nx)
     }

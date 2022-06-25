@@ -48,41 +48,10 @@ register.newfd(yfd, Wfd,type=c('direct','monotone','periodic'))
   Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
     Data Analysis, 2nd ed.}, Springer, New York.
 
-  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
+  Ramsay, James, and Silverman, Bernard. (2002), \emph{Applied
     Functional Data Analysis}, Springer, New York, ch. 6 & 7.
 }
 \seealso{
   \code{\link{landmarkreg}},
   \code{\link{register.fd}}
 }
-\examples{
-
-# Register the lip data with landmark registration, then register the first
-# derivatives with the pre-computed warping functions.
-
-# Lip data:
-lipfd <- smooth.basisPar(liptime, lip, 6, Lfdobj=int2Lfd(4),
-                         lambda=1e-12)$fd
-names(lipfd$fdnames) <- c("time(seconds)", "replications", "mm")
-
-# Landmark Registration:
-
-lipmeanmarks <- apply(lipmarks,2,mean)
-
-wnbasis <- 6
-wnorder <- 4
-wbreaks <- c(0,lipmeanmarks,0.35)
-
-warpbasis <- create.bspline.basis(nbasis=wnbasis, norder=wnorder,
-                                  breaks=wbreaks);
-WfdPar    <- fdPar(fd(basisobj=warpbasis), 2, 1e-4)
-
-lipreglist <- landmarkreg(lipfd, as.matrix(lipmarks), lipmeanmarks, WfdPar)
-
-# And warp:
-
-Dlipfd = deriv.fd(lipfd,Lfdobj=1)
-
-Dlipregfd = register.newfd(Dlipfd,lipreglist$warpfd,type='direct')
-}
-\keyword{smooth}

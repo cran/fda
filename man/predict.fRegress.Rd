@@ -16,17 +16,17 @@
     Object of class inheriting from \code{fRegress}
   }
   \item{newdata}{
-    Either NULL or a list matching object\$xfdlist.
+    Either NULL or a list matching object$xfdlist.
 
-    If(is.null(newdata)) predictions <- object\$yhatfdobj
+    If(is.null(newdata)) predictions <- object$yhatfdobj
 
     If newdata is a list, predictions = the sum of either 
     
-    newdata[i] * betaestfdlist[i] if object\$yfdobj has class \code{fd} 
+    newdata[i] * betaestfdlist[i] if object$yfdobj has class \code{fd} 
     
     or 
     
-    inprod(newdata[i], betaestfdlist[i]) if class(object\$yfdobj) =
+    inprod(newdata[i], betaestfdlist[i]) if class(object$yfdobj) =
     \code{numeric}.
   }
   \item{se.fit}{
@@ -45,9 +45,9 @@
   }
 }
 \details{
-  1.  Without \code{newdata}, fit <- object\$yhatfdobj.
+  1.  Without \code{newdata}, fit <- object$yhatfdobj.
 
-  2.  With \code{newdata}, if(class(object\$y) == 'numeric'), fit <- sum
+  2.  With \code{newdata}, if(class(object$y) == 'numeric'), fit <- sum
   over i of inprod(betaestlist[i], newdata[i]).  Otherwise, fit <- sum
   over i of betaestlist[i] * newdata[i].
 
@@ -57,11 +57,11 @@
 \value{
   The predictions produced by \code{predict.fRegress} are either a
   vector or a functional parameter (class \code{fdPar}) object, matching
-  the class of \code{object\$y}.
+  the class of \code{object$y}.
 
   If \code{interval} is not "none", the predictions will be
-  multivariate for \code{object\$y} and the requested \code{lwr} and
-  \code{upr} bounds.  If \code{object\$y} is a scalar, these predictions
+  multivariate for \code{object$y} and the requested \code{lwr} and
+  \code{upr} bounds.  If \code{object$y} is a scalar, these predictions
   are returned as a matrix;  otherwise, they are a multivariate
   functional parameter object (class \code{fdPar}).
 
@@ -71,7 +71,7 @@
   \item{fit}{
     vector or matrix or univariate or multivariate functional parameter
     object depending on the value of \code{interval} and the class of
-    \code{object\$y}.
+    \code{object$y}.
   }
   \item{se.fit}{standard error of predicted means}
 }

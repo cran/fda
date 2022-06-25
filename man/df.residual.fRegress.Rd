@@ -22,7 +22,7 @@
 \details{
   1.  Determine N = number of observations
 
-  2.  df.model <- object\$df
+  2.  df.model <- object$df
 
   3.  df.residual <- (N - df.model)
 

@@ -78,20 +78,6 @@ create.fourier.basis <- function (rangeval=c(0,1), nbasis=3,
 #  Default basis for missing arguments
 
   type        <- "fourier"
-#if (nargs()==0) {
-#    rangeval    <- c(0,1)
-#    nbasis      <- 3
-#    params      <- 1
-#    dropind     <- vector("numeric",0)
-#    quadvals    <- matrix("numeric",0,0)
-#    values      <- vector("list",0)
-#    basisvalues <- vector("list",0)
-#    basisobj  <- list(type=type,     rangeval=rangeval, nbasis=nbasis,
-#                      params=params, dropind=dropind,   quadvals=quadvals,
-#                      values=values, basisvalues=basisvalues)
-#    oldClass(basisobj) <- "basisfd"
-#    return(basisobj)
-#}
 ##
 ## 1.  check RANGEVAL
 ##

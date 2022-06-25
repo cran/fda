@@ -1,10 +1,3 @@
-#  setClass for "fdPar"
-
-# setClass("fdPar", representation(fd       = "fd",
-#                                  Lfd      = "Lfd",
-#                                  lambda   = "numeric",
-#                                  estimate = "logical",
-#                                  penmat   = "matrix",))
 
 #  Generator function of class fdPar
 

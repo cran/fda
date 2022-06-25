@@ -9,14 +9,7 @@
   mode of variation.
 }
 \usage{
-#plot.pca.fd(x, nx = 128, pointplot = TRUE, harm = 0,
-#                        expand = 0, cycle = FALSE, ...)
-
-#NOTE:  The following is required by CRAN rules that
-# function names like "as.numeric" must follow the documentation
-# standards for S3 generics, even when they are not.
-# Please ignore the following line:
-\method{plot}{pca.fd}(x, nx = 128, pointplot = TRUE, harm = 0,
+  \method{plot}{pca.fd}(x, nx = 128, pointplot = TRUE, harm = 0,
                         expand = 0, cycle = FALSE, ...)
 }
 \arguments{

@@ -565,7 +565,7 @@ summary.basisfd <- function(object, ...)
   
   #  Of course the ranges must also match.
   
-  #  Last modified 2012.07.17 by Spencer Graves
+  #  Last modified 2022.04.19 by Jim Ramsay
   
   #  check the ranges
   

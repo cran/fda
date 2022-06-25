@@ -1,8 +1,8 @@
 ---
-title: "Working with strictly monotone functions"
+title: "monotoneFunctions"
 author: "Jim Ramsay"
 date: "16/02/2022"
-output: pdf_document
+output: html_document
 vignette: >
   %\VignetteIndexEntry{monotoneFunctions}
   %\VignetteEngine{knitr::rmarkdown}
@@ -12,6 +12,7 @@ vignette: >
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
 
 ## R Markdown
 

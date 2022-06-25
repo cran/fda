@@ -75,9 +75,9 @@ create.polygonal.basis(rangeval=NULL, argvals=NULL, dropind=NULL,
     "values", respectively for these.  You would then assign them to
     \code{basisvalues} with code such as the following:
 
-    basisobj\$basisvalues <- vector("list",1)
+    basisobj$basisvalues <- vector("list",1)
 
-    basisobj\$basisvalues[[1]] <- list(args=evalargs, values=basismat)
+    basisobj$basisvalues[[1]] <- list(args=evalargs, values=basismat)
   }
   \item{names}{
     either a character vector of the same length as the number of basis

@@ -4,7 +4,7 @@ create.monomial.basis <- function(rangeval=c(0,1), nbasis=NULL,
                 axes=NULL)
 {
 #  CREATE_MONOMIAL_BASIS  Creates a monomial basis:, x^i_1, x^i_2, ...
-#  The exponents in this version must be nonnegative integers
+#  The exponents in this version must be non-negative integers
 #  Argument:
 #  RANGEVAL ...an array of length 2 containing the lower and upper
 #              boundaries for the rangeval of argument values.  If a
@@ -73,7 +73,7 @@ create.monomial.basis <- function(rangeval=c(0,1), nbasis=NULL,
 # Return:
 # BASISOBJ  ...a functional data basis object of type "monom"
 #
-# last modified July 7, 2012 by Spencer Graves.
+# last modified July 25, 2022
 #   for rangeval of class Date and POSIXct
 #  Default basis for missing arguments
 
@@ -84,9 +84,6 @@ create.monomial.basis <- function(rangeval=c(0,1), nbasis=NULL,
   op <- options(warn=-1)
   Rangeval <- as.numeric(rangeval)
   options(op)
-#  if(!is.numeric(rangeval)){
-#    stop('rangaval must be numeric;  class(rangeval) = ',
-#         class(rangeval) )
   if(length(rangeval)<1)
     stop('rangeval must be a numeric vector of length 2;  ',
          'length(rangeval) = 0.')

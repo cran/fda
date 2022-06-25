@@ -17,7 +17,6 @@ cor.fd <- function(evalarg1, fdobj1, evalarg2=evalarg1, fdobj2=fdobj1)
 ##
 ## 2.  Evaluate var1 at evalarg1 
 ##
-  print(class(var1))
   evalVar1 <- eval.bifd(evalarg1, evalarg1, var1)
 ##
 ## 3.  If missing(fdobj2) convert evalVar1 to correlations 
