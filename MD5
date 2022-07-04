@@ -1,4 +1,4 @@
-1a2bd92fc5b02c2692554893493edf80 *DESCRIPTION
+6b0ea4cd20d4a1f3ae4a749a3b8fa76c *DESCRIPTION
 0c954b61832adb769bc308a37afbbc7d *NAMESPACE
 a0fb7b504779b47cba75cfecfc668540 *R/AmpPhaseDecomp.R
 41419a07fe723ba594969037e5826ee7 *R/CRAN.R
@@ -208,10 +208,10 @@ efa4cb1b7e740d37067b928eec0453b4 *demo/handwrit.pda.R
 7006b34d1d51ae9f40b09765ebe5a934 *demo/lip.R
 d105b37b07354742fde36d3dc353ca73 *demo/pinch.R
 8e76e0a08ae07527e5e4be9692927bbf *demo/weatherANOVA.R
-4d65ef766b629eb97285f50ce3f9b03b *inst/NEWS.Rd
+7e6f05db4aad13bf09f8822e80cc860a *inst/NEWS.Rd
 997511bf63b19e04756f3d2489665561 *inst/doc/BasisBasics.R
 75c757fcd007b94403369736377311a8 *inst/doc/BasisBasics.Rmd
-f53ecd6154d6219688a9f0e00c71d780 *inst/doc/BasisBasics.html
+dc789a531ea9e71527007d794a3e18ee *inst/doc/BasisBasics.html
 e26b4906091d1e4a451f0285a06db722 *inst/doc/monotoneFunctions.R
 eb34b6757b147ca14c16b0e815729328 *inst/doc/monotoneFunctions.Rmd
 3bd5e3187a80fd92ed2278f659416317 *inst/doc/monotoneFunctions.pdf
