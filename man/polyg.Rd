@@ -34,7 +34,7 @@ arguments, and the number of columns equals the number of basis
 \code{\link{polygpen}}
 }
 \examples{
-
+oldpar <- par(no.readonly=TRUE)
 #  set up a set of 21 argument values
 x <- seq(0,1,0.05)
 #  set up a set of 11 argument values
@@ -43,7 +43,7 @@ argvals <- seq(0,1,0.1)
 basismat <- polyg(x, argvals)
 #  plot the basis functions
 matplot(x, basismat, type="l")
-
+par(oldpar)
 }
 % docclass is function
 \keyword{smooth}

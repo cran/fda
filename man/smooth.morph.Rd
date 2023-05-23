@@ -44,6 +44,20 @@ smooth.morph(x, y, ylim, WfdPar, conv=1e-4, iterlim=20, dbglev=0)
     can be helpful to turn off the output buffering feature of S-PLUS.
   }
 }
+\details{
+  The function computes a increasing function mapping one closed into interval 
+  (defined in \code{WfdPar} into another (the two-value numeric vector argument
+  \code{ylim}).  
+  The function immediately checks that the data do not fall outside of the 
+  first interval, which is located in \code{WfdPar$fd$basis$rangeval} and 
+  named \code{xlim} in its code.
+  
+  A frequent problem is that the data points in argument \code{x} are 
+  outside of this origin interval.  Small escapes less than 1e-7 are 
+  automatically converted to the correct the right limit. But the
+  user should check that this constraint is met  before invoking the 
+  function, and especially when the function is used iteratively.
+}
 \value{
   A named list of length eight containing:
   \item{Wfdobj}{

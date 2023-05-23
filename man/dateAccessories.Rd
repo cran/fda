@@ -79,11 +79,13 @@
 daybasis65 <- create.fourier.basis(c(0, 365), 65)
 daytempfd <- with(CanadianWeather, smooth.basisPar(day.5,
     dailyAv[,,"Temperature.C"], daybasis65)$fd )
-plot(daytempfd, axes=FALSE)
+oldpar <- par(axes=FALSE)
+plot(daytempfd)
 axisIntervals(1)
 # axisIntervals by default uses
 # monthBegin.5, monthEnd.5, monthMid, and month.abb
 axis(2)
+par(oldpar)
 }
 % docclass is function
 \keyword{datasets}

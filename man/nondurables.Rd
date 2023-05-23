@@ -18,7 +18,8 @@
     Functional Data Analysis}, Springer, New York, ch. 3. 
 }
 \examples{
+oldpar <- par(no.readonly=TRUE)
 plot(nondurables, log="y")
-}
-% docclass is function
+par(oldpar)
+} 
 \keyword{datasets}

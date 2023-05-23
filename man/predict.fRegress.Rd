@@ -81,7 +81,6 @@
   \code{\link[stats]{predict}}
 }
 \examples{
-
 ##
 ## vector response with functional explanatory variable
 ##
@@ -96,8 +95,9 @@ precip.Temp.f <- fRegress(annualprec ~ tempfd)
 precip.Temp.p <- predict(precip.Temp.f)
 
 # plot response vs. fitted 
+oldpar <- par(no.readonly=TRUE)
 plot(annualprec, precip.Temp.p)
-
+par(oldpar)
 }
 \keyword{ models}
 

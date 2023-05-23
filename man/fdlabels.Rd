@@ -36,6 +36,5 @@ fdlabels(fdnames, nrep, nvar)
   \code{\link{plot.fd}} 
 }
 \author{Jim Ramsay}
-%\examples{}
 \keyword{smooth }
 

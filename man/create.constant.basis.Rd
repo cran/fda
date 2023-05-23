@@ -45,9 +45,7 @@ create.constant.basis(rangeval=c(0, 1), names="const", axes=NULL)
   \code{\link{create.power.basis}}
 }
 \examples{
-
 basisobj <- create.constant.basis(c(-1,1))
-
 }
 % docclass is function
 \keyword{smooth}

@@ -61,7 +61,7 @@ pca.fd(fdobj, nharm = 2, harmfdPar=fdPar(fdobj),
 \code{\link{pda.fd}}
 }
 \examples{
-
+oldpar <- par(no.readonly=TRUE)
 #  carry out a PCA of temperature
 #  penalize harmonic acceleration, use varimax rotation
 
@@ -83,5 +83,6 @@ par(op)
 
 plot(daytemppcaobj$harmonics)
 plot(daytemppcaVarmx$harmonics)
+par(oldpar)
 }
 \keyword{smooth}

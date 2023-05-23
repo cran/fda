@@ -133,11 +133,11 @@ register.fd(y0fd=NULL, yfd=NULL, WfdParobj=NULL,
 }
 \seealso{
   \code{\link{smooth.monotone}},
-  \code{\link{smooth.morph}}
-  \code{\link{plotreg.fd}}
+  \code{\link{smooth.morph}},
   \code{\link{register.newfd}}
 }
 \examples{
+oldpar <- par(no.readonly=TRUE)
 #See the analyses of the growth data for examples.
 
 ##
@@ -185,7 +185,7 @@ smB.reg.0 <- register.fd(smBv0, smBv[1:nBoys])
 #  The right panel contains:
 #    -- the warping function h(t)
 #    -- the linear function corresponding to no warping
-plotreg.fd(smB.reg.0)
+#  plotreg.fd(smB.reg.0) # this function has been removed
 #  Notice that all the warping functions all have simple shapes
 #  due to the use of the simplest possible basis
 
@@ -201,7 +201,7 @@ Wfd0      <- fd(matrix(0,Wnbasis,1),Wbasis)
 WfdParobj <- fdPar(Wfd0, Lfdobj=2, lambda=0.01)
 #  register the curves
 smB.reg.1 <- register.fd(smBv0, smBv[1:nBoys], WfdParobj)
-plotreg.fd(smB.reg.1)
+#. plotreg.fd(smB.reg.1). #. removed
 #  Notice that now the warping functions can have more complex shapes
 
 ##
@@ -217,7 +217,7 @@ lines(smBv0, lty=2)
 #  a stronger pubertal growth spurt relative to the old target
 #  (dashed line).  Now register to the new target
 smB.reg.2 <- register.fd(smBv1, smBv[1:nBoys], WfdParobj)
-plotreg.fd(smB.reg.2)
+#. plotreg.fd(smB.reg.2). #. removed
 #  Plot the mean of these curves as well as the first and second targets
 par(mfrow=c(1,1),ask=FALSE)
 plot(mean.fd(smB.reg.2$regfd))
@@ -228,7 +228,7 @@ lines(smBv1, lty=3)
 #  pre-pubertal region.  Now register the previously registered
 #  functions to the new target.
 smB.reg.3 <- register.fd(smBv1, smB.reg.1$regfd, WfdParobj)
-plotreg.fd(smB.reg.3)
+#  plotreg.fd(smB.reg.3). function removed
 #  Notice that the warping functions only deviate from the straight line
 #  over the pre-pubertal region, and that there are some small adjustments
 #  to the registered curves as well over the pre-pubertal region.
@@ -266,8 +266,9 @@ WarpfdPar <- fdPar(Warpfd)
 gaitreglist <- register.fd(D2gaitmeanfd, D2gaitfd[1:nBoys], WarpfdPar,
                            periodic=TRUE)
 #  plot the results
-plotreg.fd(gaitreglist)
+#. plotreg.fd(gaitreglist). function removed
 #  display horizonal shift values
 print(round(gaitreglist$shift,1))
+par(oldpar)
 }
 \keyword{smooth}

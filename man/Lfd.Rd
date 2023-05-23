@@ -73,5 +73,4 @@ bfdobj  <- fd(Lcoef,Lbasis)
 bwtlist <- fd2list(bfdobj)
 harmaccelLfd <- Lfd(3, bwtlist)
 }
-% docclass is function
 \keyword{smooth}

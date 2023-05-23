@@ -31,11 +31,10 @@ tempfdPar  <- fdPar(daybasis, harmLfd, templambda)
 # do not run on CRAN because it takes too long.
 tempfd     <- smooth.basis(daytime,
        CanadianWeather$dailyAv[,,"Temperature.C"], tempfdPar)$fd
-
 tempctrfd  <- center.fd(tempfd)
-
+oldpar <- par(no.readonly= TRUE)
 plot(tempctrfd, xlab="Day", ylab="deg. C",
      main = "Centered temperature curves")
+par(oldpar)
 }
-% docclass is function
 \keyword{smooth}

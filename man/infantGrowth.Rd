@@ -23,7 +23,6 @@
     }
   }
 }
-%\details{}
 \source{
   Hermanussen, M., Thiel, C., von Bueren, E., de los Angeles Rol. de
   Lama, M., Perez Romero, A., Arizonavarreta Ruiz, C., Burmeister, J.,
@@ -38,6 +37,8 @@
 }
 \examples{
 data(infantGrowth)
+oldpar <- par(no.readonly=TRUE)
 plot(tibiaLength~day, infantGrowth)
+par(oldpar)
 }
 \keyword{datasets}

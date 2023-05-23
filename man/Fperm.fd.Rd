@@ -134,6 +134,7 @@ Fperm.fd(yfdPar, xfdlist, betalist, wt=NULL, nperm=200,
   \code{\link{Fstat.fd}}
 }
 \examples{
+oldpar <- par(no.readonly=TRUE)
 ##
 ## 1.  yfdPar = vector
 ##
@@ -181,7 +182,7 @@ F.res2 = Fperm.fd(annualprec, xfdlist, betalist, nperm=10)
 
 # First set up a basis system to hold the smooths
 
-\dontrun{
+if (!CRAN()) {
 
 Knots  <- growth$age
 norder <- 6
@@ -216,6 +217,7 @@ betalist = list(fdPar(hgtbasis,2,1e-6),fdPar(hgtbasis,2,1e-6))
 # Should use nperm = 200 or so,
 # but use 10 to save test time
 Fres = Fperm.fd(hgtfd,xfdlist,betalist,nperm=10)
+par(oldpar)
 }
 
 }

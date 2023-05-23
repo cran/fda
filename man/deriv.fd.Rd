@@ -67,10 +67,10 @@ hgtffd <- smooth.basis(age, growth$hgtf, growfdPar)$fd
 accmfd <- deriv.fd(hgtmfd, 2)
 accffd <- deriv.fd(hgtffd, 2)
 #  Plot the two sets of curves
-par(mfrow=c(2,1))
+oldpar <- par(mfrow=c(2,1))
 plot(accmfd)
 plot(accffd)
-
+par(oldpar)
 }
 % docclass is function
 \keyword{smooth}

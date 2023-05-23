@@ -4,7 +4,7 @@ author: "Jim Ramsay"
 date: "22/02/2022"
 output: html_document
 vignette: >
-  %\VignetteIndexEntry{SplineFunctions}
+  %\VignetteIndexEntry{Spline Functions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

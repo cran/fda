@@ -59,7 +59,7 @@
   \code{\link{plot.pca.fd}}
 }
 \examples{
-
+oldpar <- par(no.readonly=TRUE)
 #  carry out a PCA of temperature
 #  penalize harmonic acceleration, use varimax rotation
 
@@ -75,10 +75,8 @@ daytemppcaobj <- pca.fd(daytempfd, nharm=4, harmfdPar)
 plot.pca.fd(daytemppcaobj)
 
 # plot 4 on 1 page
-op <- par(mfrow=c(2,2))
+par(mfrow=c(2,2))
 plot.pca.fd(daytemppcaobj, cex.main=0.9)
-par(op)
-
+par(oldpar)
 }
-% docclass is function
 \keyword{smooth}

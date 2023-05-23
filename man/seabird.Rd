@@ -54,8 +54,4 @@
   \emph{Functional Data Analysis with R and Matlab}, Springer, New York
   (esp. ch. 10)
 }
-\examples{
-data(seabird)
-## maybe str(seabird) ; plot(seabird) ...
-}
 \keyword{datasets}

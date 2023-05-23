@@ -1,8 +1,8 @@
 ---
-title: "BasisBasics"
+title: "Introduction to the Basics of FDA"
 output: html_document
 vignette: >
-  %\VignetteIndexEntry{BasisBasics}
+  %\VignetteIndexEntry{Introduction to the Basics of FDA}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

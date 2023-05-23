@@ -99,6 +99,7 @@ exponentiate.fd(e1, e2, tolint=.Machine$double.eps^0.75,
 ##
 
 basis3 <- create.fourier.basis(nbasis=3)
+oldpar <- par(no.readonly=TRUE)
 plot(basis3)
 # max = sqrt(2), so
 # integral of the square of each basis function (from 0 to 1) is 1
@@ -118,42 +119,7 @@ plot(fdsinsin) # good
 \dontshow{stopifnot(}
 all.equal(fdsin2, fdsinsin)
 \dontshow{)}
-
-% ##
-% ## sqrt(sin2)
-% ##
-% plot(fdsin2)
-% fdsin. <- sqrt(fdsin2)
-% plot(fdsin, main='fdsin and sqrt(fdsin^2)')
-% lines(fdsin., col='red')
-% # fdsin is positive and negative
-% # fdsin. = sqrt(fdsin^2)
-% # has trouble, because it wants to be smooth
-% # but theoretically has a discontinuous first derivative at 0.5
-
-% fdsin.5.2 <- fdsin.^2
-% resin <- fdsin2-fdsin.5.2
-% plot(resin)
-% \dontshow{stopifnot(}
-% max(abs(resin$coefs))<0.01
-% \dontshow{)}
-
-% ##
-% ## x^2, x = straight line f(x)=x
-% ##
-% bspl1 <- create.bspline.basis(norder=2)
-% x <- fd(0:1, bspl1)
-% plot(x)
-
-% x2 <- x^2
-% plot(x2)
-
-% er.x <- x-sqrt(x2)
-% er.x$coefs
-% max(er.x$coefs)
-% \dontshow{stopifnot(}
-% max(abs(er.x$coefs))<10*.Machine$double.eps
-% \dontshow{)}
+par(oldpar)
 
 }
 % docclass is function

@@ -117,8 +117,9 @@ create.exponential.basis(rangeval=c(0,1), nbasis=NULL, ratevec=NULL,
 #  with basis functions 1, exp(-t) and exp(-5t)
 basisobj <- create.exponential.basis(c(0,5),3,c(0,-1,-5))
 #  plot the basis
+oldpar <- par(no.readonly=TRUE)
 plot(basisobj)
-
+par(oldpar)
 }
 % docclass is function
 \keyword{smooth}

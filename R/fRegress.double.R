@@ -105,6 +105,7 @@ fRegress.double <- function(y, xfdlist, betalist, wt=NULL,
         zeromat <- matrix(0,ncoef,bnbasis)
         Rmat    <- rbind(cbind(Rmat,       zeromat),
                          cbind(t(zeromat), Rmatj))
+		ncoef <- ncoef + bnbasis
       } else {
         Rmat  <- Rmatj
         ncoef <- ncoef + bnbasis

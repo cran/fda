@@ -25,18 +25,23 @@ smooth.pos <- function(argvals, y, WfdParobj, wtvec=rep(1,n), conv=1e-4,
   #               an N by NCURVE matrix, where N is the number of observed
   #               curve values for each curve and NCURVE is the number of
   #               curves observed.
-  #               If the functional data are muliivariate, this array will be
+  #               If the functional data are multivariate, this array will be
   #               an N by NCURVE by NVAR matrix, where NVAR the number of
   #               functions observed per case.  For example, for the gait
   #               data, NVAR = 2, since we observe knee and hip angles.
-  #  WFDPAROBJ... A functional parameter or fdPar object.  This object
+  #  WFDPAROBJ... An fd or an fdPar object.  This object
   #               contains the specifications for the functional data
   #               object to be estimated by smoothing the data.  See
   #               comment lines in function fdPar for details.
   #               The functional data object WFD in WFDPAROBJ is used
   #               to initialize the optimization process.
   #               Its coefficient array contains the starting values for
-  #               the iterative minimization of mean squared error.
+  #               the iterative minimization of mean squared error, and
+  #               this coefficient array must be either a K by NCURVE
+  #               matrix or a K by NUCRVE by NVAR array,  where K
+  #               is the number of basis functions.
+  #               If WFDPAROBJ is NULL, it will be initialized to
+  #               a matrix or array of zeros.
   #  WTVEC   ...  a vector of weights, a vector of N one's by default.
   #  CONV    ...  convergence criterion, 0.0001 by default
   #  ITERLIM ...  maximum number of iterations, 50 by default.
@@ -60,7 +65,7 @@ smooth.pos <- function(argvals, y, WfdParobj, wtvec=rep(1,n), conv=1e-4,
   #  FLIST objects are indexed linear with curves varying inside
   #  variables.
   
-  #  Last modified 16 November 2021 by Jim Ramsay
+  #  Last modified 17 January 2023 by Jim Ramsay
   
   #  check ARGVALS
   
@@ -76,7 +81,7 @@ smooth.pos <- function(argvals, y, WfdParobj, wtvec=rep(1,n), conv=1e-4,
   
   #  check Y
   
-  y = as.matrix(y)
+  y      <- as.matrix(y)
   ychk   <- ycheck(y, n)
   y      <- ychk$y
   ncurve <- ychk$ncurve
@@ -85,19 +90,18 @@ smooth.pos <- function(argvals, y, WfdParobj, wtvec=rep(1,n), conv=1e-4,
   
   #  check WfdParobj and get LAMBDA
   
-  WfdParobj <- fdParcheck(WfdParobj,curve)
-  lambda    <- WfdParobj$lambda
-  
-  #  the starting values for the coefficients are in FD object WFDOBJ
-  
+  if (inherits(WfdParobj, "fdPar") || inherits(WfdParobj, "fd")) {
+    if (inherits(WfdParobj, "fd")) WfdParobj <- fdPar(WfdParobj)
+  } else {
+    stop(paste("Argument WFDPAROBJ is neither an fdPar object",
+               "or an fd object."))
+  }
   Wfdobj   <- WfdParobj$fd
   Lfdobj   <- WfdParobj$Lfd
-  basisobj <- Wfdobj$basis     #  basis for W(argvals)
-  nbasis   <- basisobj$nbasis  #  number of basis functions
-  
-  #  set up initial coefficient array
-  
+  basisobj <- Wfdobj$basis     
+  nbasis   <- basisobj$nbasis  
   coef0    <- Wfdobj$coefs
+  lambda   <- WfdParobj$lambda
   
   #  check WTVEC
   

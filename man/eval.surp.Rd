@@ -19,8 +19,8 @@ eval.surp(evalarg, Wfdobj, nderiv = 0)
   the set \code{c(0,1,2)}.}
 }
 \details{A surprisal \code{M}-vector is information measured in \code{M}-bits.
-Since a multinomial probability vector must sum to one, it follows that the
-surprisal vector \code{S} must satisfy the constraint 
+Since a multinomial probability vector must sum to one, it follows 
+that the surprisal vector \code{S} must satisfy the constraint 
 \code{log_M(sum(M^(-S)) = 0.} That is, surprisal vectors lie within a
 curved \code{M-1}-dimensional manifold.
 

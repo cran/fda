@@ -60,12 +60,12 @@ lipfd <- smooth.basis(liptime, lip, lipfdPar)$fd
 names(lipfd$fdnames) = c("Normalized time", "Replications", "mm")
 
 lipstdfd <- sd.fd(lipfd)
+oldpar <- par(no.readonly=TRUE)
 plot(lipstdfd)
-
+par(oldpar)
 all.equal(lipstdfd, std.fd(lipfd))
 all.equal(lipstdfd, stdev.fd(lipfd))
 all.equal(lipstdfd, stddev.fd(lipfd))
 
 }
-% docclass is function
 \keyword{smooth}

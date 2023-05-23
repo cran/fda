@@ -114,7 +114,6 @@ export(AmpPhaseDecomp,
        plotbeta,
        plotfit.fd, 
        plotfit.fdSmooth,
-       plotreg.fd,
        plotscores,
        plus.fd, 
        polyg,
@@ -236,6 +235,8 @@ S3method(residuals,    posfd)
 S3method(matplot,      Date)
 S3method(matplot,      default)
 S3method(matplot,      POSIXct)
+S3method(matplot,      matrix)
+S3method(matplot,      numeric)
 S3method(norder,       bspline)
 S3method(norder,       default)
 S3method(plot,         cca.fd)

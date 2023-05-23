@@ -29,7 +29,9 @@
 }
 %\seealso{\code{\link{eval.penalty}}}
 \examples{
+oldpar <- par(no.readonly=TRUE)
 plot(gait[,1, 1], gait[, 1, 2], type="b")
+par(oldpar)
 }
 % docclass is function
 \keyword{datasets}

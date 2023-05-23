@@ -10,7 +10,7 @@
   M-1 dimensional surprisal subspace that is within the space of non-negative M-dimensional vectors.
 }
 \usage{
-smooth.surp(argvals, Wbin, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
+smooth.surp(argvals, y, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
             iterlim=50, dbglev=0)
 }
 \arguments{
@@ -21,7 +21,7 @@ smooth.surp(argvals, Wbin, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
     you will need to run this function inside one or more loops,
     smoothing each curve separately.
   }
-  \item{Wbin}{
+  \item{y}{
     A \code{nbin} by \code{M_i} matrix of surprisal values to be fit.  
   }
   \item{Bmat0}{A \code{Wnbasis} by \code{M_i - 1} matrix containing starting
@@ -55,7 +55,7 @@ smooth.surp(argvals, Wbin, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
   }
 }
 \value{
-  A named list with these members:
+  A named list \code{surpFd} with these members:
 
   \item{Wfdobj}{
     a functional data object defining function $W(x)$ that that
@@ -90,6 +90,7 @@ http://www.testgardener.azurewebsites.net
   \code{\link{eval.surp}}
 }
 \examples{
+oldpar <- par(no.readonly=TRUE)
 #  evaluation points
 x = seq(-2,2,len=11)
 #  evaluate a standard normal distribution function
@@ -120,8 +121,9 @@ matplot(xfine, sfine, type="l", lty=c(1,1), col=c(1,1))
 points(x, mnormdata[,1])
 points(x, mnormdata[,2])
 #  convert the surprisal fit values to probabilities
-pfine = 2^-sfine
+pfine = 2^(-sfine)
 #  check that they sum to one
 apply(pfine,1,sum)
+par(oldpar)
 }
 

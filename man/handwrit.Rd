@@ -86,7 +86,9 @@ handwritTime
 }
 %\seealso{\code{\link{eval.penalty}}}
 \examples{
+oldpar <- par(no.readonly=TRUE)
 plot(handwrit[, 1, 1], handwrit[, 1, 2], type="l")
+par(oldpar)
 }
 % docclass is function
 \keyword{datasets}

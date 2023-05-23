@@ -45,7 +45,7 @@
 \examples{
 
 #  Canonical correlation analysis of knee-hip curves
-
+oldpar <- par(no.readonly=TRUE)
 gaittime  <- (1:20)/21
 gaitrange <- c(0,1)
 gaitbasis <- create.fourier.basis(gaitrange,21)
@@ -63,7 +63,6 @@ plot.cca.fd(ccafd0)
 ccafd1 <- varmx.cca.fd(ccafd0)
 #  plot the rotated canonical weight functions
 plot.cca.fd(ccafd1)
-
+par(oldpar)
 }
-% docclass is function
 \keyword{smooth}

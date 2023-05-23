@@ -107,6 +107,7 @@ fdPar(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
   \code{\link{int2Lfd}}
 }
 \examples{
+oldpar <- par(no.readonly=TRUE)
 ##
 ## Simple example
 ##
@@ -165,7 +166,7 @@ lambda   <- 0.01  #  minimum GCV estimate
 ##
 ## with rangeval of class Date and POSIXct
 ##
-
+par(oldpar)
 
 }
 

@@ -129,17 +129,7 @@ fbplot(fit, x = NULL, method = "MBD", depth = NULL, plot = TRUE,
   Ying Sun \email{sunwards@stat.osu.edu}
 
   Marc G. Genton \email{marc.genton@kaust.edu.sa}
-%%  ~~who you are~~
 }
-%\note{
-%%  ~~further notes~~
-%}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-%\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-%}
 \examples{
 ##
 ## 1.  generate 50 random curves with some covariance structure
@@ -162,6 +152,7 @@ e=matrix(rnorm(n*p),p,n)
 ydata  = mu+t(L)\%*\%e
 
 #functional boxplot
+oldpar <- par(no.readonly=TRUE)
 fbplot(ydata,method='MBD',ylim=c(-11,15))
 
 # The same using boxplot.fd
@@ -206,7 +197,7 @@ y=mu+t(L)\%*\%e+k*cs.m
 
 #functional boxplot
 fbplot(y,method='MBD',ylim=c(-11,15))
-
+par(oldpar)
 }
 \keyword{ ~Functional Boxplots }
 %\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

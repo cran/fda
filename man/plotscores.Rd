@@ -47,5 +47,4 @@ a plot of scores
 \seealso{
 \code{\link{pca.fd}}
 }
-% docclass is function
 \keyword{smooth}

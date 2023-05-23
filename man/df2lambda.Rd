@@ -70,8 +70,9 @@ growfdPar <- fdPar(hgtbasis, Lfdobj, lambda)
 #  hgtf.
 hgtffd <- smooth.basis(age, growth$hgtf, growfdPar)$fd
 #  Plot the curves
+oldpar <- par(no.readonly=TRUE)
 plot(hgtffd)
-
+par(oldpar)
 }
 % docclass is function
 \keyword{smooth}

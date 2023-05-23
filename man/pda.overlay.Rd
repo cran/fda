@@ -37,7 +37,7 @@ pda.overlay(pdaList,nfine=501,ncoarse=11,...)
   \code{\link{eigen.pda}}
 }
 \examples{
-
+oldpar <- par(no.readonly=TRUE)
 # This example looks at a principal differential analysis of the lip data
 # in Ramsay and Silverman (2005).
 
@@ -62,6 +62,6 @@ pdaList <- pda.fd(xfdlist, bwtlist)
 # And plot the overlay
 
 pda.overlay(pdaList,lwd=2,cex.lab=1.5,cex.axis=1.5)
-
+par(oldpar)
 }
 \keyword{smooth}

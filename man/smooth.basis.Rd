@@ -252,6 +252,7 @@ smooth.basis(argvals=1:n, y, fdParobj, wtvec=NULL, fdnames=NULL,
   \code{\link{Data2fd}},
 }
 \examples{
+oldpar <- par(no.readonly=TRUE)
 ##
 ######## Simulated data example 1: a simple regression smooth  ########
 ##
@@ -852,7 +853,7 @@ harmaccelLfd <- vec2Lfd(c(0, 0, (2*pi)^2, 0))
 gaitfdPar <- fdPar(gaitbasis, harmaccelLfd, lambda)
 gaitSmooth <- smooth.basis(gaittime, gait, gaitfdPar)
 gaitfd <- gaitSmooth$fd
-\dontrun{
+if (!CRAN()){
   # by default creates multiple plots, asking for a click between plots
  plotfit.fd(gait, gaittime, gaitfd)
 }
@@ -867,6 +868,6 @@ gaitfd <- gaitSmooth$fd
 
 }
 #  end of if (!CRAN)
-
+par(oldpar)
 }
 \keyword{smooth}

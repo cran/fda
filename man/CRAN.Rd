@@ -9,7 +9,7 @@
   compute time constraints with CRAN tests.
 }
 \usage{
-CRAN(CRAN_pattern, n_R_CHECK4CRAN)
+  CRAN(CRAN_pattern, n_R_CHECK4CRAN)
 }
 \arguments{
   \item{CRAN_pattern}{
@@ -55,26 +55,24 @@ CRAN(CRAN_pattern, n_R_CHECK4CRAN)
   \code{\link{Sys.getenv}}
 }
 \examples{
-% Look in fda-ex.Rout
-% for the results from R CMD check
-% Modified defaults were tested with environment variables
-% _CRAN_pattern_ = 'A' and _n_R_CHECK4CRAN_ = '10'
-% 'R CMD check' found 26 matches and CRAN() returned TRUE
-cran <- CRAN()
-str(cran)
-gete <- attr(cran, 'Sys.getenv')
-(ngete <- names(gete))
-
-iget <- grep('^_', names(gete))
-gete[iget]
-
-\dontrun{
-if(CRAN()){
-  stop('CRAN')
-} else {
-  stop('NOT CRAN')
-}
-}
+  # Look in fda-ex.R
+  # for the results from R CMD check
+  # Modified defaults were tested with environment variables
+  # _CRAN_pattern_ = 'A' and _n_R_CHECK4CRAN_ = '10'
+  # 'R CMD check' found 26 matches and CRAN() returned TRUE
+  cran <- CRAN()
+  str(cran)
+  gete <- attr(cran, 'Sys.getenv')
+  (ngete <- names(gete))
+  iget <- grep('^_', names(gete))
+  gete[iget]
+  # if (!CRAN()) {
+  #   if (CRAN()) {
+  #     stop("CRAN")
+  #   } else {
+  #     stop("NOT CRAN")
+  #   }
+  # }
 }
 \keyword{environment}
 

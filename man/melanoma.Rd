@@ -32,8 +32,9 @@
   \code{\link[boot]{melanoma}}
 }
 \examples{
+oldpar <- par(no.readonly=TRUE)
 plot(melanoma[, -1], type="b")
+par(oldpar)
 }
-% docclass is function
 \keyword{datasets}
 

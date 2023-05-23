@@ -39,6 +39,7 @@ Lines added to an existing plot.
   \code{\link{plotfit.fd}}
 }
 \examples{
+oldpar <- par(no.readonly=TRUE)
 ##
 ## plot a fit with 3 levels of smoothing
 ##
@@ -59,7 +60,6 @@ plot(x, y, xlim=c(0.5, 1))
 lines.fdSmooth(result4.0)
 lines.fdSmooth(result4.m4, col='blue')
 # no visible difference from the default?  
-
+par(oldpar)
 }
-% docclass is function
 \keyword{smooth}

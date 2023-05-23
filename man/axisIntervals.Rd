@@ -82,6 +82,7 @@ axesIntervals(side=1:2, atTick1=fda::monthBegin.5, atTick2=fda::monthEnd.5,
   \code{\link{monthLetters}}
 }
 \examples{
+oldpar <- par(no.readonly= TRUE)
 daybasis65 <- create.fourier.basis(c(0, 365), 65)
 
 daytempfd <- with(CanadianWeather, smooth.basis(
@@ -109,7 +110,7 @@ axesIntervals()
 
 axisIntervals(3, labels=monthLetters, cex.lab=1.2, line=-0.5)
 # 'line' argument here is passed to 'axis' via '...'
-
+par(oldpar)
 }
 % docclass is function
 \keyword{smooth}

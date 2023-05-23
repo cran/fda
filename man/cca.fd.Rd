@@ -88,6 +88,9 @@ round(ccafd0$ccacorr[1:6],3)
 #  compute a VARIMAX rotation of the canonical variables
 ccafd <- varmx.cca.fd(ccafd0)
 #  plot the canonical weight functions
+oldpar <- par(no.readonly= TRUE)
 plot.cca.fd(ccafd)
+par(oldpar)
+
 }
 \keyword{smooth}

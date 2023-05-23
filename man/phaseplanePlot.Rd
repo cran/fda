@@ -91,7 +91,9 @@ argvals = seq(1919,2000,len=length(nondurables))
 logNondurSm <- smooth.basisPar(argvals,
                 y=log10(nondurables), fdobj=goodsbasis,
                 Lfdobj=LfdobjNonDur, lambda=1e-11)
+oldpar <- par(no.readonly=TRUE)
 phaseplanePlot(1964, logNondurSm$fd)
+par(oldpar)
 }
 \keyword{smooth}
 \keyword{hplot}

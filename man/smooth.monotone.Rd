@@ -173,7 +173,7 @@ smooth.monotone(argvals, y, WfdParobj, wtvec=rep(1,n),
   \code{\link{smooth.morph}}
 }
 \examples{
-
+oldpar <- par(no.readonly=TRUE)
 #  Estimate the acceleration functions for growth curves
 #  See the analyses of the growth data.
 #  Set up the ages of height measurements for Berkeley data
@@ -205,7 +205,7 @@ hgt1 = growth$hgtf[,1]
 
 # delete the test on CRAN because it takes too long
 
-\dontrun{
+if (!CRAN()) {
 result <- smooth.monotone(age, hgt1, growfdPar, wgt,
                           conv=0.1)
 #  Extract the functional data object and regression
@@ -224,7 +224,6 @@ accfine <- beta[2]*eval.monfd(agefine, Wfd, 2)
 plot(agefine, accfine, type="l")
 lines(c(1,18),c(0,0),lty=4)
 }
-
+par(oldpar)
 }
-% docclass is function
 \keyword{smooth}

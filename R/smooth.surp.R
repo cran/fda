@@ -1,6 +1,6 @@
-smooth.surp <- function(argvals, Wbin, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
+smooth.surp <- function(argvals, y, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
                        iterlim=50, dbglev=0) {
-  #  Smooths the relationship of Y to ARGVALS using weights in WTVEC by fitting 
+    #  Smooths the relationship of Y to ARGVALS using weights in WTVEC by fitting 
   #     surprisal functions to a set of surprisal transforms of choice 
   #     probabilities, where the surprisal transformation of each probability is 
   #                      W(p_m) = -log_M (p_m), m=1, ..., M,
@@ -20,7 +20,7 @@ smooth.surp <- function(argvals, Wbin, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
   #               surprisal values for each curve.  It is assumed that
   #               that these argument values are common to all observed
   #               curves.  
-  #  WBIN    ...  A matrix containingg the values to be fit.
+  #  Y       ...  A matrix containing the values to be fit.
   #               This will be an NBIN by M matrix, where NBIN is the 
   #               number of bins containing choice probabilities and M is
   #               the number of options in a specific question or rating
@@ -70,21 +70,21 @@ smooth.surp <- function(argvals, Wbin, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
   n       <- length(argvals)
   onesobs <- matrix(1,n,1)
   
-  #  Check Wbin, an n by M-1 matrix of surprisal values.  
+  #  Check y, an n by M-1 matrix of surprisal values.  
   #  It may not contain negative values.
   
-  Wbin <- as.matrix(Wbin)
-  Wbindim <- dim(Wbin)
-  M <- Wbindim[2]
-  if (Wbindim[1] != n) 
-      stop("The length of ARGVALS  and the number of rows of WBIN differ.")
-  # if (min(Wbin) < 0) stop("WBIN contains negative values.")
+  y    <- as.matrix(y)
+  ydim <- dim(y)
+  M    <- ydim[2]
+  if (ydim[1] != n) 
+      stop("The length of ARGVALS  and the number of rows of Y differ.")
   
   #  Check WfdPar and extract WBASIS, WNBASIS, Wlambda and WPENALTY.  
   #  Note that the coefficient matrix is not used.
   
   WfdPar   <- fdParcheck(WfdPar,M)
   Wbasis   <- WfdPar$fd$basis
+  
   Wnbasis  <- Wbasis$nbasis
   Wlambda  <- WfdPar$lambda
   Wpenalty <- eval.penalty(Wbasis, WfdPar$Lfd)
@@ -134,7 +134,7 @@ smooth.surp <- function(argvals, Wbin, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
   
   #  Set up list object for data required by PENSSEfun
   
-  surpList <- list(argvals=argvals, Wbin=Wbin, wtvec=wtvec, Kmat=Kmat,
+  surpList <- list(argvals=argvals, y=y, wtvec=wtvec, Kmat=Kmat,
                    Zmat=Zmat, Phimat=Phimat, M=M)
   #  --------------------------------------------------------------------
   #              loop through variables and curves
@@ -248,12 +248,13 @@ smooth.surp <- function(argvals, Wbin, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
   D2SSE    <- surpResult$D2SSE
   DvecSmatDvecB <- surpResult$DvecSmatDvecB
 
-  result <- list(Wfd=Wfd, Bmat=Bmat, f=f, gvec=gvec, hmat=hmat,
+  surpFd <- list(Wfd=Wfd, Bmat=Bmat, f=f, gvec=gvec, hmat=hmat,
                  PENSSE=PENSSE, DPENSSE=DPENSSE, D2PENSSE=D2PENSSE,
                  SSE=SSE, DSSE=DSSE, D2SSE=D2SSE,
                  DvecSmatDvecB=DvecSmatDvecB)
+  class(surpFd) <- 'surpfd'
   
-  return(result)
+  return(surpFd)
 }
 
 # ------------------------------------------------------------------
@@ -266,7 +267,7 @@ surp.fit <- function(x, surpList) {
   #  extract objects from surpList
   
   argvals <- surpList$argvals 
-  Wbin    <- surpList$Wbin 
+  y       <- surpList$y 
   wtvec   <- surpList$wtvec 
   Kmat    <- surpList$Kmat
   Zmat    <- surpList$Zmat 
@@ -288,7 +289,7 @@ surp.fit <- function(x, surpList) {
   sumexpXmat <- as.matrix(apply(expXmat,1,sum))
   Pmat     <- expXmat/(sumexpXmat %*% matrix(1,1,M))
   Smat     <- -Xmat + (log(sumexpXmat) %*% matrix(1,1,M))/logM
-  Rmat     <- Wbin - Smat
+  Rmat     <- y - Smat
   vecBmat  <- matrix(Bmat,K*(M-1),1,byrow=TRUE)
   vecRmat  <- matrix(Rmat,n*M,    1,byrow=TRUE)
   vecKmat  <- kronecker(diag(rep(1,M-1)),Kmat)

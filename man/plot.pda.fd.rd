@@ -44,7 +44,7 @@
   \code{\link{eigen.pda}}
 }
 \examples{
-
+oldpar <- par(no.readonly=TRUE)
 #  A pda analysis of the handwriting data
 
 # reduce the size to reduce the compute time for the example
@@ -97,6 +97,7 @@ plot(pdaList,whichdim=c(1,3))
 plot(pdaList,whichdim=c(2,3))
 
 plot(pdaList,whichdim=1:3)
+par(oldpar)
 }
 
 \keyword{smooth}

@@ -92,6 +92,7 @@ fdx. <- eval.fd(x., fd.)
 
 rfdx <- range(fdx.)
 
+oldpar <- par(no.readonly= TRUE)
 plot(range(x2), range(y2, fx., rfdx), type='n')
 points(x2, y2)
 lines(x., sin((x.-0.5)*pi), lty='dashed')
@@ -110,11 +111,11 @@ fn. <- as.fd(fn)
 lines(x., fn(x.), lty='dotted', col='blue')
 lines(x., eval.fd(x., fn.), col='green', lty='dotted', lwd=3)
 
-\dontrun{
+if(!CRAN()) {
 # Will NOT translate a periodic spline
-fp <- splinefun(x, y, method='periodic')
-as.fd(fp)
-#Error in as.fd.function(fp) :
+# fp <- splinefun(x, y, method='periodic')
+# as.fd(fp)
+# Error in as.fd.function(fp) :
 #  x (fp)  uses periodic B-splines, and as.fd is programmed
 #   to translate only B-splines with coincident boundary knots.
 }
@@ -130,6 +131,7 @@ lines(cars.spl)
 sp. <- with(cars, seq(min(speed), max(speed), len=101))
 d. <- eval.fd(sp., cars.fd)
 lines(sp., d., lty=2, col='red', lwd=3)
+par(oldpar)
 }
 \keyword{smooth}
 \keyword{manip}

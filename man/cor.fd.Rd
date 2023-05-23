@@ -22,25 +22,14 @@ cor.fd(evalarg1, fdobj1, evalarg2=evalarg1, fdobj2=fdobj1)
 }
 \details{
   1.  var1 <- var.fd(fdobj1) 
-
   2.  evalVar1 <- eval.bifd(evalarg1, evalarg1, var1)
-
-  
   3.  if(missing(fdobj2)) Convert evalVar1 to correlations
-
-
   4.  else:  
-
   4.1.  var2 <- var.fd(fdobj2)
-
   4.2.  evalVar2 <- eval.bifd(evalarg2, evalarg2, var2)
-
   4.3.  var12 <- var.df(fdobj1, fdobj2)
-
   4.4.  evalVar12 <- eval.bifd(evalarg1, evalarg2, var12)
-
   4.5.  Convert evalVar12 to correlations  
-
 }
 \value{
   A matrix or array:

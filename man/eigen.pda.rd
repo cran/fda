@@ -82,12 +82,5 @@ pdaParlist = list(pdaPar, pdaPar)
 
 bwtlist = list( list(pdaParlist,pdaParlist), list(pdaParlist,pdaParlist) )
 
-% #  do the second order pda
-
-% pdaList = pda.fd(xfdlist, bwtlist)
-
-% # plot the results
-
-% eigres = eigen.pda(pdaList)
 }
 \keyword{smooth}

@@ -79,6 +79,7 @@ tperm.fd(x1fd, x2fd, nperm=200, q=0.05, argvals=NULL, plotres=TRUE, ...)
 %  \code{\link{tstat.fd}}
 }
 \examples{
+oldpar <- par(no.readonly=TRUE)
 # This tests the difference between boys and girls heights in the
 # Berkeley growth data.
 
@@ -102,5 +103,6 @@ hgtffd <- smooth.basis(growth$age, growth$hgtf, growfdPar)$fd
 # Call tperm.fd
 
 tres <- tperm.fd(hgtmfd,hgtffd)
+par(oldpar)
 }
 \keyword{smooth}

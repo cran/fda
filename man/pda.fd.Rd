@@ -153,6 +153,7 @@ pda.fd(xfdlist, bwtlist=NULL,
 \code{\link{cca.fd}}
 }
 \examples{
+oldpar <- par(no.readonly=TRUE)
 #See analyses of daily weather data for examples.
 ##
 ##  set up objects for examples
@@ -392,5 +393,6 @@ plot(reslist[[1]])
 title("residual function for equation 1")
 plot(reslist[[2]])
 title("residual function for equation 2")
+par(oldpar)
 }
 \keyword{smooth}

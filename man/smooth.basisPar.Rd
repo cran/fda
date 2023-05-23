@@ -232,5 +232,4 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
 \examples{
 	#  see smooth.basis
 }
-% docclass is function
 \keyword{smooth}

@@ -9,10 +9,16 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
 ```
 
+```{r setup}
+library(fda)
+```
 
 ## R Markdown
 
@@ -39,7 +45,7 @@ print(paste("h(2*pi) =",round(hof2pi,2)))
 
 Now display the complete function $h(x)$ from 0 to $2 \pi$ along with $W(x)$.
 
-```{r,fig.height = 7}
+```{r,fig.width = 7}
 h <- delta*(cumsum(EW) - EW[101]/2)
 par(mfcol=c(2,1))
 plot(x, W, type="l")
@@ -50,7 +56,7 @@ Notice that, near $W(\pi/2) = 1$, $h$ is increasing the most rapidly, and that w
 
 Often we want $h(x)$ to end up at a fixed point.  Let's use 1, for example.  Then we simply divide $h(x)$ by $h(2 \pi)$.
 
-```{r,fig.height = 7}
+```{r,fig.width = 7}
 h <- delta*(cumsum(EW) - EW[101]/2)/hof2pi
 par(mfcol=c(2,1))
 plot(x, W, type="l")

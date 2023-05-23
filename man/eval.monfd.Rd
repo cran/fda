@@ -70,7 +70,7 @@ eval.monfd(evalarg, Wfdobj, Lfdobj=int2Lfd(0), returnMatrix=FALSE)
   \code{\link{eval.posfd}}
 }
 \examples{
-
+oldpar <- par(no.readonly=TRUE)
 #  Estimate the acceleration functions for growth curves
 #  See the analyses of the growth data.
 #  Set up the ages of height measurements for Berkeley data
@@ -132,7 +132,7 @@ growthResid <- resid(result)
 \dontshow{stopifnot(}
 all.equal(growthResid, with(result, y-hgtfit.))
 \dontshow{)}
-
+par(oldpar)
 }
 % docclass is function
 \keyword{smooth}

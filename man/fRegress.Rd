@@ -310,7 +310,7 @@ fRegress(y, ...)
   \code{\link{linmod}}
 }
 \examples{
-
+oldpar <- par(no.readonly=TRUE)
 ###
 ###
 ###   vector response with functional explanatory variable  
@@ -535,7 +535,7 @@ fRegressout <- fRegress(kneefd, xfdlist, betalist)
 \dontshow{stopifnot(}
 all.equal(fRegressout, knee.hip.f)
 \dontshow{)}
-
+par(oldpar)
 }
 % docclass is function
 \keyword{smooth}

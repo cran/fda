@@ -68,6 +68,7 @@ times.fd(e1, e2, basisobj=NULL)
   \code{\link{exponentiate.fd}}
 }
 \examples{
+oldpar <- par(no.readonly=TRUE)
 ##
 ## add a parabola to itself
 ##
@@ -165,6 +166,9 @@ all.equal(coef(-parab4.5), coefneg)
 plot(parab4.5-1)
 
 plot(1-parab4.5)
+
+par(oldpar)
+
 }
 \keyword{smooth}
 

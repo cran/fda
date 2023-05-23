@@ -36,6 +36,4 @@ plotbeta(betaestlist, betastderrlist, argvals=NULL, xlab="", ...)
 \seealso{
 \code{\link{plot.fd}}
 }
-%\examples{}
-% docclass is function
 \keyword{smooth}

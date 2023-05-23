@@ -106,7 +106,7 @@ eval.fourier3 <- eval.basis(seq(0, 1, .2), fourier3)
 # 3 basis functions on [0, 365]
 fourier3.365 <- create.fourier.basis(c(0, 365))
 eval.F3.365 <- eval.basis(day.5, fourier3.365)
-
+oldpar <- par(no.readonly=TRUE)
 matplot(eval.F3.365, type="l")
 
 # The next simplest Fourier basis (5  basis functions)
@@ -155,7 +155,7 @@ AmRevBas.ct <- predict(BspRev.ct, AmRevYrs.ct)
 matplot(AmRevYrs.ct, AmRevBas.ct, type='b')
 # Image is correct, but
 # matplot does not recognize the POSIXct class of x
-
+par(oldpar)
 }
 % docclass is function
 \keyword{smooth}

@@ -127,6 +127,7 @@ create.fourier.basis(rangeval=c(0, 1), nbasis=3,
 yearbasis3 <- create.fourier.basis(c(0,365),
                     axes=list("axesIntervals") )
 #  plot the basis
+oldpar <- par(no.readonly=TRUE)
 plot(yearbasis3)
 
 # Identify the months with letters
@@ -148,7 +149,7 @@ plot(monthbasis)
 falseFourierBasis <- create.fourier.basis(nbasis=1)
 #  plot the basis:  constant
 plot(falseFourierBasis)
-
+par(oldpar)
 }
 % docclass is function
 \keyword{smooth}

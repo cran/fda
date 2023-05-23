@@ -139,7 +139,7 @@ plot(nondurables, ylim=c(0, 120),
 
 plot(log10(nondurables), xlab = 'Year',
      ylab=expression(Log[10]~~Nondurable~~Goods~~Index), las=1 )
-abline(lm(log10(nondurables) ~ index(nondurables)), lty='dashed')
+abline(lm(log10(nondurables) ~ time(nondurables)), lty='dashed')
 
 #  ------------------------  Plot refinery data  --------------------------
 

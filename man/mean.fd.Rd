@@ -27,6 +27,7 @@ that contains the mean of the functions in the object \code{fd}.
   \code{\link{mean}}
 }
 \examples{
+oldpar <- par(no.readonly=TRUE)
 ##
 ## 1.  univeriate:  lip motion
 ##
@@ -66,7 +67,6 @@ weather.fd <- smooth.basis(day.5, CanadianWeather$dailyAv,
                            weatherBasis)$fd
 
 str(weather.fd.mean <- mean.fd(weather.fd))
-
+par(oldpar)
 }
-% docclass is function
 \keyword{smooth}

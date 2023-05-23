@@ -108,6 +108,7 @@
   \code{\link{lines.fd}}, \code{\link{plotfit.fd}}
 }
 \examples{
+oldpar <- par(no.readonly=TRUE)
 ##
 ## plot.fd
 ##
@@ -124,15 +125,15 @@ daytempfd <- with(CanadianWeather, smooth.basis(day.5,
 #  plot all the temperature functions for the monthly weather data
 plot(daytempfd, main="Temperature Functions")
 
-\dontrun{
-# To plot one at a time:
-# The following pauses to request page changes.
-\dontshow{
-# (Without 'dontrun', the package build process
-# might encounter problems with the par(ask=TRUE)
-# feature.)
-}
-plot(daytempfd, ask=TRUE)
+if (!CRAN()) {
+  # To plot one at a time:
+  # The following pauses to request page changes.
+  \dontshow{
+    # (Without 'dontrun', the package build process
+    # might encounter problems with the par(ask=TRUE)
+    # feature.)
+  }
+  plot(daytempfd, ask=TRUE)
 }
 
 ##
@@ -178,8 +179,7 @@ AmRevYrs.ct <- as.numeric(AmRevYrs.ct)
 BspRev.ct   <- create.bspline.basis(AmRev.ct)
 fitLin.ct   <- smooth.basis(AmRevYrs.ct, AmRevLin.ct, BspRev.ct)$fd
 plot(fitLin.ct)
-
+par(oldpar)
 }
-% docclass is function
 \keyword{smooth}
 \keyword{hplot}

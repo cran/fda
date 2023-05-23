@@ -56,7 +56,9 @@ tempvarbifd <- var.fd(tempfd)
 weektime    <- seq(0,365,len=53)
 tempvarmat  <- eval.bifd(weektime,weektime,tempvarbifd)
 #    make a perspective plot of the variance function
+oldpar <- par(no.readonly=TRUE)
 persp(tempvarmat)
+par(oldpar)
 }
 \keyword{smooth}
 % Converted by Sd2Rd version 1.21.

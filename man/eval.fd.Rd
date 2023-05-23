@@ -81,6 +81,7 @@ eval.fd(evalarg, fdobj, Lfdobj=0, returnMatrix=FALSE)
   \code{\link{eval.posfd}}
 }
 \examples{
+oldpar <- par(no.readonly=TRUE)
 ##
 ## eval.fd
 ##
@@ -171,7 +172,7 @@ AmRevYrs.ct <- seq(AmRev.ct[1], AmRev.ct[2], length.out=14)
 (AmRevLin.ct <- as.numeric(AmRevYrs.ct-AmRev.ct[2]))
 fitLin.ct <- smooth.basis(AmRevYrs.ct, AmRevLin.ct, BspRev.ct)
 AmPred.ct <- predict(fitLin.ct, AmRevYrs.ct)
-
+par(oldpar)
 }
 % docclass is function
 \keyword{smooth}

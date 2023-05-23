@@ -124,6 +124,7 @@ plot(m0)
 ##
 basisobj <- create.monomial.basis(c(-1,1), 5)
 #  plot the basis
+oldpar <- par(no.readonly=TRUE)
 plot(basisobj)
 
 ##
@@ -138,6 +139,6 @@ BspInvade1 <- create.monomial.basis(earlyUS.Canada)
 # POSIXct
 AmRev.ct <- as.POSIXct1970(c('1776-07-04', '1789-04-30'))
 BspRev1.ct <- create.monomial.basis(AmRev.ct)
-
+par(oldpar)
 }
 \keyword{smooth}

@@ -38,6 +38,10 @@ smooth.pos(argvals, y, WfdParobj, wtvec=rep(1,n),conv=.0001, iterlim=50, dbglev=
     initialize the optimization process.  Its coefficient array contains
     the starting values for the iterative minimization of mean squared
     error.
+    The coefficient array contains the starting values for the iterative 
+    minimization of mean squared error, and this coefficient array must 
+    be either a K by NCURVE matrix or a K by NUCRVE by NVAR array,  
+    where K is the number of basis functions.
   }
   \item{wtvec}{
     a vector of weights to be used in the smoothing.

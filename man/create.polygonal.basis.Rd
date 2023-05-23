@@ -121,7 +121,9 @@ create.polygonal.basis(rangeval=NULL, argvals=NULL, dropind=NULL,
 #  with break points at 0, 0.1, ..., 0.95, 1
 (basisobj <- create.polygonal.basis(seq(0,1,0.1)))
 #  plot the basis
+oldpar <- par(no.readonly=TRUE)
 plot(basisobj)
+par(oldpar)
 }
 % docclass is function
 \keyword{smooth}

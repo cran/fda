@@ -46,6 +46,7 @@
 \code{\link{plot.fd}}
 }
 \examples{
+oldpar <- par(no.readonly=TRUE)
 ##
 ## 1.  b-spline
 ##
@@ -80,7 +81,6 @@ Apr30.1789ct <- as.POSIXct1970('1789-04-30')
 AmRev.ct <- c(July4.1776ct, Apr30.1789ct)
 BspRev.ct <- create.bspline.basis(AmRev.ct)
 plot(BspRev.ct)
-
+par(oldpar)
 }
-% docclass is function
 \keyword{smooth}

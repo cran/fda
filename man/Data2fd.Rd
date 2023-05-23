@@ -269,6 +269,7 @@ b1.1 <- create.bspline.basis(nbasis=1, norder=1)
 y12 <- 1:2
 # smooth data, giving a constant function with value 1.5
 fd1.1 <- Data2fd(y12, basisobj=b1.1)
+oldpar <- par(no.readonly=TRUE)
 plot(fd1.1)
 # now repeat the analysis with some smoothing, which moves the
 # toward 0.
@@ -401,5 +402,6 @@ AmRevLin.ct <- as.numeric(AmRevYrs.ct-AmRev.ct[1])
 AmRevYrs.ct <- as.numeric(AmRevYrs.ct)/rescale
 AmRevLin.ct <- as.numeric(AmRevLin.ct)/rescale
 fitLin.ct   <- Data2fd(AmRevYrs.ct, AmRevLin.ct, BspRev.ct)
+par(oldpar)
 }
 \keyword{smooth}

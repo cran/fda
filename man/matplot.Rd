@@ -104,6 +104,7 @@ matplot(x, ...)
   \code{\link{par}}
 }
 \examples{
+oldpar <- par(no.readonly=TRUE)
 ##
 ## matplot.Date, matplot.POSIXct
 ##
@@ -163,7 +164,6 @@ matplot(iris.S[,"Petal.Length",], iris.S[,"Petal.Width",], pch="SCV",
                          sep = "=", collapse= ",  "),
              main = "Fisher's Iris Data")
 par(op)
-
+par(oldpar)
 }
-% docclass is function
 \keyword{hplot}

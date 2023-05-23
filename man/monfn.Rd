@@ -47,7 +47,7 @@ is the logarithm of the derivative of the monotone function.}
   \code{\link{smooth.morph}}
 }
 \examples{
-
+oldpar <- par(no.readonly=TRUE)
 ## basically this example resembles part of landmarkreg.R that uses monfn.R to
 ## estimate the warping function.
 
@@ -83,5 +83,6 @@ b <- (rangeval[2]-rangeval[1])/ (h[n]-h[1])
 a <- rangeval[1] - b*h[1]
 h <- a + b*h
 plot(tbreaks, h, xlab="Time", ylab="Transformed time", type="b")
+par(oldpar)
 }
 

@@ -103,7 +103,7 @@ landmarkreg <- function(unregfd, ximarks, x0marks, x0lim=NULL,
   
   if (is.null(WfdPar)) {
     Wnbasis   <- length(x0marks) + 2
-    Ybasis    <- create.bspline.basis(rangeval, Wnbasis)
+    Wbasis    <- create.bspline.basis(rangeval, Wnbasis)
     Wfd       <- fd(matrix(0,Wnbasis,1), Wbasis)
     WfdPar    <- fdPar(Wfd, 2, 1e-10)
   } else {

@@ -115,12 +115,13 @@ WfdParobj <- fdPar(Wfd0)
 #  estimate density
 denslist <- density.fd(x, WfdParobj)
 #  plot density
+oldpar <- par(no.readonly=TRUE)
 xval <- seq(-3,3,.2)
 wval <- eval.fd(xval, denslist$Wfdobj)
 pval <- exp(wval)/denslist$C
 plot(xval, pval, type="l", ylim=c(0,0.4))
 points(x,rep(0,50))
-
+par(oldpar)
 }
 % docclass is function
 \keyword{smooth}

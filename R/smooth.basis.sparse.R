@@ -72,14 +72,25 @@ smooth.basis.sparse <- function(argvals, y, fdParobj, fdnames=NULL, covariates=N
       }
     }
   }
-  coefs = matrix(0, nrow = basisobj$nbasis, ncol = dim(data)[2])
-  for(i in 1:dim(data)[2]){
-    curve = data[,i]
-    curve.smooth = smooth.basis(time[!is.na(curve)],curve[!is.na(curve)],
+  if(length(dim(y)) == 2){
+	coefs = matrix(0, nrow = basisobj$nbasis, ncol = dim(y)[2])
+	for(i in 1:dim(y)[2]){
+		curve = y[,i]
+		curve.smooth = smooth.basis(argvals[!is.na(curve)],curve[!is.na(curve)],
                                 basisobj, covariates, method)
-    coefs[,i] = curve.smooth$fd$coefs
+		coefs[,i] = curve.smooth$fd$coefs
+	}
+  } else if(length(dim(y)) == 3){
+ 	coefs = array(0, c(basisobj$nbasis,dim(y)[2:3]))
+	for(i in 1:dim(y)[2]){
+		for(j in 1:dim(y)[3]){
+			curve = y[,i,j]
+			curve.smooth = smooth.basis(argvals[!is.na(curve)],curve[!is.na(curve)],
+                                basisobj, covariates, method)
+			coefs[,i,j] = curve.smooth$fd$coefs
+		}
+	} 
   }
   datafd = fd(coefs,basisobj, fdnames)
-  
   return(datafd)
 }

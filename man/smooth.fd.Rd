@@ -32,7 +32,7 @@ a functional data object.
 \code{\link{smooth.basis}},
 }
 \examples{
-
+oldpar <- par(no.readonly=TRUE)
 #  Shows the effects of two levels of smoothing
 #  where the size of the third derivative is penalized.
 #  The null space contains quadratic functions.
@@ -49,14 +49,15 @@ yfd  <- result$fd
 yfdPar <- fdPar(yfd, 2, 1e-6)
 yfd1 <- smooth.fd(yfd, yfdPar)
 
-\dontrun{
+#. this code throws an error for. non-cran check
+# if (!CRAN()) {
 # FIXME: using 3rd derivative here gave error?????
-yfdPar3 <- fdPar(yfd, 3, 1e-6)
-yfd1.3 <- smooth.fd(yfd, yfdPar3)
-#Error in bsplinepen(basisobj, Lfdobj, rng) :
+# yfdPar3 <- fdPar(yfd, 3, 1e-6)
+# yfd1.3 <- smooth.fd(yfd, yfdPar3)
+# Error in bsplinepen(basisobj, Lfdobj, rng) :
 #	Penalty matrix cannot be evaluated
 #  for derivative of order 3 for B-splines of order 4
-}
+# }
 
 #  set up a functional parameter object with smoothing
 #  parameter 1 and a penalty on the 3rd derivative.
@@ -69,7 +70,6 @@ lines(yfd2, lty=3)  #  add heavily  penalized smooth
 legend(-1,3,c("0.000001","1"),lty=c(1,3))
 #  plot the data and smoothing using function plotfit.fd
 plotfit.fd(y, x, yfd1)  # plot data and smooth
-
+par(oldpar)
 }
-% docclass is function
 \keyword{smooth}

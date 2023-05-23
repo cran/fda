@@ -92,12 +92,12 @@ fd(coef=NULL, basisobj=NULL, fdnames=NULL)
 ## default
 ##
 fd()
-
+oldpar <- par(no.readonly=TRUE)
 ##
 ## The simplest b-spline basis:  order 1, degree 0, zero interior knots:
 ##       a single step function
 ##
-bspl1.1 <- create.bspline.basis(norder=1, breaks=0:1)
+bspl1.1    <- create.bspline.basis(norder=1, breaks=0:1)
 fd.bspl1.1 <- fd(0, basisobj=bspl1.1)
 
 fd.bspl1.1a <- fd(basisobj=bspl1.1)
@@ -106,13 +106,10 @@ all.equal(fd.bspl1.1, fd.bspl1.1a)
 \dontshow{ ) }
 # TRUE
 
-\dontrun{
-fd.bspl1.1b <- fd(0)
-Error in fd(0) :
-  Number of coefficients does not match number of basis functions.
-
-... because fd by default wants to create a cubic spline
-}
+# the following three lines shown an error in a non-cran check:
+# if(!CRAN()) {
+#   fd.bspl1.1b <- fd(0)
+# }
 
 ##
 ## Cubic spline:  4  basis functions
@@ -141,7 +138,7 @@ gaitbasis3 <- create.fourier.basis(nbasis=5)
 gaittime = (1:20)/21
 gaitfd3    <- smooth.basis(gaittime, gait, gaitbasis3)$fd
 gaitfd3[1]
-
+par(oldpar)
 }
 % docclass is function
 \keyword{smooth}

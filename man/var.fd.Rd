@@ -60,6 +60,7 @@ var.fd(fdobj1, fdobj2=fdobj1)
   \code{\link{stdev.fd}}
 }
 \examples{
+oldpar <- par(no.readonly=TRUE)
 ##
 ## Example with 2 different bases 
 ##
@@ -91,7 +92,7 @@ str(tempvarbifd <- var.fd(daytempfd))
 str(tempvarmat  <- eval.bifd(weeks,weeks,tempvarbifd))
 # dim(tempvarmat)= c(53, 53)
 
-op <- par(mfrow=c(1,2), pty="s")
+par(mfrow=c(1,2), pty="s")
 #contour(tempvarmat, xlab="Days", ylab="Days")
 contour(weeks, weeks, tempvarmat, 
         xlab="Daily Average Temperature",
@@ -108,7 +109,7 @@ axisIntervals(2, atTick1=seq(0, 365, length=5), atTick2=NA,
 persp(weeks, weeks, tempvarmat,
       xlab="Days", ylab="Days", zlab="Covariance")
 mtext("Temperature Covariance", line=-4, outer=TRUE)
-par(op)
+par(oldpar)
 
 }
 % docclass is function

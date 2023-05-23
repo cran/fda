@@ -92,7 +92,7 @@ evaluate \code{Wfdobj}, exponentiate the resulting vector.
 \code{\link{density.fd}}
 }
 \examples{
-
+oldpar <- par(no.readonly=TRUE)
 #  Generate 101 Poisson-distributed event times with
 #  intensity or rate two events per unit time
 N  <- 101
@@ -121,7 +121,7 @@ intenvec <- exp(eval.fd(events,Wfdobj))
 #  plot intensity function
 plot(events, intenvec, type="b")
 lines(c(0,tmax),c(mu,mu),lty=4)
-
+par(oldpar)
 }
 % docclass is function
 \keyword{smooth}

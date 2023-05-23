@@ -53,8 +53,9 @@ Lcoef   <- matrix(c(0,(2*pi/365)^2,0),1,3)
 bfdobj  <- fd(Lcoef,Lbasis)
 bwtlist <- fd2list(bfdobj)
 harmaccelLfd <- Lfd(3, bwtlist)
+oldpar <- par(no.readonly=TRUE)
 plot(harmaccelLfd)
+par(oldpar)
 }
-% docclass is function
 \keyword{smooth}
 \keyword{hplot}

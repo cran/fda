@@ -142,15 +142,15 @@ goodsbasis  = create.bspline.basis(rangeval=c(1919,2000),
 
 LfdobjNonDur= int2Lfd(4)
 
-logNondurSm = smooth.basisPar(argvals=index(nondurables),
+logNondurSm = smooth.basisPar(argvals=time(nondurables),
                 y=log10(coredata(nondurables)), fdobj=goodsbasis,
                 Lfdobj=LfdobjNonDur, lambda=1e-11)
 
 # Fig. 6.3 The log nondurable goods index for 1964 to 1967
 
-sel64.67 = ((1964<=index(nondurables)) &
-             (index(nondurables)<=1967) )
-plot(index(nondurables)[sel64.67],
+sel64.67 = ((1964<=time(nondurables)) &
+             (time(nondurables)<=1967) )
+plot(time(nondurables)[sel64.67],
      log10(nondurables[sel64.67]), xlab='Year',
      ylab='Log10 Nondurable Goods Index', las=1)
 abline(v=1965:1966, lty='dashed')

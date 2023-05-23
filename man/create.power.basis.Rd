@@ -125,7 +125,9 @@ create.power.basis(rangeval=c(0, 1), nbasis=NULL, exponents=NULL,
 #  with powers or exponents -1, -0.5, 0, 0.5 and 1
 basisobj <- create.power.basis(c(1e-7,1), 5, seq(-1,1,0.5))
 #  plot the basis
+oldpar <- par(no.readonly=TRUE)
 plot(basisobj)
+par(oldpar)
 }
 % docclass is function
 \keyword{smooth}

@@ -46,35 +46,36 @@ norder(x, ...)
   \code{\link{create.bspline.basis}}
 }
 \examples{
-bspl1.1 <- create.bspline.basis(norder=1, breaks=0:1)
+  bspl1.1 <- create.bspline.basis(norder=1, breaks=0:1)
 
-stopifnot(norder(bspl1.1)==1)
+  stopifnot(norder(bspl1.1)==1)
 
-stopifnot(norder(fd(0, basisobj=bspl1.1))==1)
+  stopifnot(norder(fd(0, basisobj=bspl1.1))==1)
 
-stopifnot(norder(fd(rep(0,4)))==4)
+  stopifnot(norder(fd(rep(0,4)))==4)
 
-stopifnot(norder(list(fd(rep(0,4))))==4)
-\dontrun{
-norder(list(list(fd(rep(0,4)))))
-Error in norder.default(list(list(fd(rep(0, 4))))) :
-  input is not a 'basisfd' object and does not have a 'basisfd'
-component.
-}
+  stopifnot(norder(list(fd(rep(0,4))))==4)
+  \dontrun{
+    norder(list(list(fd(rep(0,4)))))
+    Error in norder.default(list(list(fd(rep(0, 4))))) :
+    input is not a 'basisfd' object and does not have a 'basisfd'
+    component.
+  }
 
-stopifnot(norder(create.bspline.basis(norder=1, breaks=c(0,.5, 1))) == 1)
+  stopifnot(norder(create.bspline.basis(norder=1, breaks=c(0,.5, 1))) == 1)
 
-stopifnot(norder(create.bspline.basis(norder=2, breaks=c(0,.5, 1))) == 2)
+  stopifnot(norder(create.bspline.basis(norder=2, breaks=c(0,.5, 1))) == 2)
 
-# Defaut B-spline basis:  Cubic spline:  degree 3, order 4,
-# 21 breaks, 19 interior knots.
-stopifnot(norder(create.bspline.basis()) == 4)
+  # Default B-spline basis:  Cubic spline:  degree 3, order 4,
+  # 21 breaks, 19 interior knots.
+  stopifnot(norder(create.bspline.basis()) == 4)
 
-\dontrun{
-norder(create.fourier.basis(c(0,12) ))
-Error in norder.bspline(x) :
-  object x is of type = fourier;  'norder' is only defined for type = 'bsline'
-}
+  # these five lines throw an error of for a nocran check 
+  # if (!CRAN()) {
+  #   norder(create.fourier.basis(c(0,12) ))
+    # Error in norder.bspline(x) :
+    # object x is of type = fourier;  'norder' is only defined for type = 'bspline'
+  # }
 
 }
 \keyword{smooth}
