@@ -53,7 +53,7 @@ exponentiate.fd(e1, e2, tolint=.Machine$double.eps^0.75,
   Otherwise it throws an error unless it finds one of the following
   special cases:
 
-  \itemize{
+  \describe{
     \item{e2 = 0}{
       Return an \code{fd} object with a constant basis that is
       everywhere 1
@@ -87,6 +87,16 @@ exponentiate.fd(e1, e2, tolint=.Machine$double.eps^0.75,
 }
 \value{
   A function data object approximating the desired power.
+}
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \seealso{
   \code{\link{arithmetic.fd}}

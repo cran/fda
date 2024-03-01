@@ -71,7 +71,17 @@ axesIntervals(side=1:2, atTick1=fda::monthBegin.5, atTick2=fda::monthEnd.5,
   An axis is added to the current plot.
 }
 \author{ Spencer Graves  }
-
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+  \emph{Functional data analysis with R and Matlab}, Springer, New
+  York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional
+    Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
+    Functional Data Analysis}, Springer, New York.
+}
 \seealso{
   \code{\link{axis}},
   \code{\link{par}}

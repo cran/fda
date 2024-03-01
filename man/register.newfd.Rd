@@ -21,7 +21,7 @@ register.newfd(yfd, Wfd,type=c('direct','monotone','periodic'))
   }
   \item{type}{
     indicates the type of registration function.
-    \itemize{
+    \describe{
       \item{direct}{
 	assumes \code{Wfd} is a direct definition of the registration
 	functions. This is produced by \code{landmarkreg}.
@@ -44,12 +44,15 @@ register.newfd(yfd, Wfd,type=c('direct','monotone','periodic'))
 \details{
   Only shift registration is considered for the periodic case.
 }
-\source{
-  Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
-    Data Analysis, 2nd ed.}, Springer, New York.
-
-  Ramsay, James, and Silverman, Bernard. (2002), \emph{Applied
-    Functional Data Analysis}, Springer, New York, ch. 6 & 7.
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \seealso{
   \code{\link{landmarkreg}},

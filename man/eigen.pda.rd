@@ -39,6 +39,16 @@ eigen.pda(pdaList,plotresult=TRUE,npts=501,...)
   \item{eigvals}{The corresponding eigenvalues at each time.}
   \item{limvals}{The stable points of the system at each time.}
 }
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \seealso{
   \code{\link{pda.fd}}
   \code{\link{plot.pda.fd}}
@@ -60,10 +70,11 @@ fdarange <- c(0, 2.3)
 breaks = seq(0,2.3,length.out=116)
 norder = 6
 fdabasis = create.bspline.basis(fdarange,norder=norder,breaks=breaks)
+nbasis <- fdabasis$nbasis
 
 #  parameter object for coordinates
 
-fdaPar = fdPar(fdabasis,int2Lfd(4),1e-8)
+fdaPar = fdPar(fd(matrix(0,nbasis,1),fdabasis),int2Lfd(4),1e-8)
 
 #  coordinate functions and a list tontaining them
 

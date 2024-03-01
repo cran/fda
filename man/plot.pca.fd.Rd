@@ -53,6 +53,16 @@
 \value{
   invisible(NULL)
 }
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \seealso{
   \code{\link{cca.fd}},
   \code{\link{pda.fd}}
@@ -66,8 +76,8 @@ oldpar <- par(no.readonly=TRUE)
 daybasis65 <- create.fourier.basis(c(0, 365), nbasis=65, period=365)
 
 harmaccelLfd <- vec2Lfd(c(0,(2*pi/365)^2,0), c(0, 365))
-harmfdPar     <- fdPar(daybasis65, harmaccelLfd, lambda=1e5)
-daytempfd <- smooth.basis(day.5, CanadianWeather$dailyAv[,,"Temperature.C"],
+harmfdPar    <- fdPar(fd(matrix(0,65,1), daybasis65), harmaccelLfd, lambda=1e5)
+daytempfd    <- smooth.basis(day.5, CanadianWeather$dailyAv[,,"Temperature.C"],
                      daybasis65, fdnames=list("Day", "Station", "Deg C"))$fd
 
 daytemppcaobj <- pca.fd(daytempfd, nharm=4, harmfdPar)

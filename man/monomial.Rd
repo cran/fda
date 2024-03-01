@@ -30,12 +30,22 @@ The first element is the shift in value and the second the scale factor.
 a matrix of values of basis functions.  Rows correspond to
 argument values and columns to basis functions.
 }
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \seealso{
-\code{\link{power}}, 
-\code{\link{expon}}, 
-\code{\link{fourier}}, 
-\code{\link{polyg}}, 
-\code{\link{bsplineS}}
+  \code{\link{power}}, 
+  \code{\link{expon}}, 
+  \code{\link{fourier}}, 
+  \code{\link{polyg}}, 
+  \code{\link{bsplineS}}
 }
 \examples{
 

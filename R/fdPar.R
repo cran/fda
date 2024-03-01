@@ -36,7 +36,7 @@ fdPar <- function(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
 #  Return:
 #  FDPAROBJ ... A functional parameter object
 
-#  Last modified 16 April 2021 by Jim Ramsay
+#  Last modified 2 February 2024 by Jim Ramsay
 
 #  ----------------------------------------------------------------------
 #                            Default fdPar objects
@@ -86,22 +86,27 @@ fdPar <- function(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
 
   {
     if (is.null(Lfdobj)) {
+      #  Lfdobj is NULL, construct a default linear derivative operator according to
+      #  according tothe basis system.
       if(fdobj$basis$type=='fourier'){
+        #  a fourier basis
         rng <- fdobj$basis$rangeval
         Lfdobj <- vec2Lfd(c(0,(2*pi/diff(rng))^2,0), rng)
-#        warning("Provding default Lfdobj = harmonic acceleration ",
-#                "operator on c(", rng[1], ', ', rng[2],
-#                ') = vec2Lfd(c(0,(2*pi/diff(rng))^2,0), rng);',
-#                '  [default prior to fda 2.1.0:  int2Lfd(0)].')
       } else {
+        #  a spline basis
         norder <- {
+          # extract the order of the basis system for a spline basis, and
+          # otherwise the order is 2 by default
           if (fdobj$basis$type=='bspline') norder.bspline(fdobj$basis)
           else 2
         }
+        # the constructed differential operator 
         Lfdobj <- int2Lfd(max(0, norder-2))
       }
     }
     else
+      #  A vector of differential orders times their coefficients
+      #  is supplied.  convert to the linear differential operator.
       Lfdobj <- int2Lfd(Lfdobj)
   }
 
@@ -129,10 +134,6 @@ if (!is.null(penmat)) {
 #  ----------------------------------------------------------------------
 #                    set up the fdPar object
 #  ----------------------------------------------------------------------
-
-#  S4 definition
-# fdParobj <- new("fdPar", fd=fdobj, Lfd=Lfdobj, lambda=lambda, estimate=estimate,
-#                  penmat=penmat)
 
 #  S3 definition
 

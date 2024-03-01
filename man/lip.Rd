@@ -16,7 +16,7 @@ lipmarks
 liptime
 }
 \format{
-  \itemize{
+  \describe{
     \item{lip}{
       a matrix of dimension c(51, 20) giving the position of the lower
       lip every 7 milliseconds for 350 milliseconds.
@@ -45,10 +45,15 @@ liptime
 
   See the \code{lip} \code{demo}.
 }
-\source{
-  Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
-    Data Analysis, 2nd ed.}, Springer, New York, sections 19.2 and
-  19.3.
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 %\seealso{\code{\link{eval.penalty}}}
 \examples{

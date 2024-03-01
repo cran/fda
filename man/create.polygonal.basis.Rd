@@ -107,13 +107,23 @@ create.polygonal.basis(rangeval=NULL, argvals=NULL, dropind=NULL,
   each argument value.  The range of the polygonal basis is set to the
   interval defined by the smallest and largest argument values.
 }
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \seealso{
-\code{\link{basisfd}},
-\code{\link{create.bspline.basis}},
-\code{\link{create.constant.basis}},
-\code{\link{create.exponential.basis}},
-\code{\link{create.fourier.basis}},
-\code{\link{create.monomial.basis}},
+  \code{\link{basisfd}},
+  \code{\link{create.bspline.basis}},
+  \code{\link{create.constant.basis}},
+  \code{\link{create.exponential.basis}},
+  \code{\link{create.fourier.basis}},
+  \code{\link{create.monomial.basis}},
 \code{\link{create.power.basis}}
 }
 \examples{

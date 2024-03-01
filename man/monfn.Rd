@@ -73,7 +73,8 @@ meanmarks <- c(rangeval[1], tbreaks[8], tbreaks[13], rangeval[2])
 cmarks <- c(rangeval[1], tbreaks[6], tbreaks[16], rangeval[2])
 
 ## Establish a B-basis object for the warping function
-Wfd = smooth.morph(x=meanmarks, y=cmarks, ylim=rangeval, WfdPar=WfdPar)$Wfdobj
+Wfd <- smooth.morph(x=meanmarks, y=cmarks, ylim=rangeval, 
+                    WfdPar=WfdPar)$Wfdobj
 
 ## Estimate the warping function
 h = monfn(tbreaks, Wfd)

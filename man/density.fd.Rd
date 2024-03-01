@@ -95,11 +95,20 @@ turn off the output buffering option in S-PLUS.
   exponentiate the resulting vector, and then divide by the normalizing
   constant \code{C}.
 }
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \seealso{
   \code{\link{intensity.fd}}
 }
 \examples{
-
 #  set up range for density
 rangeval <- c(-3,3)
 #  set up some standard normal data

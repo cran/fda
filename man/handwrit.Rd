@@ -13,7 +13,7 @@ handwrit
 handwritTime
 }
 \format{
-  \itemize{
+  \describe{
     \item{handwrit}{
       An array of dimensions (1401, 20, 2) giving 1401 pairs of (x, y)
       coordinates for each of 20 replicates of cursively writing "fda"
@@ -76,20 +76,21 @@ handwritTime
 
   The smoothing parameter value 1e8 was chosen to obtain a fitting error
   of about 0.5 mm, the known error level in the OPTOTRACK equipment.
-
-
-
 }
-\source{
-  Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
-    Data Analysis, 2nd ed.}, Springer, New York.
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
-%\seealso{\code{\link{eval.penalty}}}
 \examples{
 oldpar <- par(no.readonly=TRUE)
 plot(handwrit[, 1, 1], handwrit[, 1, 2], type="l")
 par(oldpar)
 }
-% docclass is function
 \keyword{datasets}
 

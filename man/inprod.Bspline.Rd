@@ -32,10 +32,19 @@ inprod.bspline(fdobj1, fdobj2=fdobj1, nderiv1=0, nderiv2=0)
   }
 }
 \value{
-a matrix of inner products with number of rows equal
-to the number of replications of the first argument and
-number of columns equal to the number of replications
-of the second object.
+  a matrix of inner products with number of rows equal
+  to the number of replications of the first argument and
+  number of columns equal to the number of replications
+  of the second object.
 }
-% docclass is function
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \keyword{smooth}

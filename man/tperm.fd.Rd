@@ -69,9 +69,15 @@ tperm.fd(x1fd, x2fd, nperm=200, q=0.05, argvals=NULL, plotres=TRUE, ...)
 \section{Side Effects}{
   a plot of the functional observations
 }
-\source{
-  Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
-    Data Analysis, 2nd ed.}, Springer, New York.
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \seealso{
   \code{\link{fRegress}}
@@ -85,9 +91,9 @@ oldpar <- par(no.readonly=TRUE)
 
 # First set up a basis system to hold the smooths
 
-knots  <- growth$age
-norder <- 6
-nbasis <- length(knots) + norder - 2
+knots    <- growth$age
+norder   <- 6
+nbasis   <- length(knots) + norder - 2
 hgtbasis <- create.bspline.basis(range(knots), nbasis, norder, knots)
 
 # Now smooth with a fourth-derivative penalty and a very small smoothing
@@ -95,7 +101,7 @@ hgtbasis <- create.bspline.basis(range(knots), nbasis, norder, knots)
 
 Lfdobj <- 4
 lambda <- 1e-2
-growfdPar <- fdPar(hgtbasis, Lfdobj, lambda)
+growfdPar <- fdPar(fd(matrix(0,nbasis,1), hgtbasis), Lfdobj, lambda)
 
 hgtmfd <- smooth.basis(growth$age, growth$hgtm, growfdPar)$fd
 hgtffd <- smooth.basis(growth$age, growth$hgtf, growfdPar)$fd

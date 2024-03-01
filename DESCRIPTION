@@ -1,16 +1,13 @@
 Package: fda
-Version: 6.1.4
-Date: 2023-05-23
+Version: 6.1.7
+Date: 2024-03-01
 Title: Functional Data Analysis
-Authors@R: c(person("James", "Ramsay", 
-            role=c("aut","cre"),
-            email="ramsay@psych.mcgill.ca"), 
-          person("Giles", "Hooker",
-            role="ctb",
-            email="gjh27@cornell.edu"),
-          person("Spencer", "Graves", 
-            role="ctb",
-            email="spencer.graves@effectivedefense.org"))
+Authors@R: c(person("James", "Ramsay", role=c("aut","cre"),
+             email="ramsay@psych.mcgill.ca"), 
+             person("Giles", "Hooker", role="ctb",
+             email="gjh27@cornell.edu"),
+             person("Spencer", "Graves", role="ctb",
+             email="spencer.graves@effectivedefense.org"))
 Maintainer: James Ramsay <ramsay@psych.mcgill.ca>
 Depends: R (>= 3.5), splines, fds, deSolve
 Suggests: rmarkdown, knitr, lattice
@@ -28,9 +25,9 @@ URL: http://www.functionaldata.org
 LazyData: true
 NeedsCompilation: yes
 VignetteBuilder: knitr
-Packaged: 2023-05-23 16:10:20 UTC; jamesramsay
+Packaged: 2024-03-01 18:48:03 UTC; jimramsay
 Author: James Ramsay [aut, cre],
   Giles Hooker [ctb],
   Spencer Graves [ctb]
 Repository: CRAN
-Date/Publication: 2023-05-23 23:32:07 UTC
+Date/Publication: 2024-03-01 19:42:42 UTC

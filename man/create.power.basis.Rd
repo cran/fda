@@ -111,14 +111,24 @@ create.power.basis(rangeval=c(0, 1), nbasis=NULL, exponents=NULL,
   positive values, although a zero value can be tolerated
   if none of the powers are negative.
 }
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \seealso{
-\code{\link{basisfd}},
-\code{\link{create.bspline.basis}},
-\code{\link{create.constant.basis}},
-\code{\link{create.exponential.basis}},
-\code{\link{create.fourier.basis}},
-\code{\link{create.monomial.basis}},
-\code{\link{create.polygonal.basis}},
+  \code{\link{basisfd}},
+  \code{\link{create.bspline.basis}},
+  \code{\link{create.constant.basis}},
+  \code{\link{create.exponential.basis}},
+  \code{\link{create.fourier.basis}},
+  \code{\link{create.monomial.basis}},
+  \code{\link{create.polygonal.basis}},
 }
 \examples{
 #  Create a power basis over the interval [1e-7,1]

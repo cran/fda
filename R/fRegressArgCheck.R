@@ -1,5 +1,4 @@
-fRegressArgCheck <- function(yfd, xfdlist, betalist, wt=NULL) 
-{
+fRegressArgCheck <- function(yfd, xfdlist, betalist, wt=NULL) {
   #  FREGRESS_ARGCHECK checks the first four arguments for the functions
   #  for function regression, including FREGRESS.
   

@@ -62,6 +62,17 @@ times.fd(e1, e2, basisobj=NULL)
   according to rules described in function TIMES for two basis objects.
 }
 
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+  \emph{Functional data analysis with R and Matlab}, Springer, New
+  York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional
+    Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
+    Functional Data Analysis}, Springer, New York.
+}
 \seealso{
   \code{\link{basisfd}},
   \code{\link{basisfd.product}},
@@ -87,12 +98,12 @@ all.equal(coef(parab4.5+parab4.5), coef2)
 bspl5.3 <- create.bspline.basis(breaks=c(0, 1/3, 1))
 plot(bspl5.3)
 x. <- seq(0, 1, .1)
-para4.5.3 <- smooth.basis(x., 4*(x.-0.5)^2, fdParobj=bspl5.3)$fd
+para4.5.3 <- smooth.basis(x., 4*(x.-0.5)^2, bspl5.3)$fd
 plot(para4.5.3)
 
 bspl5.2 <- create.bspline.basis(breaks=c(0, 1/2, 1))
 plot(bspl5.2)
-para4.5.2 <- smooth.basis(x., 4*(x.-0.5)^2, fdParobj=bspl5.2)$fd
+para4.5.2 <- smooth.basis(x., 4*(x.-0.5)^2, bspl5.2)$fd
 plot(para4.5.2)
 
 #str(para4.5.3+para4.5.2)

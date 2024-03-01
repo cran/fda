@@ -49,26 +49,29 @@
   }
 }
 \value{
-a named list of length 3 containing:
-
-\item{betastderrlist}{
-  a list object of length the number of independent variables.  Each
-  member contains a functional parameter object for the standard error
-  of a regression function.
+  a named list of length 3 containing:
+  \item{betastderrlist}{a list object of length the number of independent 
+  variables.  Each member contains a functional parameter object for the
+  standard error of a regression function.}
+  \item{bvar}{a symmetric matrix containing sampling variances and covariances 
+    for the matrix of regression coefficients for the regression functions.
+    These are stored column-wise in defining BVARIANCE.}
+  \item{c2bMap}{a matrix containing the mapping from response variable 
+    coefficients to coefficients for regression coefficients.}
 }
-\item{bvar}{
-  a symmetric matrix containing sampling variances and covariances for
-  the matrix of regression coefficients for the regression functions.
-  These are stored column-wise in defining BVARIANCE.
-}
-\item{c2bMap}{
-  a matrix containing the mapping from response variable coefficients to
-  coefficients for regression coefficients.
-}
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \seealso{
-\code{\link{fRegress}},
-\code{\link{fRegress.CV}}
+  \code{\link{fRegress}},
+  \code{\link{fRegress.CV}}
 }
 \examples{
 #See the weather data analyses in the file daily.ssc for

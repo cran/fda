@@ -58,7 +58,7 @@ CSTRsse(par, datstruct, fitstruct, CSTRbasis, lambda)
     a list of CSTR model parameters passed via the lsoda 'parms'
     argument.  This list consists of the following 3 components:
 
-    \itemize{
+    \describe{
       \item{fitstruct}{
 	a list with 12 components describing the structure for fitting.
 	This is the same as the 'fitstruct' argument of 'CSTRfitLS' and
@@ -85,7 +85,7 @@ CSTRsse(par, datstruct, fitstruct, CSTRbasis, lambda)
     a list describing the structure of the data.  CSTRfitLS uses the
     following components:
 
-    \itemize{
+    \describe{
       \item{basismat, Dbasismat}{
 	basis coefficent matrices with one row for each observation and
 	one column for each basis vector.  These are typically produced
@@ -132,7 +132,7 @@ CSTRsse(par, datstruct, fitstruct, CSTRbasis, lambda)
   \item{fitstruct}{
     a list with 14 components:
 
-    \itemize{
+    \describe{
       \item{V}{
 	volume in cubic meters
       }
@@ -293,7 +293,7 @@ CSTRsse(par, datstruct, fitstruct, CSTRbasis, lambda)
   \item{CSTRfitLS}{
     a list with one or two components as follows:
 
-    \itemize{
+    \describe{
       \item{res}{
 	a list with two components
 
@@ -324,7 +324,7 @@ CSTRsse(par, datstruct, fitstruct, CSTRbasis, lambda)
   \item{CSTRfn}{
     a list with five components:
 
-    \itemize{
+    \describe{
       \item{res}{
 	the 'res' component of the final 'CSTRfitLS' object reformatted
 	with its component Sres first followed by Lres, using
@@ -377,17 +377,21 @@ CSTRsse(par, datstruct, fitstruct, CSTRbasis, lambda)
     must be passed via '...' in 'optim' or 'nlminb'.
   }
 }
+
 \references{
   Ramsay, J. O., Hooker, G., Cao, J. and Campbell, D. (2007) Parameter
-  estimation for differential equations: A generalized smoothing
-  approach (with discussion). \emph{Journal of the Royal Statistical
+    estimation for differential equations: A generalized smoothing
+    approach (with discussion). \emph{Journal of the Royal Statistical
     Society}, Series B, 69, 741-796.
 
-  Ramsay, J. O., and Silverman, B. W. (2006) \emph{Functional Data
-    Analysis}, 2nd ed., Springer, New York.
-
-  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
-    Functional Data Analysis}, Springer, New York.
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 
 \seealso{

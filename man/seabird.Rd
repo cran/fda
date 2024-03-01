@@ -42,16 +42,20 @@
 \details{
   Data provided by the Kodiak National Wildlife Refuge
 }
-\source{
-  Zwiefelhofer, D., Reynolds, J. H., and Keim, M. (2008) Population
-  trends and annual density estimates for select wintering seabird
-  species on Kodiak Island, Alaska, \emph{U.S. Fish and Wildlife
-    Service, Kodiak National Wildlife Refuge}, Technical Report,
-  no. 08-00x
-}
 \references{
-  Ramsay, James O., Hooker, Giles, and Graves, Spencer B. (2009)
-  \emph{Functional Data Analysis with R and Matlab}, Springer, New York
-  (esp. ch. 10)
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+
+  Zwiefelhofer, D., Reynolds, J. H., and Keim, M. (2008) Population
+    trends and annual density estimates for select wintering seabird
+    species on Kodiak Island, Alaska, \emph{U.S. Fish and Wildlife
+    Service, Kodiak National Wildlife Refuge}, Technical Report,
+    no. 08-00x
 }
 \keyword{datasets}

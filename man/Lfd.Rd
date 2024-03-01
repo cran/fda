@@ -56,6 +56,16 @@ Lfd(nderiv=0, bwtlist=vector("list", 0))
  There are \code{print}, \code{summary}, and \code{plot} methods for
  objects of class \code{Lfd}.
 }
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \seealso{
   \code{\link{int2Lfd}},
   \code{\link{vec2Lfd}},

@@ -25,17 +25,14 @@ basisfd(type, rangeval, nbasis, params,
   \item{type}{
     a character string indicating the type of basis.  Currently,
     there are eight possible types:
-
-    \enumerate{
+    \describe{
       \item{Bspline, bspline, Bsp, bsp}{b-spline basis}
       \item{const, con, constant}{constant basis}
       \item{exp, expon, exponen, exponential}{exponential basis}
       \item{Fourier, fourier, Fou, fou}{Fourier basis}
-      \item{fdVariance, fdVar}
-      \item{FEM}
       \item{mon, monom, monomial}{monomial basis}
       \item{polyg, polygon, polygonal}{polygonal basis}
-      \item{polynomial, poly}
+      \item{polynomial, poly}{polynomial basis}
       \item{power, pow}{power basis}
     }
   }
@@ -170,7 +167,7 @@ basisfd(type, rangeval, nbasis, params,
   \emph{Functional Data Analysis with R and Matlab}, Springer, New
   York.
 
-  Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
+  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional
     Data Analysis, 2nd ed.}, Springer, New York.
 
   Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied

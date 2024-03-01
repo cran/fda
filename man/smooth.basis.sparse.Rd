@@ -64,7 +64,7 @@
     a list of length 3 containing character vectors of names for the
     following:
 
-    \itemize{
+    \describe{
       \item{args}{
         name for each observation or point in time at which data are
         collected for each 'rep', unit or subject.
@@ -115,6 +115,16 @@
 }
 \value{
   an object of class \code{fd}.
+}
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \seealso{
   \code{\link{smooth.basis}}

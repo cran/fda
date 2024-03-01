@@ -41,9 +41,19 @@ a positive smoothing parameter value $lambda$
 The conversion requires a one-dimensional optimization and may be
 therefore computationally intensive.
 }
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \seealso{
-\code{\link{lambda2df}}, 
-\code{\link{lambda2gcv}}
+  \code{\link{lambda2df}}, 
+  \code{\link{lambda2gcv}}
 }
 \examples{
 
@@ -65,7 +75,7 @@ lambda <- df2lambda(age, hgtbasis, df=12)
 #  growth curves.  The 4th derivative is penalyzed to
 #  ensure a smooth 2nd derivative or acceleration.
 Lfdobj <- 4
-growfdPar <- fdPar(hgtbasis, Lfdobj, lambda)
+growfdPar <- fdPar(fd(matrix(0,nbasis,1),hgtbasis), Lfdobj, lambda)
 #  Smooth the data.  The data for the girls are in matrix
 #  hgtf.
 hgtffd <- smooth.basis(age, growth$hgtf, growfdPar)$fd

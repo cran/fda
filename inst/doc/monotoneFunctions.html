@@ -362,7 +362,6 @@ pre code {
 </div>
 
 
-<pre class="r"><code>library(fda)</code></pre>
 <div id="r-markdown" class="section level2">
 <h2>R Markdown</h2>
 <p>Let <span class="math inline">\(x\)</span> be a value of a strictly monotone function <span class="math inline">\(h(x)\)</span>. Let <span class="math inline">\(W(x)\)</span> be an arbitrary unconstrained function. We can turn this function into a strictly monotone function by first exponentiating it to make a positive version, and then integrating the positive function from an origin value to the desired value <span class="math inline">\(x\)</span>:</p>
@@ -378,8 +377,8 @@ W &lt;- sin(x)
 EW &lt;- exp(W)
 # compute the integral from 0 to 2*pi using the trapezoidal rule
 hof2pi &lt;- delta*(sum(EW) - EW[101]/2)
-print(paste(&quot;h(2*pi) =&quot;,round(hof2pi,2)))
-#&gt; [1] &quot;h(2*pi) = 7.99&quot;</code></pre>
+print(paste(&quot;h(2*pi) =&quot;,round(hof2pi,2)))</code></pre>
+<pre><code>## [1] &quot;h(2*pi) = 7.99&quot;</code></pre>
 <p>Now display the complete function <span class="math inline">\(h(x)\)</span> from 0 to <span class="math inline">\(2 \pi\)</span> along with <span class="math inline">\(W(x)\)</span>.</p>
 <pre class="r"><code>h &lt;- delta*(cumsum(EW) - EW[101]/2)
 par(mfcol=c(2,1))

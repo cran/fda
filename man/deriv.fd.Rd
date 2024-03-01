@@ -35,13 +35,22 @@
   and therefore this must have enough basis functions to represent
   the variation in the derivative satisfactorily.
 }
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \seealso{
   \code{\link{getbasismatrix}},
   \code{\link{eval.basis}}
   \code{\link{deriv}}
 }
 \examples{
-
 #  Estimate the acceleration functions for growth curves
 #  See the analyses of the growth data.
 #  Set up the ages of height measurements for Berkeley data
@@ -58,7 +67,7 @@ hgtbasis <- create.bspline.basis(rng, nbasis, norder, knots)
 #  ensure a smooth 2nd derivative or acceleration.
 Lfdobj <- 4
 lambda <- 10^(-0.5)   #  This value known in advance.
-growfdPar <- fdPar(hgtbasis, Lfdobj, lambda)
+growfdPar <- fdPar(fd(matrix(0,nbasis,1),hgtbasis), Lfdobj, lambda)
 #  Smooth the data.  The data for the boys and girls
 #  are in matrices hgtm and hgtf, respectively.
 hgtmfd <- smooth.basis(age, growth$hgtm, growfdPar)$fd

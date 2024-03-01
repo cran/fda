@@ -28,7 +28,7 @@ bifdPar(bifdobj, Lfdobjs=int2Lfd(2), Lfdobjt=int2Lfd(2), lambdas=0, lambdat=0,
 
     If \code{NULL}, Lfdobjs depends on bifdobj[['sbasis']][['type']]:
 
-    \itemize{
+    \describe{
       \item{bspline}{
 	Lfdobjs <- int2Lfd(max(0, norder-2)), where norder =
 	norder(bifdobj[['sbasis']]).
@@ -49,7 +49,7 @@ bifdPar(bifdobj, Lfdobjs=int2Lfd(2), Lfdobjt=int2Lfd(2), lambdas=0, lambdat=0,
 
     If \code{NULL}, Lfdobjt depends on bifdobj[['tbasis']][['type']]:
 
-    \itemize{
+    \describe{
       \item{bspline}{
 	Lfdobj <- int2Lfd(max(0, norder-2)), where norder =
 	norder(bifdobj[['tbasis']]).
@@ -77,8 +77,8 @@ bifdPar(bifdobj, Lfdobjs=int2Lfd(2), Lfdobjt=int2Lfd(2), lambdas=0, lambdat=0,
   \item{estimate}{not currently used.}
 }
 \value{
-  a bivariate functional parameter object (i.e., an object of class \code{bifdPar}),
-  which is a list with the following components:
+  a bivariate functional parameter object (i.e., an object of class 
+  \code{bifdPar}), which is a list with the following components:
 
   \item{bifd}{
     a functional data object (i.e., with class \code{bifd})
@@ -98,6 +98,17 @@ bifdPar(bifdobj, Lfdobjs=int2Lfd(2), Lfdobjt=int2Lfd(2), lambdas=0, lambdat=0,
     a nonnegative real number
   }
   \item{estimate}{not currently used}
+}
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+  \emph{Functional data analysis with R and Matlab}, Springer, New
+  York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional
+    Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
+    Functional Data Analysis}, Springer, New York.
 }
 \seealso{
 \code{\link{linmod}}

@@ -39,7 +39,6 @@ eval.penalty(basisobj, Lfdobj=int2Lfd(0), rng=rangeval)
   its order minus  $m$.
 }
 \details{
-
  The inner product can be computed exactly for many
  types of bases if $m$ is an integer.  These include
  B-spline, fourier, exponential, monomial, polynomial and power bases.
@@ -52,6 +51,16 @@ eval.penalty(basisobj, Lfdobj=int2Lfd(0), rng=rangeval)
  computation can be greatly speeded up by avoiding the use
  of this function, and instead using quadrature points and
  weights defined by Simpson's rule.  
+}
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \seealso{
   \code{\link{getbasispenalty}}, 

@@ -124,12 +124,15 @@ register.fd(y0fd=NULL, yfd=NULL, WfdParobj=NULL,
   monotone smoothing function in for function \code{smooth.monotone.}
   See the help file for that function for further details.
 }
-\source{
-  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional
-    Data Analysis, 2nd ed.}, Springer, New York.
-
-  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
-    Functional Data Analysis}, Springer, New York, ch. 6 & 7.
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \seealso{
   \code{\link{smooth.monotone}},
@@ -243,7 +246,8 @@ gaitrange <- c(0,20)
 gaitbasis <- create.fourier.basis(gaitrange, nbasis=21)
 # set up a functional parameter object penalizing harmonic acceleration
 harmaccelLfd <- vec2Lfd(c(0, (2*pi/20)^2, 0), rangeval=gaitrange)
-gaitfdPar    <- fdPar(gaitbasis, harmaccelLfd, 1e-2)
+gaitfdPar    <- fdPar(fd(matrix(0,gaitbasis$nbasis,1), gaitbasis), 
+                      harmaccelLfd, 1e-2)
 #  smooth the data
 gaitfd <- smooth.basis(gaittime, gait, gaitfdPar)$fd
 #  compute the angular acceleration functional data object

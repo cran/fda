@@ -90,7 +90,7 @@ smooth.basis(argvals=1:n, y, fdParobj, wtvec=NULL, fdnames=NULL,
     a list of length 3 containing character vectors of names for the
     following:
 
-    \itemize{
+    \describe{
       \item{args}{
         name for each observation or point in time at which data are
         collected for each 'rep', unit or subject.
@@ -206,38 +206,31 @@ smooth.basis(argvals=1:n, y, fdParobj, wtvec=NULL, fdnames=NULL,
 \value{
   an object of class \code{fdSmooth}, which is a named list of length 8
   with the following components:
-
-  \item{fd}{
-    a functional data object containing a smooth of the data.
-  }
-  \item{df}{
-    a degrees of freedom measure of the smooth
-  }
-  \item{gcv}{
-    the value of the generalized cross-validation or GCV criterion.  If
-    there are multiple curves, this is a vector of values, one per
+  \item{fd}{a functional data object containing a smooth of the data.}
+  \item{df}{a degrees of freedom measure of the smooth}
+  \item{gcv}{the value of the generalized cross-validation or GCV criterion.  
+    Ifthere are multiple curves, this is a vector of values, one per
     curve.  If the smooth is multivariate, the result is a matrix of gcv
     values, with columns corresponding to variables.
-
-    \deqn{gcv = n*SSE/((n-df)^2)}
-  }
-  \item{beta}{
-    the regression coefficients associated with covariate variables.
+    \deqn{gcv <- n*SSE/((n-df)^2)}}
+  \item{beta}{the regression coefficients associated with covariate variables.
     These are vector, matrix or array objects depending on whether
     there is a single curve, multiple curves or multiple curves and
-    variables, respectively.
-  }
-  \item{SSE}{
-    the error sums of squares.  SSE is a vector or a matrix of the same
-    size as GCV.
-  }
-  \item{penmat}{
-    the penalty matrix.
-  }
-  \item{y2cMap}{
-    the matrix mapping the data to the coefficients.
-  }
-  \item{argvals, y}{input arguments}
+    variables, respectively.}
+  \item{SSE}{the error sums of squares.  SSE is a vector or a matrix of the 
+    same size as GCV.}
+  \item{penmat}{the penalty matrix.}
+  \item{y2cMap}{the matrix mapping the data to the coefficients.}
+  \item{argvals, y}{input arguments}}
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \seealso{
   \code{\link{lambda2df}},
@@ -262,16 +255,16 @@ oldpar <- par(no.readonly=TRUE)
 #  analysis.
 #
 #  Set up 51 observation points equally spaced between 0 and 1
-n = 51
-argvals = seq(0,1,len=n)
+n <- 51
+argvals <- seq(0,1,len=n)
 #  The true curve values are sine function values with period 1/2
-x = sin(4*pi*argvals)
+x <- sin(4*pi*argvals)
 #  Add independent Gaussian errors with std. dev. 0.2 to the true values
-sigerr = 0.2
-y = x + rnorm(x)*sigerr
+sigerr <- 0.2
+y <- x + rnorm(x)*sigerr
 #  When we ran this code, we got these values of y (rounded to two
 #  decimals):
-y = c(0.27,  0.05,  0.58,  0.91,  1.07,  0.98,  0.54,  0.94,  1.13,  0.64,
+y <- c(0.27,  0.05,  0.58,  0.91,  1.07,  0.98,  0.54,  0.94,  1.13,  0.64,
       0.64,  0.60,  0.24,  0.15, -0.20, -0.63, -0.40, -1.22, -1.11, -0.76,
      -1.11, -0.69, -0.54, -0.50, -0.35, -0.15,  0.27,  0.35,  0.65,  0.75,
       0.75,  0.91,  1.04,  1.04,  1.04,  0.46,  0.30, -0.01, -0.19, -0.42,
@@ -279,31 +272,31 @@ y = c(0.27,  0.05,  0.58,  0.91,  1.07,  0.98,  0.54,  0.94,  1.13,  0.64,
       0.02)
 #  Set up a B-spline basis system of order 4 (piecewise cubic) and with
 #  knots at 0, 0.1, ..., 0.9 and 1.0, and plot the basis functions
-nbasis = 13
-basisobj = create.bspline.basis(c(0,1),nbasis)
+nbasis <- 13
+basisobj <- create.bspline.basis(c(0,1),nbasis)
 plot(basisobj)
 #  Smooth the data, outputting only the functional data object for the
 #  fitted curve.  Note that in this simple case we can supply the basis
 #  object as the "fdParobj" parameter
-ys = smooth.basis(argvals=argvals, y=y, fdParobj=basisobj)
-Ys = smooth.basis(argvals=argvals, y=y, fdParobj=basisobj,
+ys <- smooth.basis(argvals=argvals, y=y, basisobj)
+Ys <- smooth.basis(argvals=argvals, y=y, basisobj,
                   returnMatrix=TRUE)
-# Ys[[7]] = Ys$y2cMap is sparse;  everything else is the same
+# Ys[[7]] <- Ys$y2cMap is sparse;  everything else is the same
 
 \dontshow{stopifnot(}
 all.equal(ys[-7], Ys[-7])
 \dontshow{)}
 
-xfd = ys$fd
-Xfd = Ys$fd
+xfd <- ys$fd
+Xfd <- Ys$fd
 
 #  Plot the curve along with the data
 plotfit.fd(y, argvals, xfd)
 #  Compute the root-mean-squared-error (RMSE) of the fit relative to the
 #  truth
-RMSE = sqrt(mean((eval.fd(argvals, xfd) - x)^2))
+RMSE <- sqrt(mean((eval.fd(argvals, xfd) - x)^2))
 print(RMSE)  #  We obtained 0.069
-#  RMSE = 0.069 seems good relative to the standard error of 0.2.
+#  RMSE <- 0.069 seems good relative to the standard error of 0.2.
 #  Range through numbers of basis functions from 4 to 12 to see if we
 #  can do better.  We want the best RMSE, but we also want the smallest
 #  number of basis functions, which in this case is the degrees of
@@ -312,23 +305,23 @@ print(RMSE)  #  We obtained 0.069
 #  order of the spline.  Also display the gcv statistic to see what it
 #  likes.
 for (nbasis in 4:12) {
-  basisobj = create.bspline.basis(c(0,1),nbasis)
-  ys = smooth.basis(argvals, y, basisobj)
-  xfd = ys$fd
-  gcv = ys$gcv
-  RMSE = sqrt(mean((eval.fd(argvals, xfd) - x)^2))
+  basisobj <- create.bspline.basis(c(0,1),nbasis)
+  ys <- smooth.basis(argvals, y, basisobj)
+  xfd <- ys$fd
+  gcv <- ys$gcv
+  RMSE <- sqrt(mean((eval.fd(argvals, xfd) - x)^2))
 # progress report:
 #  cat(paste(nbasis,round(RMSE,3),round(gcv,3),"\n"))
 }
-#  We got RMSE = 0.062 for 10 basis functions as optimal, but gcv liked
+#  We got RMSE <- 0.062 for 10 basis functions as optimal, but gcv liked
 #  almost the same thing, namely 9 basis functions.  Both RMSE and gcv
 #  agreed emphatically that 7 or fewer basis functions was not enough.
 #  Unlike RMSE, however, gcv does not depend on knowing the truth.
 #  Plot the result for 10 basis functions along with "*" at the true
 #  values
-nbasis = 10
-basisobj = create.bspline.basis(c(0,1),10)
-xfd = smooth.basis(argvals, y, basisobj)$fd
+nbasis <- 10
+basisobj <- create.bspline.basis(c(0,1),10)
+xfd <- smooth.basis(argvals, y, basisobj)$fd
 plotfit.fd(y, argvals, xfd)
 points(argvals,x, pch="*")
 #  Homework:
@@ -346,22 +339,22 @@ points(argvals,x, pch="*")
 #  It does require a bit more effort, though.
 #  First, we define a little display function for showing how
 #  df, gcv and RMSE depend on the log10 smoothing parameter
-plotGCVRMSE.fd = function(lamlow, lamhi, lamdel, x, argvals, y,
+plotGCVRMSE.fd <- function(lamlow, lamhi, lamdel, x, argvals, y,
             fdParobj, wtvec=NULL, fdnames=NULL, covariates=NULL)  {
-  loglamvec = seq(lamlow, lamhi, lamdel)
-  loglamout = matrix(0,length(loglamvec),4)
-  m = 0
+  loglamvec <- seq(lamlow, lamhi, lamdel)
+  loglamout <- matrix(0,length(loglamvec),4)
+  m <- 0
   for (loglambda in loglamvec) {
-    m = m + 1
-    loglamout[m,1] = loglambda
-    fdParobj$lambda = 10^(loglambda)
-    smoothlist = smooth.basis(argvals, y, fdParobj, wtvec=wtvec,
+    m <- m + 1
+    loglamout[m,1] <- loglambda
+    fdParobj$lambda <- 10^(loglambda)
+    smoothlist <- smooth.basis(argvals, y, fdParobj, wtvec=wtvec,
              fdnames=fdnames, covariates=covariates)
-    xfd = smoothlist$fd   #  the curve smoothing the data
-    loglamout[m,2] = smoothlist$df
+    xfd <- smoothlist$fd   #  the curve smoothing the data
+    loglamout[m,2] <- smoothlist$df
     #  degrees of freedom in the smoothing curve
-    loglamout[m,3] = sqrt(mean((eval.fd(argvals, xfd) - x)^2))
-    loglamout[m,4] = mean(smoothlist$gcv)  #  the mean of the N gcv values
+    loglamout[m,3] <- sqrt(mean((eval.fd(argvals, xfd) - x)^2))
+    loglamout[m,4] <- mean(smoothlist$gcv)  #  the mean of the N gcv values
   }
   cat("log10 lambda, deg. freedom, RMSE, gcv\n")
   for (i in 1:m) {
@@ -379,41 +372,42 @@ plotGCVRMSE.fd = function(lamlow, lamhi, lamdel, x, argvals, y,
 }
 
 #  Use the data that you used in Example 1, or run the following code:
-n = 51
-argvals = seq(0,1,len=n)
-x = sin(4*pi*argvals)
-sigerr = 0.2
-err = matrix(rnorm(x),n,1)*sigerr
-y = x + err
+n <- 51
+argvals <- seq(0,1,len=n)
+x <- sin(4*pi*argvals)
+sigerr <- 0.2
+err <- matrix(rnorm(x),n,1)*sigerr
+y <- x + err
 #  We now set up a basis system with a knot at every data point.
 #  The number of basis functions will equal the number of interior knots
 #  plus the order, which in this case is still 4.
-#  49 interior knots + order 4 = 53 basis functions
-nbasis = n + 2
-basisobj = create.bspline.basis(c(0,1),nbasis)
+#  49 interior knots + order 4 <- 53 basis functions
+nbasis   <- n + 2
+basisobj <- create.bspline.basis(c(0,1),nbasis)
+fdobj    <- fd(matrix(0,nbasis,1),basisobj)
 #  Note that there are more basis functions than observed values.  A
 #  basis like this is called "super-saturated."  We have to use a
 #  positive smoothing parameter for it to work.  Set up an object of
 #  class "fdPar" that penalizes the total squared second derivative,
 #  using a smoothing parameter that is set here to 10^(-4.5).
-lambda = 10^(-4.5)
-fdParobj = fdPar(fdobj=basisobj, Lfdobj=2, lambda=lambda)
+lambda <- 10^(-4.5)
+fdParobj <- fdPar(fdobj, Lfdobj=2, lambda=lambda)
 #  Smooth the data, outputting a list containing various quantities
-smoothlist = smooth.basis(argvals, y, fdParobj)
-xfd = smoothlist$fd   #  the curve smoothing the data
-df  = smoothlist$df   #  the degrees of freedom in the smoothing curve
-gcv = smoothlist$gcv  #  the value of the gcv statistic
-RMSE = sqrt(mean((eval.fd(argvals, xfd) - x)^2))
+smoothlist <- smooth.basis(argvals, y, fdParobj)
+xfd <- smoothlist$fd   #  the curve smoothing the data
+df  <- smoothlist$df   #  the degrees of freedom in the smoothing curve
+gcv <- smoothlist$gcv  #  the value of the gcv statistic
+RMSE <- sqrt(mean((eval.fd(argvals, xfd) - x)^2))
 cat(round(c(df,RMSE,gcv),3),"\n")
 plotfit.fd(y, argvals, xfd)
 points(argvals,x, pch="*")
 #  Repeat these analyses for a range of log10(lambda) values by running
 #  the function plotGCVRMSE that we defined above.
 
-loglamout = plotGCVRMSE.fd(-6, -3, 0.25, x, argvals, y, fdParobj)
+loglamout <- plotGCVRMSE.fd(-6, -3, 0.25, x, argvals, y, fdParobj)
 
 #  When we ran this example, the optimal RMSE was 0.073, and was achieved
-#  for log10(lambda) = -4.25 or lambda = 0.000056.  At this level of
+#  for log10(lambda) <- -4.25 or lambda <- 0.000056.  At this level of
 #  smoothing, the degrees of freedom index was 10.6, a value close to
 #  the 10 degrees of freedom that we saw for regression smoothing.  The
 #  RMSE value is slightly higher than the regression analysis result, as
@@ -434,36 +428,37 @@ loglamout = plotGCVRMSE.fd(-6, -3, 0.25, x, argvals, y, fdParobj)
 ##                       Simulated data example 3:
 ##           a roughness-penalized smooth of a sample of curves
 ##
-n =  51   #  number of observations per curve
-N = 100   #  number of curves
-argvals = seq(0,1,len=n)
+n <-  51   #  number of observations per curve
+N <- 100   #  number of curves
+argvals <- seq(0,1,len=n)
 #  The true curve values are linear combinations of fourier function
 #  values.
 #  Set up the fourier basis
-nfourierbasis = 13
-fourierbasis = create.fourier.basis(c(0,1),nfourierbasis)
-fourierbasismat = eval.basis(argvals,fourierbasis)
+nfourierbasis <- 13
+fourierbasis <- create.fourier.basis(c(0,1),nfourierbasis)
+fourierbasismat <- eval.basis(argvals,fourierbasis)
 #  Set up some random coefficients, with declining contributions from
 #  higher order basis functions
-basiswt = matrix(exp(-(1:nfourierbasis)/3),nfourierbasis,N)
-xcoef = matrix(rnorm(nfourierbasis*N),nfourierbasis,N)*basiswt
-xfd = fd(xcoef, fourierbasis)
-x   = eval.fd(argvals, xfd)
+basiswt <- matrix(exp(-(1:nfourierbasis)/3),nfourierbasis,N)
+xcoef <- matrix(rnorm(nfourierbasis*N),nfourierbasis,N)*basiswt
+xfd <- fd(xcoef, fourierbasis)
+x   <- eval.fd(argvals, xfd)
 #  Add independent Gaussian noise to the data with std. dev. 0.2
-sigerr = 0.2
-y = x + matrix(rnorm(c(x)),n,N)*sigerr
+sigerr <- 0.2
+y <- x + matrix(rnorm(c(x)),n,N)*sigerr
 #  Set up spline basis system
-nbasis = n + 2
-basisobj = create.bspline.basis(c(0,1),nbasis)
+nbasis   <- n + 2
+basisobj <- create.bspline.basis(c(0,1),nbasis)
+fdobj    <- fd(matrix(0,nbasis,1),basisobj)
 #  Set up roughness penalty with smoothing parameter 10^(-5)
-lambda = 10^(-5)
-fdParobj = fdPar(fdobj=basisobj, Lfdobj=2, lambda=lambda)
+lambda <- 10^(-5)
+fdParobj <- fdPar(fdobj, Lfdobj=2, lambda=lambda)
 #  Smooth the data, outputting a list containing various quantities
-smoothlist = smooth.basis(argvals, y, fdParobj)
-xfd = smoothlist$fd   #  the curve smoothing the data
-df  = smoothlist$df   #  the degrees of freedom in the smoothing curve
-gcv = smoothlist$gcv  #  the value of the gcv statistic
-RMSE = sqrt(mean((eval.fd(argvals, xfd) - x)^2))
+smoothlist <- smooth.basis(argvals, y, fdParobj)
+xfd <- smoothlist$fd   #  the curve smoothing the data
+df  <- smoothlist$df   #  the degrees of freedom in the smoothing curve
+gcv <- smoothlist$gcv  #  the value of the gcv statistic
+RMSE <- sqrt(mean((eval.fd(argvals, xfd) - x)^2))
 #  Display the results, note that a gcv value is returned for EACH curve,
 #  and therefore that a mean gcv result is reported
 cat(round(c(df,RMSE,mean(gcv)),3),"\n")
@@ -471,7 +466,7 @@ cat(round(c(df,RMSE,mean(gcv)),3),"\n")
 #  plot
 plotfit.fd(y, argvals, xfd)
 #  Repeat these results for a range of log10(lambda) values
-loglamout = plotGCVRMSE.fd(-6, -3, 0.25, x, argvals, y, fdParobj)
+loglamout <- plotGCVRMSE.fd(-6, -3, 0.25, x, argvals, y, fdParobj)
 #  Our results were:
 # log10 lambda, deg. freedom, RMSE, GCV
 # -6.000 30.385  0.140  0.071
@@ -488,9 +483,9 @@ loglamout = plotGCVRMSE.fd(-6, -3, 0.25, x, argvals, y, fdParobj)
 # -3.250  7.217  0.164  0.075
 # -3.000  6.385  0.196  0.088
 #  RMSE and gcv both indicate an optimal smoothing level of
-#  log10(lambda) = -4.5 corresponding to 13.7 df.  When we repeated the
+#  log10(lambda) <- -4.5 corresponding to 13.7 df.  When we repeated the
 #  analysis using regression smoothing with 14 basis functions, we
-#  obtained RMSE = 0.110, about 10 percent larger than the value of
+#  obtained RMSE <- 0.110, about 10 percent larger than the value of
 #  0.101 in the roughness penalty result.  Smooth the data, outputting a
 #  list containing various quantities
 #  Homework:
@@ -515,26 +510,26 @@ if(!CRAN()){
 #  therefore can look like trend in the data that needs to be reflected
 #  in the smooth curve.  This code sets up the error correlation matrix
 #  for first-order autoregressive errors, or AR(1).
-rho = 0.9
-n = 51
-argvals = seq(0,1,len=n)
-x = sin(4*pi*argvals)
-Rerr = matrix(0,n,n)
+rho <- 0.9
+n <- 51
+argvals <- seq(0,1,len=n)
+x <- sin(4*pi*argvals)
+Rerr <- matrix(0,n,n)
 for (i in 1:n) {
-  for (j in 1:n) Rerr[i,j] =  rho^abs(i-j)
+  for (j in 1:n) Rerr[i,j] <-  rho^abs(i-j)
 }
 #  Compute the Choleski factor of the correlation matrix
-Lerr = chol(Rerr)
+Lerr <- chol(Rerr)
 #  set up some data
 #  Generate auto-correlated errors by multipling independent errors by
 #  the transpose of the Choleski factor
-sigerr = 0.2
-err = as.vector(crossprod(Lerr,matrix(rnorm(x),n,1))*sigerr)
+sigerr <- 0.2
+err <- as.vector(crossprod(Lerr,matrix(rnorm(x),n,1))*sigerr)
 #  See the long-run errors that are genrated
 plot(argvals, err)
-y = x + err
+y <- x + err
 #  Our values of y were:
-y = c(-0.03, 0.36, 0.59, 0.71, 0.97,  1.2,  1.1, 0.96, 0.79, 0.68,
+y <- c(-0.03, 0.36, 0.59, 0.71, 0.97,  1.2,  1.1, 0.96, 0.79, 0.68,
        0.56, 0.25, 0.01,-0.43,-0.69, -1,  -1.09,-1.29,-1.16,-1.09,
       -0.93, -0.9,-0.78,-0.47, -0.3,-0.01, 0.29, 0.47, 0.77, 0.85,
        0.87, 0.97,  0.9, 0.72, 0.48, 0.25,-0.17,-0.39,-0.47,-0.71,
@@ -543,12 +538,13 @@ y = c(-0.03, 0.36, 0.59, 0.71, 0.97,  1.2,  1.1, 0.96, 0.79, 0.68,
 #  every data point:  the number of basis functions will equal the
 #  number of interior knots plus the order, which in this case is still
 #  4.
-#   19 interior knots + order 4 = 23 basis functions
-nbasis = n + 2
-basisobj = create.bspline.basis(c(0,1),nbasis)
-fdParobj = fdPar(basisobj)
+#   19 interior knots + order 4 <- 23 basis functions
+nbasis   <- n + 2
+basisobj <- create.bspline.basis(c(0,1),nbasis)
+fdobj    <- fd(matrix(0,nbasis,1), basisobj)
+fdParobj <- fdPar(fdobj)
 #  Smooth these results for a range of log10(lambda) values
-loglamout = plotGCVRMSE.fd(-6, -3, 0.25, x, argvals, y, fdParobj)
+loglamout <- plotGCVRMSE.fd(-6, -3, 0.25, x, argvals, y, fdParobj)
 #  Our results without weighting were:
 # -6.000 30.385  0.261  0.004
 # -5.750 26.750  0.260  0.005
@@ -568,10 +564,10 @@ loglamout = plotGCVRMSE.fd(-6, -3, 0.25, x, argvals, y, fdParobj)
 #  undersmoothing.  In real data applications you will have to make the
 #  final call.  Now set up a weight matrix equal to the inverse of the
 #  correlation matrix
-wtmat = solve(Rerr)
+wtmat <- solve(Rerr)
 #  Smooth these results for a range of log10(lambda) values using the
 #  weight matrix
-loglamout = plotGCVRMSE.fd(-6, -3, 0.25, x, argvals, y, fdParobj,
+loglamout <- plotGCVRMSE.fd(-6, -3, 0.25, x, argvals, y, fdParobj,
                          wtvec=wtmat)
 #  Our results with weighting were:
 # -6.000 46.347  0.263  0.005
@@ -589,23 +585,23 @@ loglamout = plotGCVRMSE.fd(-6, -3, 0.25, x, argvals, y, fdParobj,
 # -3.000  6.356  0.397  0.260
 #  GCV is still not clear about what the right smoothing level is.
 #  But, comparing the two results, we see an optimal RMSE without
-#  smoothing of 0.244 at log10(lambda) = -3.75, and with smoothing 0.229
-#  at log10(lambda) = -4.  Weighting improved the RMSE.  At
-#  log10(lambda) = -4 the improvement is 9 percent.
+#  smoothing of 0.244 at log10(lambda) <- -3.75, and with smoothing 0.229
+#  at log10(lambda) <- -4.  Weighting improved the RMSE.  At
+#  log10(lambda) <- -4 the improvement is 9 percent.
 #  Smooth the data with and without the weight matrix at log10(lambda) =
 #  -4
-fdParobj = fdPar(basisobj, 2, 10^(-4))
-smoothlistnowt = smooth.basis(argvals, y, fdParobj)
-fdobjnowt = smoothlistnowt$fd   #  the curve smoothing the data
-df  = smoothlistnowt$df  # the degrees of freedom in the smoothing curve
-GCV = smoothlistnowt$gcv  #  the value of the GCV statistic
-RMSE = sqrt(mean((eval.fd(argvals, fdobjnowt) - x)^2))
+fdParobj <- fdPar(fdobj, 2, 10^(-4))
+smoothlistnowt <- smooth.basis(argvals, y, fdParobj)
+fdobjnowt <- smoothlistnowt$fd   #  the curve smoothing the data
+df  <- smoothlistnowt$df  # the degrees of freedom in the smoothing curve
+GCV <- smoothlistnowt$gcv  #  the value of the GCV statistic
+RMSE <- sqrt(mean((eval.fd(argvals, fdobjnowt) - x)^2))
 cat(round(c(df,RMSE,GCV),3),"\n")
-smoothlistwt = smooth.basis(argvals, y, fdParobj, wtvec=wtmat)
-fdobjwt = smoothlistwt$fd   #  the curve smoothing the data
-df  = smoothlistwt$df   #  the degrees of freedom in the smoothing curve
-GCV = smoothlistwt$gcv  #  the value of the GCV statistic
-RMSE = sqrt(mean((eval.fd(argvals, fdobjwt) - x)^2))
+smoothlistwt <- smooth.basis(argvals, y, fdParobj, wtvec=wtmat)
+fdobjwt <- smoothlistwt$fd   #  the curve smoothing the data
+df  <- smoothlistwt$df   #  the degrees of freedom in the smoothing curve
+GCV <- smoothlistwt$gcv  #  the value of the GCV statistic
+RMSE <- sqrt(mean((eval.fd(argvals, fdobjwt) - x)^2))
 cat(round(c(df,RMSE,GCV),3),"\n")
 par(mfrow=c(2,1))
 plotfit.fd(y, argvals, fdobjnowt)
@@ -625,19 +621,20 @@ points(argvals, y)
 #  Functional data analyses often involve estimating derivatives.  Here
 #  we repeat the analyses of Example 2, but this time focussing our
 #  attention on the estimation of the first and second derivative.
-n = 51
-argvals = seq(0,1,len=n)
-x   = sin(4*pi*argvals)
-Dx  = 4*pi*cos(4*pi*argvals)
-D2x = -(4*pi)^2*sin(4*pi*argvals)
-sigerr = 0.2
-y = x + rnorm(x)*sigerr
+n <- 51
+argvals <- seq(0,1,len=n)
+x   <- sin(4*pi*argvals)
+Dx  <- 4*pi*cos(4*pi*argvals)
+D2x <- -(4*pi)^2*sin(4*pi*argvals)
+sigerr <- 0.2
+y <- x + rnorm(x)*sigerr
 #  We now use order 6 splines so that we can control the curvature of
 #  the second derivative, which therefore involves penalizing the
 #  derivative of order four.
-norder = 6
-nbasis = n + norder - 2
-basisobj = create.bspline.basis(c(0,1),nbasis,norder)
+norder   <- 6
+nbasis   <- n + norder - 2
+basisobj <- create.bspline.basis(c(0,1),nbasis,norder)
+fdobj    <- fd(matrix(0,nbasis,1),basisobj)
 #  Note that there are more basis functions than observed values.  A
 #  basis like this is called "super-saturated."  We have to use a
 #  positive smoothing parameter for it to work.  Set up an object of
@@ -645,17 +642,17 @@ basisobj = create.bspline.basis(c(0,1),nbasis,norder)
 #  smoothing parameter that is set here to 10^(-10), because the squared
 #  fourth derivative is a much larger number than the squared second
 #  derivative.
-lambda = 10^(-10)
-fdParobj = fdPar(fdobj=basisobj, Lfdobj=4, lambda=lambda)
+lambda <- 10^(-10)
+fdParobj <- fdPar(fdobj, Lfdobj=4, lambda=lambda)
 #  Smooth the data, outputting a list containing various quantities
-smoothlist = smooth.basis(argvals, y, fdParobj)
-xfd = smoothlist$fd   #  the curve smoothing the data
-df  = smoothlist$df   #  the degrees of freedom in the smoothing curve
-gcv = smoothlist$gcv  #  the value of the gcv statistic
-Dxhat  = eval.fd(argvals, xfd, Lfd=1)
-D2xhat = eval.fd(argvals, xfd, Lfd=2)
-RMSED  = sqrt(mean((Dxhat  - Dx )^2))
-RMSED2 = sqrt(mean((D2xhat - D2x)^2))
+smoothlist <- smooth.basis(argvals, y, fdParobj)
+xfd <- smoothlist$fd   #  the curve smoothing the data
+df  <- smoothlist$df   #  the degrees of freedom in the smoothing curve
+gcv <- smoothlist$gcv  #  the value of the gcv statistic
+Dxhat  <- eval.fd(argvals, xfd, Lfd=1)
+D2xhat <- eval.fd(argvals, xfd, Lfd=2)
+RMSED  <- sqrt(mean((Dxhat  - Dx )^2))
+RMSED2 <- sqrt(mean((D2xhat - D2x)^2))
 cat(round(c(df,RMSED,RMSED2,gcv),3),"\n")
 #  Four plots of the results row-wise: data fit, first derivative fit,
 #  second derivative fit, second vs. first derivative fit
@@ -692,30 +689,30 @@ title("second against first derivative")
 ##
 #  We want to see if we can improve the spline fit.
 #  We know from elementary calculus as well as the code above that
-#  (4*pi)^2 sine(2*p*x) = -D2 sine(2*p*x), so that
-#  Lx = D2x + (4*pi)^2 x is zero for a sine or a cosine curve.
+#  (4*pi)^2 sine(2*p*x) <- -D2 sine(2*p*x), so that
+#  Lx <- D2x + (4*pi)^2 x is zero for a sine or a cosine curve.
 #  We now penalize roughness using this "smart" roughness penalty
 #  Here we set up a linear differential operator object that defines
 #  this penalty
-constbasis = create.constant.basis(c(0,1))
-xcoef.fd  = fd((4*pi)^2, constbasis)
-Dxcoef.fd = fd(0, constbasis)
-bwtlist = vector("list", 2)
-bwtlist[[1]] = xcoef.fd
-bwtlist[[2]] = Dxcoef.fd
-Lfdobj = Lfd(nderiv=2, bwtlist=bwtlist)
+constbasis <- create.constant.basis(c(0,1))
+xcoef.fd  <- fd((4*pi)^2, constbasis)
+Dxcoef.fd <- fd(0, constbasis)
+bwtlist <- vector("list", 2)
+bwtlist[[1]] <- xcoef.fd
+bwtlist[[2]] <- Dxcoef.fd
+Lfdobj <- Lfd(nderiv=2, bwtlist=bwtlist)
 #  Now we use a much larger value of lambda to reflect our confidence
 #  in power of calculus to solve problems!
-lambda = 10^(0)
-fdParobj = fdPar(fdobj=basisobj, Lfdobj=Lfdobj, lambda=lambda)
-smoothlist = smooth.basis(argvals, y, fdParobj)
-xfd = smoothlist$fd   #  the curve smoothing the data
-df  = smoothlist$df   #  the degrees of freedom in the smoothing curve
-gcv = smoothlist$gcv  #  the value of the gcv statistic
-Dxhat  = eval.fd(argvals, xfd, Lfd=1)
-D2xhat = eval.fd(argvals, xfd, Lfd=2)
-RMSED  = sqrt(mean((Dxhat  - Dx )^2))
-RMSED2 = sqrt(mean((D2xhat - D2x)^2))
+lambda <- 10^(0)
+fdParobj <- fdPar(fdobj, Lfdobj=Lfdobj, lambda=lambda)
+smoothlist <- smooth.basis(argvals, y, fdParobj)
+xfd <- smoothlist$fd   #  the curve smoothing the data
+df  <- smoothlist$df   #  the degrees of freedom in the smoothing curve
+gcv <- smoothlist$gcv  #  the value of the gcv statistic
+Dxhat  <- eval.fd(argvals, xfd, Lfd=1)
+D2xhat <- eval.fd(argvals, xfd, Lfd=2)
+RMSED  <- sqrt(mean((Dxhat  - Dx )^2))
+RMSED2 <- sqrt(mean((D2xhat - D2x)^2))
 cat(round(c(df,RMSED,RMSED2,gcv),3),"\n")
 #  Four plots of the results row-wise: data fit, first derivative fit,
 #  second derivative fit, second versus first derivative fit
@@ -750,31 +747,31 @@ title("second against first derivative")
 #  second shifted downwards by -0.2.  The two covariates are indicator
 #  or dummy variables, and the estimated regression coefficients will
 #  indicate the shifts as estimated from the data.
-n = 51
-argvals = seq(0,1,len=n)
-x = sin(4*pi*argvals)
-sigerr = 0.2
-y = x + rnorm(x)*sigerr
+n <- 51
+argvals <- seq(0,1,len=n)
+x <- sin(4*pi*argvals)
+sigerr <- 0.2
+y <- x + rnorm(x)*sigerr
 #  the n by p matrix of covariate values, p being here 2
-p = 2
-zmat = matrix(0,n,p)
-zmat[ 1:11,1] = 1
-zmat[11:20,2] = 1
+p <- 2
+zmat <- matrix(0,n,p)
+zmat[ 1:11,1] <- 1
+zmat[11:20,2] <- 1
 #  The true values of the regression coefficients
-beta0 = matrix(c(0.5,-0.2),p,1)
-y = y + zmat %*% beta0
+beta0 <- matrix(c(0.5,-0.2),p,1)
+y <- y + zmat %*% beta0
 #  The same basis system and smoothing process as used in Example 2
-nbasis = n + 2
-basisobj = create.bspline.basis(c(0,1),nbasis)
-lambda = 10^(-4)
-fdParobj = fdPar(basisobj, 2, lambda)
+nbasis <- n + 2
+basisobj <- create.bspline.basis(c(0,1),nbasis)
+fdobj    <- fd(matrix(0,nbasis,1), basisobj)
+fdParobj <- fdPar(fdobj, 2, lambda)
 #  Smooth the data, outputting a list containing various quantities
-smoothlist = smooth.basis(argvals, y, fdParobj, covariates=zmat)
-xfd  = smoothlist$fd   #  the curve smoothing the data
-df   = smoothlist$df   #  the degrees of freedom in the smoothing curve
-gcv  = smoothlist$gcv  #  the value of the gcv statistic
-beta = smoothlist$beta  #  the regression coefficients
-RMSE = sqrt(mean((eval.fd(argvals, xfd) - x)^2))
+smoothlist <- smooth.basis(argvals, y, fdParobj, covariates=zmat)
+xfd  <- smoothlist$fd   #  the curve smoothing the data
+df   <- smoothlist$df   #  the degrees of freedom in the smoothing curve
+gcv  <- smoothlist$gcv  #  the value of the gcv statistic
+beta <- smoothlist$beta  #  the regression coefficients
+RMSE <- sqrt(mean((eval.fd(argvals, xfd) - x)^2))
 cat(round(c(beta,df,RMSE,gcv),3),"\n")
 par(mfrow=c(1,1))
 plotfit.fd(y, argvals, xfd)
@@ -786,7 +783,7 @@ print(beta)
 #  estimates are based on only 10 observations, and these estimates are
 #  therefore quite reasonable.
 #  Repeat these analyses for a range of log10(lambda) values
-loglamout = plotGCVRMSE.fd(-6, -3, 0.25, x, argvals, y, fdParobj,
+loglamout <- plotGCVRMSE.fd(-6, -3, 0.25, x, argvals, y, fdParobj,
                            covariates=zmat)
 #  Homework:
 #  Try an example where the covariate values are themselves are
@@ -797,42 +794,43 @@ loglamout = plotGCVRMSE.fd(-6, -3, 0.25, x, argvals, y, fdParobj,
 ##          a roughness-penalized smooth of a sample of curves and
 ##                    variable observation points
 ##
-n = 51   #  number of observations per curve
-N = 100   #  number of curves
-argvals = matrix(0,n,N)
-for (i in 1:N) argvals[,i] = sort(runif(1:n))
+n <- 51   #  number of observations per curve
+N <- 100   #  number of curves
+argvals <- matrix(0,n,N)
+for (i in 1:N) argvals[,i] <- sort(runif(1:n))
 #  The true curve values are linear combinations of fourier function
 #  values.
 #  Set up the fourier basis
-nfourierbasis = 13
-fourierbasis = create.fourier.basis(c(0,1),nfourierbasis)
+nfourierbasis <- 13
+fourierbasis <- create.fourier.basis(c(0,1),nfourierbasis)
 #  Set up some random coefficients, with declining contributions from
 #  higher order basis functions
-basiswt = matrix(exp(-(1:nfourierbasis)/3),nfourierbasis,N)
-xcoef = matrix(rnorm(nfourierbasis*N),nfourierbasis,N)*basiswt
-xfd = fd(xcoef, fourierbasis)
-x = matrix(0,n,N)
-for (i in 1:N) x[,i] = eval.fd(argvals[,i], xfd[i])
+basiswt <- matrix(exp(-(1:nfourierbasis)/3),nfourierbasis,N)
+xcoef <- matrix(rnorm(nfourierbasis*N),nfourierbasis,N)*basiswt
+xfd <- fd(xcoef, fourierbasis)
+x <- matrix(0,n,N)
+for (i in 1:N) x[,i] <- eval.fd(argvals[,i], xfd[i])
 #  Add independent Gaussian noise to the data with std. dev. 0.2
-sigerr = 0.2
-y = x + matrix(rnorm(c(x)),n,N)*sigerr
+sigerr <- 0.2
+y <- x + matrix(rnorm(c(x)),n,N)*sigerr
 #  Set up spline basis system
-nbasis = n + 2
-basisobj = create.bspline.basis(c(0,1),nbasis)
+nbasis   <- n + 2
+basisobj <- create.bspline.basis(c(0,1),nbasis)
+fdobj    <- fd(matrix(0,nbasis,1), basisobj)
 #  Set up roughness penalty with smoothing parameter 10^(-5)
-lambda = 10^(-5)
-fdParobj = fdPar(fdobj=basisobj, Lfdobj=2, lambda=lambda)
+lambda <- 10^(-5)
+fdParobj <- fdPar(fdobj, Lfdobj=2, lambda=lambda)
 #  Smooth the data, outputting a list containing various quantities
-smoothlist = smooth.basis(argvals, y, fdParobj)
-xfd = smoothlist$fd   #  the curve smoothing the data
-df  = smoothlist$df   #  the degrees of freedom in the smoothing curve
-gcv = smoothlist$gcv  #  the value of the gcv statistic
-#RMSE = sqrt(mean((eval.fd(argvals, xfd) - x)^2))
+smoothlist <- smooth.basis(argvals, y, fdParobj)
+xfd <- smoothlist$fd   #  the curve smoothing the data
+df  <- smoothlist$df   #  the degrees of freedom in the smoothing curve
+gcv <- smoothlist$gcv  #  the value of the gcv statistic
+#RMSE <- sqrt(mean((eval.fd(argvals, xfd) - x)^2))
 eval.x <- eval.fd(argvals, xfd)
 e.xfd <- (eval.x-x)
 mean.e2 <- mean(e.xfd^2)
 
-RMSE = sqrt(mean.e2)
+RMSE <- sqrt(mean.e2)
 #  Display the results, note that a gcv value is returned for EACH
 #  curve, and therefore that a mean gcv result is reported
 cat(round(c(df,RMSE,mean(gcv)),3),"\n")
@@ -845,12 +843,14 @@ cat(round(c(df,RMSE,mean(gcv)),3),"\n")
 ## Real data example 9.  gait
 ##
 #  These data involve two variables in addition to multiple curves
-gaittime  <- (1:20)/21
-gaitrange <- c(0,1)
-gaitbasis <- create.fourier.basis(gaitrange,21)
-lambda    <- 10^(-11.5)
+gaitnbasis   <- 21
+gaittime     <- (1:20)/21
+gaitrange    <- c(0,1)
+gaitbasis    <- create.fourier.basis(gaitrange, gaitnbasis)
+gaitfd       <- fd(matrix(0,gaitnbasis,1), gaitbasis)
+lambda       <- 10^(-11.5)
 harmaccelLfd <- vec2Lfd(c(0, 0, (2*pi)^2, 0))
-gaitfdPar <- fdPar(gaitbasis, harmaccelLfd, lambda)
+gaitfdPar    <- fdPar(gaitfd, harmaccelLfd, lambda)
 gaitSmooth <- smooth.basis(gaittime, gait, gaitfdPar)
 gaitfd <- gaitSmooth$fd
 if (!CRAN()){

@@ -103,8 +103,8 @@ eval.fd <- function(evalarg, fdobj, Lfdobj=0, returnMatrix=FALSE) {
 
 #  check FDOBJ
 
-  if (!(inherits(fdobj, "fd")))
-      stop("Argument FD is not a functional data object.")
+  # if (!(inherits(fdobj, "fd")))
+  #     stop("Argument FD is not a functional data object.")
 
 #  Extract information about the basis
 

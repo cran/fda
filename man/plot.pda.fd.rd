@@ -17,7 +17,7 @@
   }
   \item{whichdim}{
     which dimension to use as grouping variables
-    \itemize{
+    \describe{
       \item{1}{ coefficients of each variable differential equation}
       \item{2}{ coefficient functions for each equation}
       \item{3}{ coefficients of derivatives of each variable}
@@ -38,6 +38,16 @@
 }
 \value{
   invisible(NULL)
+}
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \seealso{
   \code{\link{pda.fd}}

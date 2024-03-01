@@ -67,6 +67,7 @@ export(AmpPhaseDecomp,
        fRegress.fd,
        fRegress.CV,
        fRegress.stderr,
+       fRegress.double,
        fRegress.formula,
        Fstat.fd,
        geigen,
@@ -200,6 +201,7 @@ S3method(predict,      fd)
 S3method(sqrt,         fd)
 S3method(sum,          fd)
 S3method(summary,      fd)
+S3method(fRegress,     fd)
 S3method(boxplot,      fdPar)
 S3method(coef,         fdPar)
 S3method(coefficients, fdPar)
@@ -223,7 +225,6 @@ S3method(residuals,    monfd)
 S3method(predict,      monfd)
 S3method(as.fd,        'function')
 S3method(as.fd,        smooth.spline)
-S3method(fRegress,     fd)
 S3method(fRegress,     double)
 S3method(fRegress,     formula)
 S3method(fRegress,     character)
@@ -235,12 +236,12 @@ S3method(residuals,    posfd)
 S3method(matplot,      Date)
 S3method(matplot,      default)
 S3method(matplot,      POSIXct)
-S3method(matplot,      matrix)
-S3method(matplot,      numeric)
 S3method(norder,       bspline)
 S3method(norder,       default)
 S3method(plot,         cca.fd)
 S3method(plot,         pca.fd)
 S3method(plot,         pda.fd)
 S3method(summary,      bifd)
+S3method(matplot,      matrix)
+S3method(matplot,      numeric)
 

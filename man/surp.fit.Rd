@@ -26,13 +26,14 @@ A named list object for the returned objects with these names:
     \item{D2PENSSE:}{A square matrix of hessian values.}
 }
 \references{
-Ramsay, J. O., Li J. and Wiberg, M. (2020) Full information optimal scoring. 
-\emph{Journal of Educational and Behavioral Statistics}, 45, 297-315.
-
-Ramsay, J. O., Li J. and Wiberg, M. (2020) Better rating scale scores with 
-information-based psychometrics.  \emph{Psych}, 2, 347-360.
-
-http://testgardener.azurewebsites.net
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \author{Juan Li and James Ramsay}
 \seealso{

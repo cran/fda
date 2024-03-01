@@ -16,14 +16,14 @@
   
   The data are supplied through the CRAN system by package \code{fds}, and further information as well as many other datasets are to be found there.
 }
-\source{
-  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional
-    Data Analysis, 2nd ed.}, Springer, New York.
-
-  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
-    Functional Data Analysis}, Springer, New York. 
-    
-  Ramsay, James O., Hooker, Giles and Graves, Spencer (2009)  Functional
-    Data Analysis with R and Matlab, Springer, New York.
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \keyword{datasets}

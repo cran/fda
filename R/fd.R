@@ -38,7 +38,7 @@ fd <- function (coef=NULL, basisobj=NULL, fdnames=NULL)
 #  Returns:
 #  FD ... a functional data object
 
-#  Last modified 24 December 2012 by Jim Ramsay
+#  Last modified 2 February 2024 by Jim Ramsay
 
 ##
 ## 1.  check coef and get its dimensions

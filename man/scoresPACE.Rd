@@ -33,3 +33,17 @@
 \value{
   a matrix of scores with dimension nrow = nharm and ncol = ncol(data)
 }
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+
+  Yao, F., Mueller, H.G., Wang, J.L. (2005), 
+  \emph{Functional data analysis for sparse longitudinal data,} 
+  J. American Statistical Association, 100, 577-590.
+}

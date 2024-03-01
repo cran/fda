@@ -8,8 +8,8 @@ fRegress.double <- function(y, xfdlist, betalist, wt=NULL,
   #                    functions.
   #
   #  Arguments:
-  #  Y        ... an object for the dependent variable,
-  #               which  be a numeric vector
+  #  Y        ... A numeric vector that is the dependent variable.
+  #               It is converted to yvec below.
   #  XFDLIST  ... a list object of length p with each list
   #               containing an object for an independent variable.
   #               the object may be:
@@ -37,11 +37,11 @@ fRegress.double <- function(y, xfdlist, betalist, wt=NULL,
   #               enabling this option.
   #
   #  Returns LIST  ... A list containing seven members with names:
-  #    yfdobj      ... first  argument of 
-  #    xfdlist     ... second argument of 
-  #    betalist    ... third  argument of 
-  #    betaestlist ... estimated regression functions
-  #    yhatfdobj   ... functional data object containing fitted functions
+  #    yvec        ... numeric vector dependent variable 
+  #    xfdlist     ... list of objects that are dependent variables 
+  #    betalist    ... list of objects that are regression functions 
+  #    betaestlist ... list of estimated regression functions
+  #    yhatfdobj   ... functional data object containing fitted function
   #    Cmatinv     ... inverse of the coefficient matrix, needed for
   #                    function .STDERR that computes standard errors
   #    wt          ... weights for observations
@@ -51,70 +51,82 @@ fRegress.double <- function(y, xfdlist, betalist, wt=NULL,
   #  as predict(List).  In this call List can be any object of the
   #  "".
   
-  # Last modified 16 December 2020 by Jim Ramsay
+  # Last modified 29 January 2024 by Jim Ramsay
   
   #  check Y and compute sample size N
   
-  if (!inherits(y, "numeric")) stop("Y is not a numeric vector.")
+  if (!inherits(y, "numeric")) stop("Argument y is not a numeric vector.")
     
-  #  ----------------------------------------------------------------
-  #                   yfdobj is scalar or multivariate
-  #  ----------------------------------------------------------------
-    
-  #  As of 2020, if yfd is an fdPar object, it is converted to an fd object.
-  #  The added structure of the fdPar class is not used in any of the fRegress codes.
-  #  The older versions of fda package used yfdPar as the name for the first member.
-
-  arglist <- fRegressArgCheck(y, xfdlist, betalist, wt)
+  #  yvec is the dependent variable, which is a numeric vector
   
-  yfdobj   <- arglist$yfd
+  yvec <- y
+  
+  #  ----------------------------------------------------------------
+  #                   yvec is scalar or multivariate
+  #  ----------------------------------------------------------------
+    
+  #. check the terms
+  
+  arglist <- fRegressArgCheck(yvec, xfdlist, betalist, wt)
+  
+  #. extract the terms and rename them
+  
+  yvec     <- arglist$yfd
   xfdlist  <- arglist$xfdlist
   betalist <- arglist$betalist
   wt       <- arglist$wt
   
-  ymat <- as.matrix(y)
-  N    <- dim(ymat)[1]
-  p    <- length(xfdlist)
+  ymat <- as.matrix(yvec)  # yvec converted to matrix object ymat
+  N    <- dim(ymat)[1]     # the size of ymat
+  p    <- length(xfdlist)  # the number of regression terms
     
+  #. work through independent terms to format them
+  
   Zmat  <- NULL
   Rmat  <- NULL
   pjvec <- rep(0,p)
   ncoef <- 0
+  xrangeval <- matrix(0,p,2)
+  brangeval <- matrix(0,p,2)
   for (j in 1:p) {
+    # check the xfdj term
     xfdj       <- xfdlist[[j]]
     if (!inherits(xfdj, "fd")) {
       stop(paste("Independent variable",j,"is not of class fd."))
     }
-    xcoef      <- xfdj$coefs
-    xbasis     <- xfdj$basis
-    betafdParj <- betalist[[j]]
-    bbasis     <- betafdParj$fd$basis
-    bnbasis    <- bbasis$nbasis
-    pjvec[j]   <- bnbasis
-    Jpsithetaj <- inprod(xbasis,bbasis)
-    Zmat       <- cbind(Zmat,crossprod(xcoef,Jpsithetaj))
+    xcoefj        <- xfdj$coefs
+    xbasisj       <- xfdj$basis
+    xrangeval[j,] <- xbasisj$rangeval
+    betafdParj    <- betalist[[j]]
+    bbasisj       <- betafdParj$fd$basis
+    nbbasisj      <- bbasisj$nbasis
+    brangeval[j,] <- bbasisj$rangeval
+    pjvec[j]      <- nbbasisj
+    Jpsithetaj    <- inprod(xbasisj,bbasisj)
+    Zmat          <- cbind(Zmat,crossprod(xcoefj,Jpsithetaj))
     if (betafdParj$estimate) {
       lambdaj    <- betafdParj$lambda
       if (lambdaj > 0) {
         Lfdj  <- betafdParj$Lfd
-        Rmatj <- lambdaj*eval.penalty(bbasis,Lfdj)
+        Rmatj <- lambdaj*eval.penalty(bbasisj,Lfdj)
       } else {
-        Rmatj <- matrix(0,bnbasis,bnbasis)
+        Rmatj <- matrix(0,nbbasisj,nbbasisj)
       }
+      # accumulate b-coefficients into a single vector
       if (ncoef > 0) {
-        zeromat <- matrix(0,ncoef,bnbasis)
+        zeromat <- matrix(0,ncoef,nbbasisj)
         Rmat    <- rbind(cbind(Rmat,       zeromat),
                          cbind(t(zeromat), Rmatj))
-		ncoef <- ncoef + bnbasis
+		    ncoef <- ncoef + nbbasisj
       } else {
         Rmat  <- Rmatj
-        ncoef <- ncoef + bnbasis
+        ncoef <- ncoef + nbbasisj
       }
     }
   }
   
   #  -----------------------------------------------------------
-  #          set up the linear equations for the solution
+  #          solve the linear equations for the solution
   #  -----------------------------------------------------------
   
   #  solve for coefficients defining BETA
@@ -136,12 +148,14 @@ fRegress.double <- function(y, xfdlist, betalist, wt=NULL,
   
   betacoef <- Cmatinv %*% Dmat
   
-#    df <- sum(diag(Zmat %*% Cmatinv %*% t(Zmat)))
+  #  df <- sum(diag(Zmat %*% Cmatinv %*% t(Zmat)))
 
-    hatvals = diag(Zmat %*% Cmatinv %*% t(Zmat))
-    df <- sum(hatvals)
+  hatvals = diag(Zmat %*% Cmatinv %*% t(Zmat))
+  df <- sum(hatvals)
   
-  #  set up fdPar object for BETAESTFDPAR
+  #  -----------------------------------------------------------
+  #          set up fdPar object for BETAESTFDPAR
+  #  -----------------------------------------------------------
   
   betaestlist <- betalist
   mj2 <- 0
@@ -160,25 +174,27 @@ fRegress.double <- function(y, xfdlist, betalist, wt=NULL,
     betaestlist[[j]] <- betaestfdParj
   }
   
+  #  -----------------------------------------------------------
   #  set up fd object for predicted values
+  #  -----------------------------------------------------------
   
   yhatmat <- matrix(0,N,1)
   for (j in 1:p) {
     xfdj <- xfdlist[[j]]
     if (inherits(xfdj, "fd")) {
-      xbasis     <- xfdj$basis
-      xnbasis    <- xbasis$nbasis
-      xrng       <- xbasis$rangeval
-      nfine      <- max(501,10*xnbasis+1)
-      tfine      <- seq(xrng[1], xrng[2], len=nfine)
-      deltat     <- tfine[2]-tfine[1]
-      xmat       <- eval.fd(tfine, xfdj, 0, returnMatrix)
-      betafdParj <- betaestlist[[j]]
-      betafdj    <- betafdParj$fd
-      betamat    <- eval.fd(tfine, betafdj, 0, returnMatrix)
-      fitj       <- deltat*(crossprod(xmat,betamat) -
-                              0.5*(outer(xmat[1,    ],betamat[1,    ]) +
-                                     outer(xmat[nfine,],betamat[nfine,])))
+      xbasisj     <- xfdj$basis
+      xnbasisj    <- xbasisj$nbasis
+      xrngj       <- xbasisj$rangeval
+      nfinej      <- max(501,10*xnbasisj+1)
+      tfinej      <- seq(xrngj[1], xrngj[2], len=nfinej)
+      deltatj     <- tfinej[2]-tfinej[1]
+      xmatj       <- eval.fd(tfinej, xfdj, 0, returnMatrix)
+      betafdParj  <- betaestlist[[j]]
+      betafdj     <- betafdParj$fd
+      betamatj    <- eval.fd(tfinej, betafdj, 0, returnMatrix)
+      fitj        <- deltatj*(crossprod(xmatj,betamatj) -
+                              0.5*(outer(xmatj[1,     ],betamatj[1,    ]) +
+                                   outer(xmatj[nfinej,],betamatj[nfinej,])))
       yhatmat    <- yhatmat + fitj
     } else{
       betaestfdParj <- betaestlist[[j]]
@@ -188,10 +204,10 @@ fRegress.double <- function(y, xfdlist, betalist, wt=NULL,
   }
   yhatfdobj <- yhatmat
   
-    # Calculate OCV and GCV scores
+  # Calculate OCV and GCV scores
 
-    OCV = sum( (ymat-yhatmat)^2/(1-hatvals)^2 )
-    GCV = sum( (ymat-yhatmat)^2 )/( (sum(1-hatvals))^2 )
+  OCV = sum( (ymat-yhatmat)^2/(1-hatvals)^2 )
+  GCV = sum( (ymat-yhatmat)^2 )/( (sum(1-hatvals))^2 )
   
   #  -----------------------------------------------------------------------
   #        Compute pointwise standard errors of regression coefficients
@@ -243,7 +259,7 @@ fRegress.double <- function(y, xfdlist, betalist, wt=NULL,
   #  -----------------------------------------------------------------------
   
   fRegressList <-
-    list(yfdobj         = y,
+    list(yvec           = yvec,
          xfdlist        = xfdlist,
          betalist       = betalist,
          betaestlist    = betaestlist,
@@ -253,8 +269,8 @@ fRegress.double <- function(y, xfdlist, betalist, wt=NULL,
          Cmatinv        = Cmatinv,
          wt             = wt,
          df             = df,
-		 GCV			= GCV,
-		 OCV			= OCV,
+		     GCV			      = GCV,
+		     OCV			      = OCV,
          y2cMap         = y2cMap,
          SigmaE         = SigmaE,
          betastderrlist = betastderrlist,

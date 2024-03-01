@@ -27,16 +27,19 @@
 \details{
   The ages are not equally spaced.  
 }
-\source{
-  Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
-    Data Analysis, 2nd ed.}, Springer, New York. 
-
-  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
-    Functional Data Analysis}, Springer, New York, ch. 6. 
-
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+    
   Tuddenham, R. D., and Snyder, M. M. (1954) "Physical growth of
-  California boys and girls from birth to age 18", \emph{University of
-  California Publications in Child Development}, 1, 183-364.  
+    California boys and girls from birth to age 18", \emph{University of
+    California Publications in Child Development}, 1, 183-364.  
 }
 %\seealso{\code{\link{eval.penalty}}}
 \examples{

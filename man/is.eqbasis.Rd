@@ -18,11 +18,21 @@ The second basis object to be checked for being identical to the first.
 }
 }
 \value{
-a logical value:
-\code{TRUE} if the two basis objects are identical, \code{FALSE} otherwise.
+  a logical value:
+  \code{TRUE} if the two basis objects are identical, \code{FALSE} otherwise.
+}
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \seealso{
-\code{\link{basisfd}},
+  \code{\link{basisfd}},
 }
 % docclass is function
 \keyword{basis}

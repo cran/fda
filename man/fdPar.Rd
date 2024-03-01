@@ -13,9 +13,7 @@
   arguments to functions that estimate functional parameters.
 }
 \usage{
-fdPar(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
-      penmat=NULL)
-%fdPar(fdobj=fd(), Lfdobj=NULL, lambda=0, estimate=TRUE, penmat=NULL)
+  fdPar(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE, penmat=NULL)
 }
 \arguments{
   \item{fdobj}{
@@ -31,18 +29,12 @@ fdPar(fdobj=NULL, Lfdobj=NULL, lambda=0, estimate=TRUE,
 
     If \code{NULL}, Lfdobj depends on fdobj[['basis']][['type']]:
 
-    \itemize{
-      \item{bspline}{
-	Lfdobj <- int2Lfd(max(0, norder-2)), where norder =
-	norder(fdobj).
-      }
-      \item{fourier}{
-	Lfdobj = a harmonic acceleration operator:
-
-	\code{Lfdobj <- vec2Lfd(c(0,(2*pi/diff(rng))^2,0), rng)}
-
-	where rng = fdobj[['basis']][['rangeval']].
-      }
+    \describe{
+      \item{bspline}{Lfdobj <- int2Lfd(max(0, norder-2)), 
+      where norder = norder(fdobj).}
+      \item{fourier}{Lfdobj = a harmonic acceleration operator:
+	    \code{Lfdobj <- vec2Lfd(c(0,(2*pi/diff(rng))^2,0), rng)}
+      where rng = fdobj[['basis']][['rangeval']].}
       \item{anything else}{Lfdobj <- int2Lfd(0)}
     }
   }

@@ -44,6 +44,16 @@ cor.fd(evalarg1, fdobj1, evalarg2=evalarg1, fdobj2=fdobj1)
   a 4-dimensional array of dim = c(nPts, nPts, 1, choose(k+1, 2)), where
   nPts = length(evalarg1).  
 }
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \seealso{
   \code{\link{mean.fd}}, 
   \code{\link{sd.fd}}, 

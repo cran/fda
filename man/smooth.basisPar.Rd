@@ -51,7 +51,7 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
   \item{fdobj}{
     One of the following:
 
-    \itemize{
+    \describe{
       \item{fd}{
 	a functional data object (class \code{fd})
       }
@@ -80,7 +80,7 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
 
     If \code{NULL}, Lfdobj depends on fdobj[['basis']][['type']]:
 
-    \itemize{
+    \describe{
       \item{bspline}{
 	Lfdobj <- int2Lfd(max(0, norder-2)), where norder =
 	norder(fdobj).
@@ -119,7 +119,7 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
     a list of length 3 containing character vectors of names for the
     following:
 
-    \itemize{
+    \describe{
       \item{args}{
 	name for each observation or point in time at which data are
 	collected for each 'rep', unit or subject.
@@ -194,10 +194,6 @@ smooth.basisPar(argvals, y, fdobj=NULL, Lfdobj=NULL,
     curve.  If the smooth is multivariate, the result is a matrix of gcv
     values, with columns corresponding to variables.
   }
-%  \item{coef}{
-%    the coefficient matrix or array for the basis function expansion of
-%    the smoothing function
-%  }
   \item{SSE}{
     the error sums of squares.  SSE is a vector or a matrix of the same
     size as 'gcv'.

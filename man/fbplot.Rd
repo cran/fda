@@ -123,7 +123,15 @@ fbplot(fit, x = NULL, method = "MBD", depth = NULL, plot = TRUE,
   Lopez-Pintado, S. and Romo, J. (2009), "On the concept of depth for
   functional data," Journal of the American Statistical Association,
   104, 718-734.
-%% ~put references to the literature/web site here ~
+
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \author{
   Ying Sun \email{sunwards@stat.osu.edu}

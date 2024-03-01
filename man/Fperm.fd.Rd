@@ -17,7 +17,7 @@ Fperm.fd(yfdPar, xfdlist, betalist, wt=NULL, nperm=200,
     the dependent variable object.  It may be an object of three
     possible classes:
 
-    \itemize{
+    \describe{
       \item{vector}{ if the dependent variable is scalar.}
       \item{fd}{
 	a functional data object if the dependent variable is
@@ -34,15 +34,11 @@ Fperm.fd(yfdPar, xfdlist, betalist, wt=NULL, nperm=200,
     a list of length equal to the number of independent
     variables. Members of this list are the independent variables.  They
     be objects of either of these two classes:
-
-    \itemize{
-      \item a vector if the independent dependent variable is scalar.
-      \item {
-	a functional data object if the dependent variable is
-	functional.
-      }
+    \describe{
+      \item{vector:}{a vector if the independent dependent variable is scalar.}
+      \item{fd:}{a functional data object if the dependent variable is 
+        functional.}
     }
-
     In either case, the object must have the same number of replications
     as the dependent variable object.  That is, if it is a scalar, it
     must be of the same length as the dependent variable, and if it is
@@ -123,13 +119,20 @@ Fperm.fd(yfdPar, xfdlist, betalist, wt=NULL, nperm=200,
     functional data object.
   }
 }
-\source{
-  Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
-    Data Analysis, 2nd ed.}, Springer, New York.
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \section{Side Effects}{
   a plot of the functional observations
-} \seealso{
+} 
+\seealso{
   \code{\link{fRegress}},
   \code{\link{Fstat.fd}}
 }
@@ -147,7 +150,7 @@ annualprec <- log10(apply(
 smallnbasis <- 40
 smallbasis  <- create.fourier.basis(c(0, 365), smallnbasis)
 tempfd      <- smooth.basis(day.5, CanadianWeather$dailyAv[,,"Temperature.C"],
-                       smallbasis)$fd
+                            smallbasis)$fd
 constantfd <- fd(matrix(1,1,35), create.constant.basis(c(0, 365)))
 
 xfdlist <- vector("list",2)
@@ -165,14 +168,15 @@ nbetabasis  <- 35
 betabasis2  <- create.fourier.basis(c(0, 365), nbetabasis)
 betafd2     <- fd(matrix(0,nbetabasis,1), betabasis2)
 
-lambda        <- 10^12.5
+lambda          <- 10^12.5
 harmaccelLfd365 <- vec2Lfd(c(0,(2*pi/365)^2,0), c(0, 365))
-betafdPar2    <- fdPar(betafd2, harmaccelLfd365, lambda)
-betalist[[2]] <- betafdPar2
+betafdPar2      <- fdPar(betafd2, harmaccelLfd365, lambda)
+betalist[[2]]   <- betafdPar2
 
 # Should use the default nperm = 200
 # but use 10 to save test time for illustration
-F.res2 = Fperm.fd(annualprec, xfdlist, betalist, nperm=10)
+
+F.res2 = Fperm.fd(annualprec, xfdlist, betalist, nperm=100)
 
 ##
 ## 2.  yfdpar = Functional data object (class fd)
@@ -192,9 +196,10 @@ hgtbasis <- create.bspline.basis(range(Knots), nbasis, norder, Knots)
 # Now smooth with a fourth-derivative penalty and a very small smoothing
 # parameter
 
-Lfdobj <- 4
-lambda <- 1e-2
-growfdPar <- fdPar(hgtbasis, Lfdobj, lambda)
+Lfdobj    <- 4
+lambda    <- 1e-2
+growfd    <- fd(matrix(0,nbasis,1),hgtbasis)
+growfdPar <- fdPar(growfd, Lfdobj, lambda)
 
 hgtfd <- smooth.basis(growth$age,
                       cbind(growth$hgtm,growth$hgtf),growfdPar)$fd
@@ -212,11 +217,13 @@ xfdlist = list(constfd,maleindfd)
 
 # The fdPar object for the coefficients and call Fperm.fd
 
-betalist = list(fdPar(hgtbasis,2,1e-6),fdPar(hgtbasis,2,1e-6))
+betalist = list(fdPar(hgtfd,2,1e-6),fdPar(hgtfd,2,1e-6))
 
 # Should use nperm = 200 or so,
 # but use 10 to save test time
-Fres = Fperm.fd(hgtfd,xfdlist,betalist,nperm=10)
+
+Fres = Fperm.fd(hgtfd,xfdlist,betalist,nperm=100)
+
 par(oldpar)
 }
 

@@ -32,10 +32,20 @@ A named list containing:
     \item{x:}{The parameter vector at the final minimum.}
     \item{check:}{A boolean value indicating that problems were encountered.}
 }
-\references{
-Press, W. H., Taukolsky, S. A., Vetterline, W. T. and Flannery, B. P.  
-(2020) \emph{Numerical Recipes, Third Edition}, Cambridge}
 \author{Juan Li and James Ramsay}
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+
+  Press, W. H., Taukolsky, S. A., Vetterline, W. T. and Flannery, B. P. (2020) 
+  \emph{Numerical Recipes, Third Edition}, Cambridge.
+}
 \seealso{
   \code{\link{smooth.surp}}
 }

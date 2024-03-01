@@ -37,9 +37,19 @@ space spanned by the columns of the matrix, the squared loadings
 tend more and more to be either near 0 or near 1, and this tends to
 help with the process of labelling or interpreting the rotated matrix.
 }
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \seealso{
-\code{\link{varmx.pca.fd}},
-\code{\link{varmx.cca.fd}}
+  \code{\link{varmx.pca.fd}},
+  \code{\link{varmx.cca.fd}}
 }
 % docclass is function
 \keyword{smooth}

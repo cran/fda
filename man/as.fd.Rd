@@ -30,7 +30,7 @@ as.fd(x, ...)
 \details{
   The behavior depends on the \code{class} and nature of \code{x}.
 
-  \itemize{
+  \describe{
     \item{as.fd.fdSmooth}{extract the \code{fd} component}
 
     \item{as.fd.function}{
@@ -55,7 +55,10 @@ as.fd(x, ...)
   }
 }
 \references{
-  Ramsay, James O., and Silverman, Bernard W. (2006), 
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009), 
+  \emph{Functional data analysis with R and Matlab}, Springer, New York.
+
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
   \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
 
   Ramsay, James O., and Silverman, Bernard W. (2002), 
@@ -82,21 +85,20 @@ girlGrowth.fd <- as.fd(girlGrowthSm)
 ##
 x2 <- 1:7
 y2 <- sin((x2-0.5)*pi)
-f <- splinefun(x2, y2)
-fd. <- as.fd(f)
-x. <- seq(1, 7, .02)
-fx. <- f(x.)
-fdx. <- eval.fd(x., fd.)
+fd_function <- splinefun(x2, y2)
+fd.  <- as.fd(fd_function)
+x.   <- seq(1, 7, .02)
+fdx. <- fda::eval.fd(x., fd.)
 
 # range(y2, fx., fdx.) generates an error 2012.04.22
 
 rfdx <- range(fdx.)
 
 oldpar <- par(no.readonly= TRUE)
-plot(range(x2), range(y2, fx., rfdx), type='n')
+plot(range(x2), range(y2, fdx., rfdx), type='n')
 points(x2, y2)
 lines(x., sin((x.-0.5)*pi), lty='dashed')
-lines(x., f(x.), col='blue')
+lines(x., fdx., col='blue')
 lines(x., eval.fd(x., fd.), col='red', lwd=3, lty='dashed')
 # splinefun and as.fd(splineful(...)) are close
 # but quite different from the actual function
@@ -121,16 +123,16 @@ if(!CRAN()) {
 }
 
 ##
-## as.fd.smooth.spline
+## as.fd.smooth.spline ... this doesn't work (24 January 2024)
 ##
-cars.spl <- with(cars, smooth.spline(speed, dist))
-cars.fd <- as.fd(cars.spl)
+#cars.spl <- with(cars, smooth.spline(speed, dist))
+#cars.fd  <- as.fd(cars.spl)
 
-plot(dist~speed, cars)
-lines(cars.spl)
-sp. <- with(cars, seq(min(speed), max(speed), len=101))
-d. <- eval.fd(sp., cars.fd)
-lines(sp., d., lty=2, col='red', lwd=3)
+#plot(dist~speed, cars)
+#lines(cars.spl)
+#sp. <- with(cars, seq(min(speed), max(speed), len=101))
+#d. <- eval.fd(sp., cars.fd)
+#lines(sp., d., lty=2, col='red', lwd=3)
 par(oldpar)
 }
 \keyword{smooth}

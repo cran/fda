@@ -46,32 +46,22 @@ special class from the Matrix package.
 }
 }
 \value{
-a named list of length 4 containing:
-
-\item{Wfdobj}{
-a functional data object defining function $W(x)$ that that
-optimizes the fit to the data of the monotone function that it defines.
-}
-\item{Flist}{
-a named list containing three results for the final converged solution:
-(1)
-\bold{f}: the optimal function value being minimized,
-(2)
-\bold{grad}: the gradient vector at the optimal solution,   and
-(3)
-\bold{norm}: the norm of the gradient vector at the optimal solution.
-}
-\item{iternum}{
-the number of iterations.
-}
-\item{iterhist}{
-a \code{iternum+1} by 5 matrix containing the iteration
-history.
-}
+A named list of length 4 containing:
+  \item{Wfdobj}{a functional data object defining function $W(x)$ that
+    optimizes the fit to the data of the monotone function that it defines.}
+  \item{Flist}{
+    a named list containing three results for the final converged solution:
+    (1)
+    \bold{f}: the optimal function value being minimized,
+    (2)
+    \bold{grad}: the gradient vector at the optimal solution,   and
+    (3)
+    \bold{norm}: the norm of the gradient vector at the optimal solution.}
+  \item{iternum}{the number of iterations.}
+  \item{iterhist}{a \code{iternum+1} by 5 matrix containing the iteration
+    history.}
 }
 \details{
-
-
 The intensity function $I(t)$ is almost the same thing as a
 probability density function $p(t)$ estimated by function
 \code{densify.fd}.  The only difference is the absence of
@@ -88,8 +78,18 @@ process itself to be nearly homogeneous.
 To plot the intensity function or to evaluate it,
 evaluate \code{Wfdobj}, exponentiate the resulting vector.
 }
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \seealso{
-\code{\link{density.fd}}
+  \code{\link{density.fd}}
 }
 \examples{
 oldpar <- par(no.readonly=TRUE)

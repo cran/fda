@@ -41,15 +41,26 @@ eval.bifd(sevalarg, tevalarg, bifd, sLfdobj=0, tLfdobj=0)
   second to argument values in tevalarg, the third if present to
   replications, and the fourth if present to functions.
 }
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \examples{
 # every-other-day basis to save test time
 daybasis   <- create.fourier.basis(c(0,365), 183)
 harmLcoef  <- c(0,(2*pi/365)^2,0)
 harmLfd    <- vec2Lfd(harmLcoef, c(0,365))
 templambda <- 1.0
-tempfdPar  <- fdPar(daybasis, harmLfd, lambda=1)
-tempfd     <- smooth.basis(day.5,
-          CanadianWeather$dailyAv[,,"Temperature.C"], tempfdPar)$fd
+tempfdPar  <- fdPar(fd(matrix(0,daybasis$nbasis,1), daybasis), harmLfd, 
+                    lambda=1)
+tempfd     <- smooth.basis(day.5, CanadianWeather$dailyAv[,,"Temperature.C"], 
+                           tempfdPar)$fd
 #    define the variance-covariance bivariate fd object
 tempvarbifd <- var.fd(tempfd)
 #    evaluate the variance-covariance surface and plot

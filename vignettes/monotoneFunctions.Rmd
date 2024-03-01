@@ -9,15 +9,9 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
-
-```{r setup}
-library(fda)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+system.file(package="fda")
 ```
 
 ## R Markdown

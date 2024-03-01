@@ -11,9 +11,7 @@
 \method{*}{basisfd}(basisobj1, basisobj2)
 }
 \arguments{
-\item{basisobj1, basisobj2}{
-  objects of class basisfd
-}
+  \item{basisobj1, basisobj2}{objects of class basisfd}
 }
 \details{
   TIMES for (two basis objects sets up a basis suitable for expanding
@@ -44,6 +42,17 @@
        number of basis functions equal to the sum of the two
        numbers of bases and equally spaced knots.
 
+}
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+  \emph{Functional data analysis with R and Matlab}, Springer, New
+  York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional
+    Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
+    Functional Data Analysis}, Springer, New York.
 }
 \seealso{
   \code{\link{basisfd}}

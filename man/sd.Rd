@@ -33,6 +33,16 @@ stddev.fd(fdobj)
   that contains the standard deviation of the one or several functions in
   the object \code{fdobj}.
 }
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \seealso{
   \code{\link{mean.fd}}, 
   \code{\link{sum.fd}}, 
@@ -54,7 +64,7 @@ lipbasis <- create.bspline.basis(liprange, nbasis, norder)
 
 Lfdobj   <- int2Lfd(4)
 lambda   <- 1e-12
-lipfdPar <- fdPar(lipbasis, Lfdobj, lambda)
+lipfdPar <- fdPar(fd(matrix(0,nbasis,1), lipbasis), Lfdobj, lambda)
 
 lipfd <- smooth.basis(liptime, lip, lipfdPar)$fd
 names(lipfd$fdnames) = c("Normalized time", "Replications", "mm")

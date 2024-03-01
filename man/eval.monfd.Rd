@@ -64,6 +64,16 @@ eval.monfd(evalarg, Wfdobj, Lfdobj=int2Lfd(0), returnMatrix=FALSE)
   corresponds to the argument values in \code{evalarg} and the second to
   replications.
 }
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \seealso{
   \code{\link{eval.fd}},
   \code{\link{smooth.monotone}}

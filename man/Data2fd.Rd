@@ -1,264 +1,163 @@
 \name{Data2fd}
 \alias{Data2fd}
 \title{
-  Create a functional data object from data
+  Create smooth functions that fit scatterplot data.
 }
 \description{
-  This function converts an array \code{y} of 
-  function values plus an array \code{argvals} of 
-  argument values into a functional data object.
-  This function tries to do as much for the user 
-  as possible in setting up a call to function 
-  \code{smooth.basis}.  Be warned that the result
-  may not be a satisfactory smooth of the data, 
-  and consequently that it may be necessary to 
-  use function \code{smooth.basis} instead, the 
-  help file for which provides a great deal 
-  more information than is provided here.  Also, 
-  function \code{Data2fd} can swap the first 
-  two arguments, \code{argvals} and \code{y} 
-  if it appears that they have been included
-  in reverse order.  A warning message is 
-  returned if this swap takes place.  Any such 
-  automatic decision, though, has the 
-  possibility of being wrong, and the results 
-  should be carefully checked.  Preferably, 
-  the order of the arguments should be 
-  respected: \code{argvals} comes first and
-  \code{y} comes second.
-}
+  The function converts scatter plot data into one or a set of curves that do
+  a satisfactory job of representing their corresponding abscissa and ordinate 
+  values by smooth curves.  It returns a list object of class \code{fdSmooth} 
+  that contains curves defined by functional data objects of class \code{fd}
+  as well as a variety of other results related to the data smoothing process.
+  
+  The function tries to do as much for the user as possible before setting up a 
+  call to function \code{smooth.basisPar}. This is achieved by an initial call
+  to function \code{argvalsSwap} that examines arguments \code{argvals} that 
+  contains abscissa values and \code{y} that contains ordinate values.  
+  
+  If the arguments are provided in an order that is not the one above, 
+  \code{Data2fd} attempts to swap argument positions to provide the correct 
+  order. A warning message is returned if this swap takes place.  Any such 
+  automatic decision, though, has the possibility of being wrong, and the 
+  results should be carefully checked.  
+
+  Preferably, the order of the arguments should be respected: \code{argvals} 
+  comes first and \code{y} comes second.
+  
+  Be warned that the result that the \code{fdSmooth} object that is returned may 
+  not define a satisfactory smooth of the data, and consequently that it may be 
+  necessary to use the more sophisticated data smoothing function 
+  \code{smooth.basis} instead.  Its help file provides a great deal more 
+  information than is provided here.}
+  
 \usage{
-Data2fd(argvals=NULL, y=NULL, basisobj=NULL, nderiv=NULL,
-        lambda=3e-8/diff(as.numeric(range(argvals))),
-        fdnames=NULL, covariates=NULL, method="chol",
-        dfscale=1)
-}
+  Data2fd(argvals=NULL, y=NULL, basisobj=NULL, nderiv=NULL,
+          lambda=3e-8/diff(as.numeric(range(argvals))),
+          fdnames=NULL, covariates=NULL, method="chol")}
+          
 \arguments{
-  \item{argvals}{
-    a set of argument values.  If this is a 
-    vector, the same set of argument values is 
-    used for all columns of \code{y}.  If 
-    \code{argvals} is a matrix, the columns 
-    correspond to the columns of \code{y}, and 
-    contain the argument values for that 
-    replicate or case.
-
-    Dimensions for \code{argvals} must match 
-    the first dimensions of \code{y}, though 
-    \code{y} can have more dimensions.  For 
-    example, if dim(y) = c(9, 5, 2), 
-    \code{argvals} can be a vector of length 9 
-    or a matrix of dimensions c(9, 5) or an 
-    array of dimensions c(9, 5, 2).
-  }
-  \item{y}{
-    an array containing sampled values of curves.
-
-    If \code{y} is a vector, only one replicate 
-    and variable are assumed.  If \code{y} is a 
-    matrix, rows must correspond to argument
-    values and columns to replications or cases, 
-    and it will be assumed that there is only 
-    one variable per observation.  If \code{y} 
-    is a three-dimensional array, the first 
-    dimension (rows) corresponds to argument 
-    values, the second (columns) to replications, 
-    and the third (layers) to variables within 
-    replications.  Missing values are permitted, 
-    and the number of values may vary from one 
-    replication to another.  If this is the 
-    case, the number of rows must equal the
-    maximum number of argument values, and 
-    columns of \code{y} having fewer values 
-    must be padded out with NA's.
-  }
-  \item{basisobj}{
-    One of the following:
-
-    \itemize{
-      \item{basisfd}{
-      	a functional basis object 
-      	(class \code{basisfd}).
-      }
-      \item{fd}{
-      	a functional data object 
-      	(class \code{fd}), from which 
-      	its \code{basis} component is 
-      	extracted.
-      }
-      \item{fdPar}{
-      	a functional parameter object 
-      	(class \code{fdPar}), from which
-      	its \code{basis} component is 
-      	extracted.
-      }
-      \item{integer}{
-      	an integer giving the order of 
-      	a B-spline basis, 
-      	\code{create.bspline.basis(argvals, 
-      	norder=basisobj)}
-      }
-      \item{numeric vector}{
-      	specifying the knots for a 
-      	B-spline basis, 
-      	\code{create.bspline.basis(basisobj)}
-      }
-      \item{NULL}{
-      	Defaults to 
-      	create.bspline.basis(argvals).
-      }
+  \item{argvals}{a set of argument values.  If this is a vector, the same set of 
+    argument values is used for all columns of \code{y}.  If \code{argvals} is a 
+    matrix, the columns correspond to the columns of \code{y}, and contain the 
+    argument values for that replicate or case.
+    Dimensions for \code{argvals} must match the first dimensions of \code{y}, 
+    though \code{y} can have more dimensions.  For example, if dim(y) = 
+    c(9, 5, 2), \code{argvals} can be a vector of length 9 or a matrix of 
+    dimensions c(9, 5) or an array of dimensions c(9, 5, 2).}
+  \item{y}{an array containing sampled values of curves.  If \code{y} is a 
+    vector, only one replicate and variable are assumed.  If \code{y} is a 
+    matrix, rows must correspond to argument values and columns to replications 
+    or cases, and it will be assumed that there is only one variable per 
+    observation.  If \code{y} is a three-dimensional array, the first dimension 
+    (rows) corresponds to argument values, the second (columns) to replications, 
+    and the third (layers) to variables within replications.  Missing values are 
+    permitted, and the number of values may vary from one replication to 
+    another.  If this is the case, the number of rows must equal the maximum 
+    number of argument values, and columns of \code{y} having fewer values 
+    must be padded out with NA's.}
+  \item{basisobj}{An object of one of the following classes:
+    \describe{
+      \item{basisfd}{a functional basis object (class \code{basisfd}).}
+      \item{fd}{a functional data object (class \code{fd}), from which its 
+      \code{basis} component is extracted.}
+      \item{fdPar}{a functional parameter object (class \code{fdPar}), from 
+        which	its \code{basis} component is extracted.}
+      \item{integer}{an integer giving the order of	a B-spline basis, 
+      	\code{create.bspline.basis(argvals, norder=basisobj)}}
+      \item{numeric vector}{specifying the knots for a B-spline basis, 
+      	\code{create.bspline.basis(basisobj)}}
+      \item{NULL}{Defaults to create.bspline.basis(argvals).}
     }
   }
-  \item{nderiv}{
-    Smoothing typically specified as an 
-    integer order for the derivative
-    whose square is integrated and 
-    weighted by \code{lambda} to smooth.
-    By default, \code{if basisobj[['type']] == 
-    'bspline'}, the smoothing operator is 
-    \code{int2Lfd(max(0, norder-2)).}
+  \item{nderiv}{Smoothing typically specified as an integer order for the 
+    derivative whose square is integrated and weighted by \code{lambda} to 
+    smooth.  By default, \code{if basisobj[['type']] == 'bspline'}, the 
+    smoothing operator is \code{int2Lfd(max(0, norder-2)).}
 
-    A general linear differential 
-    operator can also be supplied.
-  }
-  \item{lambda}{
-    weight on the smoothing operator 
-    specified by \code{nderiv}.
-  }
-  \item{fdnames}{
-    Either a character vector of length 
-    3 or a named list of length 3.  In 
-    either case, the three elements 
-    correspond to the following:
-
-    \itemize{
-      \item{argname}{
-	      name of the argument, e.g. 
-	      "time" or "age".
-      }
-      \item{repname}{
-	      a description of the cases, 
-	      e.g. "reps" or "weather stations"
-      }
-      \item{value}{
-	      the name of the observed 
-	      function value, e.g. "temperature"
-      }
+    A general linear differential operator can also be supplied.}
+  \item{lambda}{weight on the smoothing operator specified by \code{nderiv}.}
+  \item{fdnames}{Either a character vector of length 3 or a named list of length 
+    3.  In either case, the three elements correspond to the following:
+    \describe{
+      \item{argname}{name of the argument, e.g. "time" or "age".}
+      \item{repname}{a description of the cases, e.g. "reps" or "weather 
+        stations".}
+      \item{value}{the name of the observed function value, e.g. "temperature".}
     }
-
-    If fdnames is a list, the components 
-    provide labels for the levels of the 
-    corresponding dimension of \code{y}.
-  }
-  \item{covariates}{
-    the observed values in \code{y} are 
-    assumed to be primarily determined by
-    the height of the curve being 
-    estimated.  However, from time to time
-    certain values can also be influenced 
-    by other known variables.  For 
-    example, multi-year sets of climate 
-    variables may be also determined by
-    the presence of absence of an El 
-    Nino event, or a volcanic eruption.
-    One or more of these covariates can 
-    be supplied as an \code{n} by
-    \code{p} matrix, where \code{p} is 
-    the number of such covariates.  When
-    such covariates are available, the 
-    smoothing is called "semi-parametric."
-    Matrices or arrays of regression 
-    coefficients are then estimated that
-    define the impacts of each of these 
-    covariates for each curve and each
-    variable.
-  }
-  \item{method}{
-    by default the function uses the 
-    usual textbook equations for 
-    computing the coefficients of the 
-    basis function expansions.  But, as 
-    in regression analysis, a price is 
-    paid in terms of rounding error for 
-    such computations since they 
-    involved cross-products of  basis 
-    function values.  Optionally, if 
-    \code{method} is set equal to the 
-    string "qr", the computation uses 
-    an algorithm based on the 
-    qr-decomposition which is more 
-    accurate, but will require 
-    substantially more computing time
-    when \code{n} is large, meaning 
-    more than 500 or so.  The default
-    is "chol", referring the Choleski 
-    decomposition of a symmetric 
-    positive definite matrix.
-  }
-  \item{dfscale}{
-    the generalized cross-validation 
-    or "gcv" criterion that is often 
-    used to determine the size of the 
-    smoothing parameter involves the
-    subtraction of an measure of 
-    degrees of freedom from \code{n}.  
-    Chong Gu has argued that 
-    multiplying this degrees of 
-    freedom measure by a constant 
-    slightly greater than 1, such as 
-    1.2, can produce better decisions 
-    about the level of smoothing to 
-    be used.  The default value is, 
-    however, 1.0.
-  }
+    If fdnames is a list, the components provide labels for the levels of the 
+    corresponding dimension of \code{y}.}
+  \item{covariates}{the observed values in \code{y} are assumed to be primarily 
+    determined by the height of the curve being estimated.  However, from time 
+    to time certain values can also be influenced by other known variables.  For 
+    example, multi-year sets of climate variables may be also determined by
+    the presence of absence of an El Nino event, or a volcanic eruption.One or 
+    more of these covariates can be supplied as an \code{n} by\code{p} matrix, 
+    where \code{p} is the number of such covariates.  When such covariates are 
+    available, the smoothing is called "semi-parametric."  Matrices or arrays of 
+    regression coefficients are then estimated that define the impacts of each 
+    of these covariates for each curve and each variable.}
+  \item{method}{by default the function uses the usual textbook equations for 
+    computing the coefficients of the basis function expansions.  But, as in 
+    regression analysis, a price is paid in terms of rounding error for such 
+    computations since they involved cross-products of  basis function values.  
+    Optionally, if \code{method} is set equal to the string "qr", the 
+    computation uses an algorithm based on the qr-decomposition which is more 
+    accurate, but will require substantially more computing timewhen \code{n} is 
+    large, meaning more than 500 or so.  The defaultis "chol", referring the 
+    Choleski decomposition of a symmetric positive definite matrix.}
 }
+
 \details{
-  This function tends to be used in 
-  rather simple applications where
-  there is no need to control the 
-  roughness of the resulting curve 
-  with any great finesse.  The 
-  roughness is essentially 
-  controlled by how many basis 
-  functions are used.  In more 
-  sophisticated applications, it
-  would be better to use the 
-  function \code{\link{smooth.basisPar}}.
+  This function tends to be used in rather simple applications where there is no 
+  need to control the roughness of the resulting curve with any great finesse.  
+  The roughness is essentially controlled by how many basis functions are used.  
+  In more sophisticated applications, it would be better to use the function   
+  \code{\link{smooth.basisPar}}.
+  
+  It may happen that a value in argvals is outside the basis object interval 
+  due to rounding error and other causes of small violations.  The code tests
+  for this and pulls these near values into the interval if they are within
+  1e-7 times the interval width.
 }
-\value{
-  an object of the \code{fd} class containing:
-  \itemize{
-  \item{coefs}{
-    the coefficient array
-  }
-  \item{basis}{
-    a basis object
-  }
-  \item{fdnames}{
-    a list containing names for the 
-    arguments, function values and 
-    variables
-  }
-  }
-}
-\references{
-  Ramsay, James O., and Silverman, 
-  Bernard W. (2005), \emph{Functional
-    Data Analysis, 2nd ed.}, Springer, New York.
 
-  Ramsay, James O., and Silverman, 
-  Bernard W. (2002), \emph{Applied
-    Functional Data Analysis}, Springer, New York.
+\value{
+  an S3 list object of class \code{fdSmooth} defined in file 
+  \code{smooth.basis1.R} containing:
+  \describe{
+    \item{fd}{the functional data object defining smooth B-spline curves that
+      fit the data}
+    \item{df}{the degrees of freedom in the fits}
+    \item{gcv}{a generalized cross-validation value}
+    \item{beta}{the semi-parametric coefficient array}
+    \item{SSE}{Error sum of squares}
+    \item{penmat}{the symmetric matrix defining roughness penalty}
+    \item{argvals}{the argument values}
+    \item{y}{the array of ordinate values in the scatter-plot} 
+  }
 }
+
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
+
 \seealso{
   \code{\link{smooth.basisPar}},
   \code{\link{smooth.basis}},
+  \code{\link{smooth.basis1}},
   \code{\link{project.basis}},
   \code{\link{smooth.fd}},
   \code{\link{smooth.monotone}},
   \code{\link{smooth.pos}},
   \code{\link{day.5}}
 }
+
 \examples{
 ##
 ## Simplest possible example:  constant function
@@ -273,11 +172,15 @@ oldpar <- par(no.readonly=TRUE)
 plot(fd1.1)
 # now repeat the analysis with some smoothing, which moves the
 # toward 0.
-fd1.1.5 <- Data2fd(y12, basisobj=b1.1, lambda=0.5)
+fd1.5 <- Data2fd(y12, basisobj=b1.1, lambda=0.5)
 #  values of the smooth:
-# fd1.1.5 = sum(y12)/(n+lambda*integral(over arg=0 to 1 of 1))
+# fd1.1 = sum(y12)/(n+lambda*integral(over arg=0 to 1 of 1))
 #         = 3 / (2+0.5) = 1.2
-eval.fd(seq(0, 1, .2), fd1.1.5)
+#. JR ... Data2fd returns an fdsmooth object and a member of the
+#         is an fd smooth object.  Calls to functions expecting 
+#         an fd object require attaching $fd to the fdsmooth object
+#         this is required in lines 268, 311 and 337
+eval.fd(seq(0, 1, .2), fd1.5)
 ##
 ## step function smoothing
 ##
@@ -296,11 +199,11 @@ par(op)
 # 3 step basis functions: order 1 = degree 0 = step functions
 b1.3 <- create.bspline.basis(nbasis=3, norder=1)
 #  smooth the data with smoothing
-fd1.3.5 <- Data2fd(y12, basisobj=b1.3, lambda=0.5)
+fd1.3 <- Data2fd(y12, basisobj=b1.3, lambda=0.5)
 #  plot the fit along with the points
 plot(0:1, c(0, 2), type='n')
 points(0:1, y12)
-lines(fd1.3.5)
+lines(fd1.3)
 # Fit = penalized least squares with penalty =
 #          = lambda * integral(0:1 of basis^2),
 #            which shrinks the points towards 0.

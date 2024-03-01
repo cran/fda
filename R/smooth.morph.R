@@ -40,17 +40,11 @@ smooth.morph <- function(x, y, ylim, WfdPar,
   #  WFD       Functional data object for W.  It's coefficient vector
   #               contains the optimized coefficients.
   
-  #  last modified 17 May 2023 by Jim Ramsay
+  #  last modified 3 June 2022 by Jim Ramsay
   
-  #  number of observations and weights on x-values
-  
-  nobs <- length(x)        
+  nobs <- length(x)        #  number of observations
   wt   <- matrix(1,nobs,1)
   wt[nobs] <- 10
-  
-  #  -----------------------------------------------------
-  #                  Check arguments
-  #  -----------------------------------------------------
   
   # check consistency of x and y and convert to column matrices
   
@@ -87,13 +81,10 @@ smooth.morph <- function(x, y, ylim, WfdPar,
   }
   
   #  -----------------------------------------------------
-  #                  Initialize optimization
+  #      extract information from WfdPar
   #  -----------------------------------------------------
   
-  #      extract information from WfdPar
-  
   Wfdobj   <- WfdPar$fd
-  cvec     <- Wfdobj$coef   #  initial coefficients
   Wbasis   <- Wfdobj$basis      #  basis for Wfdobj
   Wnbasis  <- Wbasis$nbasis      #  no. basis functions
   Wrange   <- Wbasis$rangeval
@@ -105,21 +96,19 @@ smooth.morph <- function(x, y, ylim, WfdPar,
     stop("One or more weights are negative.") 
   }
   
-  #  check that values in x are within limits in xlim
+  cvec <- Wfdobj$coef   #  initial coefficients
+  Zmat <- fda::zerobasis(length(cvec))
+  bvec <- t(Zmat) %*% cvec
+  cvec <- Zmat %*% bvec
+  
+  #  check range of x
   
   if (abs(x[1] - xlim[1]) > 1e-7 || abs(x[nobs] - xlim[2]) > 1e-7) {
-    print("Argument vector x is out of range:")
-    stop("Values are out of bounds by more than 1e-7")
+    stop("Values in x are out of bounds by more than 1e-7")
   }  else {
     x[1   ] <- xlim[1]
     x[nobs] <- xlim[2]
   }
-  
-  #  transform coefficients to zero column sum 
-  
-  Zmat <- fda::zerobasis(length(cvec))
-  bvec <- t(Zmat) %*% cvec
-  cvec <- Zmat %*% bvec
   
   #  initialize matrix Kmat defining penalty term
   
@@ -170,6 +159,10 @@ smooth.morph <- function(x, y, ylim, WfdPar,
   }
   iterhist <- matrix(0,iterlim+1,length(status))
   iterhist[1,]  <- status
+  
+  #  -----------------------------------------------------
+  #  -------------  Begin main iterations  ---------------
+  #  -----------------------------------------------------
   
   STEPMAX <- 10
   itermax <- 20
@@ -227,7 +220,7 @@ smooth.morph <- function(x, y, ylim, WfdPar,
   }
   
   #  -----------------------------------------------------
-  #    construct output objects and return in a list
+  #         construct output objects
   #  -----------------------------------------------------
   
   Wfdobj  <- fd(cvec, Wbasis)
@@ -240,8 +233,7 @@ smooth.morph <- function(x, y, ylim, WfdPar,
   hwidth  <- hmax - hmin
   hfine   <- (ylim[1] - hmin) + hfine*(ywidth/hwidth)
   
-  return(list(Wfdobj=Wfdobj, f=f, grad=grad, hmat=hmat, 
-              norm=norm, hfine=hfine, 
+  return(list(Wfdobj=Wfdobj, f=f, grad=grad, hmat=hmat, norm=norm, hfine=hfine, 
               iternum=iternum, iterhist=iterhist))
   
 }

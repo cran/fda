@@ -37,6 +37,16 @@
 \value{
   invisible(NULL)
 }
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \seealso{
   \code{\link{cca.fd}},
   \code{\link{pda.fd}}
@@ -46,12 +56,14 @@
 
 #  Canonical correlation analysis of knee-hip curves
 oldpar <- par(no.readonly=TRUE)
-gaittime  <- (1:20)/21
-gaitrange <- c(0,1)
-gaitbasis <- create.fourier.basis(gaitrange,21)
-lambda    <- 10^(-11.5)
+gaittime   <- (1:20)/21
+gaitrange  <- c(0,1)
+gaitbasis  <- create.fourier.basis(gaitrange,21)
+gaitnbasis <- gaitbasis$nbasis
+lambda     <- 10^(-11.5)
 harmaccelLfd <- vec2Lfd(c(0, 0, (2*pi)^2, 0))
-gaitfdPar <- fdPar(gaitbasis, harmaccelLfd, lambda)
+gaitfdPar <- fdPar(fd(matrix(0,gaitnbasis,1), gaitbasis), harmaccelLfd, 
+                   lambda)
 gaitfd    <- smooth.basis(gaittime, gait, gaitfdPar)$fd
 ccafdPar  <- fdPar(gaitfd, harmaccelLfd, 1e-8)
 ccafd0    <- cca.fd(gaitfd[,1], gaitfd[,2], ncan=3, ccafdPar, ccafdPar)

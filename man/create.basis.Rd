@@ -25,7 +25,7 @@
   The following summarizes arguments used by some or all of the current
   \code{create.basis} functions:
 
-  \itemize{
+  \describe{
     \item{rangeval}{
       a vector of length 2 giving the lower and upper limits of the
       range of permissible values for the function argument.
@@ -68,7 +68,7 @@
     \code{constant} bases have one or two parameters unique to that
     basis type or shared with one other:
 
-    \itemize{
+    \describe{
       \item{bspline}{
 	Argument \code{norder} = the order of the spline, which is one
 	more than the degree of the polynomials used.  This defaults to
@@ -102,7 +102,7 @@
     \code{create.basis} functions will be as follows;  some but not all
     are available in the previous versions of \code{fda}:
 
-    \itemize{
+    \describe{
       \item{dropind}{
 	a vector of integers specifiying the basis functions to be
         dropped, if any.
@@ -183,11 +183,14 @@
   J. O. Ramsay and Spencer Graves
 }
 \references{
-  Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
-    Data Analysis, 2nd ed.}, Springer, New York.
-
-  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
-    Functional Data Analysis}, Springer, New York.
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \seealso{
   \code{\link{create.bspline.basis}}

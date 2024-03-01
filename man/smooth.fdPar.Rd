@@ -22,7 +22,7 @@ smooth.fdPar(fdobj, Lfdobj=NULL, lambda=1e-4,
 
     If \code{NULL}, Lfdobj depends on fdobj[['basis']][['type']]:
 
-    \itemize{
+    \describe{
       \item{bspline}{
 	Lfdobj <- int2Lfd(max(0, norder-2)), where norder =
 	norder(fdobj).
@@ -60,21 +60,23 @@ smooth.fdPar(fdobj, Lfdobj=NULL, lambda=1e-4,
   a functional data object.
 }
 \references{
-  Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
-    Data Analysis, 2nd ed.}, Springer, New York.
-
-  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
-    Functional Data Analysis}, Springer, New York.
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \seealso{
-\code{\link{smooth.fd}},
-\code{\link{fdPar}},
-\code{\link{smooth.basis}},
-\code{\link{smooth.pos}},
-\code{\link{smooth.morph}}
+  \code{\link{smooth.fd}},
+  \code{\link{fdPar}},
+  \code{\link{smooth.basis}},
+  \code{\link{smooth.pos}},
+  \code{\link{smooth.morph}}
 }
 \examples{
 	#  see smooth.basis
 }
-% docclass is function
 \keyword{smooth}

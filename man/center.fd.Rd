@@ -14,6 +14,16 @@
  \item{fdobj}{a functional data object to be centered.}
 }
 \value{a functional data object whose mean is zero.}
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \seealso{
   \code{\link{mean.fd}},
   \code{\link{sum.fd}},
@@ -26,7 +36,8 @@ daybasis   <- create.fourier.basis(c(0,365), 365)
 harmLcoef  <- c(0,(2*pi/365)^2,0)
 harmLfd    <- vec2Lfd(harmLcoef, c(0,365))
 templambda <- 0.01
-tempfdPar  <- fdPar(daybasis, harmLfd, templambda)
+dayfd      <- fda::fd(matrix(0, daybasis$nbasis, 1), daybasis)
+tempfdPar  <- fda::fdPar(dayfd, harmLfd, templambda)
 
 # do not run on CRAN because it takes too long.
 tempfd     <- smooth.basis(daytime,

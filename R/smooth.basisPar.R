@@ -41,7 +41,8 @@ smooth.basisPar <- function(argvals, y, fdobj=NULL, Lfdobj=NULL,
 ##
 ## 2.  fdPar:  set up the functional parameter object from arguments
 ##
-  fdP <- fdPar(fdobj, Lfdobj=Lfdobj, lambda=lambda,
+#  fdobj <- fd(matrix(0,nbasis,1), fdobj)
+   fdP   <- fdPar(fdobj, Lfdobj=Lfdobj, lambda=lambda,
                estimate=estimate, penmat=penmat)
   
 ##

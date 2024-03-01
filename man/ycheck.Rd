@@ -18,6 +18,16 @@ ycheck(y, n)
 \value{
 Argument \code{y} is returned if it checks out, converted to a one-column
 matrix if the input was a numeric vector.}
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \seealso{
   \code{\link{smooth.basis1}},
   \code{\link{smooth.monotone}},

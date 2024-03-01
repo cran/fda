@@ -73,7 +73,7 @@
   \item{axes}{
     Either a logical or a list or \code{NULL}.
 
-    \itemize{
+    \describe{
       \item{logical}{
 	whether axes should be drawn on the plot
       }
@@ -104,6 +104,16 @@
 \section{Side Effects}{
   a plot of the functional observations
 }
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \seealso{
   \code{\link{lines.fd}}, \code{\link{plotfit.fd}}
 }
@@ -112,19 +122,15 @@ oldpar <- par(no.readonly=TRUE)
 ##
 ## plot.fd
 ##
-
 daybasis65 <- create.fourier.basis(c(0, 365), 65,
                     axes=list("axesIntervals"))
 harmaccelLfd <- vec2Lfd(c(0,(2*pi/365)^2,0), c(0, 365))
-
-harmfdPar     <- fdPar(daybasis65, harmaccelLfd, lambda=1e5)
-
+harmfdPar    <- fdPar(fd(matrix(0, daybasis65$nbasis,1), daybasis65), 
+                      harmaccelLfd, lambda=1e5)
 daytempfd <- with(CanadianWeather, smooth.basis(day.5,
         dailyAv[,,"Temperature.C"], daybasis65)$fd)
-
 #  plot all the temperature functions for the monthly weather data
 plot(daytempfd, main="Temperature Functions")
-
 if (!CRAN()) {
   # To plot one at a time:
   # The following pauses to request page changes.
@@ -139,12 +145,10 @@ if (!CRAN()) {
 ##
 ## plot.fdSmooth
 ##
-b3.4 <- create.bspline.basis(norder=3, breaks=c(0, .5, 1))
+b3.4 <- create.bspline.basis(nbasis=4, norder=3, breaks=c(0, .5, 1))
 # 4 bases, order 3 = degree 2 =
 # continuous, bounded, locally quadratic
-fdPar3 <- fdPar(b3.4, lambda=1)
-%plot(fdPar3)
-%# constant 0 because fdPar3$coefs = c(0,0,0,0)
+fdPar3 <- fdPar(fd(matrix(0,4,1), b3.4), lambda=1)
 
 # Penalize excessive slope Lfdobj=1;
 # (Can not smooth on second derivative Lfdobj=2 at it is discontinuous.)

@@ -41,6 +41,17 @@ bsplineS(x, breaks, norder=4, nderiv=0, returnMatrix=FALSE)
   arguments, and the number of columns equals the number of basis
   functions.
 }
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+  \emph{Functional data analysis with R and Matlab}, Springer, New
+  York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), \emph{Functional
+    Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
+    Functional Data Analysis}, Springer, New York.
+}
 \examples{
 # Minimal example:  A B-spline of order 1 (i.e., a step function)
 # with 0 interior knots:

@@ -18,11 +18,20 @@ an object to be checked.
 a logical value:
 \code{TRUE} if the class is correct, \code{FALSE} otherwise.
 }
-\seealso{
-\code{\link{is.basis}},
-\code{\link{is.fd}},
-\code{\link{is.Lfd}},
-\code{\link{is.fdPar}}
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
-% docclass is function
+\seealso{
+  \code{\link{is.basis}},
+  \code{\link{is.fd}},
+  \code{\link{is.Lfd}},
+  \code{\link{is.fdPar}}
+}
 \keyword{smooth}

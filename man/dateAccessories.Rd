@@ -20,7 +20,7 @@
 }
 \format{
 
-  \itemize{
+  \describe{
     \item{dayOfYear}{
       a numeric vector = 1:365 with names 'jan01' to 'dec31'.
     }
@@ -70,6 +70,16 @@
   Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
     Functional Data Analysis}, Springer, New York
 
+}
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \seealso{
   \code{\link{axisIntervals}}

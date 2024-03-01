@@ -51,12 +51,14 @@ as.fd.function <- function(x, ...){
 ##
   Knots <- xz$x
   y.x <- xz$y
-  basis <- create.bspline.basis(range(Knots), breaks=Knots)
-  fd. <- fdPar(basis, lambda=0)
-  nKn <- length(Knots) 
-  nobs <- (2*nKn-1)
-  x. <- seq(Knots[1], Knots[nKn], length=nobs) 
-  smooth.basis(x., x(x.), fd.)$fd
+  basisobj <- create.bspline.basis(range(Knots), breaks=Knots)
+  print(basisobj)
+  fdobj    <- fda::fd(matrix(0,basisobj$nbasis,1), basisobj)
+  fdParobj <- fdPar(fdobj, lambda=0)
+  nKn      <- length(Knots) 
+  nobs     <- (2*nKn-1)
+  x.       <- seq(Knots[1], Knots[nKn], length=nobs) 
+  smooth.basis(x., x(x.), fdParobj)$fd
 }
 
 as.fd.smooth.spline <- function(x, ...){
@@ -83,8 +85,8 @@ as.fd.smooth.spline <- function(x, ...){
   Knots <- (x0+(x1-x0)*Kn0[4:(length(Kn0)-3)])
 # Don't use 'unique' in case 'x' has coincident interior knots.
 #  basis <- create.bspline.basis(breaks=Knots)
-  basis <- create.bspline.basis(range(Knots), breaks=Knots)
+  basisobj <- create.bspline.basis(range(Knots), breaks=Knots)
 #
-  fd(x$fit$coef, basis)
+  fd(x$fit$coef, basisobj)
 }
 

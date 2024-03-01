@@ -16,7 +16,17 @@ zerobasis(k)
 There are many ways of generating these matrix. This functions uses
 the discrete Fourier series less the constant vector.}
 \value{
-A \code{k} by \code{k-1} matrix with orthonormal columns that sum to zero.
+  A \code{k} by \code{k-1} matrix with orthonormal columns that sum to zero.
+}
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \seealso{
   \code{\link{smooth.surp}},

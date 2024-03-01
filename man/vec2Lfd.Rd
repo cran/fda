@@ -21,11 +21,21 @@ operator is defined
 }
 }
 \value{
-a linear differential operator object
+  a linear differential operator object
+}
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \seealso{
-\code{\link{int2Lfd}},
-\code{\link{Lfd}}
+  \code{\link{int2Lfd}},
+  \code{\link{Lfd}}
 }
 \examples{
 #  define the harmonic acceleration operator used in the

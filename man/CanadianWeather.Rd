@@ -19,10 +19,10 @@ daily
   'daily' is included primarily for compatibility with scripts written
   before the other format became available and for compatibility with
   the Matlab 'fda' code.
-  \itemize{
+  \describe{
     \item{CanadianWeather}{
     A list with the following components:
-    \itemize{
+    \describe{
 	    \item{dailyAv}{
 	      a three dimensional array c(365, 35, 3) summarizing data
 	      collected at 35 different weather stations in Canada on the
@@ -71,7 +71,7 @@ daily
   }
   \item{daily}{
     A list with the following components:
-    \itemize{
+    \describe{
 	    \item{place}{
 	      Names of the 35 different weather stations in Canada whose
 	      data are summarized in 'dailyAv'.  These names are all 11
@@ -96,12 +96,15 @@ daily
 }
 }
 
-\source{
-  Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
-    Data Analysis, 2nd ed.}, Springer, New York.
-
-  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
-    Functional Data Analysis}, Springer, New York
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \seealso{
   \code{\link{monthAccessories}}

@@ -1,8 +1,7 @@
 \name{landmarkreg}
 \alias{landmarkreg}
 \title{
-  Landmark Registration of Functional Observations with Differing 
-  Ranges
+  Landmark Registration of Functional Observations with Differing Ranges
 }
 \description{
 It is common to see that among a set of functions certain prominent
@@ -106,6 +105,16 @@ landmarkreg(unregfd, ximarks, x0marks, x0lim,
   the functional parameter argument \code{WfdPar}.  A registration with
   a few prominent landmarks is often a good preliminary to using the
   more sophisticated but more lengthy process in \code{register.fd}.
+}
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \seealso{
   \code{\link{register.fd}},

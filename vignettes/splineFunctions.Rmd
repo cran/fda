@@ -1,10 +1,10 @@
 ---
-title: "Spline Functions"
+title: "SplineFunctions"
 author: "Jim Ramsay"
 date: "22/02/2022"
 output: html_document
 vignette: >
-  %\VignetteIndexEntry{Spline Functions}
+  %\VignetteIndexEntry{SplineFunctions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

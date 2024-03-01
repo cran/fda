@@ -60,7 +60,7 @@ smooth.surp <- function(argvals, y, Bmat0, WfdPar, wtvec=NULL, conv=1e-4,
   #  FLIST objects are indexed linear with curves varying inside
   #  variables.
   
-  #  Last modified 23 March 2022 by Jim Ramsay
+  #  Last modified 14 August 2023 by Jim Ramsay
   
   #  check ARGVALS, a vector of length n
   

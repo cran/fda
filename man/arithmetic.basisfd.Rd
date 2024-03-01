@@ -20,6 +20,9 @@
   basisobj1 == basisobj2 returns a logical scalar.
 }
 \references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009), 
+    Functional data analysis with R and Matlab, Springer, New York.
+
   Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
     Data Analysis, 2nd ed.}, Springer, New York.
 

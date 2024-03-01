@@ -2,7 +2,6 @@
 \name{fda}
 \alias{fda}
 \title{Functions for statistical analyses of functions}
-
 \description{
 The data analyses that we use for data matrices or dataFrames, such as means, covariances, linear regressions, principal and canonical component analyses, can also be applied to samples of functions or curves.  This package provides functional versions of these analyses along with plotting and other assessment tools.  
 

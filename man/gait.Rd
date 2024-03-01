@@ -20,18 +20,9 @@
 
   [[3]] gait variable = "Hip Angle" or "Knee Angle"
 }
-\source{
-  Ramsay, James O., and Silverman, Bernard W. (2006), \emph{Functional
-    Data Analysis, 2nd ed.}, Springer, New York.
-
-  Ramsay, James O., and Silverman, Bernard W. (2002), \emph{Applied
-    Functional Data Analysis}, Springer, New York. 
-}
-%\seealso{\code{\link{eval.penalty}}}
 \examples{
 oldpar <- par(no.readonly=TRUE)
 plot(gait[,1, 1], gait[, 1, 2], type="b")
 par(oldpar)
 }
-% docclass is function
 \keyword{datasets}

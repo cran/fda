@@ -76,6 +76,16 @@
   \item{se.fit}{standard error of predicted means}
 }
 \author{ Spencer Graves }
+\references{
+  Ramsay, James O., Hooker, Giles, and Graves, Spencer (2009),
+    \emph{Functional data analysis with R and Matlab}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2005), 
+    \emph{Functional Data Analysis, 2nd ed.}, Springer, New York.
+  
+  Ramsay, James O., and Silverman, Bernard W. (2002), 
+    \emph{Applied Functional Data Analysis}, Springer, New York.
+}
 \seealso{
   \code{\link{fRegress}}
   \code{\link[stats]{predict}}
@@ -84,20 +94,19 @@
 ##
 ## vector response with functional explanatory variable
 ##
-
+\dontrun{
 annualprec <- log10(apply(CanadianWeather$dailyAv[,,
                    "Precipitation.mm"], 2,sum))
 smallbasis  <- create.fourier.basis(c(0, 365), 25)
 tempfd <- smooth.basis(day.5,
    CanadianWeather$dailyAv[,,"Temperature.C"], smallbasis)$fd
 precip.Temp.f <- fRegress(annualprec ~ tempfd)
-
 precip.Temp.p <- predict(precip.Temp.f)
-
 # plot response vs. fitted 
 oldpar <- par(no.readonly=TRUE)
 plot(annualprec, precip.Temp.p)
 par(oldpar)
+}
 }
 \keyword{ models}
 

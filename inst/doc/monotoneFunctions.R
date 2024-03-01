@@ -1,11 +1,6 @@
-## ---- include = FALSE---------------------------------------------------------
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-
-## ----setup--------------------------------------------------------------------
-library(fda)
+## ----setup, include=FALSE-----------------------------------------------------
+knitr::opts_chunk$set(echo = TRUE)
+system.file(package="fda")
 
 ## -----------------------------------------------------------------------------
 # create a fine mesh of x-values over [0,2*pi]

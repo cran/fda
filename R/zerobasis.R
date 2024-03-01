@@ -7,7 +7,7 @@ zerobasis <- function(k) {
   tk <- 0:(k-1) + 0.5
   fbasis     <- create.fourier.basis(k,k)
   fbasmat    <- eval.basis(tk, fbasis)
-  fbasmat    <- fbasmat[,2:k]
+  if (k > 2) fbasmat <- fbasmat[,2:k] else fbasmat <- matrix(c(1,-1),2,1)
   fbasnorm   <- sqrt(apply(fbasmat^2,2,sum))
   zerobasmat <- fbasmat/outer(rep(1,k),fbasnorm)
   return(zerobasmat)
