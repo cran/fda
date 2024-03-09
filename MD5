@@ -1,4 +1,4 @@
-bdeedd38c6b49c07a770b4f48b8e4de0 *DESCRIPTION
+fb732bf3ffc08afc1ef8b731d431f6fe *DESCRIPTION
 efec85a648dabc14a2d421074b6c8931 *NAMESPACE
 a0fb7b504779b47cba75cfecfc668540 *R/AmpPhaseDecomp.R
 41419a07fe723ba594969037e5826ee7 *R/CRAN.R
@@ -145,7 +145,7 @@ ecc8b9d3eb56f1e217ce7fe160fc3b8b *R/scoresPACE.R
 e26dd87f6c755500591e3bee54a944b8 *R/smooth.basis.R
 91cb2256cc99220911e8219f40301578 *R/smooth.basis.glm.R
 15cc0b6fa5c830f76d6161306e668947 *R/smooth.basis.sparse.R
-4c5c9222623134f52d8e2bd290f2d49b *R/smooth.basis1.R
+01dd60d9e7c36f7b31a54b77c496f0b3 *R/smooth.basis1.R
 d2851b8f543c95a7a5b9b682dcd7091a *R/smooth.basisPar.R
 7c79f565d87c2c6965e528e26a414f49 *R/smooth.bibasis.R
 e815296837c412e929e69312679114ff *R/smooth.fd.R
@@ -210,7 +210,7 @@ d105b37b07354742fde36d3dc353ca73 *demo/pinch.R
 7e6f05db4aad13bf09f8822e80cc860a *inst/NEWS.Rd
 f42177b2694343526080aa7782815d1c *inst/doc/BasisBasics.R
 576824a6d53a0c3aa9f06501c250f4f4 *inst/doc/BasisBasics.Rmd
-882e9bcc27a103d5c965c7d600917abf *inst/doc/BasisBasics.html
+9462e8452666690e4a1189021bb1da49 *inst/doc/BasisBasics.html
 8be42fd4c7d6bd330911b2fe6aeadd5c *inst/doc/monotoneFunctions.R
 528891ace34512bec8395a5d2788c01a *inst/doc/monotoneFunctions.Rmd
 028116e2d0145cdd1b5c756b0fd071d9 *inst/doc/monotoneFunctions.html

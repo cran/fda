@@ -310,7 +310,7 @@ smooth.basis1 <- function (argvals=1:n, y, fdParobj,
         if (ndim==2) {
           coef <- solve(basismat, y)
         } else {
-          for (ivar in 1:var)
+          for (ivar in 1:nvar)
             coef[1:n, , ivar] <- solve(basismat, y[,,ivar])
         }
         penmat  <- NULL
@@ -460,7 +460,7 @@ smooth.basis1 <- function (argvals=1:n, y, fdParobj,
         if (ndim==2){
           coef <- solve(basismat, y)
         } else {
-          for (ivar in 1:var)
+          for (ivar in 1:nvar)
             coef[,,ivar] <- solve(basismat, y[,,ivar])
         }
         penmat <- NULL
