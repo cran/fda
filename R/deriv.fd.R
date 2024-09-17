@@ -1,4 +1,8 @@
-deriv <- function(expr, ...) UseMethod('deriv')
+#. added by Andrea Gilardi 29 August 24
+
+deriv <- function(expr, ...) 
+
+  UseMethod('deriv')
 
 deriv.fd <- function(expr, Lfdobj=int2Lfd(1), ...)
 {

@@ -1,5 +1,5 @@
-fb732bf3ffc08afc1ef8b731d431f6fe *DESCRIPTION
-efec85a648dabc14a2d421074b6c8931 *NAMESPACE
+e786391fd0030c1af2053b5d1bc69561 *DESCRIPTION
+9b966bfba88ae7fd5c287dfb43fbca42 *NAMESPACE
 a0fb7b504779b47cba75cfecfc668540 *R/AmpPhaseDecomp.R
 41419a07fe723ba594969037e5826ee7 *R/CRAN.R
 d3945e00b122b0f0d58294e61dbcaed0 *R/CSTR2.R
@@ -7,7 +7,7 @@ d3945e00b122b0f0d58294e61dbcaed0 *R/CSTR2.R
 a1f4cf38ef0fd65b5175448452fa8c45 *R/CSTRfitLS.R
 c240b6c4ee4c01202bc9d15dd9448303 *R/CSTRfn.R
 dc89b21978486eb95017d1cc016d3480 *R/CSTRres.R
-e3b307fe7d85075a24b79a869c7048fb *R/Data2fd.R
+de3999547f7b7fe1979c966a740a155c *R/Data2fd.R
 6ce1fe124a3413fa9c23db1b8237a56e *R/Eigen.R
 9cd2ec7edbc248fdf5306ac2e7b056f0 *R/Fperm.fd.R
 579e1de98aa45fde9e8a841c14694855 *R/Fstat.fd.R
@@ -30,7 +30,7 @@ d62747e06b07cb3b8c80ffa30456bed1 *R/checkLogicalInteger.R
 ab41ec9ef62abc6510efa90e31d0aeca *R/coef.R
 2a90b9927f9a7a1fc90a16991855486f *R/cor.fd.R
 2e577cc6b76b12d01c78ef1560e1d88d *R/covPACE.R
-0061ced3e44c4dba558e5fa863b5186f *R/create.bspline.basis.R
+e97763243bb839cf9c4184cc252bebcd *R/create.bspline.basis.R
 ff82a2f90b90d2a340160ec9e4aec224 *R/create.constant.basis.R
 1309a3f5db36daa84d9dcbaaafbde6e1 *R/create.exponential.basis.R
 d8526c86c695fcfcac8af4cb7eb86c41 *R/create.fdVar.basis.R
@@ -41,8 +41,8 @@ d8526c86c695fcfcac8af4cb7eb86c41 *R/create.fdVar.basis.R
 0615ddceddad467ba75355c858c20441 *R/create.power.basis.R
 82736a5f3edfd610486e5af1f6f26ee1 *R/cumfd.R
 10260134b4ad43a636e57016485e7d67 *R/cycleplot.fd.R
-98e50548665a85cf58fad913d7e4d4f8 *R/density.fd.R
-1b838c704f972eb680d9520e99bc2be3 *R/deriv.fd.R
+5585975e91922e3ea4f2650d0b5e1561 *R/density.fd.R
+444ed9207d7e17f93fd6617d9bf972f3 *R/deriv.fd.R
 32fc99498ff726d31c0f3cad3f500889 *R/derivchk.R
 045243b5ce89202c17b238a12bfa9b8b *R/derivs.R
 eaead99c612a3963245eaef553e40c58 *R/df.residual.fRegress.R
@@ -68,7 +68,7 @@ cd239ee8b6213b5a512df81bde6bee8a *R/fRegress.formula.R
 11155cb78cc5528a22ace3460cf8af8a *R/fRegress.stderr.R
 7bba120236de361ae2372a19017e8eff *R/fRegressArgCheck.R
 1907295776025f62e326b41019638f60 *R/fbplot.R
-1ce66b34d8b11a40fd4c92c8e0ca862e *R/fd.R
+35c1504a8ef7e4d93827c82729b1ff7e *R/fd.R
 fba540718564e9a0c5f52903f0d1abe9 *R/fd2list.R
 13f0ff9fa0255ad4915303f19f70efe8 *R/fdPar.R
 f2cfb79677f3d45ecc913a6b583ef1c3 *R/fdParcheck.R
@@ -101,7 +101,7 @@ f6e5ef54af7fd7175a465025728c5355 *R/knots.fd.R
 5a35a04fa3f332a07576e0e02f382931 *R/landmarkreg.R
 d2d624369cb9d1fb3474e112340bfe9a *R/lines.fd.R
 2b9c34a37a3e9d20a694da92de70bbb9 *R/linmod.R
-14ec68d349ccd75708dd0bc19902490b *R/lnsrch.R
+909e1e46f4dde0b855ac25d16448cfbd *R/lnsrch.R
 cbf6876d622cd0913006f002e90afd98 *R/matplot.R
 9c25df5db8113c2de7dd65b565357b6d *R/monfn.R
 20749103334afb5a434607b1b8ea7fad *R/mongrad.R
@@ -142,10 +142,12 @@ c61d551987b6f8f74a8c88b6b0e0da11 *R/project.basis.R
 734c3e04dba0d5eea9aebf0cb9fa5501 *R/register.fd.R
 a63388cecb8b94bf8ff04d9a301ff48e *R/register.newfd.R
 ecc8b9d3eb56f1e217ce7fe160fc3b8b *R/scoresPACE.R
-e26dd87f6c755500591e3bee54a944b8 *R/smooth.basis.R
+79a0b952808157985b65224567dd4d9e *R/smooth.basis.R
 91cb2256cc99220911e8219f40301578 *R/smooth.basis.glm.R
 15cc0b6fa5c830f76d6161306e668947 *R/smooth.basis.sparse.R
 01dd60d9e7c36f7b31a54b77c496f0b3 *R/smooth.basis1.R
+0695726fb54642150f3388725eec1b5a *R/smooth.basis2.R
+81352dce3b23c7dc43129d8a7056dd82 *R/smooth.basis3.R
 d2851b8f543c95a7a5b9b682dcd7091a *R/smooth.basisPar.R
 7c79f565d87c2c6965e528e26a414f49 *R/smooth.bibasis.R
 e815296837c412e929e69312679114ff *R/smooth.fd.R
@@ -210,7 +212,7 @@ d105b37b07354742fde36d3dc353ca73 *demo/pinch.R
 7e6f05db4aad13bf09f8822e80cc860a *inst/NEWS.Rd
 f42177b2694343526080aa7782815d1c *inst/doc/BasisBasics.R
 576824a6d53a0c3aa9f06501c250f4f4 *inst/doc/BasisBasics.Rmd
-9462e8452666690e4a1189021bb1da49 *inst/doc/BasisBasics.html
+700565a91d4819b4c26c1bec3208cabd *inst/doc/BasisBasics.html
 8be42fd4c7d6bd330911b2fe6aeadd5c *inst/doc/monotoneFunctions.R
 528891ace34512bec8395a5d2788c01a *inst/doc/monotoneFunctions.Rmd
 028116e2d0145cdd1b5c756b0fd071d9 *inst/doc/monotoneFunctions.html
@@ -246,7 +248,7 @@ c95656fac6e752bbc8eca84ff9044df9 *inst/scripts/fdarm-ch11.R
 9dbbab0a55e3cf68c83da6f3b7afdbad *man/CRAN.Rd
 2f0458a04e0e590514eece3cb5ab73dc *man/CSTR.Rd
 32b0006514d433e99482ca760de399f0 *man/CanadianWeather.Rd
-37c7c5591bbf8620953f284bc02a0ac5 *man/Data2fd.Rd
+60274bbaa08cf3d9a95a9891a58bf9b4 *man/Data2fd.Rd
 1e94b871ccda27b55665c33acc8574d5 *man/Eigen.Rd
 17dd269db84670194e4decd8d988c3c8 *man/ElectricDemand.Rd
 4302c4e1022a0c982adda794737b8158 *man/Fperm.fd.Rd

@@ -807,12 +807,16 @@ times.fd <- function(e1, e2, basisobj=NULL)
 
 # see exponentiate.fd
 
+# Added by Andrea Gilardi. 9 Sept. 24
 # http://r.789695.n4.nabble.com/warning-creating-an-as-array-method-in-a-package-td3080309.html
 #
 # need the following to eliminate a goofy warning in R CMD check
 #    Warning:  found an S4 version of 'mean'
 #    so it has not been imported correctly
-mean <- function(x, ...)UseMethod('mean')
+
+mean <- function(x, ...) 
+  
+  UseMethod('mean')
 
 #  ----------------------------------------------------------------
 #       mean for fd class
@@ -842,7 +846,7 @@ mean.fd <- function(x, ...)
   fdnames <- x$fdnames
   fdnames[[2]] <- "mean"
   fdnames[[3]] <- paste("mean",fdnames[[3]])
-  meanfd <- fd(coefmean, basisobj, fdnames)
+  meanfd <- fda::fd(coefmean, basisobj, fdnames)
 #
   meanfd
 }

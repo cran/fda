@@ -267,7 +267,7 @@ par(op)
 ##  Two simple Fourier examples
 ##
 gaitbasis3 <- create.fourier.basis(nbasis=5)
-gaitfd3    <- Data2fd(gait, basisobj=gaitbasis3)
+gaitfd3    <- Data2fd(seq(0,1,len=20), gait, basisobj=gaitbasis3)
 # plotfit.fd(gait, seq(0,1,len=20), gaitfd3)
 #    set up the fourier basis
 daybasis <- create.fourier.basis(c(0, 365), nbasis=65)

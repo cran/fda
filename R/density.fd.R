@@ -1,4 +1,4 @@
-density <- function(x, ...)UseMethod('density')
+density <- function(x, ...) UseMethod('density')
 
 density.fd <- function(x, WfdParobj, conv=0.0001, iterlim=20,
                       active=1:nbasis, dbglev=0, ...) {

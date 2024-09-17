@@ -31,7 +31,7 @@ create.bspline.basis <- function (rangeval=NULL, nbasis=NULL,
 #             a function be zero at the left boundary, this is achieved
 #             by dropping the first basis function, the only one that
 #             is nonzero at that point.
-#  QUADVALS...A NQUAD by 2 matrix.  The firs t column contains quadrature
+#  QUADVALS...A NQUAD by 2 matrix.  The first column contains quadrature
 #             points to be used in a fixed point quadrature.  The second
 #             contains quadrature weights.  For example, for (Simpson"s
 #             rule for (NQUAD = 7, the points are equally spaced and the
@@ -279,9 +279,9 @@ create.bspline.basis <- function (rangeval=NULL, nbasis=NULL,
 ##
 ## 6.  set up basis object
 ##
-  basisobj <- basisfd(type=type, rangeval=rangeval, nbasis=nbasis,
-                  params=params, dropind=dropind,   quadvals=quadvals,
-                  values=values, basisvalues=basisvalues)
+  basisobj <- basisfd(type=type,     rangeval=rangeval, nbasis=nbasis,
+                      params=params, dropind=dropind,   quadvals=quadvals,
+                      values=values, basisvalues=basisvalues)
 ##
 ## 7.  names
 ##

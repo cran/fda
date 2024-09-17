@@ -138,6 +138,9 @@ export(AmpPhaseDecomp,
        stdev.fd, 
        stddev.fd,
        smooth.basis,
+       smooth.basis1,
+       smooth.basis2,
+       smooth.basis3,
        smooth.bibasis,
        smooth.fd,
        smooth.basisPar,
@@ -192,9 +195,7 @@ S3method(boxplot,      fd)
 S3method(coef,         fd)
 S3method(coefficients, fd)
 S3method(density,      fd)
-S3method(deriv,        fd)
 S3method(lines,        fd)
-S3method(mean,         fd)
 S3method(norder,       fd)
 S3method(plot,         fd)
 S3method(predict,      fd)

@@ -1,6 +1,6 @@
 Package: fda
-Version: 6.1.8
-Date: 2024-03-05
+Version: 6.2.0
+Date: 2024-09-16
 Title: Functional Data Analysis
 Authors@R: c(person("James", "Ramsay", role=c("aut","cre"),
              email="ramsay@psych.mcgill.ca"), 
@@ -25,9 +25,9 @@ URL: http://www.functionaldata.org
 LazyData: true
 NeedsCompilation: yes
 VignetteBuilder: knitr
-Packaged: 2024-03-05 18:35:42 UTC; jimramsay
+Packaged: 2024-09-17 20:02:31 UTC; jimramsay
 Author: James Ramsay [aut, cre],
   Giles Hooker [ctb],
   Spencer Graves [ctb]
 Repository: CRAN
-Date/Publication: 2024-03-09 03:50:02 UTC
+Date/Publication: 2024-09-17 21:00:02 UTC
