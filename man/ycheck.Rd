@@ -32,6 +32,5 @@ matrix if the input was a numeric vector.}
   \code{\link{smooth.basis1}},
   \code{\link{smooth.monotone}},
   \code{\link{smooth.pos}},
-  \code{\link{smooth.monotone}},
-  \code{\link{smooth.surp}}
+  \code{\link{smooth.monotone}}
 }

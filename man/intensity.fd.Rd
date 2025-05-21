@@ -88,9 +88,6 @@ evaluate \code{Wfdobj}, exponentiate the resulting vector.
   Ramsay, James O., and Silverman, Bernard W. (2002), 
     \emph{Applied Functional Data Analysis}, Springer, New York.
 }
-\seealso{
-  \code{\link{density.fd}}
-}
 \examples{
 oldpar <- par(no.readonly=TRUE)
 #  Generate 101 Poisson-distributed event times with

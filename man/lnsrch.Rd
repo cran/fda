@@ -46,6 +46,3 @@ A named list containing:
   Press, W. H., Taukolsky, S. A., Vetterline, W. T. and Flannery, B. P. (2020) 
   \emph{Numerical Recipes, Third Edition}, Cambridge.
 }
-\seealso{
-  \code{\link{smooth.surp}}
-}

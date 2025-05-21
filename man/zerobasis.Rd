@@ -28,7 +28,3 @@ the discrete Fourier series less the constant vector.}
   Ramsay, James O., and Silverman, Bernard W. (2002), 
     \emph{Applied Functional Data Analysis}, Springer, New York.
 }
-\seealso{
-  \code{\link{smooth.surp}},
-  \code{\link{eval.surp}}
-}

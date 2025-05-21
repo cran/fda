@@ -89,7 +89,6 @@
 }
 \seealso{
   \code{\link{cca.fd}},
-  \code{\link{density.fd}},
   \code{\link{fRegress}},
   \code{\link{intensity.fd}},
   \code{\link{pca.fd}},

@@ -38,7 +38,6 @@ export(AmpPhaseDecomp,
        cumfd,
        cycleplot.fd,
        Data2fd,
-       density.fd,
        deriv.fd,
        df2lambda,
        dirs,
@@ -50,7 +49,6 @@ export(AmpPhaseDecomp,
        eval.monfd,
        eval.penalty,
        eval.posfd,
-       eval.surp,
        evaldiag.bifd,
        expon,
        exponentiate.fd,
@@ -150,10 +148,8 @@ export(AmpPhaseDecomp,
        smooth.pos,
        smooth.basis.sparse,
        smooth.sparse.mean,
-       smooth.surp,
        sparse.list,
        sparse.mat,
-       surp.fit,
        stepchk,
        stepit,
        symsolve,
@@ -194,7 +190,6 @@ S3method('^',          fd)
 S3method(boxplot,      fd)
 S3method(coef,         fd)
 S3method(coefficients, fd)
-S3method(density,      fd)
 S3method(lines,        fd)
 S3method(norder,       fd)
 S3method(plot,         fd)

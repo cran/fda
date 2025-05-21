@@ -7,7 +7,7 @@
 \description{
   This is the constructor function for objects of the \code{fd} class.
   Each function that sets up an object of this class must call this
-  function.  This includes functions  \code{\link{smooth.basis}}, \code{\link{density.fd}}, and so forth
+  function.  This includes functions  \code{\link{smooth.basis}}, and so forth
   that estimate functional data objects that smooth or otherwise
   represent data.  Ordinarily, users of the functional data analysis
   software will not need to call this function directly, but these notes
@@ -80,11 +80,10 @@ fd(coef=NULL, basisobj=NULL, fdnames=NULL)
     Functional Data Analysis}, Springer, New York
 }
 \seealso{
-  \code{\link{smooth.basis}}
-  \code{\link{smooth.fdPar}}
-  \code{\link{smooth.basisPar}}
-  \code{\link{density.fd}}
-  \code{\link{create.bspline.basis}}
+  \code{\link{smooth.basis}},
+  \code{\link{smooth.fdPar}},
+  \code{\link{smooth.basisPar}},
+  \code{\link{create.bspline.basis}},
   \code{\link{arithmetic.fd}}
 }
 \examples{

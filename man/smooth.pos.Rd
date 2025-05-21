@@ -89,7 +89,6 @@ smooth.pos(argvals, y, WfdParobj, wtvec=rep(1,n),conv=.0001, iterlim=50, dbglev=
     \emph{Applied Functional Data Analysis}, Springer, New York.
 }
 \seealso{
-  \code{\link{smooth.surp}},
   \code{\link{smooth.monotone}},
   \code{\link{smooth.morph}}
 }
